@@ -1,0 +1,77 @@
+﻿@model CerberusMultiBranch.Models.Entities.Catalog.Product
+
+@{
+    ViewBag.Title = "Details";
+    int index = 0;
+    @Scripts.Render("~/bundles/bootstrap")
+}
+
+<h2>Details</h2>
+
+<div class="row col-md-5">
+    <div id="divCarousel" class="carousel slide" data-ride="carousel">
+        <ol id="olSlides" class="carousel-indicators">
+        </ol>
+
+        <div id="divGallery" class="carousel-inner">
+        </div>
+
+        <a class="left carousel-control" href="#divCarousel" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#divCarousel" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</div>
+
+<div class="row col-md-7">
+    <div class="row">
+        @Html.DisplayNameFor(model => model.Code):
+        @Html.DisplayFor(model => model.Code)
+    </div>
+
+    <div class="row">
+        @Html.DisplayNameFor(model => model.Name):
+        @Html.DisplayFor(model => model.Name)
+    </div>
+
+    <div class="row">
+        @Html.DisplayNameFor(model => model.Description):
+        @Html.DisplayFor(model => model.Description)
+    </div>
+    <div class="row">
+        @Html.DisplayNameFor(model => model.StorePrice):
+        @Html.DisplayFor(model => model.StorePrice)
+    </div>
+</div>
+
+
+@foreach (var file in Model.Images)
+{
+    var base64 = Convert.ToBase64String(file.File);
+    var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+    var a = index == Decimal.Zero ? "active":"";
+
+
+    var olSlidex = string.Format("<li data-target='#divCarousel' data-slide-to='{0}' class='{1}'></li>", index, a);
+    var divGalery = string.Format("<div class='item {0}'><img  src='{1}' /></div>", a, imgSrc);
+
+    <script>
+        $('#olSlides').append("@olSlidex")
+        $('#divGallery').append("@divGalery")
+    </script>
+}
+
+<script>
+    $('#divCarousel').carousel();
+</script>
+
+
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
+

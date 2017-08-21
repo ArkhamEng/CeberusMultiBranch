@@ -1,0 +1,231 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+
+@{
+    ViewBag.Title = "Create";
+}
+
+
+<h3>Productos</h3>
+<hr />
+
+@section Scripts {
+
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+}
+
+
+
+
+
+
+@using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <div class="col-md-8 panel-group">
+        
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Datos de producto
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="form-group col-md-8 ">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-2 col-md-offset-2">
+                        @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-4 ">
+                        @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model.CategoryId, Model.Categories,"", new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.SubCategoryId, htmlAttributes: new { @class = "control-label" })
+                        @Html.DropDownListFor(model => model.SubCategoryId, Model.SubCategories, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.SubCategoryId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.StorePercentage, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.DealerPercentage, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-2 col-md-offset-4">
+                        @Html.LabelFor(model => model.BuyPrice, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.MinQuantity, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.MinQuantity, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.MinQuantity, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+              
+                <div class="row">
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-4 col-md-offset-4">
+                        @Html.LabelFor(model => model.BarCode, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.BarCode, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-success" title="Guardar">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                Imagenes
+            </div>
+
+            <div id="divImages" class="panel-body" style="max-height:300px;  overflow-y: scroll;">
+
+
+                @*<div id="myCarousel" class="carousel slide" data-ride="carousel">
+                        <ol id="olSlides" class="carousel-indicators">
+
+                        </ol>
+
+                        <div id="divGallery" class="carousel-inner">
+                        </div>
+                        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
+                            <span class="glyphicon glyphicon-chevron-left"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="right carousel-control" href="#myCarousel" data-slide="next">
+                            <span class="glyphicon glyphicon-chevron-right"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>*@
+            </div>
+
+            <div id="divUploader" class="panel-footer ">
+                <button type="button" class="btn btn-success">
+                    <span class="glyphicon glyphicon-upload" />
+                </button>
+                <label class="btn btn-warning btn-file ">
+                    <span class="glyphicon glyphicon-folder-open" />
+                    <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
+                </label>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+<script>
+    var imgLoaded = 0;
+
+    $(document).ready(function ()
+    {
+        SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
+    });
+
+    
+
+    function ImageLoaded(input) {
+        var files = input.files;
+        //for (var i = 0, file; file = files[i]; i++)
+        //{
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $('#divImages').append(" <div id='div'" + imgLoaded + "' class='thumbnail' ><a class='close' href='#'>×</a><img  src='" + e.target.result + "' class='img-responsive' />");
+            imgLoaded++;
+            console.log("Imagenes Cargadas " + imgLoaded);
+        }
+        reader.readAsDataURL(files[0]);
+        //}
+
+        $(input).closest("label").hide();
+        AddUploader();
+    }
+
+    function AddUploader() {
+        var ctrl = ' <label  class="btn btn-warning btn-file ">' +
+                    '<span class="glyphicon glyphicon-folder-open" />' +
+                    '<input id="upl' + imgLoaded + '" type="file" name="Files" multiple onchange="ImageLoaded(this)" style="display: none;">' +
+                    '</label>';
+
+        $('#divUploader').append(ctrl);
+    }
+
+    function Preview(input) {
+        var files = input.files;
+
+        if (files && files[0]) {
+            var j = 0;
+            //console.log("Allow Attach Files " + files.length);
+            for (var i = 0, file; file = files[i]; i++) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    console.log("Read Image " + j);
+
+                    if (j == 0) {
+                        console.log("Setting Active Image");
+                        $('#olSlides').append("  <li data-target='#myCarousel' data-slide-to='" + j + "' class='active'></li>")
+                        $('#divGallery').append(" <div class='item active'><img  src='" + e.target.result + "' /></div>")
+                    }
+                    else {
+                        console.log("Place Images ");
+                        $('#olSlides').append("  <li data-target='#myCarousel' data-slide-to='" + j + "' ></li>")
+                        $('#divGallery').append(" <div class='item'><img  src='" + e.target.result + "' /></div>")
+                    }
+                    j++;
+                }
+
+                console.log("Loading Image " + i);
+                reader.readAsDataURL(file);
+            }
+        }
+
+        $('.carousel').carousel();
+    }
+
+</script>
