@@ -2,18 +2,36 @@
 
 @{
     ViewBag.Title = "Details";
-    int index = 0;
-    @Scripts.Render("~/bundles/bootstrap")
+    int liIndex = 0;
+    int imgIndex = 0;
 }
 
-<h2>Details</h2>
-
-<div class="row col-md-5">
+<br/>
+<div class="col-md-4">
     <div id="divCarousel" class="carousel slide" data-ride="carousel">
         <ol id="olSlides" class="carousel-indicators">
-        </ol>
+            @foreach (var file in Model.Images)
+            {
+                var a = liIndex == Decimal.Zero ? "active" : "";
+                <li data-target="#divCarousel" data-slide-to="@liIndex" class='@a'>
+                </li>
 
+                    liIndex++;
+                }
+        </ol>
         <div id="divGallery" class="carousel-inner">
+            @foreach (var file in Model.Images)
+            {
+                var base64 = Convert.ToBase64String(file.File);
+                var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+                var a = imgIndex == Decimal.Zero ? "active" : "";
+
+                <div class="item @a">
+                    <img src="@imgSrc" />
+                </div>
+
+                    imgIndex++;
+                }
         </div>
 
         <a class="left carousel-control" href="#divCarousel" data-slide="prev">
@@ -27,51 +45,50 @@
     </div>
 </div>
 
-<div class="row col-md-7">
+<div class="col-md-8">
     <div class="row">
-        @Html.DisplayNameFor(model => model.Code):
-        @Html.DisplayFor(model => model.Code)
+        <div class="form-group col-md-3">
+            @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.Code, htmlAttributes: new { @class = "form-control", @readonly = "readonly" })
+        </div>
     </div>
 
     <div class="row">
-        @Html.DisplayNameFor(model => model.Name):
-        @Html.DisplayFor(model => model.Name)
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+            
+            @Html.TextBoxFor(model => model.Name, htmlAttributes: new { @class = "form-control", @readonly = "readonly" })
+        </div>
     </div>
+    <div class="row">
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
+            @Html.TextAreaFor(model => model.Description, htmlAttributes: new { @class = "form-control", @readonly = "readonly" })
 
-    <div class="row">
-        @Html.DisplayNameFor(model => model.Description):
-        @Html.DisplayFor(model => model.Description)
+        </div>
     </div>
     <div class="row">
-        @Html.DisplayNameFor(model => model.StorePrice):
-        @Html.DisplayFor(model => model.StorePrice)
+        <div class="form-group col-md-3">
+            @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.StorePrice, htmlAttributes: new { @class = "form-control", @readonly = "readonly" })
+        </div>
+        <div class="form-group col-md-3">
+            @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
+            @Html.TextBoxFor(model => model.DealerPrice, htmlAttributes: new { @class = "form-control", @readonly = "readonly" })
+        </div>
     </div>
 </div>
 
 
-@foreach (var file in Model.Images)
-{
-    var base64 = Convert.ToBase64String(file.File);
-    var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
-    var a = index == Decimal.Zero ? "active":"";
 
-
-    var olSlidex = string.Format("<li data-target='#divCarousel' data-slide-to='{0}' class='{1}'></li>", index, a);
-    var divGalery = string.Format("<div class='item {0}'><img  src='{1}' /></div>", a, imgSrc);
-
-    <script>
-        $('#olSlides').append("@olSlidex")
-        $('#divGallery').append("@divGalery")
-    </script>
-}
 
 <script>
-    $('#divCarousel').carousel();
+
+    $(document).ready(function ()
+    {
+        $('#divCarousel').carousel();
+    })
+
 </script>
 
-
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.ProductId }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
 

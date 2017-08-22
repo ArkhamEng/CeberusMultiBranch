@@ -10,6 +10,9 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/common")
 
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+    <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -33,13 +36,15 @@
         </div>
     </div>
     <div class="container-fluid small">
+        @*<div class="progress" id="prg">
+            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            </div>
+        </div>*@
         @RenderBody()
-      
-       
     </div>
     <hr />
     <footer>
-        <p>&copy; @DateTime.Now.Year - Argos Developer Division</p>
+        <p>&copy; @DateTime.Now.Year - Argos Software Develop Division</p>
     </footer>
 
  

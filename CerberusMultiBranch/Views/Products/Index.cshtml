@@ -1,63 +1,98 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel>
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.SearchProductViewModel
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<h3>Catálogo de Productos</h3>
+<hr />
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Code)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.MinQuantity)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.BarCode)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.BuyPrice)
-        </th>
-        <th></th>
-    </tr>
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            Filtros de busqueda
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
+                    @Html.DropDownList("CategoryId", Model.Categories,"", new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.Label("Sub Categoría", htmlAttributes: new { @class = "control-label" })
+                    @Html.DropDownList("SubCategoryId", Model.SubCategories, "", new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.Label("Nombre del Producto", htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control", id = "txtName" })
+                </div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Code)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.MinQuantity)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.BarCode)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.BuyPrice)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.ProductId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.ProductId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.ProductId })
-        </td>
-    </tr>
-}
+                <div class="form-group col-md-6">
+                    @Html.Label("Código", htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-primary" type="button" onclick="Search()">
+                <span class="glyphicon glyphicon-search" />
+            </button>
+            @Html.ActionLink(" ", "Create", new {  }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
+        </div>
+    </div>
+</div>
 
-</table>
+<div id="divProducts" class="col-md-8">
+    @Html.Partial("_List", Model.Products)
+</div>
+
+
+<script>
+
+    $(document).ready(function ()
+    {
+        SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
+    });
+
+    function Search()
+    {
+        console.log("Searching");
+
+        //$("#prg .progress-bar").css("width", "50%").addClass("progress-bar-striped active").html("50%");
+
+        $.ajax({
+            url: "/Products/Search",
+            type: "POST",
+            data: {
+                categoryId: $("#CategoryId").val(),
+                subCategoryId: $("#SubCategoryId").val(),
+                Name: $("#txtName").val(),
+                Code: $("#txtCode").val()
+            },
+            sucess: function (view)
+            {
+                console.log("Succes");
+                $("#divProducts").html(view);
+               // $("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
+            },
+
+            error: function (data) { console.log("Usuario Invalido"); console.log(data); },
+            statusCode: {
+                200: function (view)
+                {
+                    console.log("200: Authenticated ");
+                    $("#divProducts").html(view);
+                    //$("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
+                },
+                401: function (data)
+                {
+                    alert('401: Unauthenticated');
+                    // Handle the 401 error here.
+                }
+            }
+        });
+
+        
+    }
+
+</script>

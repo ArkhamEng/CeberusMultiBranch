@@ -20,7 +20,34 @@ namespace CerberusMultiBranch.Controllers.Inventory
         // GET: Products
         public ActionResult Index()
         {
-            return View(db.Products.ToList());
+            var model = new SearchProductViewModel();
+            model.Products = db.Products.ToList();
+            model.Categories = db.Categories.ToSelectList();
+
+            foreach (var prod in model.Products)
+            {
+                prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
+            }
+            return View(model);
+        }
+
+
+        public ActionResult Search(int? categoryId, int? subCatergoryId, string name, string code)
+        {
+            var model = (from p in db.Products
+                         where (categoryId == null || p.SubCategory.CategoryId == categoryId)
+                         && (subCatergoryId == null || p.SubCategoryId == subCatergoryId)
+                         && (name == string.Empty || p.Name.Contains(name))
+                         && (code == string.Empty || p.Code == code)
+                         select p
+                         ).ToList();
+
+            foreach (var prod in model)
+            {
+                prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
+            }
+
+            return PartialView("_List",model);
         }
 
         // GET: Products/Details/5
@@ -45,9 +72,23 @@ namespace CerberusMultiBranch.Controllers.Inventory
         // GET: Products/Create
         public ActionResult Create(int? id)
         {
-            ProductViewModel model = new ProductViewModel();
-            model.Categories = db.Categories.ToSelectList();
-            return View(model);
+            if (id == null)
+            {
+                ProductViewModel model = new ProductViewModel();
+                model.Categories = db.Categories.ToSelectList();
+                return View(model);
+            }
+            else
+            {
+                var product = db.Products.Find(id);
+                product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
+               
+
+                ProductViewModel model = new ProductViewModel(product);
+                model.Categories    = db.Categories.ToSelectList();
+                model.SubCategories = db.SubCategories.Where(sc => sc.CategoryId == model.SubCategory.CategoryId).ToSelectList();
+                return View(model);
+            }
         }
 
         // POST: Products/Create

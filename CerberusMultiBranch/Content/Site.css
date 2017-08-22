@@ -44,6 +44,7 @@ textarea {
     display: block;
 }
 
+/*****PANEL HEADING OVERRIDE*****/
 .panel-warning > .panel-heading 
 {
      color: #fff;
@@ -65,4 +66,94 @@ textarea {
   display: block;
   border-top: 1px solid #ccc;
 
+}
+/*************TABLE ELEMENT CENTERED********************/
+.table > tbody > tr > td 
+{
+     vertical-align: middle;
+}
+
+/***************DATA TABLES**********************/
+table.TablePrimary {
+    width: 100%;
+    clear: both;
+}
+
+    table.TablePrimary thead th {
+        border-bottom: 1px solid transparent;
+        border-top-left-radius: 3px;
+        border-top-right-radius: 3px;
+        border-color: #337ab7;
+    }
+
+.dataTables_length {
+    background-color: #337ab7;
+    color: silver !important;
+    width: 50%;
+    float: left !important;
+    height: 40px !important;
+    padding-top: 8px;
+    padding-left: 16px;
+}
+
+.dataTables_filter {
+    background-color: #337ab7;
+    width: 50%;
+    float: right !important;
+    height: 40px !important;
+    padding-top: 8px;
+    padding-right: 10px;
+    color: silver !important;
+}
+
+.dataTables_info {
+    padding: 9px 6px 6px 6px;
+    float: left;
+    background-color: #f5f5f5;
+    width: 50%;
+    height: 40px !important;
+}
+
+.dataTables_paginate {
+    float: left;
+    font-weight: 300 !important;
+    background-color: #f5f5f5;
+    width: 50%;
+    height: 40px !important;
+}
+
+html[xmlns] .dataTables_wrapper {
+    display: block;
+}
+
+
+.dataTables_wrapper:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.dataTables_wrapper {
+    margin-bottom: 20px;
+    background-color: #fff;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+    height:100%;
+    /*border-color: #337ab7;*/
+}
+
+    .dataTables_wrapper > .TablePrimary thead th {
+        border-color: #337ab7;
+        width: 100%;
+    }
+
+table.TablePrimary tbody th {
+    text-align: left;
+    background: #91c5d4;
+    border-color: #337ab7;
 }

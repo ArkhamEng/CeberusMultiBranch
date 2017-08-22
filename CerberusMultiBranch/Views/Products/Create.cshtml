@@ -4,20 +4,15 @@
     ViewBag.Title = "Create";
 }
 
-
-<h3>Productos</h3>
+<h3>Administración de Productos</h3>
 <hr />
 
-@section Scripts {
-
+@section Scripts
+{
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
 }
-
-
-
-
 
 
 @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -26,7 +21,7 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
     <div class="col-md-8 panel-group">
-        
+
         <div class="panel panel-primary">
             <div class="panel-heading">
                 Datos de producto
@@ -48,7 +43,7 @@
                 <div class="row">
                     <div class="form-group col-md-4 ">
                         @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
-                        @Html.DropDownListFor(model => model.CategoryId, Model.Categories,"", new { @class = "form-control" })
+                        @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "", new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group col-md-4">
@@ -87,7 +82,7 @@
                         @Html.ValidationMessageFor(model => model.MinQuantity, "", new { @class = "text-danger" })
                     </div>
                 </div>
-              
+
                 <div class="row">
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
@@ -110,63 +105,60 @@
                 <button type="submit" class="btn btn-success" title="Guardar">
                     <span class="glyphicon glyphicon-floppy-disk"></span>
                 </button>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-4">
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                Imagenes
-            </div>
+                @Html.ActionLink(" ", "Index", new {}, new { @class = "btn btn-primary glyphicon glyphicon-search" })
 
-            <div id="divImages" class="panel-body" style="max-height:300px;  overflow-y: scroll;">
-
-
-                @*<div id="myCarousel" class="carousel slide" data-ride="carousel">
-                        <ol id="olSlides" class="carousel-indicators">
-
-                        </ol>
-
-                        <div id="divGallery" class="carousel-inner">
-                        </div>
-                        <a class="left carousel-control" href="#myCarousel" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-                        <a class="right carousel-control" href="#myCarousel" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
-                    </div>*@
-            </div>
-
-            <div id="divUploader" class="panel-footer ">
-                <button type="button" class="btn btn-success">
+                <button type="button" class="btn btn-warning" onclick="ShowFiles()">
                     <span class="glyphicon glyphicon-upload" />
                 </button>
-                <label class="btn btn-warning btn-file ">
-                    <span class="glyphicon glyphicon-folder-open" />
-                    <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
-                </label>
             </div>
         </div>
     </div>
+
+    <div id="divImagesModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel panel-primary">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Imagenes Nuevas</h4>
+                </div>
+
+                <div id="divImages" class="modal-body panel-body"  style="height:150px;  overflow-y: scroll;">
+                </div>
+
+                <div id="divUploader" class="modal-footer panel-footer">
+                    <label class="btn btn-warning btn-file ">
+                        <span class="glyphicon glyphicon-folder-open" />
+                        <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="divImagesLoaded" class="col-md-4">
+      @Html.Partial("_ImagesLoaded",Model.Images)
+    </div>
 }
-
-
-
-
 
 <script>
     var imgLoaded = 0;
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
     });
 
-    
+    function ShowFiles() {
+        $("#divImagesModal").modal({ backdrop: "static" });
+    }
+
+    function DropImage(index) {
+        console.log("Drop #div" + index);
+        $("#div" + index).remove();
+
+        console.log("Drop #upl" + index);
+        $("#upl" + index).remove();
+    }
 
     function ImageLoaded(input) {
         var files = input.files;
@@ -175,7 +167,7 @@
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            $('#divImages').append(" <div id='div'" + imgLoaded + "' class='thumbnail' ><a class='close' href='#'>×</a><img  src='" + e.target.result + "' class='img-responsive' />");
+            $('#divImages').append(" <div id='div" + imgLoaded + "' class='thumbnail col-md-4' ><a class='close'  onclick='DropImage(" + imgLoaded + ")'>×</a><img  src='" + e.target.result + "' class='img-responsive' style='min-height:50px;height:70px;'/>");
             imgLoaded++;
             console.log("Imagenes Cargadas " + imgLoaded);
         }

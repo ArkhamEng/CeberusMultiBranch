@@ -1,0 +1,121 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+
+@{var index = 0; }
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+
+<div class="panel panel-primary">
+    <table id="tbProducts" class="table TablePrimary table-striped">
+        <thead class="panel-heading">
+            <tr hidden="hidden">
+                <th class="col-md-2"></th>
+                <th class="col-md-9"></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                //var liIndex = 0;
+                var imgIndex = 0;
+                <tr>
+                    <td class="col-md-3">
+                        <div id="divCarousel_@index" class="carousel slide" data-ride="carousel">
+                            @*<ol id="olSlides" class="carousel-indicators">
+                                    @foreach (var file in item.Images)
+                                    {
+                                        var a = liIndex == Decimal.Zero ? "active" : "";
+                                        <li data-target="#divCarousel_@index" data-slide-to="@liIndex" class='@a'>
+                                        </li>
+
+                                        liIndex++;
+                                    }
+                                </ol>*@
+                            <div class="carousel-inner">
+                                @foreach (var file in item.Images)
+                                {
+                                    var base64 = Convert.ToBase64String(file.File);
+                                    var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+                                    var a = imgIndex == Decimal.Zero ? "active" : "";
+
+                                    <div class="item @a">
+                                        <img src="@imgSrc" />
+                                    </div>
+
+                                    imgIndex++;
+                                }
+                            </div>
+
+                            <a class="left carousel-control" href="#divCarousel_@index" data-slide="prev">
+                                <span class="glyphicon glyphicon-chevron-left"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="right carousel-control" href="#divCarousel_@index" data-slide="next">
+                                <span class="glyphicon glyphicon-chevron-right"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                        </div>
+                    </td>
+
+                    <td>
+                        <h3>
+                            @Html.DisplayFor(model => item.Name)
+                        </h3>
+                        <h4>
+                            @Html.DisplayFor(model => item.StorePrice)
+                        </h4>
+                        @Html.DisplayFor(model => item.Description)
+                        <h5>
+                           Código: @Html.DisplayFor(model => item.Code)
+                        </h5>
+                    </td>
+                
+                    <td class="form-group" align="center">
+                        @Html.ActionLink(" ", "Create", new { id = item.ProductId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil" }) 
+
+                        @Html.ActionLink(" ", "Delete", new { id = item.ProductId }, new { @class = "btn btn-danger glyphicon glyphicon-trash" })
+                    </td>
+                </tr>
+                index++;
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        LoadList();
+        $('.carousel').carousel();
+    })
+
+    $(document).ready(LoadList);
+
+    function LoadList()
+    {
+        $("#tbProducts").DataTable(
+       {
+           destroy: true,
+           //"createdRow": function (row) { RowCreated(row); },
+           "lengthChange": true,
+           "searching": true,
+           "pageLength": 5,
+           "language": {
+               "search": "filtrar resultados",
+               "lengthMenu": "mostrar  _MENU_ ",
+               "zeroRecords": "no hay datos disponibles",
+               "info": "página _PAGE_ de _PAGES_",
+               "infoEmpty": "",
+               "infoFiltered": "(filtered from _MAX_ total records)",
+               "paginate": {
+                   "previous": "Anterior",
+                   "next": "Siguiente"
+               }
+           }
+       });
+
+        console.log("Produc List Loaded");
+    }
+
+</script>
