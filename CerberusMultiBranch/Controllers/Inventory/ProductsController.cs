@@ -10,9 +10,11 @@ using System.IO;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
+using System.IO.Compression;
 
 namespace CerberusMultiBranch.Controllers.Inventory
 {
+    [Authorize]
     public class ProductsController : Controller
     {
         private ApplicationData db = new ApplicationData();
@@ -27,6 +29,11 @@ namespace CerberusMultiBranch.Controllers.Inventory
             foreach (var prod in model.Products)
             {
                 prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
+                if (prod.ProductId >= 10)
+                {
+                    foreach (var image in prod.Images)
+                        image.File = GzipWrapper.Decompress(image.File);
+                }
             }
             return View(model);
         }
@@ -45,9 +52,15 @@ namespace CerberusMultiBranch.Controllers.Inventory
             foreach (var prod in model)
             {
                 prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
+
+                if (prod.ProductId >= 10)
+                {
+                    foreach (var image in prod.Images)
+                        image.File = GzipWrapper.Decompress(image.File);
+                }
             }
 
-            return PartialView("_List",model);
+            return PartialView("_List", model);
         }
 
         // GET: Products/Details/5
@@ -82,10 +95,15 @@ namespace CerberusMultiBranch.Controllers.Inventory
             {
                 var product = db.Products.Find(id);
                 product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
-               
+
+                if (product.ProductId >= 10)
+                {
+                    foreach (var image in product.Images)
+                        image.File = GzipWrapper.Decompress(image.File);
+                }
 
                 ProductViewModel model = new ProductViewModel(product);
-                model.Categories    = db.Categories.ToSelectList();
+                model.Categories = db.Categories.ToSelectList();
                 model.SubCategories = db.SubCategories.Where(sc => sc.CategoryId == model.SubCategory.CategoryId).ToSelectList();
                 return View(model);
             }
@@ -112,14 +130,16 @@ namespace CerberusMultiBranch.Controllers.Inventory
                     {
                         using (MemoryStream target = new MemoryStream())
                         {
+
                             file.InputStream.CopyTo(target);
+                            var bArr = target.ToArray();
 
                             ProductImage f = new ProductImage();
 
                             f.ProductId = product.ProductId;
                             f.Name = file.FileName;
                             f.Type = file.ContentType;
-                            f.File = target.ToArray();
+                            f.File = GzipWrapper.Compress(bArr);
 
                             db.ProductImages.Add(f);
                         }

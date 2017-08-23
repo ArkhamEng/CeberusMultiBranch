@@ -38,8 +38,8 @@
                                     var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
                                     var a = imgIndex == Decimal.Zero ? "active" : "";
 
-                                    <div class="item @a">
-                                        <img src="@imgSrc" />
+                                    <div class="item @a" style="align-content:center">
+                                        <img src="@imgSrc" style="min-height:70px;height:120px;"/>
                                     </div>
 
                                     imgIndex++;
