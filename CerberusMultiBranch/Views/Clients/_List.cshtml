@@ -1,0 +1,117 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Client>
+
+@{var index = 0; }
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+<script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+
+<div class="panel panel-primary">
+    <table id="tbClients" class="table TablePrimary table-striped">
+        <thead class="panel-heading">
+            <tr >
+                <th class="col-md-4">@Html.DisplayName("Nombre y Dirección")</th>
+                <th class="col-md-4">@Html.DisplayName("Facturación")</th>
+                <th class="col-md-3">@Html.DisplayName("Teléfon y Correo")</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td >
+                        <h4>
+                           @Html.DisplayFor(model => item.Name)
+                        </h4>
+                        <h6>
+                           @Html.DisplayFor(model => item.Address)
+                        </h6>
+                        <h6>
+                            @Html.DisplayFor(model => item.City.State.Name) @Html.DisplayFor(model => item.City.Name)
+                        </h6>
+                        <h5>
+                            Código: @Html.DisplayFor(model => item.Code)
+                        </h5>
+                    </td>
+
+                    <td>
+                        <h6>
+                            @Html.DisplayFor(model => item.BusinessName)
+                        </h6>
+                        <h6>
+                            @Html.DisplayFor(model => item.LegalRepresentative)
+                        </h6>
+                       
+                    </td>
+                    <td>
+                        <h6>
+                            @Html.DisplayFor(model => item.Phone)
+                        </h6>
+                        <h6>
+                            @Html.DisplayFor(model => item.Email)
+                        </h6>
+                    </td>
+
+                    <td class="form-group" align="center">
+                        @Html.ActionLink(" ", "Create", new { id = item.ClientId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil" })
+
+                        @Html.ActionLink(" ", "Delete", new { id = item.ClientId }, new { @class = "btn btn-danger glyphicon glyphicon-trash" })
+                    </td>
+                </tr>
+                index++;
+            }
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        LoadList();
+    })
+
+    $(document).ready(LoadList);
+
+    function LoadList()
+    {
+        $("#tbClients").DataTable(
+       {
+           destroy: true,
+           "createdRow": function (row) { RowCreated(row); },
+           "lengthChange": true,
+           "searching": true,
+           "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
+           "pageLength": 5,
+           "language": {
+               "search": "filtrar resultados",
+               "lengthMenu": "mostrar  _MENU_ ",
+               "zeroRecords": "no hay datos disponibles",
+               "info": "página _PAGE_ de _PAGES_",
+               "infoEmpty": "",
+               "infoFiltered": "(filtered from _MAX_ total records)",
+               "paginate": {
+                   "previous": "Anterior",
+                   "next": "Siguiente"
+               }
+           }
+       });
+
+        console.log("Client List Loaded");
+    }
+
+    function RowCreated()
+    {
+        function RowCreated(row) {
+            var id = $(row).find('td:eq(0)').text();
+            var options = {
+                title: "Quieres borrar el registro?", placement: "left", buttons: [
+             { label: "Si", class: 'btn btn-primary', icon: 'glyphicon glyphicon-ok', onClick: function () { Delete(id, row); } },
+             { label: "No", class: 'btn btn-danger', icon: 'glyphicon glyphicon-remove' }]
+            }
+
+            $(row).find('td:eq(6)').children("button").confirmation(options);
+            $(row).dblclick(Select);
+        }
+    }
+
+</script>

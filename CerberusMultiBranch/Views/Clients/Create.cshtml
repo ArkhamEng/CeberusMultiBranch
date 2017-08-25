@@ -1,0 +1,206 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ClientViewModel
+
+
+<h2>Edición de clientes</h2>
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.ClientId)
+
+    @Html.HiddenFor(m => m.InsDate)
+
+    @Html.HiddenFor(m => m.IsActive)
+
+    <div class="col-md-5">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Generales
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
+
+                            <span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>
+                        </div>
+                    </div>
+                        
+                    
+                    <div class="form-group col-md-4 col-md-offset-4">
+                        @Html.LabelFor(model => model.Entrance, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Entrance, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.Entrance, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control",placeholder = Html.DisplayNameFor(model => model.Name) } })
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-6">
+                        @Html.LabelFor(model => model.City.StateId, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-4 col-lg-offset-2">
+                        @Html.LabelFor(model => model.ZipCode, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.ZipCode) } })
+                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group  col-md-6">
+                        @Html.LabelFor(model => model.CityId, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-4 col-lg-offset-2">
+                        @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Phone) } })
+                        @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Address) } })
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group  col-md-8">
+                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Email) } })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                Facturación
+            </div>
+            <div class="panel-body">
+                <div class="row">
+
+                    <div class="form-group col-md-8">
+                        @Html.LabelFor(model => model.BusinessName, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.BusinessName, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.FTR, htmlAttributes: new { @class = "control-label" })
+                        @Html.EditorFor(model => model.FTR, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-8">
+                        @Html.LabelFor(model => model.LegalRepresentative, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.LegalRepresentative, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.LegalRepresentative, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-8">
+                        @Html.LabelFor(model => model.TaxAddress, htmlAttributes: new { @class = "control-label" })
+
+                        @Html.EditorFor(model => model.TaxAddress, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor(model => model.TaxAddress, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <button type="submit" class="btn btn-success" title="Guardar">
+                    <span class="glyphicon glyphicon-floppy-disk"></span>
+                </button>
+                <button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+
+                <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+   
+    $(document).ready(LoadCreate);
+
+    function EditCode(checkBox)
+    {
+        console.log($(checkBox).is(':checked'));
+        $("#Code").attr("readonly", !$(checkBox).is(':checked'));
+    }
+
+    function LoadCreate()
+    {
+        SetCascade("#StateId", "#CityId", "GetCities");
+
+        console.log("Loading CreateClient");
+        $("#Code").attr("readonly", true);
+        
+
+        $("#Name").keyup(FillNames);
+        $("#Address").keyup(FillTaxAddress);
+        $("#ZipCode").keyup(FillTaxAddress);
+
+        $("#States").change(FillTaxAddress);
+        $("#CityId").change(FillTaxAddress);
+
+
+        //Setting buttons
+        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
+        $("#btnClear").click(function () { Renew() });
+
+        console.log("Create Client Loaded");
+    }
+
+
+    function FillTaxAddress()
+    {
+        var tAddress = $("#Address").val() + "\n";
+
+        if ($("#CityId").val() != '')
+            tAddress = tAddress + $("#CityId option:selected").text() + ", ";
+
+        if ($("#StateId").val() != '')
+            tAddress = tAddress + $("#StateId option:selected").text() + "  C.P. ";
+
+
+        tAddress = tAddress + $("#ZipCode").val();
+
+        $("#TaxAddress").val(tAddress);
+    }
+
+    function FillNames()
+    {
+        $("#BusinessName").val($("#Name").val());
+        $("#LegalRepresentative").val($("#Name").val());
+    }
+
+
+
+
+</script>
+
+

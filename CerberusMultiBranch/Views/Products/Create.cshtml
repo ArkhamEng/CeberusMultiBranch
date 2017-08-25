@@ -27,6 +27,7 @@
                 Datos de producto
             </div>
             <div class="panel-body">
+                @Html.HiddenFor(model=> model.ProductId)
                 <div class="row">
                     <div class="form-group col-md-8 ">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
@@ -72,7 +73,7 @@
 
                     <div class="form-group col-md-2 col-md-offset-4">
                         @Html.LabelFor(model => model.BuyPrice, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", @type = "number", @min = "0", @step = "0.5", @value = "0" } })
                         @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
                     </div>
 
@@ -127,7 +128,7 @@
                 </div>
 
                 <div id="divUploader" class="modal-footer panel-footer">
-                    <label class="btn btn-warning btn-file ">
+                    <label id="upl0" class="btn btn-warning btn-file ">
                         <span class="glyphicon glyphicon-folder-open" />
                         <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
                     </label>
@@ -135,16 +136,18 @@
             </div>
         </div>
     </div>
-
-    <div id="divImagesLoaded" class="col-md-4">
-      @Html.Partial("_ImagesLoaded",Model.Images)
-    </div>
 }
+
+
+<div id="divImagesLoaded" class="col-md-4">
+    @Html.Partial("_ImagesLoaded", Model.Images)
+</div>
 
 <script>
     var imgLoaded = 0;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
     });
 
@@ -152,7 +155,8 @@
         $("#divImagesModal").modal({ backdrop: "static" });
     }
 
-    function DropImage(index) {
+    function DropImage(index)
+    {
         console.log("Drop #div" + index);
         $("#div" + index).remove();
 
@@ -160,28 +164,35 @@
         $("#upl" + index).remove();
     }
 
-    function ImageLoaded(input) {
+    function ImageLoaded(input)
+    {
         var files = input.files;
         //for (var i = 0, file; file = files[i]; i++)
         //{
         var reader = new FileReader();
 
-        reader.onload = function (e) {
+        reader.onload = function (e)
+        {
             $('#divImages').append(" <div id='div" + imgLoaded + "' class='thumbnail col-md-4' ><a class='close'  onclick='DropImage(" + imgLoaded + ")'>×</a><img  src='" + e.target.result + "' class='img-responsive' style='min-height:50px;height:70px;'/>");
+            console.log("Imagen Index " + imgLoaded);
+
             imgLoaded++;
-            console.log("Imagenes Cargadas " + imgLoaded);
+
+            AddUploader();
         }
         reader.readAsDataURL(files[0]);
         //}
 
         $(input).closest("label").hide();
-        AddUploader();
     }
 
-    function AddUploader() {
-        var ctrl = ' <label  class="btn btn-warning btn-file ">' +
+    function AddUploader()
+    {
+        console.log("Creating Upload " + imgLoaded);
+
+        var ctrl = ' <label id="upl' + imgLoaded + '" class="btn btn-warning btn-file ">' +
                     '<span class="glyphicon glyphicon-folder-open" />' +
-                    '<input id="upl' + imgLoaded + '" type="file" name="Files" multiple onchange="ImageLoaded(this)" style="display: none;">' +
+                    '<input  type="file" name="Files" multiple onchange="ImageLoaded(this)" style="display: none;">' +
                     '</label>';
 
         $('#divUploader').append(ctrl);

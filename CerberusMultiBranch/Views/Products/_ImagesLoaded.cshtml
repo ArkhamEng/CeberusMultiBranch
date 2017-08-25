@@ -14,6 +14,9 @@
                 var imgSrc = String.Format("data:{0};base64,{1}", item.Type, base64);
 
                 <tr>
+                    <td>
+                        
+                    </td>
                     <td class="col-md-4" >
                         <div  class="thumbnail">
                             <img src="@imgSrc" class="img-rounded" />
@@ -21,7 +24,9 @@
                     </td>
                     <td class="col-md-6" valign="middle" />
                     <td >
-                        @Html.ActionLink(" ", "Delete", new { id = item.ProductImageId }, new { @class = "btn btn-danger glyphicon glyphicon-trash" })
+                        <button class="btn btn-danger" type="button" onclick="DeleteImage(@item.ProductImageId)">
+                            <span class="glyphicon glyphicon-trash"/>
+                        </button>
                     </td>
                 </tr>
             }
@@ -32,4 +37,44 @@
     </div>
 </div>
 
+<script>
+  
+    function DeleteImage(id)
+    {
+        console.log("Deleting Image Id: " + id);
 
+        //$("#prg .progress-bar").css("width", "50%").addClass("progress-bar-striped active").html("50%");
+
+        $.ajax({
+            url: "/Products/DeleteImage",
+            type: "POST",
+            data: {id:id},
+            sucess: function (view)
+            {
+                console.log("Succes");
+                $("#divImagesLoaded").html(view);
+            },
+
+            error: function (data)
+            {
+                console.log("Error"); 
+            },
+            statusCode:
+            {
+                200: function (view)
+                {
+                    console.log("Success 200: Authenticated ");
+                    $("#divImagesLoaded").html(view);
+                },
+                401: function (data)
+                {
+                    console.log("401: Unauthenticated");
+                }
+            }
+        });
+
+
+    }
+
+
+</script>

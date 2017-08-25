@@ -12,33 +12,22 @@ using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
 using System.IO.Compression;
 
-namespace CerberusMultiBranch.Controllers.Inventory
+namespace CerberusMultiBranch.Controllers.Catalog
 {
     [Authorize]
     public class ProductsController : Controller
     {
         private ApplicationData db = new ApplicationData();
 
-        // GET: Products
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = db.Products.ToList();
-            model.Categories = db.Categories.ToSelectList();
 
-            foreach (var prod in model.Products)
-            {
-                prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
-                if (prod.ProductId >= 10)
-                {
-                    foreach (var image in prod.Images)
-                        image.File = GzipWrapper.Decompress(image.File);
-                }
-            }
+            model.Categories = db.Categories.ToSelectList();
             return View(model);
         }
 
-
+        [HttpPost]
         public ActionResult Search(int? categoryId, int? subCatergoryId, string name, string code)
         {
             var model = (from p in db.Products
@@ -53,34 +42,14 @@ namespace CerberusMultiBranch.Controllers.Inventory
             {
                 prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
 
-                if (prod.ProductId >= 10)
-                {
-                    foreach (var image in prod.Images)
-                        image.File = GzipWrapper.Decompress(image.File);
-                }
+                foreach (var image in prod.Images)
+                    image.File = GzipWrapper.Decompress(image.File);
+
             }
 
             return PartialView("_List", model);
         }
 
-        // GET: Products/Details/5
-
-        public ActionResult Details(int? id)
-        {
-            var userId = User.Identity.GetUserId<int>();
-
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            product.Images = db.ProductImages.Where(p => p.ProductId == product.ProductId).ToList();
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
 
         // GET: Products/Create
         public ActionResult Create(int? id)
@@ -96,11 +65,8 @@ namespace CerberusMultiBranch.Controllers.Inventory
                 var product = db.Products.Find(id);
                 product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
 
-                if (product.ProductId >= 10)
-                {
-                    foreach (var image in product.Images)
-                        image.File = GzipWrapper.Decompress(image.File);
-                }
+                foreach (var image in product.Images)
+                    image.File = GzipWrapper.Decompress(image.File);
 
                 ProductViewModel model = new ProductViewModel(product);
                 model.Categories = db.Categories.ToSelectList();
@@ -119,7 +85,11 @@ namespace CerberusMultiBranch.Controllers.Inventory
         {
             if (ModelState.IsValid)
             {
-                db.Products.Add(product);
+                if (product.ProductId == Cons.Zero)
+                    db.Products.Add(product);
+                else
+                    db.Entry(product).State = EntityState.Modified;
+
                 db.SaveChanges();
 
                 int i = Cons.Zero;
@@ -149,11 +119,35 @@ namespace CerberusMultiBranch.Controllers.Inventory
 
                 if (i > Cons.Zero)
                     db.SaveChanges();
-
-                return RedirectToAction("Create");
             }
 
-            return View(product);
+            return RedirectToAction("Create", product.ProductId);
+        }
+
+        [HttpPost] 
+        public ActionResult DeleteImage(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            var image = db.ProductImages.Find(id);
+            int pId = image.ProductId;
+            if (image == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
+            }
+            ModelState.Clear();
+
+            db.ProductImages.Remove(image);
+            db.SaveChanges();
+
+            var model = db.ProductImages.Where(i => i.ProductId == pId).ToList();
+            foreach (var img in model)
+                img.File = GzipWrapper.Decompress(image.File);
+
+            return PartialView("_ImagesLoaded", model);
         }
 
         // GET: Products/Edit/5
@@ -171,47 +165,11 @@ namespace CerberusMultiBranch.Controllers.Inventory
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(product).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(product);
-        }
+      
 
-        // GET: Products/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
+      
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Product product = db.Products.Find(id);
-            db.Products.Remove(product);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
+      
 
         protected override void Dispose(bool disposing)
         {

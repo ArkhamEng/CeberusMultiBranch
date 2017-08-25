@@ -19,6 +19,10 @@ namespace CerberusMultiBranch.Models.Entities
 
         public DbSet<SubCategory> SubCategories { get; set; }
 
+        public DbSet<State> States { get; set; }
+
+        public DbSet<City> Cities { get; set; }
+
         #endregion
 
         #region Catalogs
@@ -54,5 +58,6 @@ namespace CerberusMultiBranch.Models.Entities
             // You can globally assign schema here
             modelBuilder.HasDefaultSchema("Security");
         }
+
     }
 }

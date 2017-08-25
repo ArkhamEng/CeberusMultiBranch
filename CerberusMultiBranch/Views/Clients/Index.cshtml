@@ -1,0 +1,97 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.SearchClientViewModel
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h3>Catálogo de Clientes</h3>
+<hr />
+
+<div class="col-md-4">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            Filtros de busqueda
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    @Html.Label("Estado", htmlAttributes: new { @class = "control-label" })
+                    @Html.DropDownList("StateId", Model.States, "", new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.Label("Ciudad / Municipio", htmlAttributes: new { @class = "control-label" })
+                    @Html.DropDownList("SubCategoryId", Model.Cities, "", new { @class = "form-control" })
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.Label("Nombre del Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control", id = "txtName" })
+                </div>
+
+                <div class="form-group col-md-7">
+                    @Html.Label("Clave de Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
+                </div>
+                <div class="form-group col-md-7">
+                    @Html.Label("Télefono", htmlAttributes: new { @class = "control-label" })
+                    @Html.TextBox("Phone", "", htmlAttributes: new { @class = "form-control", id = "txtPhone" })
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-primary" type="button" onclick="Search()">
+                <span class="glyphicon glyphicon-search" />
+            </button>
+            @Html.ActionLink(" ", "Create", new { }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
+        </div>
+    </div>
+</div>
+
+<div id="divClients" class="col-md-8">
+    @Html.Partial("_List", Model.Clients)
+</div>
+
+
+<script>
+
+    $(document).ready(function ()
+    {
+        SetCascade("#StateId", "#CityId", "GetCities");
+    });
+
+    function Search()
+    {
+        console.log("Searching");
+
+        $.ajax({
+            url: "/Clients/Search",
+            type: "POST",
+            data: {
+                stateId: $("#StateId").val(),
+                cityId: $("#CityId").val(),
+                name: $("#txtName").val(),
+                code: $("#txtCode").val(),
+                phone: $("#txtPhone").val()
+            },
+            sucess: function (view)
+            {
+                console.log("Succes");
+                $("#divClients").html(view);
+            },
+
+            error: function (data) { console.log("Usuario Invalido"); console.log(data); },
+            statusCode:
+            {
+                200: function (view)
+                {
+                    console.log("200: Authenticated ");
+                    $("#divClients").html(view);
+                },
+                401: function (data)
+                {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+</script>

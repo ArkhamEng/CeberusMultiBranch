@@ -40,6 +40,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Precio de Compra")]
         [DataType(DataType.Currency)]
+        
         public double BuyPrice { get; set; }
 
         [Display(Name = "% Mostrador")]

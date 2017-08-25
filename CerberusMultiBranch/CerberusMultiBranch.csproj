@@ -181,11 +181,12 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Common\CascadeController.cs" />
     <Compile Include="Controllers\Common\CategoriesController.cs" />
     <Compile Include="Controllers\Common\SubCategoriesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\Inventory\ProductsController.cs" />
+    <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -214,6 +215,18 @@
     <Compile Include="Migrations\201708180322582_a.Designer.cs">
       <DependentUpon>201708180322582_a.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708252042003_Change to State - City.cs" />
+    <Compile Include="Migrations\201708252042003_Change to State - City.Designer.cs">
+      <DependentUpon>201708252042003_Change to State - City.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708252110398_Cities.cs" />
+    <Compile Include="Migrations\201708252110398_Cities.Designer.cs">
+      <DependentUpon>201708252110398_Cities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708252114116_City2.cs" />
+    <Compile Include="Migrations\201708252114116_City2.Designer.cs">
+      <DependentUpon>201708252114116_City2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\ApplicationData.cs" />
@@ -232,7 +245,9 @@
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\SearchClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -315,9 +330,6 @@
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Products\Create.cshtml" />
-    <Content Include="Views\Products\Delete.cshtml" />
-    <Content Include="Views\Products\Details.cshtml" />
-    <Content Include="Views\Products\Edit.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
     <Content Include="Views\Categories\Create.cshtml" />
     <Content Include="Views\Categories\Delete.cshtml" />
@@ -331,9 +343,13 @@
     <Content Include="Views\SubCategories\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
+    <Content Include="Views\Clients\Create.cshtml" />
+    <Content Include="Views\Clients\Index.cshtml" />
+    <Content Include="Views\Clients\_List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\Inventory\" />
     <Folder Include="Views\Inventory\" />
   </ItemGroup>
   <ItemGroup>
@@ -358,6 +374,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708180322582_a.resx">
       <DependentUpon>201708180322582_a.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708252042003_Change to State - City.resx">
+      <DependentUpon>201708252042003_Change to State - City.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708252110398_Cities.resx">
+      <DependentUpon>201708252110398_Cities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708252114116_City2.resx">
+      <DependentUpon>201708252114116_City2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -20,5 +20,11 @@ namespace CerberusMultiBranch.Controllers.Common
             var list = db.SubCategories.Where(sc => sc.CategoryId == parentId).ToSelectList();
             return Json(list);
         }
+
+        public JsonResult GetCities(int parentId)
+        {
+            var list = db.Cities.Where(c => c.StateId == parentId).ToSelectList();
+            return Json(list);
+        }
     }
 }

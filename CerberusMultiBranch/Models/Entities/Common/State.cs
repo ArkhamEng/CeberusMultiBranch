@@ -12,13 +12,18 @@ namespace CerberusMultiBranch.Models.Entities.Common
     {
         public int StateId { get; set; }
 
+        public string Code { get; set; }
+
         [Display(Name = "Nombre")]
         [Required]
         [StringLength(50)]
         [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
 
-       
+        public string ShorName { get; set; }
+
+
+        public bool IsActive { get; set; }
 
         public ICollection<City> Cities { get; set; }
 
