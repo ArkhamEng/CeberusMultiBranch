@@ -182,6 +182,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
+    <Compile Include="Controllers\Catalog\EmployeesController.cs" />
     <Compile Include="Controllers\Common\CascadeController.cs" />
     <Compile Include="Controllers\Common\CategoriesController.cs" />
     <Compile Include="Controllers\Common\SubCategoriesController.cs" />
@@ -227,6 +228,10 @@
     <Compile Include="Migrations\201708252114116_City2.Designer.cs">
       <DependentUpon>201708252114116_City2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201708262257175_Employee.cs" />
+    <Compile Include="Migrations\201708262257175_Employee.Designer.cs">
+      <DependentUpon>201708262257175_Employee.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\ApplicationData.cs" />
@@ -248,6 +253,7 @@
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchClientViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -346,6 +352,8 @@
     <Content Include="Views\Clients\Create.cshtml" />
     <Content Include="Views\Clients\Index.cshtml" />
     <Content Include="Views\Clients\_List.cshtml" />
+    <Content Include="Views\Employees\Create.cshtml" />
+    <Content Include="Views\Employees\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -383,6 +391,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708252114116_City2.resx">
       <DependentUpon>201708252114116_City2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708262257175_Employee.resx">
+      <DependentUpon>201708262257175_Employee.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

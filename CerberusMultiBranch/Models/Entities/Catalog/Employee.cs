@@ -23,12 +23,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Nombre")]
         [Required]
         public string Name { get; set; }
-
-        [Display(Name = "Razón Social")]
-        [MaxLength(50)]
-        [Index("IDX_BussinessName", IsUnique = false)]
-        public string BusinessName { get; set; }
-
       
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
@@ -71,6 +65,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public int CityId { get; set; }
 
+
+        public byte[] Picture { get; set; }
+
         public bool IsActive { get; set; }
 
         [Required]
@@ -82,7 +79,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual City City { get; set; }
 
-
+        [NotMapped]
+        public HttpPostedFileBase PostedFile { get; set; }
 
         public Employee()
         {
@@ -93,26 +91,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.Code    = Cons.CodeMask;
         }
 
-        public Employee Copy()
-        {
-            return new Employee
-            {
-                EmployeeId   = this.EmployeeId,
-                Address      = this.Address,
-                BusinessName = this.BusinessName,
-                CityId       = this.CityId,
-                Code         = this.Code,
-                Email        = this.Email,
-                Entrance     = this.Entrance,
-                FTR = this.FTR,
-                IsActive = this.IsActive,
-                InsDate = this.InsDate,
-                UpdDate = this.UpdDate,
-                Name = this.Name,
-                Phone = this.Phone,
-                TaxAddress = this.TaxAddress,
-                ZipCode = this.ZipCode
-            };
-        }
+       
     }
 }
