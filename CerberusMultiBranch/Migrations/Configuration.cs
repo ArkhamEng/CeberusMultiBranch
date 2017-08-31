@@ -10,7 +10,6 @@ namespace CerberusMultiBranch.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
-            ContextKey = "CerberusMultiBranch.Models.Entities.ApplicationData";
         }
 
         protected override void Seed(CerberusMultiBranch.Models.Entities.ApplicationData context)

@@ -184,53 +184,14 @@
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
     <Compile Include="Controllers\Common\CascadeController.cs" />
-    <Compile Include="Controllers\Common\CategoriesController.cs" />
-    <Compile Include="Controllers\Common\SubCategoriesController.cs" />
+    <Compile Include="Controllers\Config\CategoriesController.cs" />
+    <Compile Include="Controllers\Config\MakesController.cs" />
+    <Compile Include="Controllers\Config\ModelsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708172100028_InitialCreate.cs" />
-    <Compile Include="Migrations\201708172100028_InitialCreate.Designer.cs">
-      <DependentUpon>201708172100028_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708172205075_ProductChanges.cs" />
-    <Compile Include="Migrations\201708172205075_ProductChanges.Designer.cs">
-      <DependentUpon>201708172205075_ProductChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708172231014_P.cs" />
-    <Compile Include="Migrations\201708172231014_P.Designer.cs">
-      <DependentUpon>201708172231014_P.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708172240418_p1.cs" />
-    <Compile Include="Migrations\201708172240418_p1.Designer.cs">
-      <DependentUpon>201708172240418_p1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708180308245_Security.cs" />
-    <Compile Include="Migrations\201708180308245_Security.Designer.cs">
-      <DependentUpon>201708180308245_Security.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708180322582_a.cs" />
-    <Compile Include="Migrations\201708180322582_a.Designer.cs">
-      <DependentUpon>201708180322582_a.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708252042003_Change to State - City.cs" />
-    <Compile Include="Migrations\201708252042003_Change to State - City.Designer.cs">
-      <DependentUpon>201708252042003_Change to State - City.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708252110398_Cities.cs" />
-    <Compile Include="Migrations\201708252110398_Cities.Designer.cs">
-      <DependentUpon>201708252110398_Cities.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708252114116_City2.cs" />
-    <Compile Include="Migrations\201708252114116_City2.Designer.cs">
-      <DependentUpon>201708252114116_City2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708262257175_Employee.cs" />
-    <Compile Include="Migrations\201708262257175_Employee.Designer.cs">
-      <DependentUpon>201708262257175_Employee.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -241,10 +202,11 @@
     <Compile Include="Models\Entities\Common\City.cs" />
     <Compile Include="Models\Entities\Common\ISelectable.cs" />
     <Compile Include="Models\Entities\Common\State.cs" />
-    <Compile Include="Models\Entities\Configuration\Branch.cs" />
-    <Compile Include="Models\Entities\Configuration\Company.cs" />
-    <Compile Include="Models\Entities\Common\Category.cs" />
+    <Compile Include="Models\Entities\Config\Branch.cs" />
+    <Compile Include="Models\Entities\Config\Company.cs" />
+    <Compile Include="Models\Entities\Config\Category.cs" />
     <Compile Include="Models\Entities\Catalog\Product.cs" />
+    <Compile Include="Models\Entities\Config\Year.cs" />
     <Compile Include="Models\Entities\Inventory\ProductImage.cs" />
     <Compile Include="Models\Entities\Inventory\ProductInBranch.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
@@ -266,10 +228,11 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\Images\20882251_1326378734139486_3689747523903187170_n.jpg" />
-    <Content Include="Content\Images\descarga.jpg" />
-    <Content Include="Content\Images\motor.jpg" />
+    <Content Include="Content\font-awesome.css" />
+    <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="favicon.ico" />
+    <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
@@ -281,6 +244,11 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -342,11 +310,6 @@
     <Content Include="Views\Categories\Details.cshtml" />
     <Content Include="Views\Categories\Edit.cshtml" />
     <Content Include="Views\Categories\Index.cshtml" />
-    <Content Include="Views\SubCategories\Create.cshtml" />
-    <Content Include="Views\SubCategories\Delete.cshtml" />
-    <Content Include="Views\SubCategories\Details.cshtml" />
-    <Content Include="Views\SubCategories\Edit.cshtml" />
-    <Content Include="Views\SubCategories\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
     <Content Include="Views\Clients\Create.cshtml" />
@@ -354,6 +317,17 @@
     <Content Include="Views\Clients\_List.cshtml" />
     <Content Include="Views\Employees\Create.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
+    <Content Include="Views\Employees\_Register.cshtml" />
+    <Content Include="Views\Makes\Create.cshtml" />
+    <Content Include="Views\Makes\Delete.cshtml" />
+    <Content Include="Views\Makes\Details.cshtml" />
+    <Content Include="Views\Makes\Edit.cshtml" />
+    <Content Include="Views\Makes\Index.cshtml" />
+    <Content Include="Views\Models\Create.cshtml" />
+    <Content Include="Views\Models\Delete.cshtml" />
+    <Content Include="Views\Models\Details.cshtml" />
+    <Content Include="Views\Models\Edit.cshtml" />
+    <Content Include="Views\Models\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -363,38 +337,6 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201708172100028_InitialCreate.resx">
-      <DependentUpon>201708172100028_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708172205075_ProductChanges.resx">
-      <DependentUpon>201708172205075_ProductChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708172231014_P.resx">
-      <DependentUpon>201708172231014_P.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708172240418_p1.resx">
-      <DependentUpon>201708172240418_p1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708180308245_Security.resx">
-      <DependentUpon>201708180308245_Security.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708180322582_a.resx">
-      <DependentUpon>201708180322582_a.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708252042003_Change to State - City.resx">
-      <DependentUpon>201708252042003_Change to State - City.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708252110398_Cities.resx">
-      <DependentUpon>201708252110398_Cities.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708252114116_City2.resx">
-      <DependentUpon>201708252114116_City2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708262257175_Employee.resx">
-      <DependentUpon>201708262257175_Employee.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

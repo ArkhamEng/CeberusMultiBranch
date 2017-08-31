@@ -1,5 +1,11 @@
-﻿
+﻿$(document).ready(function () {
 
+    $('#sidebarCollapse').on('click', function ()
+    {
+        $('#sidebar').toggleClass('active');
+    });
+
+});
 
 function SetCascade(ddlParent, ddlChild, action) {
     console.log("Setting Cascade Controls State/Cities");

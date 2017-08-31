@@ -1,4 +1,6 @@
 
+SET IDENTITY_INSERT Common.State ON
+
 INSERT INTO Common.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (1, '01', 'Aguascalientes', 'Ags.', 1),
 (2, '02', 'Baja California', 'BC', 1),

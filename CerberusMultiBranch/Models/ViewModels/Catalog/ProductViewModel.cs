@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Inventory;
 using CerberusMultiBranch.Support;
 using System;
@@ -17,15 +18,13 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
     {
         public SelectList Categories { get; set; }
 
-        public SelectList SubCategories { get; set; }
+      
 
-        [Display(Name="Categoría")]
-        public int CategoryId { get; set; }
+
 
         public ProductViewModel()
         {
             this.Categories    = new List<Category>().ToSelectList();
-            this.SubCategories = new List<SubCategory>().ToSelectList();
             this.Images        = new List<ProductImage>();
         }
 
@@ -33,9 +32,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
         {
             this.ProductId = product.ProductId;
             this.Name = product.Name;
+            this.CategoryId = product.CategoryId;
             this.BarCode = product.BarCode;
             this.BuyPrice = product.BuyPrice;
-            this.CategoryId = product.SubCategory.CategoryId;
             this.Code = product.Code;
             this.DealerPercentage = product.DealerPercentage;
             this.DealerPrice = product.DealerPrice;
@@ -44,12 +43,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.MinQuantity = product.MinQuantity;
             this.StorePercentage = product.StorePercentage;
             this.StorePrice = product.StorePrice;
-            this.SubCategory = product.SubCategory;
-            this.SubCategoryId = product.SubCategoryId;
-
+            this.TradeMark = product.TradeMark;
+            this.Unit = product.Unit;
+   
             this.Categories = new List<Category>().ToSelectList();
-            this.SubCategories = new List<SubCategory>().ToSelectList();
-
+         
         }
     }
 } 

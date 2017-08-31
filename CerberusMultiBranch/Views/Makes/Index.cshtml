@@ -1,16 +1,16 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Make>
 
 @{
     ViewBag.Title = "Index";
 }
 
-<h3>Categorias de Producto</h3>
+<h3>Marcas de Autos</h3>
 
 <p>
     @Html.ActionLink("Agregar Nuevo", "Create")
 </p>
 <div class="col-md-10">
-    <table id="tbCategories" class="table TablePrimary table-striped ">
+    <table id="tbMarks" class="table TablePrimary table-striped ">
         <thead>
             <tr>
                 <th class="col-md-6">
@@ -28,10 +28,10 @@
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td class="form-group" align="center">
-                        @Html.ActionLink(" ", "Edit", new { id = item.CategoryId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil btn-xs" })
+                        @Html.ActionLink(" ", "Edit", new { id = item.MakeId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil btn-xs" })
                     </td>
                     <td class="form-group" align="center">
-                        @Html.ActionLink(" ", "Delete", new { id = item.CategoryId }, new { @class = "btn btn-danger glyphicon glyphicon-trash btn-xs" })
+                        @Html.ActionLink(" ", "Delete", new { id = item.MakeId }, new { @class = "btn btn-danger glyphicon glyphicon-trash btn-xs" })
                     </td>
                 </tr>
             }
@@ -46,7 +46,7 @@
     })
 
     function LoadList() {
-        $("#tbCategories").DataTable(
+        $("#tbMarks").DataTable(
        {
            destroy: true,
            // "createdRow": function (row) { RowCreated(row); },

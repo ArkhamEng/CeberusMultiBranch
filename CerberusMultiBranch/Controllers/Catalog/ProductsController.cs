@@ -24,6 +24,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var model = new SearchProductViewModel();
 
             model.Categories = db.Categories.ToSelectList();
+            model.Makes = db.Makes.ToSelectList();
             return View(model);
         }
 
@@ -31,10 +32,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Search(int? categoryId, int? subCatergoryId, string name, string code)
         {
             var model = (from p in db.Products
-                         where (categoryId == null || p.SubCategory.CategoryId == categoryId)
-                         && (subCatergoryId == null || p.SubCategoryId == subCatergoryId)
-                         && (name == string.Empty || p.Name.Contains(name))
-                         && (code == string.Empty || p.Code == code)
+                         where (categoryId == null || p.CategoryId == categoryId)
+                         &&    (name == string.Empty || p.Name.Contains(name))
+                         &&    (code == string.Empty || p.Code == code)
                          select p
                          ).ToList();
 
@@ -70,7 +70,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 ProductViewModel model = new ProductViewModel(product);
                 model.Categories = db.Categories.ToSelectList();
-                model.SubCategories = db.SubCategories.Where(sc => sc.CategoryId == model.SubCategory.CategoryId).ToSelectList();
+                
                 return View(model);
             }
         }
@@ -138,14 +138,16 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             }
-            ModelState.Clear();
+           
 
             db.ProductImages.Remove(image);
             db.SaveChanges();
 
             var model = db.ProductImages.Where(i => i.ProductId == pId).ToList();
             foreach (var img in model)
-                img.File = GzipWrapper.Decompress(image.File);
+                img.File = GzipWrapper.Decompress(img.File);
+
+            ModelState.Clear();
 
             return PartialView("_ImagesLoaded", model);
         }

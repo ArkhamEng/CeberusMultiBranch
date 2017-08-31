@@ -4,7 +4,7 @@
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 
-<div class="panel panel-primary">
+<div class="panel panel-danger">
     <table id="tbClients" class="table TablePrimary table-striped">
         <thead class="panel-heading">
             <tr >
@@ -78,10 +78,10 @@
        {
            destroy: true,
            "createdRow": function (row) { RowCreated(row); },
-           "lengthChange": true,
-           "searching": true,
+           "lengthChange": false,
+           "searching": false,
            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
-           "pageLength": 5,
+           "pageLength": 10,
            "language": {
                "search": "filtrar resultados",
                "lengthMenu": "mostrar  _MENU_ ",

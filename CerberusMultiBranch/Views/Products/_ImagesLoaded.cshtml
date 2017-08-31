@@ -1,80 +1,110 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Inventory.ProductImage>
 
 
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        Imagenes Guardadas
-    </div>
+@{
+    int imgIndex = 0;
+}
 
-    <div class="panel-body" style="max-height:300px;  overflow-y: scroll;">
-        <table class="table table-striped">
-            @foreach (var item in Model)
+<div id="divCarousel" class="carousel slide" data-ride="carousel">
+        <div id="imgContainer" class="carousel-inner">
+
+
+            @foreach (var file in Model)
             {
-                var base64 = Convert.ToBase64String(item.File);
-                var imgSrc = String.Format("data:{0};base64,{1}", item.Type, base64);
+                var base64 = Convert.ToBase64String(file.File);
+                var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+                var a = imgIndex == Decimal.Zero ? "active" : "";
 
-                <tr>
-                    <td>
-                        
-                    </td>
-                    <td class="col-md-4" >
-                        <div  class="thumbnail">
-                            <img src="@imgSrc" class="img-rounded" />
-                        </div>
-                    </td>
-                    <td class="col-md-6" valign="middle" />
-                    <td >
-                        <button class="btn btn-danger" type="button" onclick="DeleteImage(@item.ProductImageId)">
-                            <span class="glyphicon glyphicon-trash"/>
-                        </button>
-                    </td>
-                </tr>
+                <div id="div+@file.ProductImageId" class="item @a thumbnail">
+                    <img src="@imgSrc" />
+                    <div class="carousel-caption">
+                        <h4>
+                            <span class="glyphicon glyphicon-trash danger" onclick="DeleteImage(@file.ProductImageId)"></span>
+                        </h4>
+                    </div>
+                </div>
+
+                imgIndex++;
             }
-        </table>
+
+            @if (imgIndex == 0)
+            {
+                <div class="item active thumbnail">
+                    <img src="~/Content/Images/sinimagen.jpg" />
+                </div>
+            }
+
+        </div>
+
+
+        <a class="left carousel-control" href="#divCarousel" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+
+        <a class="right carousel-control" href="#divCarousel" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
 
-    <div class="panel-footer ">
+@*@foreach (var file in Model)
+{
+    var base64 = Convert.ToBase64String(file.File);
+    var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+    var a = imgIndex == Decimal.Zero ? "active" : "";
+    <div class="thumbnail">
+        <a class="close"  onclick="DeleteImage(@file.ProductImageId)">x</a>
+        <img src="@imgSrc" />
     </div>
-</div>
+    imgIndex++;
+}
 
-<script>
+@if (imgIndex == 0)
+{
+    <div class="thumbnail">
+        <img src="~/Content/Images/sinimagen.jpg" />
+    </div>
+}*@
+
   
-    function DeleteImage(id)
-    {
+<script>
+    $(document).ready(function () {
+
+        $("#Pictures").val("@imgIndex");
+
+    });
+
+    function DeleteImage(id) {
         console.log("Deleting Image Id: " + id);
 
-        //$("#prg .progress-bar").css("width", "50%").addClass("progress-bar-striped active").html("50%");
-
+    
         $.ajax({
             url: "/Products/DeleteImage",
             type: "POST",
-            data: {id:id},
-            sucess: function (view)
-            {
+            cache: false,
+            
+            //processData: false,
+            data: { id: id },
+            sucess: function (view) {
                 console.log("Succes");
-                $("#divImagesLoaded").html(view);
+                $("#imgPartial").html(view);
             },
 
-            error: function (data)
-            {
-                console.log("Error"); 
+            error: function (data) {
+                console.log("Error");
             },
             statusCode:
             {
-                200: function (view)
-                {
+                200: function (view) {
                     console.log("Success 200: Authenticated ");
-                    $("#divImagesLoaded").html(view);
+                    $("#imgPartial").html(view);
+                    // $("#divImagesLoaded").modal();
                 },
-                401: function (data)
-                {
+                401: function (data) {
                     console.log("401: Unauthenticated");
                 }
             }
         });
-
-
     }
-
-
 </script>

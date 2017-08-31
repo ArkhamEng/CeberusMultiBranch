@@ -4,14 +4,17 @@
     ViewBag.Title = "Create";
 }
 
-<h3>Administración de Productos</h3>
+<h3>
+    <span class="fa fa-car" style="float:left"></span>
+    &nbsp;&nbsp;Edición de Productos
+</h3>
 <hr />
 
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @*@Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")*@
 }
 
 
@@ -20,85 +23,158 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="col-md-8 panel-group">
-
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                Datos de producto
-            </div>
+    <div class="col-md-11 panel-group">
+        <div class="panel panel-default">
+            @*<div class="panel-heading">
+                    Administración de Productos
+                </div>*@
             <div class="panel-body">
-                @Html.HiddenFor(model=> model.ProductId)
+                @Html.HiddenFor(model => model.ProductId)
                 <div class="row">
                     <div class="form-group col-md-8 ">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-star-empty"></i></span>
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
                     <div class="form-group col-md-2 col-md-offset-2">
                         @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                            @*<span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>*@
+                        </div>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-4 ">
+                    <div class="form-group col-md-6 ">
                         @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
-                        @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "", new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
+                            @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                    <div class="form-group col-md-4">
-                        @Html.LabelFor(model => model.SubCategoryId, htmlAttributes: new { @class = "control-label" })
-                        @Html.DropDownListFor(model => model.SubCategoryId, Model.SubCategories, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.SubCategoryId, "", new { @class = "text-danger" })
+
+                    <div class="form-group col-md-2 col-md-offset-4">
+                        @Html.Label("Imagenes Adjuntas", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group" onclick="ShowImages()">
+                            <span class="input-group-addon"><i class="fa fa-camera"></i></span>
+                            @Html.TextBox("Pictures", "", htmlAttributes: new { @class = "form-control disabled" })
+                        </div>
                     </div>
+
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-comment"></i></span>
+                            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(model => model.TradeMark, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
+                            @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
+                            @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.StorePercentage, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.DealerPercentage, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
-                    <div class="form-group col-md-2 col-md-offset-4">
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.WholesalerPercentage, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.WholesalerPercentage, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 col-md-offset-2">
                         @Html.LabelFor(model => model.BuyPrice, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", @type = "number", @min = "0", @step = "0.5", @value = "0" } })
-                        @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                            @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", @type = "number", @min = "0", @step = "0.5", @value = "0" } })
+                            @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.MinQuantity, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.MinQuantity, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.MinQuantity, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calculator"></i></span>
+                            @Html.EditorFor(model => model.MinQuantity, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.MinQuantity, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                            @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                            @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                    <div class="form-group col-md-4 col-md-offset-4">
+
+                    <div class="col-md-2 form-group">
+                        @Html.LabelFor(model => model.WholesalerPrice, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                            @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-4 col-md-offset-2">
                         @Html.LabelFor(model => model.BarCode, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.BarCode, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-barcode"></i></span>
+                            @Html.EditorFor(model => model.BarCode, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,29 +183,30 @@
                     <span class="glyphicon glyphicon-floppy-disk"></span>
                 </button>
 
-                @Html.ActionLink(" ", "Index", new {}, new { @class = "btn btn-primary glyphicon glyphicon-search" })
+                @Html.ActionLink(" ", "Index", new { }, new { @class = "btn btn-primary glyphicon glyphicon-search" })
 
-                <button type="button" class="btn btn-warning" onclick="ShowFiles()">
-                    <span class="glyphicon glyphicon-upload" />
+                <button type="button" class="btn btn-default" onclick="ShowFiles()">
+                    <span class="fa fa-cloud-upload" />
                 </button>
+
+                <label id="lblMessage" class="text-danger" />
             </div>
         </div>
     </div>
 
     <div id="divImagesModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
-            <div class="modal-content panel panel-primary">
-                <div class="modal-header panel-heading">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <div class="modal-content panel panel-danger">
+                @*<div class="modal-header panel-heading">
                     <h4 class="modal-title">Imagenes Nuevas</h4>
-                </div>
+                </div>*@
 
-                <div id="divImages" class="modal-body panel-body"  style="height:150px;  overflow-y: scroll;">
+                <div id="divImages" class="modal-body panel-body" style="height:150px;  overflow-y: scroll;">
                 </div>
 
                 <div id="divUploader" class="modal-footer panel-footer">
                     <label id="upl0" class="btn btn-warning btn-file ">
-                        <span class="glyphicon glyphicon-folder-open" />
+                        <span class="glyphicon glyphicon-picture" />
                         <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
                     </label>
                 </div>
@@ -139,20 +216,74 @@
 }
 
 
-<div id="divImagesLoaded" class="col-md-4">
-    @Html.Partial("_ImagesLoaded", Model.Images)
+<div id="divImagesLoaded" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div id="imgPartial" class="modal-content">
+
+            @Html.Partial("_ImagesLoaded", Model.Images)
+
+        </div>
+    </div>
 </div>
+
 
 <script>
     var imgLoaded = 0;
+    var count = 0;
 
-    $(document).ready(function ()
-    {
-        SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
+    $(document).ready(function () {
+        //$("#Code").attr("readonly", true);
+        $("#Pictures").attr("readonly", true);
+
+        $("#StorePrice").attr("readonly", true);
+        $("#WholesalerPrice").attr("readonly", true);
+        $("#DealerPrice").attr("readonly", true);
+
+
+        $("#StorePercentage").keyup(SetPrice);
+        $("#StorePercentage").click(SetPrice);
+
+        $("#WholesalerPercentage").keyup(SetPrice);
+        $("#WholesalerPercentage").click(SetPrice);
+
+        $("#DealerPercentage").keyup(SetPrice);
+        $("#DealerPercentage").click(SetPrice);
+
+        $("#BuyPrice").keyup(SetPrice);
+        $("#BuyPrice").click(SetPrice);
+
     });
 
-    function ShowFiles() {
-        $("#divImagesModal").modal({ backdrop: "static" });
+    function SetPrice()
+    {
+        console.log("KeyPressed");
+
+        var sp = (1 + $("#StorePercentage").val() / 100);
+        var dp = (1 + $("#WholesalerPercentage").val() / 100);
+        var wp = (1 + $("#DealerPercentage").val() / 100);
+
+        $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(2));
+        $("#WholesalerPrice").val(($("#BuyPrice").val() * dp).toFixed(2));
+        $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(2));
+    }
+
+
+
+    function EditCode(checkBox)
+    {
+        console.log($(checkBox).is(':checked'));
+        $("#Code").attr("readonly", !$(checkBox).is(':checked'));
+    }
+
+
+    function ShowFiles()
+    {
+        //$("#divImagesModal").modal({ backdrop: "static" });
+        $("#divImagesModal").modal();
+    }
+
+    function ShowImages() {
+        $("#divImagesLoaded").modal();
     }
 
     function DropImage(index)
@@ -162,17 +293,24 @@
 
         console.log("Drop #upl" + index);
         $("#upl" + index).remove();
+
+        count--;
+        console.log(count);
+
+        if (count == 0)
+            $("#lblMessage").text("");
+        else
+            $("#lblMessage").text("Imagenes a cargar " + count);
+
     }
 
     function ImageLoaded(input)
     {
         var files = input.files;
-        //for (var i = 0, file; file = files[i]; i++)
-        //{
+
         var reader = new FileReader();
 
-        reader.onload = function (e)
-        {
+        reader.onload = function (e) {
             $('#divImages').append(" <div id='div" + imgLoaded + "' class='thumbnail col-md-4' ><a class='close'  onclick='DropImage(" + imgLoaded + ")'>×</a><img  src='" + e.target.result + "' class='img-responsive' style='min-height:50px;height:70px;'/>");
             console.log("Imagen Index " + imgLoaded);
 
@@ -181,7 +319,6 @@
             AddUploader();
         }
         reader.readAsDataURL(files[0]);
-        //}
 
         $(input).closest("label").hide();
     }
@@ -196,6 +333,10 @@
                     '</label>';
 
         $('#divUploader').append(ctrl);
+
+        count++;
+        console.log(count);
+            $("#lblMessage").text("Imagenes a cargar " + count);
     }
 
     function Preview(input) {
@@ -227,8 +368,6 @@
                 reader.readAsDataURL(file);
             }
         }
-
-        $('.carousel').carousel();
     }
 
 </script>

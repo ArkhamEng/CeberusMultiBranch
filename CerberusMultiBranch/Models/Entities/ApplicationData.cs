@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Inventory;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -12,12 +13,19 @@ namespace CerberusMultiBranch.Models.Entities
 {
     public class ApplicationData: DbContext
     {
-
-        #region Common
+        #region Config
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<SubCategory> SubCategories { get; set; }
+        public DbSet<Make> Makes { get; set; }
+
+        public DbSet<Model> Models { get; set; }
+
+       // public DbSet<Year> Years { get; set; }
+
+        #endregion
+
+        #region Common
 
         public DbSet<State> States { get; set; }
 
@@ -50,14 +58,5 @@ namespace CerberusMultiBranch.Models.Entities
             base("DefaultConnection")
         {
         }
-
-
-        
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            // You can globally assign schema here
-            modelBuilder.HasDefaultSchema("Security");
-        }
-
     }
 }

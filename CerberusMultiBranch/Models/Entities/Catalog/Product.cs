@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Inventory;
 using Microsoft.AspNet.Identity;
 using System;
@@ -15,8 +16,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ProductId { get; set; }
 
-        [Display(Name="Sub Categoría")]
-        public int SubCategoryId { get; set; }
+        [Display(Name="Categoría")]
+        public int CategoryId { get; set; }
 
         [Display(Name = "Código")]
         [Required]
@@ -49,23 +50,40 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "% Distribuidor")]
         public int DealerPercentage { get; set; }
 
+        [Display(Name = "% Mayorista")]
+        public int WholesalerPercentage { get; set; }
+
         [Display(Name = "Precio Mostrador")]
         [DataType(DataType.Currency)]
         public double StorePrice { get; set; }
+
+        [Display(Name = "Precio Mayorista")]
+        [DataType(DataType.Currency)]
+        public double WholesalerPrice { get; set; }
+        
 
         [Display(Name = "Precio Distribuidor")]
         [DataType(DataType.Currency)]
         public double DealerPrice { get; set; }
 
-        public virtual SubCategory SubCategory { get; set; }
+        [DataType(DataType.Currency)]
+        public double MinimunPrice { get; set; }
+
+        [Display(Name = "Fabricante")]
+        public string TradeMark { get; set; }
+
+        [Display(Name = "Unidad")]
+        public string Unit { get; set; }
+
+        //public virtual SubCategory SubCategory { get; set; }
+
+        public virtual Category Category { get; set; }
 
         public ICollection<ProductImage> Images { get; set; }
 
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 
-
     }
 
-   
 }

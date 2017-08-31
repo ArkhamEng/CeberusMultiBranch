@@ -15,15 +15,21 @@ namespace CerberusMultiBranch.Controllers.Common
     {
         private ApplicationData db = new ApplicationData();
 
-        public JsonResult GetSubCategories(int parentId)
-        {
-            var list = db.SubCategories.Where(sc => sc.CategoryId == parentId).ToSelectList();
-            return Json(list);
-        }
+        //public JsonResult GetSubCategories(int parentId)
+        //{
+        //    var list = db.SubCategories.Where(sc => sc.CategoryId == parentId).ToSelectList();
+        //    return Json(list);
+        //}
 
         public JsonResult GetCities(int parentId)
         {
             var list = db.Cities.Where(c => c.StateId == parentId).ToSelectList();
+            return Json(list);
+        }
+
+        public JsonResult GetModels(int parentId)
+        {
+            var list = db.Models.Where(m => m.ModelId == parentId).ToSelectList();
             return Json(list);
         }
     }

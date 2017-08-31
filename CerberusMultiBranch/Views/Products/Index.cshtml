@@ -4,32 +4,68 @@
     ViewBag.Title = "Index";
 }
 
-<h3>Catálogo de Productos</h3>
+@*<h3>Catálogo de Productos</h3>*@
+<h3>
+    <span class="fa fa-car" style="float:left"></span>
+    &nbsp;&nbsp;Catálogo de Producto
+</h3>
 <hr />
 
 <div class="col-md-4">
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            Filtros de busqueda
-        </div>
+    <div class="panel panel-danger">
+        @*<div class="panel-heading">
+                Filtros de busqueda
+            </div>*@
         <div class="panel-body">
             <div class="row">
                 <div class="form-group col-md-12">
                     @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownList("CategoryId", Model.Categories,"", new { @class = "form-control" })
-                </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Sub Categoría", htmlAttributes: new { @class = "control-label" })
-                    @Html.DropDownList("SubCategoryId", Model.SubCategories, "", new { @class = "form-control" })
-                </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Nombre del Producto", htmlAttributes: new { @class = "control-label" })
-                    @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control", id = "txtName" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("CategoryId", Model.Categories, "", new { @class = "form-control" })
+                    </div>
                 </div>
 
-                <div class="form-group col-md-6">
+                <div class="form-group col-md-12">
+                    @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("MakeId", Model.Makes, "", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Modelo", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("ModelId", Model.Models, "", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Año", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("YearId", Model.Years, "", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Nombre del Producto", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control", id = "txtName" })
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-8">
                     @Html.Label("Código", htmlAttributes: new { @class = "control-label" })
-                    @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -37,7 +73,7 @@
             <button class="btn btn-primary" type="button" onclick="Search()">
                 <span class="glyphicon glyphicon-search" />
             </button>
-            @Html.ActionLink(" ", "Create", new {  }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
+            @Html.ActionLink(" ", "Create", new { }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
         </div>
     </div>
 </div>
@@ -49,13 +85,13 @@
 
 <script>
 
-    $(document).ready(function ()
-    {
-        SetCascade("#CategoryId", "#SubCategoryId", "GetSubCategories");
+    $(document).ready(function () {
+        SetCascade("#MakeId", "#ModelId", "GetModels");
+
+        SetCascade("#ModelId", "#YearId", "GetYear");
     });
 
-    function Search()
-    {
+    function Search() {
         console.log("Searching");
 
         //$("#prg .progress-bar").css("width", "50%").addClass("progress-bar-striped active").html("50%");
@@ -69,31 +105,28 @@
                 Name: $("#txtName").val(),
                 Code: $("#txtCode").val()
             },
-            sucess: function (view)
-            {
+            sucess: function (view) {
                 console.log("Succes");
                 $("#divProducts").html(view);
-               // $("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
+                // $("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
             },
 
             error: function (data) { console.log("Usuario Invalido"); console.log(data); },
             statusCode:
             {
-                200: function (view)
-                {
+                200: function (view) {
                     console.log("200: Authenticated ");
                     $("#divProducts").html(view);
                     //$("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
                 },
-                401: function (data)
-                {
+                401: function (data) {
                     alert('401: Unauthenticated');
                     // Handle the 401 error here.
                 }
             }
         });
 
-        
+
     }
 
 </script>

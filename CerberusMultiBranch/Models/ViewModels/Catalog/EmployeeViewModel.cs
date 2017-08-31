@@ -19,10 +19,14 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public int StateId { get; set; }
 
+
+        public RegisterViewModel Register { get; set; }
+
         public EmployeeViewModel()
         {
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
+            this.Register = new RegisterViewModel();
         }
 
         public EmployeeViewModel(Employee employee)
@@ -42,8 +46,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.ZipCode      = employee.ZipCode;
             this.Picture      = employee.Picture;
 
-            this.States = new List<State>().ToSelectList();
-            this.Cities = new List<City>().ToSelectList();
+            this.States   = new List<State>().ToSelectList();
+            this.Cities   = new List<City>().ToSelectList();
+            this.Register = new RegisterViewModel();
         }
     }
 }
