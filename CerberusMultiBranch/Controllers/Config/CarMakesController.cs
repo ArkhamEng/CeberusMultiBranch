@@ -11,7 +11,7 @@ using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    public class MakesController : Controller
+    public class CarMakesController : Controller
     {
         private ApplicationData db = new ApplicationData();
 
@@ -28,7 +28,7 @@ namespace CerberusMultiBranch.Controllers.Config
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Make make = db.Makes.Find(id);
+            CarMake make = db.Makes.Find(id);
             if (make == null)
             {
                 return HttpNotFound();
@@ -47,7 +47,7 @@ namespace CerberusMultiBranch.Controllers.Config
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "MakeId,Name")] Make make)
+        public ActionResult Create([Bind(Include = "MakeId,Name")] CarMake make)
         {
             if (ModelState.IsValid)
             {
@@ -66,7 +66,7 @@ namespace CerberusMultiBranch.Controllers.Config
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Make make = db.Makes.Find(id);
+            CarMake make = db.Makes.Find(id);
             if (make == null)
             {
                 return HttpNotFound();
@@ -79,7 +79,7 @@ namespace CerberusMultiBranch.Controllers.Config
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "MakeId,Name")] Make make)
+        public ActionResult Edit([Bind(Include = "MakeId,Name")] CarMake make)
         {
             if (ModelState.IsValid)
             {
@@ -97,7 +97,7 @@ namespace CerberusMultiBranch.Controllers.Config
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Make make = db.Makes.Find(id);
+            CarMake make = db.Makes.Find(id);
             if (make == null)
             {
                 return HttpNotFound();
@@ -110,7 +110,7 @@ namespace CerberusMultiBranch.Controllers.Config
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Make make = db.Makes.Find(id);
+            CarMake make = db.Makes.Find(id);
             db.Makes.Remove(make);
             db.SaveChanges();
             return RedirectToAction("Index");

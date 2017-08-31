@@ -184,14 +184,26 @@
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
     <Compile Include="Controllers\Common\CascadeController.cs" />
+    <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\CategoriesController.cs" />
-    <Compile Include="Controllers\Config\MakesController.cs" />
-    <Compile Include="Controllers\Config\ModelsController.cs" />
+    <Compile Include="Controllers\Config\CarMakesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708311943178_Initial.cs" />
+    <Compile Include="Migrations\201708311943178_Initial.Designer.cs">
+      <DependentUpon>201708311943178_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708311950432_Year.cs" />
+    <Compile Include="Migrations\201708311950432_Year.Designer.cs">
+      <DependentUpon>201708311950432_Year.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708312007583_CarModel.cs" />
+    <Compile Include="Migrations\201708312007583_CarModel.Designer.cs">
+      <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -206,7 +218,7 @@
     <Compile Include="Models\Entities\Config\Company.cs" />
     <Compile Include="Models\Entities\Config\Category.cs" />
     <Compile Include="Models\Entities\Catalog\Product.cs" />
-    <Compile Include="Models\Entities\Config\Year.cs" />
+    <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Inventory\ProductImage.cs" />
     <Compile Include="Models\Entities\Inventory\ProductInBranch.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
@@ -314,20 +326,18 @@
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
     <Content Include="Views\Clients\Create.cshtml" />
     <Content Include="Views\Clients\Index.cshtml" />
-    <Content Include="Views\Clients\_List.cshtml" />
     <Content Include="Views\Employees\Create.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
     <Content Include="Views\Employees\_Register.cshtml" />
-    <Content Include="Views\Makes\Create.cshtml" />
-    <Content Include="Views\Makes\Delete.cshtml" />
-    <Content Include="Views\Makes\Details.cshtml" />
-    <Content Include="Views\Makes\Edit.cshtml" />
-    <Content Include="Views\Makes\Index.cshtml" />
-    <Content Include="Views\Models\Create.cshtml" />
-    <Content Include="Views\Models\Delete.cshtml" />
-    <Content Include="Views\Models\Details.cshtml" />
-    <Content Include="Views\Models\Edit.cshtml" />
-    <Content Include="Views\Models\Index.cshtml" />
+    <Content Include="Views\CarMakes\Create.cshtml" />
+    <Content Include="Views\CarMakes\Edit.cshtml" />
+    <Content Include="Views\CarMakes\Index.cshtml" />
+    <Content Include="Views\Clients\_List.cshtml" />
+    <Content Include="Views\CarModels\Delete.cshtml" />
+    <Content Include="Views\CarModels\Details.cshtml" />
+    <Content Include="Views\CarModels\Edit.cshtml" />
+    <Content Include="Views\CarModels\Index.cshtml" />
+    <Content Include="Views\CarModels\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -337,6 +347,17 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201708311943178_Initial.resx">
+      <DependentUpon>201708311943178_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708311950432_Year.resx">
+      <DependentUpon>201708311950432_Year.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708312007583_CarModel.resx">
+      <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

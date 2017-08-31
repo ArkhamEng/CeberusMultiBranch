@@ -22,9 +22,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
         public SearchProductViewModel()
         {
             Categories    = new List<Category>().ToSelectList();
-            Makes = new List<Make>().ToSelectList();
-            Models = new List<Model>().ToSelectList();
-            Years = new List<Year>().ToSelectList();
+            Makes = new List<CarMake>().ToSelectList();
+            Models = new List<CarModel>().ToSelectList();
+            Years = new List<CarYear>().ToSelectList();
             Products      = new List<Product>();
         }
     }

@@ -8,27 +8,28 @@ using System.Web;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    public class ModelsController : Controller
+    public class CarModelsController : Controller
     {
         private ApplicationData db = new ApplicationData();
 
-        // GET: Models
+        // GET: CarModels
         public ActionResult Index()
         {
             return View(db.Models.ToList());
         }
 
-        // GET: Models/Details/5
+        // GET: CarModels/Details/5
         public ActionResult Details(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Model model = db.Models.Find(id);
+            CarModel model = db.Models.Find(id);
             if (model == null)
             {
                 return HttpNotFound();
@@ -36,18 +37,19 @@ namespace CerberusMultiBranch.Controllers.Config
             return View(model);
         }
 
-        // GET: Models/Create
-        public ActionResult Create()
+        // GET: CarModels/Create
+        public ActionResult Create(int? id)
         {
+            ViewBag.CarMakes = db.Makes.ToList();
             return View();
         }
 
-        // POST: Models/Create
+        // POST: CarModels/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ModelId,Name")] Model model)
+        public ActionResult Create([Bind(Include = "CarModelId,CarMakeId,Name")] CarModel model)
         {
             if (ModelState.IsValid)
             {
@@ -59,27 +61,28 @@ namespace CerberusMultiBranch.Controllers.Config
             return View(model);
         }
 
-        // GET: Models/Edit/5
+        // GET: CarModels/Edit/5
         public ActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Model model = db.Models.Find(id);
+            CarModel model = db.Models.Find(id);
             if (model == null)
             {
                 return HttpNotFound();
             }
+            ViewBag.CarMakes = db.Makes.ToList();
             return View(model);
         }
 
-        // POST: Models/Edit/5
+        // POST: CarModels/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ModelId,Name")] Model model)
+        public ActionResult Edit([Bind(Include = "CarModelId,CarMakeId,Name")] CarModel model)
         {
             if (ModelState.IsValid)
             {
@@ -90,14 +93,14 @@ namespace CerberusMultiBranch.Controllers.Config
             return View(model);
         }
 
-        // GET: Models/Delete/5
+        // GET: CarModels/Delete/5
         public ActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Model model = db.Models.Find(id);
+            CarModel model = db.Models.Find(id);
             if (model == null)
             {
                 return HttpNotFound();
@@ -105,12 +108,12 @@ namespace CerberusMultiBranch.Controllers.Config
             return View(model);
         }
 
-        // POST: Models/Delete/5
+        // POST: CarModels/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Model model = db.Models.Find(id);
+            CarModel model = db.Models.Find(id);
             db.Models.Remove(model);
             db.SaveChanges();
             return RedirectToAction("Index");

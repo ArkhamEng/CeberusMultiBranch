@@ -110,14 +110,14 @@
     $(document).ready(LoadList);
 
     function LoadList() {
-        $("#tbProducts").DataTable(
+        var oTable = $("#tbProducts").DataTable(
        {
            destroy: true,
            "createdRow": function (row) { RowCreated(row); },
            "lengthChange": false,
-           "searching": false,
+           "searching": true,
            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
-           "pageLength": 5,
+           "pageLength": 10,
            "language": {
                "search": "filtrar resultados",
                "lengthMenu": "mostrar  _MENU_ ",
@@ -132,7 +132,16 @@
            }
        });
 
-        console.log("Produc List Loaded");
+        $("#txtName").keyup(function ()
+        {
+            //oTable.data().filter(function (value, index) { console.log(value); value == $("#txtName").val() ? true : false; }).draw();
+
+            oTable.data()
+      .search(this.value)
+      .draw();
+        });
+
+        console.log("Product List Loaded");
     }
 
     function RowCreated(row) {

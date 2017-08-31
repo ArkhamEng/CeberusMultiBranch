@@ -17,9 +17,9 @@ namespace CerberusMultiBranch.Models.Entities
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<Make> Makes { get; set; }
+        public DbSet<CarMake> Makes { get; set; }
 
-        public DbSet<Model> Models { get; set; }
+        public DbSet<CarModel> Models { get; set; }
 
        // public DbSet<Year> Years { get; set; }
 

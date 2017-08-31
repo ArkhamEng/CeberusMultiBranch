@@ -8,9 +8,25 @@
     <span class="fa fa-address-book" style="float:left"></span>
     &nbsp;&nbsp;Catálogo de Clientes
 </h3>
-<hr />
 
-    <div class="col-md-4">
+<div class="col-md-6">
+    <div class="input-group ">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+    </div>
+</div>
+<div class="btn-group">
+    <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+        <span class="glyphicon glyphicon-eye-open"></span>
+    </button>
+    <button  type="button" class="btn btn-success"  onclick="window.location='/Clients/Create';" >
+        <span class="glyphicon  glyphicon-file"></span>
+    </button>
+
+</div>
+<br /><br /><br />
+
+    <div id="divFilters" class="col-md-4 collapse">
         <div class="panel panel-danger">
             @*<div class="panel-heading">
                 Filtros de busqueda
@@ -35,7 +51,7 @@
                         @Html.Label("Nombre del Cliente", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control", id = "txtName" })
+                            @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control"})
                             </div>
                         </div>
 
@@ -56,25 +72,40 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <button class="btn btn-primary" type="button" onclick="Search()">
+                <button class="btn btn-default" type="button" onclick="Search()">
                     <span class="glyphicon glyphicon-search" />
                 </button>
-                @Html.ActionLink(" ", "Create", new { }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
             </div>
         </div>
     </div>
 
-    <div id="divClients" class="col-md-8">
+    <div id="divClients" class="col-md-12">
         @Html.Partial("_List", Model.Clients)
     </div>
 
 
 <script>
-
+   
     $(document).ready(function ()
     {
         SetCascade("#StateId", "#CityId", "GetCities");
+
+        $("#divFilters").on("hide.bs.collapse", function ()
+        {
+            $("#btnFilter").attr("class", "btn btn-warning");
+            $("#btnFilter").html('<span class="glyphicon glyphicon-eye-open"></span>');
+            $("#divClients").attr("class", "col-md-12");
+        });
+        $("#divFilters").on("show.bs.collapse", function ()
+        {
+            $("#btnFilter").attr("class", "btn btn-default");
+            $("#btnFilter").html('<span class="glyphicon glyphicon-eye-close"></span>');
+            $("#divClients").attr("class", "col-md-8");
+        });
+
     });
+
+
 
     function Search()
     {

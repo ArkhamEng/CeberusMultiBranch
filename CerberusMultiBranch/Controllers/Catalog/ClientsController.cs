@@ -18,8 +18,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Clients
         public ActionResult Index()
         {
+
             var model = new SearchClientViewModel();
             model.States = db.States.ToSelectList();
+            model.Clients = db.Clients.Take(200).ToList();
+            
             return View(model);
         }
 

@@ -155,17 +155,21 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <button type="submit" class="btn btn-success" title="Guardar">
-                    <span class="glyphicon glyphicon-floppy-disk"></span>
-                </button>
-                <button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
+                <div class="btn-group">
 
-                <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
-                    <span class="glyphicon glyphicon-search"></span>
-                </button>
-            </div>
+                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
+                        <span class="fa fa-search-plus"></span>
+                    </button>
+                    <button type="submit" class="btn btn-success" title="Guardar">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </button>
+                   
+                    <button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
+                        <span class="glyphicon glyphicon-file"></span>
+                    </button>
+
+                </div>
+                </div>
         </div>
     </div>
 }
@@ -198,7 +202,7 @@
 
         //Setting buttons
         $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
-        $("#btnClear").click(function () { Renew() });
+        $("#btnClear").click(function () { window.location.replace('@Url.Action("Create")') });
 
         console.log("Create Client Loaded");
     }
