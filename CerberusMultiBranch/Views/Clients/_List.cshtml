@@ -2,25 +2,25 @@
 
 
 
-    <table id="tbClients" class="table TablePrimary table-striped">
-        <thead class="panel-heading">
+    <table id="tbClients" style="visibility:hidden" class="table  table-striped">
+        <thead >
             <tr>
-                <th>
+                <th class="col-md-1">
                     @Html.DisplayNameFor(model => model.Code)
                 </th>
-                <th>
+                <th class="col-md-2">
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th>
+                <th class="col-md-4">
                     @Html.DisplayNameFor(model => model.Address)
                 </th>
-                <th>
+                <th class="col-md-2">
                     @Html.DisplayNameFor(model => model.Email)
                 </th>
-                <th>
+                <th class="col-md-2">
                     @Html.DisplayNameFor(model => model.Phone)
                 </th>
-                <th></th>
+                <th class="col-md-1"></th>
             </tr>
         </thead>
         <tbody>
@@ -42,10 +42,15 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Phone)
                     </td>
-                    <td>
-                        @Html.ActionLink(" ", "Create", new { id = item.ClientId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil btn-xs" })
-
-                        @Html.ActionLink(" ", "Delete", new { id = item.ClientId }, new { @class = "btn btn-danger glyphicon glyphicon-trash  btn-xs" })
+                    <td align="right">
+                        <div class="btn-group">
+                            <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.ClientId})'">
+                                <span class="glyphicon glyphicon-pencil" />
+                            </button>
+                            <button class="btn btn-danger  btn-xs">
+                                <span class="glyphicon glyphicon-trash" />
+                            </button>
+                        </div>
                     </td>
                 </tr>
         }
@@ -54,55 +59,15 @@
 
 
 <script>
-
-
-
-    $(document).ready(function () {
-        LoadList();
-
+    
+    $(document).ready(function ()
+    {
+        SetDataTable("#tbClients");
+       console.log("Client List Loaded");
     })
 
-    $(document).ready(LoadList);
-
-    function LoadList()
+    function RowCreated()
     {
-        var oTable = $("#tbClients").DataTable(
-        {
-            destroy: true,
-            "createdRow": function (row) { RowCreated(row); },
-            "lengthChange": false,
-            "searching": true,
-            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
-            "pageLength": 10,
-            "language": {
-                "search": "filtrar resultados",
-                "lengthMenu": "mostrar  _MENU_ ",
-                "zeroRecords": "no hay datos disponibles",
-                "info": "página _PAGE_ de _PAGES_",
-                "infoEmpty": "",
-                "infoFiltered": "(filtered from _MAX_ total records)",
-                "paginate": {
-                    "previous": "Anterior",
-                    "next": "Siguiente"
-                }
-            }
-        });
-
-       $("#txtName").keyup(function ()
-       {
-           //oTable.data().filter(function (value, index) { console.log(value); value == $("#txtName").val() ? true : false; }).draw();
-
-              oTable.data()
-        .search(this.value)
-        .draw();
-       });
-
-        console.log("Client List Loaded");
-    }
-
-
-
-    function RowCreated() {
         function RowCreated(row) {
             var id = $(row).find('td:eq(0)').text();
             var options = {

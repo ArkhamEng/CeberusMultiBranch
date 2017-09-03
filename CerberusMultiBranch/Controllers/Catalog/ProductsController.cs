@@ -22,9 +22,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-
+            model.Products = db.Products.Include(p => p.Images);
             model.Categories = db.Categories.ToSelectList();
-            model.Makes = db.Makes.ToSelectList();
+            model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
 

@@ -183,6 +183,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
+    <Compile Include="Controllers\Catalog\ProvidersController.cs" />
     <Compile Include="Controllers\Common\CascadeController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\CategoriesController.cs" />
@@ -205,10 +206,27 @@
     <Compile Include="Migrations\201708312007583_CarModel.Designer.cs">
       <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709011520502_ProductNameLength.cs" />
+    <Compile Include="Migrations\201709011520502_ProductNameLength.Designer.cs">
+      <DependentUpon>201709011520502_ProductNameLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709011638062_Compatibility.cs" />
+    <Compile Include="Migrations\201709011638062_Compatibility.Designer.cs">
+      <DependentUpon>201709011638062_Compatibility.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709011642579_CarModel1.cs" />
+    <Compile Include="Migrations\201709011642579_CarModel1.Designer.cs">
+      <DependentUpon>201709011642579_CarModel1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709020002134_Categories.cs" />
+    <Compile Include="Migrations\201709020002134_Categories.Designer.cs">
+      <DependentUpon>201709020002134_Categories.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\ApplicationData.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
+    <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
     <Compile Include="Models\Entities\Common\City.cs" />
@@ -226,9 +244,12 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
+    <Compile Include="Models\ViewModels\Config\CarModelViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
@@ -318,9 +339,6 @@
     <Content Include="Views\Products\Create.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
     <Content Include="Views\Categories\Create.cshtml" />
-    <Content Include="Views\Categories\Delete.cshtml" />
-    <Content Include="Views\Categories\Details.cshtml" />
-    <Content Include="Views\Categories\Edit.cshtml" />
     <Content Include="Views\Categories\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
@@ -333,11 +351,12 @@
     <Content Include="Views\CarMakes\Edit.cshtml" />
     <Content Include="Views\CarMakes\Index.cshtml" />
     <Content Include="Views\Clients\_List.cshtml" />
-    <Content Include="Views\CarModels\Delete.cshtml" />
-    <Content Include="Views\CarModels\Details.cshtml" />
-    <Content Include="Views\CarModels\Edit.cshtml" />
     <Content Include="Views\CarModels\Index.cshtml" />
     <Content Include="Views\CarModels\Create.cshtml" />
+    <Content Include="Views\CarModels\_YearList.cshtml" />
+    <Content Include="Views\Providers\Create.cshtml" />
+    <Content Include="Views\Providers\Index.cshtml" />
+    <Content Include="Views\Providers\_List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -357,6 +376,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201708312007583_CarModel.resx">
       <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709011520502_ProductNameLength.resx">
+      <DependentUpon>201709011520502_ProductNameLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709011638062_Compatibility.resx">
+      <DependentUpon>201709011638062_Compatibility.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709011642579_CarModel1.resx">
+      <DependentUpon>201709011642579_CarModel1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709020002134_Categories.resx">
+      <DependentUpon>201709020002134_Categories.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

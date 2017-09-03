@@ -1,4 +1,5 @@
-﻿$(document).ready(function () {
+﻿$(document).ready(function ()
+{
 
     $('#sidebarCollapse').on('click', function ()
     {
@@ -52,5 +53,83 @@ function SetCascade(ddlParent, ddlChild, action) {
             $(ddlChild).empty();
             $(ddlChild).attr("readonly", true);
         }
+    });
+}
+
+function Search(url,data,target)
+{
+    console.log("Executing Ajax..");
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: data,
+        
+        sucess: function (view)
+        {
+            console.log("Success");
+            $(target).html(view);
+        },
+
+        error: function (data) { console.log("Error Executing"); console.log(data); },
+        statusCode:
+        {
+            200: function (view)
+            {
+                console.log("200: Authenticated ");
+                $(target).html(view);
+            },
+            401: function (data) {
+                alert('401: Unauthenticated');
+            }
+        }
+    });
+}
+
+
+function SetDataTable(table)
+{
+    var oTable = $(table).DataTable(
+       {
+           destroy: true,
+        //   "deferRender": true,
+          // "createdRow": function (row) { RowCreated(row); },
+           "lengthChange": false,
+           "searching": true,
+           "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
+           "pageLength": 10,
+           "language": {
+               "search": "filtrar resultados",
+               "lengthMenu": "mostrar  _MENU_ ",
+               "zeroRecords": "no hay datos disponibles",
+               "info": "página _PAGE_ de _PAGES_",
+               "infoEmpty": "",
+               "infoFiltered": "(filtered from _MAX_ total records)",
+               "paginate": {
+                   "previous": "Anterior",
+                   "next": "Siguiente"
+               }
+           }
+       });
+
+    $("#txtName").keyup(function ()
+    {
+        oTable.data().search(this.value).draw();
+    });
+
+    $(table).css("visibility", "visible")
+}
+
+function SetFilterControls(filters,button,target)
+{
+    $(filters).on("hide.bs.collapse", function () {
+        $(button).attr("class", "btn btn-warning");
+        $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');
+        $(target).attr("class", "col-md-12");
+    });
+    $(filters).on("show.bs.collapse", function () {
+        $(button).attr("class", "btn btn-default");
+        $(button).html('<span class="glyphicon glyphicon-eye-close"></span>');
+        $(target).attr("class", "col-md-8");
     });
 }

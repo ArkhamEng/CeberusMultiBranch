@@ -29,7 +29,13 @@ namespace CerberusMultiBranch.Controllers.Common
 
         public JsonResult GetModels(int parentId)
         {
-            var list = db.Models.Where(m => m.CarModelId == parentId).ToSelectList();
+            var list = db.CarModels.Where(m => m.CarMakeId == parentId).ToSelectList();
+            return Json(list);
+        }
+
+        public JsonResult GetYears(int parentId)
+        {
+            var list = db.CarYears.Where(m => m.CarModelId == parentId).ToSelectList();
             return Json(list);
         }
     }

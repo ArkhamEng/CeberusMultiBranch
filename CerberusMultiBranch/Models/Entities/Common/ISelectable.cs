@@ -10,6 +10,6 @@ namespace CerberusMultiBranch.Models.Entities.Common
     {
         int Id { get; }
 
-        string Name { get; set; }
+        string Name { get;  }
     }
 }

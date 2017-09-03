@@ -19,29 +19,29 @@ namespace CerberusMultiBranch.Controllers.Config
         // GET: CarModels
         public ActionResult Index()
         {
-            return View(db.Models.ToList());
-        }
-
-        // GET: CarModels/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            CarModel model = db.Models.Find(id);
-            if (model == null)
-            {
-                return HttpNotFound();
-            }
+            var model = db.CarModels.Include(m=> m.CarYears).ToList();
+         
             return View(model);
         }
 
         // GET: CarModels/Create
         public ActionResult Create(int? id)
         {
-            ViewBag.CarMakes = db.Makes.ToList();
-            return View();
+            ViewBag.CarMakes = db.CarMakes.ToList();
+
+            if (id != null)
+            {
+                CarModel model = db.CarModels.Include(m => m.CarYears).ToList().Find(m=> m.CarModelId == id.Value);
+                
+
+                return View(model);
+            }
+            else
+            {
+                CarModel model = new CarModel();
+                model.CarYears = new List<CarYear>();
+                return View(model);
+            }
         }
 
         // POST: CarModels/Create
@@ -53,7 +53,12 @@ namespace CerberusMultiBranch.Controllers.Config
         {
             if (ModelState.IsValid)
             {
-                db.Models.Add(model);
+
+                if (model.CarModelId != Cons.Zero)
+                    db.Entry(model).State = EntityState.Modified;
+                else
+                    db.CarModels.Add(model);
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -61,38 +66,20 @@ namespace CerberusMultiBranch.Controllers.Config
             return View(model);
         }
 
-        // GET: CarModels/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            CarModel model = db.Models.Find(id);
-            if (model == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CarMakes = db.Makes.ToList();
-            return View(model);
-        }
-
-        // POST: CarModels/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CarModelId,CarMakeId,Name")] CarModel model)
+        public ActionResult AddYear(int carModelId, int year)
         {
-            if (ModelState.IsValid)
-            {
-                db.Entry(model).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(model);
-        }
 
+            var carYear = new CarYear { CarModelId = carModelId, Year = year };
+            db.CarYears.Add(carYear);
+            db.SaveChanges();
+
+            var model = db.CarYears.Where(y => y.CarModelId == carYear.CarModelId).OrderBy(y => y.Year);
+            return PartialView("_YearList", model);
+        }
+        
+
+       
         // GET: CarModels/Delete/5
         public ActionResult Delete(int? id)
         {
@@ -100,7 +87,7 @@ namespace CerberusMultiBranch.Controllers.Config
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            CarModel model = db.Models.Find(id);
+            CarModel model = db.CarModels.Find(id);
             if (model == null)
             {
                 return HttpNotFound();
@@ -113,8 +100,8 @@ namespace CerberusMultiBranch.Controllers.Config
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            CarModel model = db.Models.Find(id);
-            db.Models.Remove(model);
+            CarModel model = db.CarModels.Find(id);
+            db.CarModels.Remove(model);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

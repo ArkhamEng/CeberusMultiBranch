@@ -32,11 +32,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
                 var model = (from c in db.Clients
                           where
-                              (name     == string.Empty || c.Name.Contains(name)) &&
+                              (name     == null || c.Name.Contains(name)) &&
                               (stateId  == null || c.City.StateId == stateId) &&
                               (cityId   == null || c.CityId == cityId) &&
-                              (phone    == string.Empty || c.Phone == phone) &&
-                              (code     == string.Empty || c.Code == code)
+                              (phone    == null || c.Phone == phone) &&
+                              (code     == null || c.Code == code)
                           select c).ToList();
 
                 return PartialView("_List", model);

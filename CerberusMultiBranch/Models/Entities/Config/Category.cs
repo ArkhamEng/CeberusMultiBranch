@@ -15,9 +15,6 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public string Name { get; set; }
 
-        //public ICollection<SubCategory> SubCategories { get; set; }
-
-        public ICollection<Product> SubCategories { get; set; }
 
         public int Id { get { return CategoryId; } }
     }

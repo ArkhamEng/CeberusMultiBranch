@@ -26,7 +26,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Code { get; set; }
 
         [Display(Name = "Nombre")]
-        [MaxLength(20)]
+        [MaxLength(100)]
         [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
 
@@ -75,11 +75,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Unidad")]
         public string Unit { get; set; }
 
-        //public virtual SubCategory SubCategory { get; set; }
-
         public virtual Category Category { get; set; }
 
         public ICollection<ProductImage> Images { get; set; }
+
+        public ICollection<Compatibility> Compatibilities { get; set; }
 
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }

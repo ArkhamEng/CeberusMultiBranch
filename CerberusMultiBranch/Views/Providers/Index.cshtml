@@ -1,13 +1,14 @@
-﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.SearchClientViewModel
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.SearchProviderViewModel
 
 @{
     ViewBag.Title = "Index";
 }
 
 <h3>
-    <span class="fa fa-address-book" style="float:left"></span>
-    &nbsp;&nbsp;Catálogo de Clientes
+    <span class="fa fa-address-book-o" style="float:left"></span>
+    &nbsp;&nbsp;Catálogo de Proveedores
 </h3>
+
 
 <div class="col-md-7">
     <div class="input-group ">
@@ -17,7 +18,7 @@
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
-            <button type="button" class="btn btn-success" id="btnCreate">
+            <button type="button" class="btn btn-success"  id="btnCreate">
                 <span class="glyphicon  glyphicon-file"></span>
             </button>
         </span>
@@ -28,9 +29,7 @@
 
 <div id="divFilters" class="col-md-4 collapse">
     <div class="panel panel-danger">
-        @*<div class="panel-heading">
-                Filtros de busqueda
-            </div>*@
+      
         <div class="panel-body">
             <div class="row">
                 <div class="form-group col-md-12">
@@ -48,7 +47,7 @@
                     </div>
                 </div>
                 <div class="form-group col-md-12">
-                    @Html.Label("Nombre del Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Nombre del Proveedor", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control" })
@@ -56,7 +55,7 @@
                 </div>
 
                 <div class="form-group col-md-7">
-                    @Html.Label("Clave de Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Clave de Proveedor", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
@@ -72,7 +71,7 @@
             </div>
         </div>
         <div class="panel-footer">
-            <button class="btn btn-default" type="button" id="btnSearch">
+            <button class="btn btn-default" type="button" onclick="Search()">
                 <span class="glyphicon glyphicon-search" />
             </button>
         </div>
@@ -80,28 +79,34 @@
 </div>
 
 <div id="divClients" class="col-md-12">
-    @Html.Partial("_List", Model.Clients)
+    @Html.Partial("_List", Model.Providers)
 </div>
 
-
 <script>
-
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '/Clients/Create'; });
-
-        SetCascade("#StateId", "#CityId", "GetCities");
+        $("#btnCreate").click(function () { window.location = '/Providers/Create'; });
 
         SetFilterControls("#divFilters", "#btnFilter", "#divClients");
 
+        SetCascade("#StateId", "#CityId", "GetCities");
 
         $("#btnSearch").click(function ()
         {
             console.log("Searching Clients");
-            var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#Name").val(), code: $("#Code").val(), phone: $("#Phone").val() };
+
+            var data = {
+                stateId: $("#StateId").val(),
+                cityId: $("#CityId").val(),
+                name: $("#Name").val(),
+                code: $("#Code").val(),
+                phone: $("#Phone").val()
+            };
+
             Search("/Clients/Search", data, "#divClients");
         });
     });
-
-
 </script>
+
+
+

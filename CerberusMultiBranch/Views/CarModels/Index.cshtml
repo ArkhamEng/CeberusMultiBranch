@@ -13,23 +13,30 @@
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button class="btn btn-warning" id="btnCreate">
+                <span class="glyphicon glyphicon-plus" />
+            </button>
+        </span>
     </div>
 </div>
-@Html.ActionLink(" ", "Create", new { }, new { @class = "btn btn-warning glyphicon glyphicon-plus btn-md" })
-<br /><br />
+
+<br /><br /><br />
 
 <div class="col-md-10">
-    <table id="tbModels" class="table TablePrimary table-striped">
+    <table id="tbModels" style="visibility:hidden" class="table  table-striped">
         <thead>
             <tr>
-                <th >
+                <th class="col-md-3">
                     @Html.DisplayNameFor(model => model.CarMakeId)
                 </th>
-                <th > 
+                <th class="col-md-5">
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th ></th>
-                <th></th>
+                <th class="col-md-3">
+                    @Html.DisplayNameFor(model => model.CarYears)
+                </th>
+                <th class="col-md-1" hidden="hidden"></th>
             </tr>
         </thead>
 
@@ -38,16 +45,32 @@
             {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Make.Name)
+                        @Html.DisplayFor(modelItem => item.CarMake.Name)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-                    <td class="form-group" align="center">
-                        @Html.ActionLink(" ", "Edit", new { id = item.CarModelId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil btn-xs" })
+                    <td>
+                        @if (item.CarYears != null)
+                        {
+                            foreach (var carYear in item.CarYears)
+                            {
+                                @Html.DisplayFor(mYear => carYear.Year)<a>,</a>
+                            }
+                        }
+
                     </td>
-                    <td class="form-group" align="center">
-                        @Html.ActionLink(" ", "Delete", new { id = item.CarModelId }, new { @class = "btn btn-danger glyphicon glyphicon-trash btn-xs" })
+                    <td align="right">
+                        <div class="btn-group">
+                            <div class="btn-group">
+                                <button class="btn btn-primary  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.CarModelId})'">
+                                    <span class="glyphicon glyphicon-pencil" />
+                                </button>
+                                <button class="btn btn-danger  btn-xs">
+                                    <span class="glyphicon glyphicon-trash" />
+                                </button>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             }
@@ -56,39 +79,10 @@
 </div>
 
 <script>
-    $(document).ready(function () {
-        LoadList();
-    })
-
-    function LoadList()
+    $(document).ready(function ()
     {
-        var oTable = $("#tbModels").DataTable(
-        {
-            destroy: true,
-            // "createdRow": function (row) { RowCreated(row); },
-            "lengthChange": true,
-            "searching": true,
-            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
-            "pageLength": 10,
-            "language": {
-                "search": "filtrar resultados",
-                "lengthMenu": "mostrar  _MENU_ ",
-                "zeroRecords": "no hay datos disponibles",
-                "info": "página _PAGE_ de _PAGES_",
-                "infoEmpty": "",
-                "infoFiltered": "(filtered from _MAX_ total records)",
-                "paginate": {
-                    "previous": "Anterior",
-                    "next": "Siguiente"
-                }
-            }
-        });
+        $("#btnCreate").click(function () { window.location.replace('@Url.Action("Create")') });
 
-
-        $("#Name").keyup(function ()
-        {
-            //oTable.data().filter(function (value, index) { console.log(value); value == $("#txtName").val() ? true : false; }).draw();
-            oTable.data().search(this.value).draw();
-        });
-    }
+        SetDataTable("#tbModels");
+    })
 </script>

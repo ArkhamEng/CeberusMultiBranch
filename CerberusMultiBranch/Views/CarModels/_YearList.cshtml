@@ -1,0 +1,21 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.CarYear>
+
+
+    <table class="table table-striped panel panel-danger">
+        <tbody>
+            @foreach (var carYear in Model)
+            {
+                <tr>
+                    <td class="col-md-2 fa fa-calendar-plus-o"></td>
+                    <td>
+                        @Html.DisplayFor(modelItem => carYear.Year)
+                    </td>
+                    <td  class="col-md-1 ">
+                        <button class="btn btn-danger btn-xs">
+                            <span class="glyphicon glyphicon-trash" />
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>

@@ -23,6 +23,9 @@ namespace CerberusMultiBranch.Models.Entities.Inventory
         public double Size { get; set; }
 
         public virtual Product Product { get; set; }
+        [NotMapped]
+        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.File); } }
+
 
     }
 }

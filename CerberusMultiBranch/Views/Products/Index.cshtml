@@ -10,21 +10,21 @@
     &nbsp;&nbsp;Catálogo de Producto
 </h3>
 
-<div class="col-md-6">
+<div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+                <span class="glyphicon glyphicon-eye-open"></span>
+            </button>
+            <button type="button" class="btn btn-success" id="btnCreate">
+                <span class="glyphicon  glyphicon-file"></span>
+            </button>
+        </span>
     </div>
 </div>
-<div class="btn-group">
-    <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
-        <span class="glyphicon glyphicon-eye-open"></span>
-    </button>
-    <button type="button" class="btn btn-success" onclick="window.location='/Clients/Create';">
-        <span class="glyphicon  glyphicon-file"></span>
-    </button>
 
-</div>
 <br /><br /><br />
 
 <div id="divFilters" class="col-md-4  collapse">
@@ -46,7 +46,7 @@
                     @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("MakeId", Model.Makes, "", new { @class = "form-control" })
+                        @Html.DropDownList("CarMakeId", Model.Makes, "", new { @class = "form-control" })
                     </div>
                 </div>
 
@@ -54,7 +54,7 @@
                     @Html.Label("Modelo", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("ModelId", Model.Models, "", new { @class = "form-control" })
+                        @Html.DropDownList("CarModelId", Model.Models, "", new { @class = "form-control" })
                     </div>
                 </div>
 
@@ -62,7 +62,7 @@
                     @Html.Label("Año", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("YearId", Model.Years, "", new { @class = "form-control" })
+                        @Html.DropDownList("CarYearId", Model.Years, "", new { @class = "form-control" })
                     </div>
                 </div>
 
@@ -86,7 +86,7 @@
             </div>
         </div>
         <div class="panel-footer">
-            <button class="btn btn-primary" type="button" onclick="Search()">
+            <button class="btn btn-primary" type="button" id="btnSearch">
                 <span class="glyphicon glyphicon-search" />
             </button>
             @Html.ActionLink(" ", "Create", new { }, new { @class = "btn btn-warning glyphicon glyphicon-file" })
@@ -104,54 +104,27 @@
     $(document).ready(function () {
         SetCascade("#MakeId", "#ModelId", "GetModels");
 
-        $("#divFilters").on("hide.bs.collapse", function () {
-            $("#btnFilter").attr("class", "btn btn-warning");
-            $("#btnFilter").html('<span class="glyphicon glyphicon-eye-open"></span>');
-            $("#divProducts").attr("class", "col-md-12");
-        });
-        $("#divFilters").on("show.bs.collapse", function () {
-            $("#btnFilter").attr("class", "btn btn-default");
-            $("#btnFilter").html('<span class="glyphicon glyphicon-eye-close"></span>');
-            $("#divProducts").attr("class", "col-md-8");
-        });
-    });
+        SetCascade("#ModelId", "#YearId", "GetYears");
 
-    function Search() {
-        console.log("Searching");
+        $("#btnCreate").click(function () { window.location = '/Products/Create'; });
 
-        //$("#prg .progress-bar").css("width", "50%").addClass("progress-bar-striped active").html("50%");
+        SetFilterControls("#divFilters", "#btnFilter", "#divProducts");
 
-        $.ajax({
-            url: "/Products/Search",
-            type: "POST",
-            data: {
+        $("#btnSearch").click(function ()
+        {
+            console.log("Searching Clients");
+
+            var data = {
                 categoryId: $("#CategoryId").val(),
-                subCategoryId: $("#SubCategoryId").val(),
-                Name: $("#txtName").val(),
-                Code: $("#txtCode").val()
-            },
-            sucess: function (view) {
-                console.log("Succes");
-                $("#divProducts").html(view);
-                // $("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
-            },
+                carMakeId: $("#CarMakeId").val(),
+                carModelId: $("#CarModelId").val(),
+                carYear: $("#CarYear").val(),
+                name: $("#Name").val(),
+                code: $("#Code").val(),
+            };
 
-            error: function (data) { console.log("Usuario Invalido"); console.log(data); },
-            statusCode:
-            {
-                200: function (view) {
-                    console.log("200: Authenticated ");
-                    $("#divProducts").html(view);
-                    //$("#prg .progress-bar").css({ "width": "100%" }).removeClass("active").html("100%");
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                    // Handle the 401 error here.
-                }
-            }
+            Search("/Products/Search", data, "#divProducts");
         });
 
-
-    }
-
+    });
 </script>

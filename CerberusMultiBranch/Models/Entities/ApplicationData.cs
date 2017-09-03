@@ -17,11 +17,11 @@ namespace CerberusMultiBranch.Models.Entities
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<CarMake> Makes { get; set; }
+        public DbSet<CarMake> CarMakes { get; set; }
 
-        public DbSet<CarModel> Models { get; set; }
+        public DbSet<CarModel> CarModels { get; set; }
 
-       // public DbSet<Year> Years { get; set; }
+        public DbSet<CarYear> CarYears { get; set; }
 
         #endregion
 
@@ -36,6 +36,8 @@ namespace CerberusMultiBranch.Models.Entities
         #region Catalogs
 
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<Compatibility> Compatibilites { get; set; }
 
         public DbSet<Client> Clients { get; set; }
 

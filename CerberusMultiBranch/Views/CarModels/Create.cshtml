@@ -4,46 +4,128 @@
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
-
-
-@using (Html.BeginForm()) 
+<h3>
+    <span class="fa fa-car" style="float:left"></span>
+    &nbsp;&nbsp;Edición de Modelos
+</h3>
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>CarModel</h4>
+
+    <div class="col-md-6">
+
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.CarMakeId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("CarMakeId",new SelectList( ViewBag.CarMakeId,"Id","Name"), new { @class = "form-control" })
-                
-                @Html.ValidationMessageFor(model => model.CarMakeId, "", new { @class = "text-danger" })
-            </div>
+
+        @Html.HiddenFor(model => model.CarModelId)
+        <div class="form-group col-md-10">
+            @Html.LabelFor(model => model.CarMakeId, htmlAttributes: new { @class = "control-label" })
+            @Html.DropDownListFor(model => model.CarMakeId, new SelectList(ViewBag.CarMakes, "Id", "Name"), "", new { @class = "form-control" })
+
+            @Html.ValidationMessageFor(model => model.CarMakeId, "", new { @class = "text-danger" })
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-            </div>
+        <div class="form-group col-md-10">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
         </div>
 
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
+        <div class="form-group col-md-7">
+            <div class="btn-group">
+                <button class="btn btn-success">
+                    <span class="glyphicon glyphicon-floppy-disk" />
+                </button>
+                <button type="button" class="btn btn-primary" id="btnSearch">
+                    <span class="fa fa-search-plus"></span>
+                </button>
             </div>
         </div>
     </div>
 }
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
+<div class="col-md-6 ">
+    <hr />
+    <div class="row">
+        <div class="form-group col-md-7">
+            @Html.Label("Agregar Años", htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+                @Html.TextBox("Year", "", htmlAttributes: new { @class = "form-control" })
+                <span class="input-group-btn">
+                    <button class="btn btn-warning" id="btnAddYear">
+                        <span class="glyphicon glyphicon-plus" />
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div id="divYears" class="form-group col-md-7">
+            @Html.Partial("_YearList", Model.CarYears)
+        </div>
+    </div>
 </div>
+
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnSearch").click(function () { window.location.replace('@Url.Action("Index")') });
+
+        $("#btnAddYear").click(AddYear);
+
+        $("#btnAddYear").prop("disabled", true);
+
+        $("#Year").keyup(function ()
+        {
+            if ($(this).val().length > 0)
+                $("#btnAddYear").prop("disabled", false);
+            else
+                $("#btnAddYear").prop("disabled", true);
+        })
+
+        if ($("#CarModelId").val() != "0")
+            $("#Year").prop("disabled", false);
+
+        else
+            $("#Year").prop("disabled", true);
+
+    });
+
+    function AddYear() 
+    {
+       
+        $.ajax({
+            url: "/CarModels/AddYear",
+            type: "post",
+            data: { CarModelId: $("#CarModelId").val(), Year: $("#Year").val() },
+            
+            sucess: function (view)
+            {
+                console.log("Succes");
+                $("#divYears").html(view);
+            },
+
+            error: function (data) { console.log("Usuario Invalido"); console.log(data); },
+            statusCode:
+            {
+                200: function (view)
+                {
+                    console.log("200: Authenticated ");
+                    $("#divYears").html(view);
+                    $("#Year").val("");
+                    $("#btnAddYear").prop("disabled", true);
+                },
+                401: function (data)
+                {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+</script>
