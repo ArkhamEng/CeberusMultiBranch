@@ -18,6 +18,14 @@ namespace CerberusMultiBranch.Support
                 return (int)decimal.Zero;
         }
 
+        public static string ToCode(this string code)
+        {
+            if (code != null && code != string.Empty)
+                return (Convert.ToInt32(code) + Cons.One).ToString(Cons.CodeMask);
+            else
+                return (decimal.Zero + Cons.One).ToString(Cons.CodeMask);
+        }
+
         public static SelectList ToSelectList(this IEnumerable data)
         {
             return new SelectList(data, nameof(ISelectable.Id), nameof(ISelectable.Name));

@@ -20,25 +20,26 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Providers
         public ActionResult Index()
         {
-            var model = new SearchProviderViewModel();
-            model.States = db.States.ToSelectList();
+            var model       = new SearchProviderViewModel();
+            model.Providers = db.Providers.Take(100).ToList();
+            model.States    = db.States.ToSelectList();
 
             return View(model);
         }
 
-        // GET: Providers/Details/5
-        public ActionResult Details(int? id)
+        [HttpPost]
+        public ActionResult Search(int? stateId, int? cityId, string code, string name, string phone)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Provider provider = db.Providers.Find(id);
-            if (provider == null)
-            {
-                return HttpNotFound();
-            }
-            return View(provider);
+            var model = (from c in db.Providers
+                         where
+                             (name == null || c.Name.Contains(name)) &&
+                             (stateId == null || c.City.StateId == stateId) &&
+                             (cityId == null || c.CityId == cityId) &&
+                             (phone == null || c.Phone == phone) &&
+                             (code == null || c.Code == code)
+                         select c).ToList();
+
+            return PartialView("_List", model);
         }
 
         // GET: Providers/Create
@@ -46,7 +47,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             ProviderViewModel model;
             if (id != null)
-                model = new ProviderViewModel(db.Providers.Find(id));
+            {
+                model = CreateModel(db.Providers.Find(id));
+            }
             else
                 model = new ProviderViewModel();
 
@@ -55,81 +58,34 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         }
 
+        private ProviderViewModel CreateModel(Provider provider)
+        {
+            var model = new ProviderViewModel(provider);
+            model.States = db.States.ToSelectList();
+            model.StateId = db.Cities.Find(model.CityId).StateId;
+            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
+
+            return model;
+        }
+
         // POST: Providers/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "ProviderId,Code,Name,BusinessName,WebSite,FTR,Address,ZipCode,Email,Phone,CityId,IsActive,InsDate,UpdDate")] Provider provider)
+        public ActionResult Create(Provider provider)
         {
-            if (ModelState.IsValid)
-            {
-                db.Providers.Add(provider);
+                if (provider.ProviderId == Cons.Zero)
+                {
+                    provider.Code = db.Providers.Max(c => c.Code).ToCode();
+                    db.Providers.Add(provider);
+                }
+                else
+                    db.Entry(provider).State = EntityState.Modified;
+
                 db.SaveChanges();
-                return RedirectToAction("Index");
-            }
 
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Code", provider.CityId);
-            return View(provider);
-        }
-
-        // GET: Providers/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Provider provider = db.Providers.Find(id);
-            if (provider == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Code", provider.CityId);
-            return View(provider);
-        }
-
-        // POST: Providers/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "ProviderId,Code,Name,BusinessName,WebSite,FTR,Address,ZipCode,Email,Phone,CityId,IsActive,InsDate,UpdDate")] Provider provider)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(provider).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Code", provider.CityId);
-            return View(provider);
-        }
-
-        // GET: Providers/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Provider provider = db.Providers.Find(id);
-            if (provider == null)
-            {
-                return HttpNotFound();
-            }
-            return View(provider);
-        }
-
-        // POST: Providers/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Provider provider = db.Providers.Find(id);
-            db.Providers.Remove(provider);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+                return RedirectToAction("Create",new { id = provider.ProviderId });            
         }
 
         protected override void Dispose(bool disposing)

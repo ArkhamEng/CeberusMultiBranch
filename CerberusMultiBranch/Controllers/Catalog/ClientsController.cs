@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var model = new SearchClientViewModel();
             model.States = db.States.ToSelectList();
             model.Clients = db.Clients.Take(200).ToList();
-            
+
             return View(model);
         }
 
@@ -30,33 +30,33 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult Search(int? stateId, int? cityId, string code, string name, string phone)
         {
-                var model = (from c in db.Clients
-                          where
-                              (name     == null || c.Name.Contains(name)) &&
-                              (stateId  == null || c.City.StateId == stateId) &&
-                              (cityId   == null || c.CityId == cityId) &&
-                              (phone    == null || c.Phone == phone) &&
-                              (code     == null || c.Code == code)
-                          select c).ToList();
+            var model = (from c in db.Clients
+                         where
+                             (name == null || c.Name.Contains(name)) &&
+                             (stateId == null || c.City.StateId == stateId) &&
+                             (cityId == null || c.CityId == cityId) &&
+                             (phone == null || c.Phone == phone) &&
+                             (code == null || c.Code == code)
+                         select c).ToList();
 
-                return PartialView("_List", model);
+            return PartialView("_List", model);
         }
 
 
         // GET: Clients/Create
         public ActionResult Create(int? id)
         {
+            ClientViewModel model;
+
             if (id == null)
-            {
-                var model = new ClientViewModel();
-                model.States = db.States.ToSelectList();
-                return View(model);
-            }
+                model = new ClientViewModel();
             else
-            {
-                var model = CreateModel(db.Clients.Find(id));
-                return View(model);
-            }
+                 model = CreateModel(db.Clients.Find(id));
+
+
+            model.States = db.States.ToSelectList();
+            return View(model);
+
         }
 
         private ClientViewModel CreateModel(Client client)
@@ -78,6 +78,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             if (client.ClientId == Cons.Zero)
             {
+                client.Code = db.Clients.Max(c => c.Code).ToCode();
                 db.Clients.Add(client);
             }
             else
@@ -85,8 +86,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             db.SaveChanges();
 
-            var model = CreateModel(client);
-            return View(model);
+
+            return RedirectToAction("Create", new { id = client.ClientId });
         }
 
         // GET: Clients/Delete/5

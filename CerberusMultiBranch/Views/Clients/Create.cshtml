@@ -37,8 +37,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-key"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
-
-                            @*<span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>*@
+                            <span class="input-group-addon"><input type="checkbox" id="cbCode" ></span>
                         </div>
                         @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
                     </div>
@@ -161,7 +160,7 @@
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                     </button>
                    
-                    <button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
+                    <button type="button" class="btn btn-warning " title="Limpiar" id="btnClear">
                         <span class="glyphicon glyphicon-file"></span>
                     </button>
 
@@ -176,17 +175,15 @@
 
     $(document).ready(LoadCreate);
 
-    function EditCode(checkBox)
-    {
-        console.log($(checkBox).is(':checked'));
-        $("#Code").attr("readonly", !$(checkBox).is(':checked'));
-    }
-
+  
     function LoadCreate() {
         SetCascade("#StateId", "#CityId", "GetCities");
 
-        console.log("Loading CreateClient");
-        //$("#Code").attr("readonly", true);
+        $("#Code").attr("readonly", !$(this).is(':checked'));
+
+        $("#cbCode").click(function () {
+            $("#Code").attr("readonly", !$(this).is(':checked'));
+        })
 
 
         $("#Name").keyup(FillNames);
@@ -198,8 +195,8 @@
 
 
         //Setting buttons
-        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
-        $("#btnClear").click(function () { window.location.replace('@Url.Action("Create")') });
+        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")' });
+        $("#btnClear").click(function () { window.location = '@Url.Action("Create",new { })' });
 
         console.log("Create Client Loaded");
     }

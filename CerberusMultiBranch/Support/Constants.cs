@@ -10,6 +10,6 @@ namespace CerberusMultiBranch.Support
         public const int Zero = 0;
         public const int One = 1;
 
-        public const string CodeMask = "0000";
+        public const string CodeMask = "000000";
     }
 }

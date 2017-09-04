@@ -65,9 +65,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 var product = db.Products.Find(id);
                 product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
 
-                foreach (var image in product.Images)
-                    image.File = GzipWrapper.Decompress(image.File);
-
                 ProductViewModel model = new ProductViewModel(product);
                 model.Categories = db.Categories.ToSelectList();
                 
@@ -121,7 +118,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.SaveChanges();
             }
 
-            return RedirectToAction("Create", product.ProductId);
+            return RedirectToAction("Create",new { id = product.ProductId });
         }
 
         [HttpPost] 

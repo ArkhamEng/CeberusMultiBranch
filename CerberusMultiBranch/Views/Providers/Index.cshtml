@@ -71,23 +71,23 @@
             </div>
         </div>
         <div class="panel-footer">
-            <button class="btn btn-default" type="button" onclick="Search()">
+            <button class="btn btn-default" type="button" id="btnSearch">
                 <span class="glyphicon glyphicon-search" />
             </button>
         </div>
     </div>
 </div>
 
-<div id="divClients" class="col-md-12">
+<div id="divProviders" class="col-md-12">
     @Html.Partial("_List", Model.Providers)
 </div>
 
 <script>
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '/Providers/Create'; });
+        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
 
-        SetFilterControls("#divFilters", "#btnFilter", "#divClients");
+        SetFilterControls("#divFilters", "#btnFilter", "#divProviders");
 
         SetCascade("#StateId", "#CityId", "GetCities");
 
@@ -103,7 +103,7 @@
                 phone: $("#Phone").val()
             };
 
-            Search("/Clients/Search", data, "#divClients");
+            Search("/Providers/Search", data, "#divProviders");
         });
     });
 </script>

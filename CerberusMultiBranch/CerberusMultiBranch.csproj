@@ -247,6 +247,7 @@
     <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\SearchEmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\CarModelViewModel.cs" />
@@ -357,6 +358,7 @@
     <Content Include="Views\Providers\Create.cshtml" />
     <Content Include="Views\Providers\Index.cshtml" />
     <Content Include="Views\Providers\_List.cshtml" />
+    <Content Include="Views\Employees\_List.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
