@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities;
-using CerberusMultiBranch.Models.Entities.Inventory;
+using CerberusMultiBranch.Models.Entities.Catalog;
 using Microsoft.AspNet.Identity;
 using System.IO;
 using CerberusMultiBranch.Models.Entities.Catalog;

@@ -39,8 +39,6 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         [Display(Name = "Años")]
         public ICollection<CarYear> CarYears { get; set; }
-
-     
     }
 
     [Table("CarYear", Schema = "Config")]
@@ -62,12 +60,4 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public virtual CarModel CarModel { get; set; }
     }
 
-    [Serializable()]
-    public class TestYear
-    {
-        public string CarModelId { get; set; }
-
-        
-        public string Year { get; set; }
-    }
 }

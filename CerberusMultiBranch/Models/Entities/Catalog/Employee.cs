@@ -30,12 +30,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_FTR", IsUnique = false)]
         public string FTR { get; set; }
 
-        [Display(Name = "Dirección Fiscal")]
-        [DataType(DataType.MultilineText)]
-        public string TaxAddress { get; set; }
 
         [Display(Name = "Dirección")]
-        [DataType(DataType.MultilineText)]
         [Required]
         public string Address { get; set; }
 
@@ -81,6 +77,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [NotMapped]
         public HttpPostedFileBase PostedFile { get; set; }
+
+        [NotMapped]
+        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
+
+        public string PictureType { get; set; }
 
         public Employee()
         {

@@ -1,7 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Inventory;
+using CerberusMultiBranch.Models.Entities.Catalog;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;

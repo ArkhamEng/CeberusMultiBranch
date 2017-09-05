@@ -5,9 +5,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-namespace CerberusMultiBranch.Models.Entities.Inventory
+namespace CerberusMultiBranch.Models.Entities.Catalog
 {
-    [Table("ProductImage", Schema = "Inventory")]
+    [Table("ProductImage", Schema = "Catalog")]
     public class ProductImage
     {
         public int ProductImageId { get; set; }

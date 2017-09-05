@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
-namespace CerberusMultiBranch.Models.Entities.Inventory
+namespace CerberusMultiBranch.Models.Entities.Catalog
 {
     [Table("ProductInBranch", Schema = "Inventory")]
     public class ProductInBranch

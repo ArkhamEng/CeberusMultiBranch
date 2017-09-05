@@ -1,7 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Inventory;
+using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -17,10 +17,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
     public class ProductViewModel:Product
     {
         public SelectList Categories { get; set; }
-
-      
-
-
 
         public ProductViewModel()
         {

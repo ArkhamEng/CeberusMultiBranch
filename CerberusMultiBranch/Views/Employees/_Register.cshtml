@@ -6,8 +6,13 @@
         {
             <div class="panel-body">
                 @Html.AntiForgeryToken()
-                <h4>Cuenta de usuario</h4>
+
+                <h4>
+                    <span class="fa fa-user-o" style="float:left"></span>
+                    &nbsp;&nbsp;Cuenta de usuario
+                </h4>
                 <hr />
+
                 <div class="row">
                     <div class="form-group col-md-10">
                         @Html.LabelFor(m => m.Email, new { @class = "control-label" })

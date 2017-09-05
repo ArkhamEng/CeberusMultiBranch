@@ -222,6 +222,14 @@
     <Compile Include="Migrations\201709020002134_Categories.Designer.cs">
       <DependentUpon>201709020002134_Categories.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709042307544_EmployeeImage.cs" />
+    <Compile Include="Migrations\201709042307544_EmployeeImage.Designer.cs">
+      <DependentUpon>201709042307544_EmployeeImage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709050006583_Employee Changes.cs" />
+    <Compile Include="Migrations\201709050006583_Employee Changes.Designer.cs">
+      <DependentUpon>201709050006583_Employee Changes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\ApplicationData.cs" />
@@ -237,7 +245,7 @@
     <Compile Include="Models\Entities\Config\Category.cs" />
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
-    <Compile Include="Models\Entities\Inventory\ProductImage.cs" />
+    <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Inventory\ProductInBranch.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -390,6 +398,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709020002134_Categories.resx">
       <DependentUpon>201709020002134_Categories.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709042307544_EmployeeImage.resx">
+      <DependentUpon>201709042307544_EmployeeImage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709050006583_Employee Changes.resx">
+      <DependentUpon>201709050006583_Employee Changes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

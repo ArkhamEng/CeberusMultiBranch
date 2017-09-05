@@ -20,27 +20,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Employees
         public ActionResult Index()
         {
-            var employees = db.Employees.Include(e => e.City);
-            return View(employees.ToList());
+            var model       = new SearchEmployeeViewModel();
+            model.Employees = db.Employees.Include(e => e.City);
+            model.States    = db.States.ToSelectList();
+            
+            return View(model);
         }
 
-        // GET: Employees/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
-            {
-                return HttpNotFound();
-            }
-            return View(employee);
-        }
+       
 
         // GET: Employees/Create
-        public ActionResult Create()
+        public ActionResult Create(int? id)
         {
             var model    = new EmployeeViewModel();
             model.States = db.States.ToSelectList();
@@ -53,7 +43,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "EmployeeId,Code,Name,BusinessName,FTR,TaxAddress,Address,ZipCode,Entrance,Email,Phone,CityId,Picture,IsActive,InsDate,UpdDate")] Employee employee)
+        public ActionResult Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
