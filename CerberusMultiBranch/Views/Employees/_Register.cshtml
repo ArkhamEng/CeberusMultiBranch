@@ -1,43 +1,52 @@
 ﻿@model CerberusMultiBranch.Models.RegisterViewModel
 
 <div class="panel panel-danger">
-   
-        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-        {
-            <div class="panel-body">
-                @Html.AntiForgeryToken()
 
-                <h4>
-                    <span class="fa fa-user-o" style="float:left"></span>
-                    &nbsp;&nbsp;Cuenta de usuario
-                </h4>
-                <hr />
+    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {
+        <div class="panel-body">
+            @Html.AntiForgeryToken()
 
-                <div class="row">
-                    <div class="form-group col-md-10">
-                        @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+            <h4>
+                <span class="fa fa-user-o" style="float:left"></span>
+                &nbsp;&nbsp;Cuenta de usuario
+            </h4>
+            <hr />
+
+            <div class="row">
+                <div class="form-group col-md-12">
+                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa fa-at"></i></span>
                         @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                     </div>
-                    <div class="form-group col-md-10">
-                        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                </div>
 
+                <div class="form-group col-md-12">
+                    @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa fa-key"></i></span>
                         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                     </div>
-                    <div class="form-group col-md-10">
-                        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                </div>
+                <div class="form-group col-md-12">
+                    @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa fa-key"></i></span>
                         @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
                         @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <button type="button" class="btn btn-success">
-                    Registrar&nbsp;<span class="glyphicon glyphicon-user"/>
-                </button>
-            </div>
-        }
+        </div>
+        <div class="panel-footer">
+            <button type="button" class="btn btn-success">
+                <span class="glyphicon glyphicon-user" />
+            </button>
+        </div>
+    }
 </div>
 
 @section Scripts {

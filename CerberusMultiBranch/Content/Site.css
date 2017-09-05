@@ -176,7 +176,8 @@ table.TablePrimary tbody th {
     min-height: 100vh;
 }
 
-    #sidebar.active {
+    #sidebar.active 
+    {
         margin-left: -250px;
     }
 

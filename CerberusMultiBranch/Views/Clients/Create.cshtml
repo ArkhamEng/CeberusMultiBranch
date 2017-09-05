@@ -37,7 +37,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-key"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
-                            <span class="input-group-addon"><input type="checkbox" id="cbCode" ></span>
+                            <span class="input-group-addon"><input type="checkbox" id="cbCode"></span>
                         </div>
                         @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
                     </div>
@@ -58,7 +58,7 @@
                             @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
                     <div class="form-group col-md-4 col-lg-offset-2">
                         @Html.LabelFor(model => model.ZipCode, htmlAttributes: new { @class = "control-label" })
@@ -67,7 +67,7 @@
                             @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
                     <div class="form-group  col-md-6">
                         @Html.LabelFor(model => model.CityId, htmlAttributes: new { @class = "control-label" })
@@ -76,7 +76,7 @@
                             @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
                             @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
                     <div class="form-group col-md-4 col-lg-offset-2">
                         @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
@@ -84,7 +84,7 @@
                             @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label" })
@@ -93,7 +93,7 @@
                             @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Address) } })
                             @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
                     <div class="form-group  col-md-8">
                         @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
@@ -102,7 +102,7 @@
                             @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,7 +119,7 @@
                             @Html.EditorFor(model => model.FTR, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.BusinessName, htmlAttributes: new { @class = "control-label" })
@@ -128,7 +128,7 @@
                             @Html.EditorFor(model => model.BusinessName, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
 
 
                     <div class="form-group col-md-12">
@@ -139,7 +139,7 @@
                             @Html.EditorFor(model => model.LegalRepresentative, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.LegalRepresentative, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.TaxAddress, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
@@ -147,7 +147,7 @@
                             @Html.EditorFor(model => model.TaxAddress, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.TaxAddress, "", new { @class = "text-danger" })
                         </div>
-                        </div>
+                    </div>
                 </div>
             </div>
             <div class="panel-footer">
@@ -159,13 +159,13 @@
                     <button type="submit" class="btn btn-success" title="Guardar">
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                     </button>
-                   
+
                     <button type="button" class="btn btn-warning " title="Limpiar" id="btnClear">
                         <span class="glyphicon glyphicon-file"></span>
                     </button>
 
                 </div>
-                </div>
+            </div>
         </div>
     </div>
 }
@@ -175,7 +175,7 @@
 
     $(document).ready(LoadCreate);
 
-  
+
     function LoadCreate() {
         SetCascade("#StateId", "#CityId", "GetCities");
 

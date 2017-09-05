@@ -7,7 +7,7 @@
     &nbsp;&nbsp;Registro de Empleados
 </h3>
 
-<hr/>
+<hr />
 @Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm())
@@ -21,26 +21,22 @@
 
     @Html.HiddenFor(m => m.IsActive)
 
-    <div class="col-md-7">
+    <div class="col-md-8">
         <div class="panel panel-danger">
-            @*<div class="panel-heading">
-                    Generales
-                </div>*@
             <div class="panel-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="btn-group-vertical thumbnail">
                             @if (Model.Picture == null)
                             {
-                                <img src="~/Content/Images/sinimagen.jpg" class="btn" />
+                                <img id="imgEmployee" src="~/Content/Images/sinimagen.jpg" class="btn" />
                             }
                             else
                             {
                                 var base64 = Convert.ToBase64String(Model.ClearImage);
                                 var imgSrc = String.Format("data:{0};base64,{1}", Model.PictureType, base64);
-                                <div class="thumbnail">
-                                    <img src="@imgSrc" class="btn" />
-                                </div>
+
+                                <img id="imgEmployee" src="@imgSrc" class="btn" />
                             }
                             <label id="uplEmployee" class="btn btn-warning btn-file btn-xs">
                                 <span class="fa fa-upload" />
@@ -52,68 +48,76 @@
                     <div class="form-group col-md-4">
                         @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
 
                             <span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>
                         </div>
                     </div>
 
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-4 col-md-offset-1">
                         @Html.LabelFor(model => model.Entrance, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.Entrance, new { htmlAttributes = new { @class = "form-control" } })
-                        @Html.ValidationMessageFor(model => model.Entrance, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            @Html.EditorFor(model => model.Entrance, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Entrance, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-
-                    <div class="form-group col-md-8">
+                    <div class="form-group col-md-9">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
-
-                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Name) } })
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-
                 </div>
 
                 <div class="row">
-                   
+
                     <div class="form-group col-md-6">
                         @Html.LabelFor(model => model.City.StateId, htmlAttributes: new { @class = "control-label" })
-
-                        @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                            @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
+                        </div>
                     </div>
+
                     <div class="form-group  col-md-6">
                         @Html.LabelFor(model => model.CityId, htmlAttributes: new { @class = "control-label" })
-
-                        @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
+                            @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                        </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="form-group col-md-7">
+                    <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.Address, htmlAttributes: new { @class = "control-label" })
-
-                        @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Address) } })
-                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                            @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
-                    <div class="form-group col-md-4 col-md-offset-1">
+                    <div class="form-group col-md-4">
                         @Html.LabelFor(model => model.ZipCode, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.ZipCode) } })
-                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
+                            @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
+                        </div>
                     </div>
 
-                    <div class="form-group  col-md-7">
-                        @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
-
-                        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Email) } })
-                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group col-md-4 col-md-offset-1">
+                    <div class="form-group col-md-4 col-md-offset-4">
                         @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
-                        @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Phone) } })
-                        @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control"} })
+                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
             </div>
@@ -121,21 +125,21 @@
             <div class="panel-footer">
                 <div class="btn-group">
                     <button type="submit" class="btn btn-success" title="Guardar">
-                        Guardar&nbsp;<span class="glyphicon glyphicon-floppy-disk" />
+                        <span class="glyphicon glyphicon-floppy-disk" />
                     </button>
                     <button type="reset" class="btn btn-warning" title="Limpiar" id="btnClear">
-                        Limpiar&nbsp;<span class="glyphicon glyphicon-refresh" />
+                        <span class="glyphicon glyphicon-refresh" />
                     </button>
 
                     <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
-                        &nbsp;Búscar <span class="glyphicon glyphicon-search" />
+                        <span class="glyphicon glyphicon-search" />
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="col-md-5">
+    <div class="col-md-4">
         @*<div class="panel-heading">
                 Creación de usuario
             </div>*@
@@ -149,7 +153,8 @@
 
     $(document).ready(LoadCreate);
 
-    function EditCode(checkBox) {
+    function EditCode(checkBox)
+    {
         console.log($(checkBox).is(':checked'));
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
@@ -161,10 +166,21 @@
         $("#Code").attr("readonly", true);
 
         //Setting buttons
-        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
+        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")'; });
         $("#btnClear").click(function () { Renew() });
 
         console.log("Create Employee Loaded");
+    }
+
+    function ImageLoaded(input) {
+        var files = input.files;
+
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $("#imgEmployee").attr("src", e.target.result);
+        }
+        reader.readAsDataURL(files[0]);
     }
 </script>
 
