@@ -339,6 +339,7 @@
     <Content Include="Views\Providers\Index.cshtml" />
     <Content Include="Views\Providers\_List.cshtml" />
     <Content Include="Views\Employees\_List.cshtml" />
+    <Content Include="Views\Shared\_CatalogButtonGroup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

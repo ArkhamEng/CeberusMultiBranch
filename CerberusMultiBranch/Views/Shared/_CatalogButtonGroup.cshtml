@@ -1,0 +1,61 @@
+﻿
+
+<button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
+    <span class="fa fa-search-plus"></span>
+</button>
+<button type="button" class="btn btn-success" title="Guardar los Datos?" id="btnSave">
+    <span class="glyphicon glyphicon-floppy-disk"></span>
+</button>
+
+<button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
+    <span class="glyphicon glyphicon-file"></span>
+</button>
+
+<div id="divPopOverSubmit" style="display:none">
+    <div class="text-center">
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary btn-sm" id="btnAccept" onclick="Submit()">
+                Si  <span class="fa fa-check"></span>
+            </button>
+            <button type="button" class="btn btn-danger  btn-sm" id="btnCancel" onclick="Hide()">
+                No <span class="fa fa-times"></span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function ()
+    {
+        LoadPopover();
+
+        $("#btnSave").click(function () {
+            LoadPopover();
+        });
+
+        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
+        $("#btnClear").click(function () { window.location = '@Url.Action("Create",new { id="" })'; });
+    });
+
+    function Hide()
+    {
+        $("#btnSave").popover('hide');
+        $("#btnSave").data("bs.popover").inState.click = false;
+    }
+
+    function LoadPopover() {
+        $("#btnSave").popover({
+            html: true,
+            content: function () { return $("#divPopOverSubmit").html(); },
+            container: 'body'
+        });
+    }
+
+    function Submit() {
+        console.log("Submit");
+        $("#btnAccept").submit();
+        Hide();
+    }
+
+</script>

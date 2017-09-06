@@ -1,7 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProviderViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Proveedores";
 }
 
 
@@ -139,21 +139,13 @@
             <div class="panel-footer">
                 <div class="btn-group">
 
-                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
-                        <span class="fa fa-search-plus"></span>
-                    </button>
-                    <button type="submit" class="btn btn-success" title="Guardar">
-                        <span class="glyphicon glyphicon-floppy-disk"></span>
-                    </button>
-
-                    <button type="reset" class="btn btn-warning " title="Limpiar" id="btnClear">
-                        <span class="glyphicon glyphicon-file"></span>
-                    </button>
+                    @Html.Partial("_CatalogButtonGroup")
 
                 </div>
             </div>
         </div>
     </div>
+
 }
 
 
@@ -179,11 +171,6 @@
 
         $("#States").change(FillTaxAddress);
         $("#CityId").change(FillTaxAddress);
-
-
-        //Setting buttons
-        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
-        $("#btnClear").click(function () { window.location.replace('@Url.Action("Create",new { })') });
     }
 
     function FillTaxAddress() {

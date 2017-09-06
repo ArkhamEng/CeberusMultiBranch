@@ -1,6 +1,8 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.EmployeeViewModel
 
-
+@{ 
+    ViewBag.Title = "Empleados";
+}
 
 <h3>
     <span class="fa fa-address-card" style="float:left"></span>
@@ -60,16 +62,16 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                             @Html.EditorFor(model => model.Entrance, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Entrance, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Entrance, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group col-md-9">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-user"></i></span>
                             @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
@@ -80,17 +82,17 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map"></i></span>
                             @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group  col-md-6">
                         @Html.LabelFor(model => model.CityId, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
-                            @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
+                            @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })    
                         </div>
+                        @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-12">
@@ -98,8 +100,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
                             @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-4">
@@ -107,8 +109,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
                             @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-4 col-md-offset-4">
@@ -116,28 +118,20 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-phone"></i></span>
                             @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control"} })
-                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
 
             <div class="panel-footer">
                 <div class="btn-group">
-                    <button type="submit" class="btn btn-success" title="Guardar">
-                        <span class="glyphicon glyphicon-floppy-disk" />
-                    </button>
-                    <button type="reset" class="btn btn-warning" title="Limpiar" id="btnClear">
-                        <span class="glyphicon glyphicon-refresh" />
-                    </button>
-
-                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
-                        <span class="glyphicon glyphicon-search" />
-                    </button>
+                   @Html.Partial("_CatalogButtonGroup")
                 </div>
             </div>
         </div>
     </div>
+
 
     <div id="divRegister" class="col-md-4">
         @Html.Partial("_Register", Model.Register)
@@ -160,10 +154,6 @@
 
         console.log("Loading CreateClient");
         $("#Code").attr("readonly", true);
-
-        //Setting buttons
-        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")'; });
-        $("#btnClear").click(function () { Renew() });
 
         console.log("Create Employee Loaded");
     }

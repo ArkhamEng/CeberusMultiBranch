@@ -1,7 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Productos";
 }
 
 <h3>
@@ -13,8 +13,6 @@
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
-    @*@Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")*@
 }
 
 
@@ -25,9 +23,6 @@
 
     <div class="col-md-11 panel-group">
         <div class="panel panel-default">
-            @*<div class="panel-heading">
-                    Administración de Productos
-                </div>*@
             <div class="panel-body">
                 @Html.HiddenFor(model => model.ProductId)
                 <div class="row">
@@ -179,28 +174,23 @@
                 </div>
             </div>
             <div class="panel-footer">
-                <button type="submit" class="btn btn-success" title="Guardar">
-                    <span class="glyphicon glyphicon-floppy-disk"></span>
-                </button>
+                <div class="btn-group">
+                   @Html.Partial("_CatalogButtonGroup")
 
-                @Html.ActionLink(" ", "Index", new { }, new { @class = "btn btn-primary glyphicon glyphicon-search" })
-
-                <button type="button" class="btn btn-default" onclick="ShowFiles()">
-                    <span class="fa fa-cloud-upload" />
-                </button>
+                    <button type="button" class="btn btn-default" id="btnUpload">
+                        <span class="fa fa-cloud-upload" />
+                    </button>
+                </div>
 
                 <label id="lblMessage" class="text-danger" />
             </div>
         </div>
     </div>
 
+
     <div id="divImagesModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content panel panel-danger">
-                @*<div class="modal-header panel-heading">
-                    <h4 class="modal-title">Imagenes Nuevas</h4>
-                </div>*@
-
                 <div id="divImages" class="modal-body panel-body" style="height:150px;  overflow-y: scroll;">
                 </div>
 
@@ -219,9 +209,7 @@
 <div id="divImagesLoaded" class="modal" role="dialog">
     <div class="modal-dialog">
         <div id="imgPartial" class="modal-content">
-
             @Html.Partial("_ImagesLoaded", Model.Images)
-
         </div>
     </div>
 </div>
@@ -231,7 +219,8 @@
     var imgLoaded = 0;
     var count = 0;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
 
@@ -251,6 +240,9 @@
 
         $("#BuyPrice").keyup(SetPrice);
         $("#BuyPrice").click(SetPrice);
+
+
+        $("#btnUpload").click(function () { $("#divImagesModal").modal(); });
 
     });
 
@@ -275,11 +267,6 @@
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
 
-
-    function ShowFiles()
-    {
-        $("#divImagesModal").modal();
-    }
 
     function ShowImages() {
         $("#divImagesLoaded").modal();

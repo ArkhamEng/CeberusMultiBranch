@@ -41,7 +41,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
             var empId = bdUsers.Users.Where(x => x.Id == userId).FirstOrDefault().EmployeeId;
 
-            var employee = db.Employees.Where(e => e.EmployeeId == e.EmployeeId).FirstOrDefault();
+            var employee = db.Employees.Where(e => e.EmployeeId == empId).FirstOrDefault();
 
             return new FileContentResult(employee.ClearImage, employee.PictureType);
 

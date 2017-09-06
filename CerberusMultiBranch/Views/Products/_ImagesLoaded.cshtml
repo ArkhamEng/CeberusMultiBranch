@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Inventory.ProductImage>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.ProductImage>
 
 
 @{
@@ -11,7 +11,7 @@
 
             @foreach (var file in Model)
             {
-                var base64 = Convert.ToBase64String(file.File);
+                var base64 = Convert.ToBase64String(file.ClearImage);
                 var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
                 var a = imgIndex == Decimal.Zero ? "active" : "";
 

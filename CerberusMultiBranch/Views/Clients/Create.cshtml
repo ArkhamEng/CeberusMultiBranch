@@ -50,8 +50,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
                             @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Name) } })
-                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-6">
@@ -59,8 +59,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map"></i></span>
                             @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.City.StateId, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-4 col-lg-offset-2">
@@ -68,8 +68,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
                             @Html.EditorFor(model => model.ZipCode, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.ZipCode, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group  col-md-6">
@@ -77,16 +77,16 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-o"></i></span>
                             @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group col-md-4 col-lg-offset-2">
                         @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-phone"></i></span>
                             @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-12">
@@ -94,8 +94,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
                             @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Address) } })
-                            @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group  col-md-8">
@@ -103,8 +103,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-at"></i></span>
                             @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
@@ -120,8 +120,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-key"></i></span>
                             @Html.EditorFor(model => model.FTR, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-12">
@@ -129,8 +129,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
                             @Html.EditorFor(model => model.BusinessName, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
                     </div>
 
 
@@ -140,55 +140,29 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-gavel"></i></span>
                             @Html.EditorFor(model => model.LegalRepresentative, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.LegalRepresentative, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.LegalRepresentative, "", new { @class = "text-danger" })
                     </div>
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.TaxAddress, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-industry"></i></span>
                             @Html.EditorFor(model => model.TaxAddress, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.TaxAddress, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.TaxAddress, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
             <div class="panel-footer">
                 <div class="btn-group">
-
-                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
-                        <span class="fa fa-search-plus"></span>
-                    </button>
-                    <button type="button" class="btn btn-success" id="btnSave" data-placement='top'>
-                        <span class="glyphicon glyphicon-floppy-disk"></span>
-                    </button>
-                    <button type="button" class="btn btn-warning " title="Limpiar" id="btnClear">
-                        <span class="glyphicon glyphicon-file"></span>
-                    </button>
+                    @Html.Partial("_CatalogButtonGroup")
 
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="divPopOver" style="display:none">
-        <div class="text-center">
-            <h6>
-                Estas seguro que deseas
-            </h6>
-            <h6>
-                guardar los datos?
-            </h6>
-            <div class="btn-group">
-                <button type="submit" class="btn btn-primary btn-sm" title="Guardar">
-                    <span class="fa fa-check"></span>
-                </button>
-                <button type="button" class="btn btn-danger  btn-sm" title="Limpiar">
-                    <span class="fa fa-times"></span>
-                </button>
-            </div>
-        </div>
-    </div>
+    
 }
 
 
@@ -197,23 +171,9 @@
     $(document).ready(LoadCreate);
 
 
+
     function LoadCreate()
     {
-        $("#btnSave").popover({
-            html: true,
-            content: function () { return $("#divPopOver").html(); },
-            container: 'body'
-        });
-
-        $("#btnSave").click(function ()
-        {
-            $("#btnSave").popover({
-                html: true,
-                content: function () { return $("#divPopOver").html(); },
-                container: 'body'
-            });
-        });
-
         SetCascade("#StateId", "#CityId", "GetCities");
 
         $("#Code").attr("readonly", !$(this).is(':checked'));
@@ -229,11 +189,6 @@
 
         $("#States").change(FillTaxAddress);
         $("#CityId").change(FillTaxAddress);
-
-
-        //Setting buttons
-        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")' });
-        $("#btnClear").click(function () { window.location = '@Url.Action("Create",new { })' });
 
         console.log("Create Client Loaded");
     }
