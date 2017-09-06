@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Argos Software Division </title>
+    <title>@ViewBag.Title - Cerberus 1.0 </title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -23,7 +23,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                
+
                 @Html.ActionLink("AutoBien Refaccionaria", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
@@ -45,62 +45,65 @@
         <nav id="sidebar">
             <!-- Sidebar Header -->
             <div class="sidebar-header">
+                @if(User.Identity.IsAuthenticated)
+                {
+                    <img src="@Url.Action("GetPicture", "Employees" )" class="img-circle img-responsive" />
+                }
               
+                </div>
+
+                <ul class="list-unstyled components">
+                    <li><a href="/Home/">&nbsp;Inicio<span class="glyphicon glyphicon-home" style="float:left" /></a></li>
+                    <li>
+                        <!-- Link with dropdown items -->
+                        <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
+                        <ul class="collapse list-unstyled" id="homeSubmenu">
+                            <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
+                            <li><a href="/Employees/Create">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
+                            <li><a href="/Products/">&nbsp;Productos<span class="fa fa-car" style="float:left" /></a></li>
+                            <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">&nbsp;Compras<span class="glyphicon glyphicon-shopping-cart" style="float:left" /></a></li>
+                    <li><a href="#">&nbsp;Ventas<span class="glyphicon glyphicon glyphicon-usd" style="float:left" /></a></li>
+                    <li><a href="#">&nbsp;Crédito<span class="glyphicon glyphicon glyphicon-credit-card" style="float:left" /></a></li>
+                    <li><a href="#">&nbsp;Reportes<span class="glyphicon glyphicon  glyphicon-file" style="float:left" /></a></li>
+
+                    <li>
+                        <!-- Link with dropdown items -->
+                        <a href="#ConfigSuMenu" data-toggle="collapse" aria-expanded="false">&nbsp;Configuraciones<span class="fa fa-cogs" style="float:left" /></a>
+                        <ul class="collapse list-unstyled" id="ConfigSuMenu">
+                            <li><a href="/Categories/">&nbsp;Categorias<span class="glyphicon glyphicon-list-alt" style="float:left" /></a></li>
+                            <li><a href="/CarMakes/">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
+                            <li><a href="/CarModels/">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
+                            <li><a href="/Branches/">&nbsp;Sucursales<span class="fa fa-building-o" style="float:left" /></a></li>
+
+                        </ul>
+                    </li>
+
+                    <li><a href="/Home/About">&nbsp;Acerca de<span class="glyphicon glyphicon-question-sign" style="float:left" /></a></li>
+                </ul>
+
+            </nav>
+
+            <div id="content" class="container small">
+                @*<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn btn-xs">
+                        <i class="glyphicon glyphicon-align-left"></i>
+                        Toggle Sidebar
+                    </button>*@
+                @*<div class="progress" id="prg">
+                        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>*@
+                @RenderBody()
             </div>
-
-            <ul class="list-unstyled components">
-                <li ><a href="/Home/">&nbsp;Inicio<span class="glyphicon glyphicon-home" style="float:left" /></a></li>
-
-                <li>
-                    <!-- Link with dropdown items -->
-                    <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
-                    <ul class="collapse list-unstyled" id="homeSubmenu">
-                        <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
-                        <li><a href="/Employees/Create">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
-                        <li><a href="/Products/">&nbsp;Productos<span class="fa fa-car" style="float:left" /></a></li>
-                        <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
-                    </ul>
-                </li>
-                <li><a href="#" >&nbsp;Compras<span class="glyphicon glyphicon-shopping-cart" style="float:left" /></a></li> 
-                <li><a href="#" >&nbsp;Ventas<span class="glyphicon glyphicon glyphicon-usd" style="float:left" /></a></li>
-                <li><a href="#" >&nbsp;Crédito<span class="glyphicon glyphicon glyphicon-credit-card" style="float:left" /></a></li>
-                <li><a href="#" >&nbsp;Reportes<span class="glyphicon glyphicon  glyphicon-file" style="float:left" /></a></li>
-
-                <li>
-                    <!-- Link with dropdown items -->
-                    <a href="#ConfigSuMenu" data-toggle="collapse" aria-expanded="false">&nbsp;Configuraciones<span class="fa fa-cogs" style="float:left" /></a>
-                    <ul class="collapse list-unstyled" id="ConfigSuMenu">
-                        <li><a href="/Categories/">&nbsp;Categorias<span class="glyphicon glyphicon-list-alt" style="float:left" /></a></li>
-                        <li><a href="/CarMakes/">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
-                        <li><a href="/CarModels/">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
-                        <li><a href="/Branches/">&nbsp;Sucursales<span class="fa fa-building-o" style="float:left" /></a></li>
-                        
-                    </ul>
-                </li>
-
-                <li><a href="/Home/About">&nbsp;Acerca de<span class="glyphicon glyphicon-question-sign" style="float:left" /></a></li>
-            </ul>
-
-        </nav>
-
-        <div id="content" class="container small">
-            @*<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn btn-xs">
-                <i class="glyphicon glyphicon-align-left"></i>
-                Toggle Sidebar
-            </button>*@
-            @*<div class="progress" id="prg">
-                    <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                </div>*@
-            @RenderBody()
         </div>
-    </div>
-    <hr />
-    @*<footer>
-            <p>&copy; @DateTime.Now.Year - Argos Software Develop Division</p>
-        </footer>*@
+        <hr />
+        @*<footer>
+                <p>&copy; @DateTime.Now.Year - Argos Software Develop Division</p>
+            </footer>*@
 
 
-    @RenderSection("scripts", required: false)
-</body>
+        @RenderSection("scripts", required: false)
+    </body>
 </html>

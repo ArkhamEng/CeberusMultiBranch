@@ -83,6 +83,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public string PictureType { get; set; }
 
+
         public Employee()
         {
             this.IsActive = true;

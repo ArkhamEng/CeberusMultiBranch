@@ -24,8 +24,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public EmployeeViewModel()
         {
-            this.States = new List<State>().ToSelectList();
-            this.Cities = new List<City>().ToSelectList();
+            this.States   = new List<State>().ToSelectList();
+            this.Cities   = new List<City>().ToSelectList();
             this.Register = new RegisterViewModel();
         }
 

@@ -13,7 +13,7 @@ namespace CerberusMultiBranch.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "201708311943178_Initial"; }
+            get { return "201709051959474_Initial"; }
         }
         
         string IMigrationMetadata.Source

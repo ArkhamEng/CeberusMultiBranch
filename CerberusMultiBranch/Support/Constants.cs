@@ -12,4 +12,16 @@ namespace CerberusMultiBranch.Support
 
         public const string CodeMask = "000000";
     }
+
+    public struct FileStruct
+    {
+        public string Name { get;set;}
+
+        public string Type { get; set; }
+
+        public byte[] Bytes { get; set; }
+
+        public int Size { get {return this.Bytes!=null? this.Bytes.Length : Cons.Zero; } }
+
+    }
 }

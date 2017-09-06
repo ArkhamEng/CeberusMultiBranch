@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -29,6 +30,20 @@ namespace CerberusMultiBranch.Support
         public static SelectList ToSelectList(this IEnumerable data)
         {
             return new SelectList(data, nameof(ISelectable.Id), nameof(ISelectable.Name));
+        }
+
+        public static byte[] ToCompressedFile(this HttpPostedFileBase stream)
+        {
+            byte[] b;
+
+            using (MemoryStream target = new MemoryStream())
+            {
+                stream.InputStream.CopyTo(target);
+                var bArr = target.ToArray();
+                b = GzipWrapper.Compress(bArr);
+            }
+
+            return b;
         }
     }
 }

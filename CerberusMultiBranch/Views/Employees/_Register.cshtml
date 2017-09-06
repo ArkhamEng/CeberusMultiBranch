@@ -2,53 +2,65 @@
 
 <div class="panel panel-danger">
 
-    @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-    {
-        <div class="panel-body">
-            @Html.AntiForgeryToken()
-
+    @*@using (Html.BeginForm("CreateUser", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+    {*@
+        <div id="divRegister" class="panel-body">
             <h4>
                 <span class="fa fa-user-o" style="float:left"></span>
                 &nbsp;&nbsp;Cuenta de usuario
             </h4>
             <hr />
-
-            <div class="row">
+            @Html.HiddenFor(m => m.HasAccount)
+            <div  class="row">
                 <div class="form-group col-md-12">
                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa fa-at"></i></span>
                         @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                     </div>
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                 </div>
 
-                <div class="form-group col-md-12">
+                <div class="form-group col-md-12 hadle">
                     @Html.LabelFor(m => m.Password, new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa fa-key"></i></span>
                         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                     </div>
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
                 </div>
-                <div class="form-group col-md-12">
+
+                <div class="form-group col-md-12 hadle">
                     @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa fa-key"></i></span>
                         @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-                        @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
                     </div>
+                    @Html.ValidationMessageFor(model => model.ConfirmPassword, "", new { @class = "text-danger" })
                 </div>
             </div>
         </div>
-        <div class="panel-footer">
-            <button type="button" class="btn btn-success">
-                <span class="glyphicon glyphicon-user" />
-            </button>
-        </div>
-    }
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
+
+<script>
+
+    $(document).ready(function ()
+    {
+        if ($("#Email").val().length > 0)
+        {
+            $("#Email").attr('readonly', true);
+            $("#Password").attr('readonly', true);
+            $("#ConfirmPassword").attr('readonly', true);
+
+            $("#Password").val("***********");
+            $("#ConfirmPassword").val("***********");
+
+        }
+            
+    });
+
+</script>

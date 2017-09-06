@@ -1,7 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;

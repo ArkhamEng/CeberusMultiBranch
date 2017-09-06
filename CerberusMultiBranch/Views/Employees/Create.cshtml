@@ -10,7 +10,7 @@
 <hr />
 @Scripts.Render("~/bundles/jqueryval")
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(null,null, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -40,7 +40,7 @@
                             }
                             <label id="uplEmployee" class="btn btn-warning btn-file btn-xs">
                                 <span class="fa fa-upload" />
-                                <input type="file" name="Picture" onchange="ImageLoaded(this)" style="display: none;">
+                                <input type="file" name="PostedFile" onchange="ImageLoaded(this)" style="display: none;">
                             </label>
                         </div>
                     </div>
@@ -139,11 +139,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
-        @*<div class="panel-heading">
-                Creación de usuario
-            </div>*@
-
+    <div id="divRegister" class="col-md-4">
         @Html.Partial("_Register", Model.Register)
     </div>
 }

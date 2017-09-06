@@ -69,6 +69,8 @@ namespace CerberusMultiBranch.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
 
+        public int? EmployeeId { get; set; }
+
         [Required]
         [StringLength(100, ErrorMessage = "La contraseña {0} debe tener {2} caracteres como mínimo.", MinimumLength = 6)]
         [DataType(DataType.Password)]
@@ -79,6 +81,9 @@ namespace CerberusMultiBranch.Models
         [Display(Name = "Confirmar contraseña")]
         [Compare("Password", ErrorMessage = "La contraseña y la confirmación deben coincidir")]
         public string ConfirmPassword { get; set; }
+
+        public bool HasAccount { get; set; }
+
     }
 
     public class ResetPasswordViewModel

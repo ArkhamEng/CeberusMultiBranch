@@ -1,5 +1,8 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ClientViewModel
 
+@{
+    ViewBag.Title = "Clientes";
+ }
 
 <h3>
     <span class="fa fa-address-book" style="float:left"></span>
@@ -156,15 +159,33 @@
                     <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
                         <span class="fa fa-search-plus"></span>
                     </button>
-                    <button type="submit" class="btn btn-success" title="Guardar">
+                    <button type="button" class="btn btn-success" id="btnSave" data-placement='top'>
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                     </button>
-
                     <button type="button" class="btn btn-warning " title="Limpiar" id="btnClear">
                         <span class="glyphicon glyphicon-file"></span>
                     </button>
 
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="divPopOver" style="display:none">
+        <div class="text-center">
+            <h6>
+                Estas seguro que deseas
+            </h6>
+            <h6>
+                guardar los datos?
+            </h6>
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary btn-sm" title="Guardar">
+                    <span class="fa fa-check"></span>
+                </button>
+                <button type="button" class="btn btn-danger  btn-sm" title="Limpiar">
+                    <span class="fa fa-times"></span>
+                </button>
             </div>
         </div>
     </div>
@@ -176,7 +197,23 @@
     $(document).ready(LoadCreate);
 
 
-    function LoadCreate() {
+    function LoadCreate()
+    {
+        $("#btnSave").popover({
+            html: true,
+            content: function () { return $("#divPopOver").html(); },
+            container: 'body'
+        });
+
+        $("#btnSave").click(function ()
+        {
+            $("#btnSave").popover({
+                html: true,
+                content: function () { return $("#divPopOver").html(); },
+                container: 'body'
+            });
+        });
+
         SetCascade("#StateId", "#CityId", "GetCities");
 
         $("#Code").attr("readonly", !$(this).is(':checked'));

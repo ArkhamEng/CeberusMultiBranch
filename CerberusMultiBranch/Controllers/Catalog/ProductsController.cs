@@ -5,12 +5,9 @@ using System.Net;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Catalog;
-using Microsoft.AspNet.Identity;
 using System.IO;
-using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
-using System.IO.Compression;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -95,21 +92,33 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
                     if (file != null)
                     {
-                        using (MemoryStream target = new MemoryStream())
-                        {
+                        //using (MemoryStream target = new MemoryStream())
+                        //{
 
-                            file.InputStream.CopyTo(target);
-                            var bArr = target.ToArray();
+                        //    file.InputStream.CopyTo(target);
+                        //    var bArr = target.ToArray();
 
-                            ProductImage f = new ProductImage();
+                        //    ProductImage f = new ProductImage();
 
-                            f.ProductId = product.ProductId;
-                            f.Name = file.FileName;
-                            f.Type = file.ContentType;
-                            f.File = GzipWrapper.Compress(bArr);
+                        //    f.ProductId = product.ProductId;
+                        //    f.Name = file.FileName;
+                        //    f.Type = file.ContentType;
+                        //    f.File = GzipWrapper.Compress(bArr);
 
-                            db.ProductImages.Add(f);
-                        }
+                        //    db.ProductImages.Add(f);
+                        //}
+
+                       
+                        ProductImage f = new ProductImage();
+
+                        f.ProductId = product.ProductId;
+                        f.Name      = file.FileName;
+                        f.Type      = file.ContentType;
+                        f.File      = file.ToCompressedFile();
+                        f.Size      = f.File.Length;
+
+                        db.ProductImages.Add(f);
+
                         i++;
                     }
                 }

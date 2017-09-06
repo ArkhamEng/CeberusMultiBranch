@@ -194,41 +194,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201708311943178_Initial.cs" />
-    <Compile Include="Migrations\201708311943178_Initial.Designer.cs">
-      <DependentUpon>201708311943178_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201709051959474_Initial.cs" />
+    <Compile Include="Migrations\201709051959474_Initial.Designer.cs">
+      <DependentUpon>201709051959474_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201708311950432_Year.cs" />
-    <Compile Include="Migrations\201708311950432_Year.Designer.cs">
-      <DependentUpon>201708311950432_Year.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201708312007583_CarModel.cs" />
-    <Compile Include="Migrations\201708312007583_CarModel.Designer.cs">
-      <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709011520502_ProductNameLength.cs" />
-    <Compile Include="Migrations\201709011520502_ProductNameLength.Designer.cs">
-      <DependentUpon>201709011520502_ProductNameLength.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709011638062_Compatibility.cs" />
-    <Compile Include="Migrations\201709011638062_Compatibility.Designer.cs">
-      <DependentUpon>201709011638062_Compatibility.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709011642579_CarModel1.cs" />
-    <Compile Include="Migrations\201709011642579_CarModel1.Designer.cs">
-      <DependentUpon>201709011642579_CarModel1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709020002134_Categories.cs" />
-    <Compile Include="Migrations\201709020002134_Categories.Designer.cs">
-      <DependentUpon>201709020002134_Categories.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709042307544_EmployeeImage.cs" />
-    <Compile Include="Migrations\201709042307544_EmployeeImage.Designer.cs">
-      <DependentUpon>201709042307544_EmployeeImage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709050006583_Employee Changes.cs" />
-    <Compile Include="Migrations\201709050006583_Employee Changes.Designer.cs">
-      <DependentUpon>201709050006583_Employee Changes.cs</DependentUpon>
+    <Compile Include="Migrations\201709052001585_Initial1.cs" />
+    <Compile Include="Migrations\201709052001585_Initial1.Designer.cs">
+      <DependentUpon>201709052001585_Initial1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -378,32 +350,11 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201708311943178_Initial.resx">
-      <DependentUpon>201708311943178_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201709051959474_Initial.resx">
+      <DependentUpon>201709051959474_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708311950432_Year.resx">
-      <DependentUpon>201708311950432_Year.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201708312007583_CarModel.resx">
-      <DependentUpon>201708312007583_CarModel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709011520502_ProductNameLength.resx">
-      <DependentUpon>201709011520502_ProductNameLength.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709011638062_Compatibility.resx">
-      <DependentUpon>201709011638062_Compatibility.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709011642579_CarModel1.resx">
-      <DependentUpon>201709011642579_CarModel1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709020002134_Categories.resx">
-      <DependentUpon>201709020002134_Categories.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709042307544_EmployeeImage.resx">
-      <DependentUpon>201709042307544_EmployeeImage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709050006583_Employee Changes.resx">
-      <DependentUpon>201709050006583_Employee Changes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201709052001585_Initial1.resx">
+      <DependentUpon>201709052001585_Initial1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
