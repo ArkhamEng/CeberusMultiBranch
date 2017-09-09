@@ -230,7 +230,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchEmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
-    <Compile Include="Models\ViewModels\Config\CarModelViewModel.cs" />
+    <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
@@ -244,6 +244,10 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\Images\argos wahit.gif" />
+    <Content Include="Content\Images\Argos.png" />
+    <Content Include="Content\Images\backgroud.jpg" />
+    <Content Include="Content\Images\backgroud_red.jpg" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
@@ -340,6 +344,7 @@
     <Content Include="Views\Providers\_List.cshtml" />
     <Content Include="Views\Employees\_List.cshtml" />
     <Content Include="Views\Shared\_CatalogButtonGroup.cshtml" />
+    <Content Include="Views\Products\_CarModelSelector.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

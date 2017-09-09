@@ -30,7 +30,8 @@ function SetCascade(ddlParent, ddlChild, action) {
                     type: "POST",
                     data: { parentId: parentId },
 
-                    success: function (data) {
+                    success: function (data)
+                    {
                         console.log("cascade data adquired");
                         $(ddlChild).empty();
                         $(ddlChild).append($('<option></option>').val("").html(""));
@@ -133,3 +134,4 @@ function SetFilterControls(filters,button,target)
         $(target).attr("class", "col-md-8");
     });
 }
+

@@ -7,6 +7,7 @@ using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
+    [Authorize]
     public class CategoriesController : Controller
     {
         private ApplicationData db = new ApplicationData();

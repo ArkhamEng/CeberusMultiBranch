@@ -13,6 +13,7 @@ using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
+    [Authorize]
     public class ProvidersController : Controller
     {
         private ApplicationData db = new ApplicationData();

@@ -26,12 +26,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? subCatergoryId, string name, string code)
+        public ActionResult Search(int? categoryId, int? carYear, string name, string code)
         {
             var model = (from p in db.Products
                          where (categoryId == null || p.CategoryId == categoryId)
-                         &&    (name == string.Empty || p.Name.Contains(name))
-                         &&    (code == string.Empty || p.Code == code)
+                         && (name == null || p.Name.Contains(name))
+                         && (code == string.Empty || p.Code == code)
+                         && (carYear == null || p.Compatibilities.Where(c=> c.CarYearId == carYear).ToList().Count > 0)
                          select p
                          ).ToList();
 
@@ -51,22 +52,21 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Products/Create
         public ActionResult Create(int? id)
         {
+            ProductViewModel model;
             if (id == null)
-            {
-                ProductViewModel model = new ProductViewModel();
-                model.Categories = db.Categories.ToSelectList();
-                return View(model);
-            }
+                model = new ProductViewModel();
             else
             {
                 var product = db.Products.Find(id);
                 product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
 
-                ProductViewModel model = new ProductViewModel(product);
-                model.Categories = db.Categories.ToSelectList();
-                
-                return View(model);
+                model = new ProductViewModel(product);
             }
+
+            model.Categories = db.Categories.ToSelectList();
+            model.CarMakes = db.CarMakes.ToSelectList();
+
+            return View(model);
         }
 
         // POST: Products/Create
@@ -108,14 +108,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         //    db.ProductImages.Add(f);
                         //}
 
-                       
+
                         ProductImage f = new ProductImage();
 
                         f.ProductId = product.ProductId;
-                        f.Name      = file.FileName;
-                        f.Type      = file.ContentType;
-                        f.File      = file.ToCompressedFile();
-                        f.Size      = f.File.Length;
+                        f.Name = file.FileName;
+                        f.Type = file.ContentType;
+                        f.File = file.ToCompressedFile();
+                        f.Size = f.File.Length;
 
                         db.ProductImages.Add(f);
 
@@ -127,10 +127,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.SaveChanges();
             }
 
-            return RedirectToAction("Create",new { id = product.ProductId });
+            return RedirectToAction("Create", new { id = product.ProductId });
         }
 
-        [HttpPost] 
+        [HttpPost]
         public ActionResult DeleteImage(int? id)
         {
             if (id == null)
@@ -144,7 +144,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             }
-           
+
 
             db.ProductImages.Remove(image);
             db.SaveChanges();
@@ -173,11 +173,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(product);
         }
 
-      
 
-      
 
-      
+
+
+
 
         protected override void Dispose(bool disposing)
         {

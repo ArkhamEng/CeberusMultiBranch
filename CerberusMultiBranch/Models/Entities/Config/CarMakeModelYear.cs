@@ -1,4 +1,5 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
+﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -58,6 +59,8 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public int Year { get; set; }
 
         public virtual CarModel CarModel { get; set; }
+
+        public ICollection<Compatibility> Compatibilities { get; set; }
     }
 
 }

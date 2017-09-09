@@ -96,7 +96,7 @@ namespace CerberusMultiBranch.Models
         [Required]
         [StringLength(100, ErrorMessage = "La contraseña {0} debe tener {2} caracteres como mínimo.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
+        [Display(Name = "Contraseña")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]

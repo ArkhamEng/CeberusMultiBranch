@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Support;
+using CerberusMultiBranch.Models.ViewModels.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
+    [Authorize]
     public class CarModelsController : Controller
     {
         private ApplicationData db = new ApplicationData();
@@ -19,9 +19,42 @@ namespace CerberusMultiBranch.Controllers.Config
         // GET: CarModels
         public ActionResult Index()
         {
-            var model = db.CarModels.Include(m=> m.CarYears).ToList();
-         
+            var query = db.CarModels;
+            query.Select(m => m.CarYears).Load();
+
+            var model = query.ToList();
+            
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult GetModels()
+        {
+            return PartialView("_CarModelSelector", db.CarMakes.ToSelectList());
+        }
+
+        [HttpPost]
+        public JsonResult GetModelsAvailable(int? carMakeId)
+        {
+            var data = (from c in db.CarYears
+                        where c.CarModel.CarMakeId == carMakeId
+                        select c).ToList();
+            var jData = new List<JCarModelYear>();
+
+            foreach(var d in data)
+            {
+                var jm = new JCarModelYear
+                {
+                    CarModel = d.CarModel.Name,
+                    Year = d.Year,
+                    CarModelId = d.CarModelId,
+                    CarYearId = d.CarYearId
+                };
+
+                jData.Add(jm);
+            }
+
+            return Json(jData);
         }
 
         // GET: CarModels/Create

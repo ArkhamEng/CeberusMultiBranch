@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6 ">
+                    <div class="form-group col-md-6">
                         @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
@@ -55,7 +55,15 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-md-2 col-md-offset-4">
+                    <div class="form-group col-md-2">
+                        @Html.Label("Modelos Compatibles", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group"  id="divModComp">
+                            <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                            @Html.TextBox("Compatibilities", "", htmlAttributes: new { @class = "form-control disabled" })
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-2 col-md-offset-2">
                         @Html.Label("Imagenes Adjuntas", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group" onclick="ShowImages()">
                             <span class="input-group-addon"><i class="fa fa-camera"></i></span>
@@ -181,7 +189,6 @@
                         <span class="fa fa-cloud-upload" />
                     </button>
                 </div>
-
                 <label id="lblMessage" class="text-danger" />
             </div>
         </div>
@@ -203,6 +210,8 @@
             </div>
         </div>
     </div>
+
+
 }
 
 
@@ -214,6 +223,10 @@
     </div>
 </div>
 
+@Html.Partial("_CarModelSelector",Model.CarMakes)
+
+<div id="divComp"></div>
+
 
 <script>
     var imgLoaded = 0;
@@ -223,6 +236,7 @@
     {
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
+        $("#Compatibilities").attr("readonly", true);
 
         $("#StorePrice").attr("readonly", true);
         $("#WholesalerPrice").attr("readonly", true);
@@ -243,8 +257,39 @@
 
 
         $("#btnUpload").click(function () { $("#divImagesModal").modal(); });
-
+        $("#divModComp").click(function () { $("#divCompModal").modal(); });
     });
+
+    function ShowCompatibilities()
+    {
+
+        console.log("Loading CarModels Ajax..");
+
+        $.ajax({
+            url: '@Url.Action("GetModels", "CarModels")',
+            type: "POST",
+           
+            sucess: function (view)
+            {
+                console.log("Success");
+                $("#divComp").html(view);
+                $("#divCompModal").modal();
+            },
+
+            error: function (data) { console.log("Error Executing"); console.log(data); },
+            statusCode:
+            {
+                200: function (view) {
+                    console.log("200: Authenticated ");
+                    $("#divComp").html(view);
+                    $("#divCompModal").modal();
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
 
     function SetPrice()
     {

@@ -18,6 +18,7 @@ using System.IO;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
+    [Authorize]
     public class EmployeesController : Controller
     {
         private ApplicationData db = new ApplicationData();

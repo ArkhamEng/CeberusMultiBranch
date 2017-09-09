@@ -17,10 +17,13 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
     {
         public SelectList Categories { get; set; }
 
+        public SelectList CarMakes { get; set; }
+
         public ProductViewModel()
         {
             this.Categories    = new List<Category>().ToSelectList();
             this.Images        = new List<ProductImage>();
+            this.CarMakes = new List<CarMake>().ToSelectList();
         }
 
         public ProductViewModel(Product product)
