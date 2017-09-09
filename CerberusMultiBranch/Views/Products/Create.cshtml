@@ -61,6 +61,7 @@
                             <span class="input-group-addon"><i class="fa fa-car"></i></span>
                             @Html.TextBox("Compatibilities", "", htmlAttributes: new { @class = "form-control disabled" })
                         </div>
+                        <label id="lblMessageModel" class="text-danger" />
                     </div>
 
                     <div class="form-group col-md-2 col-md-offset-2">
@@ -211,6 +212,7 @@
         </div>
     </div>
 
+    @Html.Partial("_CarModelSelector", Model)
 
 }
 
@@ -223,10 +225,6 @@
     </div>
 </div>
 
-@Html.Partial("_CarModelSelector",Model.CarMakes)
-
-<div id="divComp"></div>
-
 
 <script>
     var imgLoaded = 0;
@@ -237,6 +235,8 @@
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
         $("#Compatibilities").attr("readonly", true);
+
+        $("#Compatibilities").val('@Model.Compatibilities.Count');
 
         $("#StorePrice").attr("readonly", true);
         $("#WholesalerPrice").attr("readonly", true);
@@ -258,6 +258,8 @@
 
         $("#btnUpload").click(function () { $("#divImagesModal").modal(); });
         $("#divModComp").click(function () { $("#divCompModal").modal(); });
+
+      
     });
 
     function ShowCompatibilities()

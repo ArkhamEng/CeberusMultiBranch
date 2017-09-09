@@ -102,9 +102,9 @@
 <script>
 
     $(document).ready(function () {
-        SetCascade("#MakeId", "#ModelId", "GetModels");
+        SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 
-        SetCascade("#ModelId", "#YearId", "GetYears");
+        SetCascade("#CarModelId", "#CarYearId", "GetYears");
 
         $("#btnCreate").click(function () { window.location = '/Products/Create'; });
 
@@ -118,7 +118,7 @@
                 categoryId: $("#CategoryId").val(),
                 carMakeId: $("#CarMakeId").val(),
                 carModelId: $("#CarModelId").val(),
-                carYear: $("#CarYear").val(),
+                carYear: $("#CarYearId").val(),
                 name: $("#Name").val(),
                 code: $("#Code").val(),
             };
@@ -126,5 +126,10 @@
             Search("/Products/Search", data, "#divProducts");
         });
 
+        $("#CarMakeId").change(function ()
+        {
+            $("#CarYearId").empty();
+            $("#CarYearId").attr("readonly", true);
+        });
     });
 </script>

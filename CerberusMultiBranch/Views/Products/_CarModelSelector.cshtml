@@ -1,9 +1,9 @@
-﻿@model System.Web.Mvc.SelectList
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 
 
 <div id="divCompModal" class="modal" role="dialog">
-    <div class="modal-dialog ">
-        <div class="modal-content panel panel-danger">
+    <div class="modal-dialog  modal-lg">
+        <div class="modal-content panel panel-danger ">
             <div class="panel-body">
                 <div class="row">
 
@@ -12,7 +12,7 @@
                             <h4>Marcas de Autos</h4>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                                @Html.DropDownList("CarModelFilter", Model, htmlAttributes: new { @class = "form-control" })
+                                @Html.DropDownList("CarModelFilter", Model.CarMakes, htmlAttributes: new { @class = "form-control" })
                             </div>
                         </div>
 
@@ -20,9 +20,9 @@
                             <h4>
                                 Disponibles
                             </h4>
-
-                            <select multiple class="form-control" id="tcAvailable" ondrop="drop(event)" ondragover="allowDrop(event)"></select>
-                            <button class="btn btn-success btn-xs" id="btnAdd">
+                            
+                            <select multiple class="form-control"  id="AvailableModels" name="AvailableModels" ondrop="drop(event)" ondragover="allowDrop(event)"></select>
+                            <button class="btn btn-success btn-xs" id="btnAdd" type="button">
                                 <span class="glyphicon glyphicon-arrow-down"></span>
                             </button>
                         </div>
@@ -30,9 +30,9 @@
                         <div class="col-md-12 btn-group-vertical">
 
                             <h4>
-                                Pendintes de Guardar
+                                Pendientes de Guardar
                             </h4>
-                            <button class="btn btn-danger btn-xs" id="btnRemove">
+                            <button class="btn btn-danger btn-xs" id="btnRemove" type="button">
                                 <span class="glyphicon glyphicon-arrow-up"></span>
                             </button>
                             <select multiple class="form-control" id="tcPending" ondrop="drop(event)" ondragover="allowDrop(event)"></select>
@@ -44,8 +44,14 @@
                         <h4>
                             Asignados
                         </h4>
-                        <select multiple class="form-control" id="tcAssigned" ondrop="drop(event)" ondragover="allowDrop(event)" style="height:220px"></select>
-                        <button class="btn btn-danger btn-xs">
+                      
+                        <select multiple class="form-control" id="tcAssigned" ondrop="drop(event)" ondragover="allowDrop(event)" style="height:220px">
+                            @foreach(var com in Model.Compatibilities)
+                            {
+                                <option value="@com.CompatibilityId">@com.CarYear.CarModel.CarMake.Name - @com.CarYear.CarModel.Name - @com.CarYear.Year</option>
+                            }
+                        </select>
+                        <button class="btn btn-danger btn-xs" type="button">
                             <span class="glyphicon glyphicon-remove" />
                         </button>
                     </div>
@@ -56,9 +62,9 @@
 </div>
 
 <script>
-
+    var ModelCount = 0;
     $(document).ready(function () {
-        var ModelCount = 0;
+        
 
         $("#CarModelFilter").change(function () {
             GetAvailables();
@@ -66,29 +72,35 @@
 
         GetAvailables();
 
-        $("#btnAdd").click(function () {
-            var op = $("#tcAvailable").val();
-
-            console.log(op);
-
-            $("#tcAvailable option:selected").each(function () {
-                if (!$("#tcPending option[value=" + $(this).val() + "]").length) {
+        $("#btnAdd").click(function ()
+        {
+           
+            $("#AvailableModels option:selected").each(function () {
+                if (!$("#tcPending option[value=" + $(this).val() + "]").length)
+                {
                     $("#tcPending").append($(this).clone());
+                    ModelCount++;
+                    SetLabelModels();
                 }
             });
         });
 
 
-        $("#btnRemove").click(function () {
-
+        $("#btnRemove").click(function ()
+        {
             $("#tcPending option:selected").remove();
-            //$("#tcPending option:selected").each(function () {
-
-            //        $("#tcPending").remove($(this));
-
-            //});
+            ModelCount--;
+            SetLabelModels();
         });
     });
+
+    function SetLabelModels()
+    {
+        if (ModelCount == 0)
+            $("#lblMessageModel").text("");
+        else
+            $("#lblMessageModel").text("Modelos pendientes de guardar " + ModelCount);
+    }
 
 
     function GetAvailables() {
@@ -105,11 +117,10 @@
                 var trHTML = '';
                 $.each(response, function (key, value) {
                     trHTML +=
-                       '<option value="' + value.CarYearId + '" draggable="true" ondragstart="drag(event)">Modelo ' + value.CarModel + ' Año ' + value.Year + '</option>';
+                       '<option value="' + value.CarYearId + '" draggable="true" ondragstart="drag(event)">' + $("#CarModelFilter option:selected").text() + '-' + value.CarModel + '-' + value.Year + '</option>';
                 });
-                $('#tcAvailable').empty();
-                $('#tcAvailable').append(trHTML);
-
+                $('#AvailableModels').empty();
+                $('#AvailableModels').append(trHTML);
 
             },
             error: function (response) {

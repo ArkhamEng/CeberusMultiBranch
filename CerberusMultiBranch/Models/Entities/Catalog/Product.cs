@@ -75,6 +75,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Unidad")]
         public string Unit { get; set; }
 
+        [NotMapped]
+        public List<int> AvailableModels { get; set; }
+
         public virtual Category Category { get; set; }
 
         public ICollection<ProductImage> Images { get; set; }

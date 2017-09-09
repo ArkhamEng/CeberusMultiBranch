@@ -12,7 +12,7 @@
 <hr />
 @Scripts.Render("~/bundles/jqueryval")
 
-@using (Html.BeginForm(null,null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Create","Employees", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -126,6 +126,7 @@
 
             <div class="panel-footer">
                 <div class="btn-group">
+                   
                    @Html.Partial("_CatalogButtonGroup")
                 </div>
             </div>

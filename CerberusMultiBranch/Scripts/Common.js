@@ -54,6 +54,8 @@ function SetCascade(ddlParent, ddlChild, action) {
             $(ddlChild).empty();
             $(ddlChild).attr("readonly", true);
         }
+
+        
     });
 }
 

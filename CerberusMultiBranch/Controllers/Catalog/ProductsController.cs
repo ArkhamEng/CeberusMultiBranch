@@ -31,19 +31,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var model = (from p in db.Products
                          where (categoryId == null || p.CategoryId == categoryId)
                          && (name == null || p.Name.Contains(name))
-                         && (code == string.Empty || p.Code == code)
+                         && (code == null || p.Code == code)
                          && (carYear == null || p.Compatibilities.Where(c=> c.CarYearId == carYear).ToList().Count > 0)
                          select p
-                         ).ToList();
+                         ).Include(p=> p.Images).ToList();
 
-            foreach (var prod in model)
-            {
-                prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
+            //foreach (var prod in model)
+            //{
+            //    prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
 
-                foreach (var image in prod.Images)
-                    image.File = GzipWrapper.Decompress(image.File);
+            //    foreach (var image in prod.Images)
+            //        image.File = GzipWrapper.Decompress(image.File);
 
-            }
+            //}
 
             return PartialView("_List", model);
         }
@@ -59,7 +59,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 var product = db.Products.Find(id);
                 product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
-
+                product.Compatibilities = db.Compatibilites.Where(c => c.ProductId == product.ProductId).ToList();
                 model = new ProductViewModel(product);
             }
 
@@ -75,7 +75,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         [ValidateAntiForgeryToken]
         //public ActionResult Create([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product,HttpPostedFileBase file)
-        public ActionResult Create(Product product)
+        public ActionResult Create([Bind(Exclude = "Compatibilities")]Product product)
         {
             if (ModelState.IsValid)
             {
@@ -88,27 +88,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 int i = Cons.Zero;
 
+                foreach(var carYearId in product.AvailableModels)
+                {
+                    Compatibility comp = new Compatibility { CarYearId = carYearId, ProductId = product.ProductId };
+                    db.Compatibilites.Add(comp);
+                }
+                db.SaveChanges();
+
+                //Guardado Imagenes
                 foreach (var file in product.Files)
                 {
                     if (file != null)
                     {
-                        //using (MemoryStream target = new MemoryStream())
-                        //{
-
-                        //    file.InputStream.CopyTo(target);
-                        //    var bArr = target.ToArray();
-
-                        //    ProductImage f = new ProductImage();
-
-                        //    f.ProductId = product.ProductId;
-                        //    f.Name = file.FileName;
-                        //    f.Type = file.ContentType;
-                        //    f.File = GzipWrapper.Compress(bArr);
-
-                        //    db.ProductImages.Add(f);
-                        //}
-
-
                         ProductImage f = new ProductImage();
 
                         f.ProductId = product.ProductId;

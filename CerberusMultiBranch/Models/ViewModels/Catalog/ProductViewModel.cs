@@ -19,6 +19,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList CarMakes { get; set; }
 
+        
+
         public ProductViewModel()
         {
             this.Categories    = new List<Category>().ToSelectList();
@@ -41,11 +43,14 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.MinQuantity = product.MinQuantity;
             this.StorePercentage = product.StorePercentage;
             this.StorePrice = product.StorePrice;
+            this.WholesalerPercentage = product.WholesalerPercentage;
+            this.WholesalerPrice = product.WholesalerPrice;
             this.TradeMark = product.TradeMark;
             this.Unit = product.Unit;
+            this.Compatibilities = product.Compatibilities;
    
             this.Categories = new List<Category>().ToSelectList();
-         
+            this.CarMakes = new List<CarMake>().ToSelectList();
         }
     }
 } 
