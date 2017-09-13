@@ -22,6 +22,8 @@ namespace CerberusMultiBranch.Models.Entities
 
         public DbSet<CarYear> CarYears { get; set; }
 
+        public DbSet<Branch> Branches { get; set; }
+
         #endregion
 
         #region Common
@@ -47,13 +49,13 @@ namespace CerberusMultiBranch.Models.Entities
         #endregion
 
         #region Inventory
-
+        public DbSet<ProductInventory> ProductInventories { get; set; }
 
         #endregion
 
         public DbSet<ProductImage> ProductImages { get; set; }
 
-        public DbSet<ProductInBranch> ProductsIsBranch { get; set; }
+        
 
         public ApplicationData(): 
             base("DefaultConnection")

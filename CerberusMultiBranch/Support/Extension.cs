@@ -1,9 +1,13 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
+﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 
@@ -44,6 +48,26 @@ namespace CerberusMultiBranch.Support
             }
 
             return b;
+        }
+
+        public static void OrderCarModels(this IEnumerable<Product> products)
+        {
+            foreach (var p in products)
+            {
+                p.ModelCompatibilities = new List<CarModel>();
+                foreach (var m in p.Compatibilities)
+                {
+                    if (!p.ModelCompatibilities.Contains(m.CarYear.CarModel))
+                        p.ModelCompatibilities.Add(m.CarYear.CarModel);
+                }
+            }
+        }
+
+        public static string GetEmployeeId(this IIdentity identity)
+        {
+            var claim = ((ClaimsIdentity)identity).FindFirst("EmployeeId");
+            // Test for null to avoid issues during local testing
+            return (claim != null) ? claim.Value : string.Empty;
         }
     }
 }

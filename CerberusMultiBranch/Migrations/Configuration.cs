@@ -6,7 +6,7 @@ namespace CerberusMultiBranch.Migrations
     using System.Linq;
 
     // internal sealed class Configuration : DbMigrationsConfiguration<CerberusMultiBranch.Models.Entities.ApplicationData>
- /*   internal sealed class Configuration : DbMigrationsConfiguration<CerberusMultiBranch.Models.Entities.ApplicationData>
+    internal sealed class Configuration : DbMigrationsConfiguration<CerberusMultiBranch.Models.Entities.ApplicationData>
     {
         public Configuration()
         {
@@ -28,9 +28,9 @@ namespace CerberusMultiBranch.Migrations
             //    );
             //
         }
-    }*/
+    }
 
-
+/*
     internal sealed class Configuration : DbMigrationsConfiguration<CerberusMultiBranch.Models.ApplicationDbContext>
     {
         public Configuration()
@@ -53,5 +53,5 @@ namespace CerberusMultiBranch.Migrations
             //    );
             //
         }
-    }
+    }*/
 }

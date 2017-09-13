@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -7,18 +8,21 @@ using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {
-    [Table("ProductInBranch", Schema = "Inventory")]
-    public class ProductInBranch
+    [Table("ProductInventory", Schema = "Inventory")]
+    public class ProductInventory
     {
-        public int ProductInBranchId { get; set; }
+        public int ProductInventoryId { get; set; }
 
         public int ProductId { get; set; }
 
         public int BranchId { get; set; }
 
-        public double Quantity { get; set; }
+        public double Stock { get; set; }
 
+        #region Navigation Properties
         public virtual  Product Product { get; set; }
 
+        public virtual Branch Branch { get; set; }
+        #endregion
     }
 }

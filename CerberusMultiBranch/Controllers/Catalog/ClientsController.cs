@@ -51,7 +51,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (id == null)
                 model = new ClientViewModel();
             else
-                 model = CreateModel(db.Clients.Find(id));
+                model = CreateModel(db.Clients.Find(id));
 
 
             model.States = db.States.ToSelectList();
@@ -76,16 +76,29 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [ValidateAntiForgeryToken]
         public ActionResult Create(Client client)
         {
-            if (client.ClientId == Cons.Zero)
+            try
             {
-                client.Code = db.Clients.Max(c => c.Code).ToCode();
-                db.Clients.Add(client);
+                if (client.ClientId == Cons.Zero)
+                {
+                    client.Code = db.Clients.Max(c => c.Code).ToCode();
+                    db.Clients.Add(client);
+                }
+                else
+                    db.Entry(client).State = EntityState.Modified;
+
+                db.SaveChanges();
             }
-            else
-                db.Entry(client).State = EntityState.Modified;
+            catch (System.Exception ex)
+            {
+                if (ex.InnerException.InnerException.Message.Contains("Phone"))
+                    ModelState.AddModelError("Phone", "El número "+client.Phone+" ya se encuentra registrado");
 
-            db.SaveChanges();
+                if (ex.InnerException.InnerException.Message.Contains("BussinessName"))
+                    ModelState.AddModelError("BusinessName", "Ya existe un cliente con el nombre "+client.BusinessName);
 
+                var model = CreateModel(client);
+                return View(model);
+            }
 
             return RedirectToAction("Create", new { id = client.ClientId });
         }

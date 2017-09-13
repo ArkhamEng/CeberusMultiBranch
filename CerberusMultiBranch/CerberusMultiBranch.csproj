@@ -184,7 +184,7 @@
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
     <Compile Include="Controllers\Catalog\ProvidersController.cs" />
-    <Compile Include="Controllers\Common\CascadeController.cs" />
+    <Compile Include="Controllers\Common\JsonController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\CategoriesController.cs" />
     <Compile Include="Controllers\Config\CarMakesController.cs" />
@@ -193,14 +193,6 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709051959474_Initial.cs" />
-    <Compile Include="Migrations\201709051959474_Initial.Designer.cs">
-      <DependentUpon>201709051959474_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709052001585_Initial1.cs" />
-    <Compile Include="Migrations\201709052001585_Initial1.Designer.cs">
-      <DependentUpon>201709052001585_Initial1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -218,7 +210,7 @@
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
-    <Compile Include="Models\Entities\Inventory\ProductInBranch.cs" />
+    <Compile Include="Models\Entities\Inventory\ProductInventory.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -231,6 +223,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
+    <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
@@ -248,6 +241,7 @@
     <Content Include="Content\Images\Argos.png" />
     <Content Include="Content\Images\backgroud.jpg" />
     <Content Include="Content\Images\backgroud_red.jpg" />
+    <Content Include="Content\Images\header.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
@@ -345,6 +339,7 @@
     <Content Include="Views\Employees\_List.cshtml" />
     <Content Include="Views\Shared\_CatalogButtonGroup.cshtml" />
     <Content Include="Views\Products\_CarModelSelector.cshtml" />
+    <Content Include="Views\Shared\_QuickSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -354,14 +349,6 @@
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\201709051959474_Initial.resx">
-      <DependentUpon>201709051959474_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709052001585_Initial1.resx">
-      <DependentUpon>201709052001585_Initial1.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

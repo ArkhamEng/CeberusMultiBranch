@@ -12,41 +12,60 @@
                             <h4>Marcas de Autos</h4>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                                @Html.DropDownList("CarModelFilter", Model.CarMakes, htmlAttributes: new { @class = "form-control" })
+                                @Html.DropDownList("CarMakeFilter", Model.CarMakes, "", htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <h4>Modelos disponibles</h4>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                                @Html.DropDownList("CarModelFilter", Model.CarModels, "", htmlAttributes: new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 input-group">
+                            <div class="col-md-5 form-group">
+                                @Html.Label("Inicio", htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+                                    @Html.TextBox("Ini", "", htmlAttributes: new { @class = "form-control" })
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 col-md-offset-1 form-group">
+                                @Html.Label("Fin", htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+                                    @Html.TextBox("End", "", htmlAttributes: new { @class = "form-control" })
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-success" id="btnAdd" type="button">
+                                            <span class="fa fa-angle-double-down"></span>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
                         <div class="col-md-12 btn-group-vertical">
-                            <h4>
-                                Disponibles
-                            </h4>
-                            
-                            <select multiple class="form-control"  id="AvailableModels" name="AvailableModels" ondrop="drop(event)" ondragover="allowDrop(event)"></select>
-                            <button class="btn btn-success btn-xs" id="btnAdd" type="button">
-                                <span class="glyphicon glyphicon-arrow-down"></span>
-                            </button>
-                        </div>
-
-                        <div class="col-md-12 btn-group-vertical">
-
                             <h4>
                                 Pendientes de Guardar
                             </h4>
                             <button class="btn btn-danger btn-xs" id="btnRemove" type="button">
                                 <span class="glyphicon glyphicon-arrow-up"></span>
                             </button>
-                            <select multiple class="form-control" id="tcPending" ondrop="drop(event)" ondragover="allowDrop(event)"></select>
-                        </div>
+                            <div id="divValues" >
 
+                            </div>
+                            <select multiple class="form-control" id="tcPending" name="NewCompatibilities"></select>
+                        </div>
                     </div>
 
                     <div class="btn-group-vertical col-md-5">
                         <h4>
                             Asignados
                         </h4>
-                      
                         <select multiple class="form-control" id="tcAssigned" ondrop="drop(event)" ondragover="allowDrop(event)" style="height:220px">
-                            @foreach(var com in Model.Compatibilities)
+                            @foreach (var com in Model.Compatibilities)
                             {
                                 <option value="@com.CompatibilityId">@com.CarYear.CarModel.CarMake.Name - @com.CarYear.CarModel.Name - @com.CarYear.Year</option>
                             }
@@ -64,86 +83,68 @@
 <script>
     var ModelCount = 0;
     $(document).ready(function () {
-        
+        SetCascade("#CarMakeFilter", "#CarModelFilter", "GetModels");
+
+        $("#Ini").attr("readonly", true);
+        $("#End").attr("readonly", true);
 
         $("#CarModelFilter").change(function () {
-            GetAvailables();
+            if ($("#CarModelFilter").val() != "") {
+                $("#Ini").attr("readonly", false);
+                $("#End").attr("readonly", false);
+            }
+            else {
+                $("#Ini").attr("readonly", true);
+                $("#End").attr("readonly", true);
+            }
         });
 
-        GetAvailables();
 
         $("#btnAdd").click(function ()
         {
-           
-            $("#AvailableModels option:selected").each(function () {
-                if (!$("#tcPending option[value=" + $(this).val() + "]").length)
-                {
-                    $("#tcPending").append($(this).clone());
-                    ModelCount++;
-                    SetLabelModels();
-                }
-            });
+            if ($("#Ini").val() > 1900 & $("#End").val() > $("#Ini").val())
+            {
+                var ip = '<input type="text" name="NewCompatibilities" value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val() + '" />';
+                var op = '<option value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val()
+                    + '">' + $("#CarMakeFilter option:selected").text() + ' ' + $("#CarModelFilter option:selected").text() + ' ' + $("#Ini").val() + '-' + $("#End").val() + '</option>';
+
+                console.log(op);
+                console.log(ip);
+
+                $("#tcPending").append(op);
+                $("#divValues").append(ip);
+                ModelCount++;
+                SetLabelModels();
+
+                $("#Ini").attr("readonly", true).val("");
+                $("#End").attr("readonly", true).val("");
+                $("#CarModelFilter").attr("readonly", true).val("");
+                $("#CarMakeFilter").val("");
+            }
+            else
+                alert("El año final debe ser mayor que el inicial");
         });
 
 
         $("#btnRemove").click(function ()
         {
-            $("#tcPending option:selected").remove();
-            ModelCount--;
+
+            $("#selectId > option:selected").each(function () {
+                console.log(this.text + ' ' + this.value);
+            });
+
+            $("#tcPending option").remove();
+            $("#divValues").empty();
+            ModelCount= 0;
             SetLabelModels();
         });
     });
 
-    function SetLabelModels()
-    {
+    function SetLabelModels() {
         if (ModelCount == 0)
             $("#lblMessageModel").text("");
         else
             $("#lblMessageModel").text("Modelos pendientes de guardar " + ModelCount);
-    }
-
-
-    function GetAvailables() {
-        var id = $("#CarModelFilter").val();
-        console.log("Getting Availables for Id" + id);
-        $.ajax({
-            url: "@Url.Action("GetModelsAvailable", "CarModels")",
-            type: "POST",
-
-            data: { carMakeId: $("#CarModelFilter").val() },
-            success: function (response) {
-                console.log(response);
-
-                var trHTML = '';
-                $.each(response, function (key, value) {
-                    trHTML +=
-                       '<option value="' + value.CarYearId + '" draggable="true" ondragstart="drag(event)">' + $("#CarModelFilter option:selected").text() + '-' + value.CarModel + '-' + value.Year + '</option>';
-                });
-                $('#AvailableModels').empty();
-                $('#AvailableModels').append(trHTML);
-
-            },
-            error: function (response) {
-                console.log(response);
-            }
-        });
-    }
-
-    function allowDrop(ev) {
-        console.log(ev);
-        ev.preventDefault();
-    }
-
-    function drag(ev) {
-        console.log(ev);
-        ev.dataTransfer.setData("text", ev.target.id);
-    }
-
-    function drop(ev) {
-        console.log(ev);
-        ev.preventDefault();
-        var data = ev.dataTransfer.getData("text");
-        ev.target.appendChild(document.getElementById(data));
     }
 
 </script>

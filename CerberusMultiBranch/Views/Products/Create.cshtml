@@ -4,12 +4,13 @@
     ViewBag.Title = "Productos";
 }
 
-<h3>
-    <span class="fa fa-car" style="float:left"></span>
-    &nbsp;&nbsp;Edición de Productos
-</h3>
-<hr />
 
+<div class="col-md-11">
+    <h3>
+        <span class="fa fa-car" style="float:left"></span>
+        &nbsp;&nbsp;Edición de Productos
+    </h3>
+</div>
 @section Scripts
 {
     @Scripts.Render("~/bundles/jqueryval")
@@ -31,18 +32,19 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-star-empty"></i></span>
                             @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-2 col-md-offset-2">
                         @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
                             @*<span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>*@
                         </div>
+                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+
                     </div>
                 </div>
                 <div class="row">
@@ -57,7 +59,7 @@
 
                     <div class="form-group col-md-2">
                         @Html.Label("Modelos Compatibles", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group"  id="divModComp">
+                        <div class="input-group" id="divModComp">
                             <span class="input-group-addon"><i class="fa fa-car"></i></span>
                             @Html.TextBox("Compatibilities", "", htmlAttributes: new { @class = "form-control disabled" })
                         </div>
@@ -70,6 +72,7 @@
                             <span class="input-group-addon"><i class="fa fa-camera"></i></span>
                             @Html.TextBox("Pictures", "", htmlAttributes: new { @class = "form-control disabled" })
                         </div>
+                        <label id="lblMessage" class="text-danger" />
                     </div>
 
                     <div class="form-group col-md-12">
@@ -184,13 +187,13 @@
             </div>
             <div class="panel-footer">
                 <div class="btn-group">
-                   @Html.Partial("_CatalogButtonGroup")
+                    @Html.Partial("_CatalogButtonGroup")
 
                     <button type="button" class="btn btn-default" id="btnUpload">
                         <span class="fa fa-cloud-upload" />
                     </button>
                 </div>
-                <label id="lblMessage" class="text-danger" />
+
             </div>
         </div>
     </div>
@@ -230,8 +233,7 @@
     var imgLoaded = 0;
     var count = 0;
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
         $("#Compatibilities").attr("readonly", true);
@@ -259,20 +261,47 @@
         $("#btnUpload").click(function () { $("#divImagesModal").modal(); });
         $("#divModComp").click(function () { $("#divCompModal").modal(); });
 
-      
+        $("#Code").change(CheckCode);
+
     });
 
-    function ShowCompatibilities()
-    {
+    function CheckCode() {
+        console.log("Checar Codigo");
+        $.ajax({
+            url: '@Url.Action("CheckProductCode", "Json")',
+            type: "POST",
+            data: { code: $("#Code").val() },
+            sucess: function (exist) {
+                console.log("Result " + exist);
+                if (exist)
+                    alert("El Codigo ya existe");
+            },
+            error: function () {
+                console.log("Error al ejecutar " + exist);
+            },
+            statusCode:
+           {
+               200: function (exist) {
+                   console.log("Result " + exist);
+                   if (exist)
+                       alert("El Codigo ya existe");
+               },
+               401: function (exist) {
+                   alert('401: Unauthenticated');
+               }
+           }
+        });
+    }
+
+    function ShowCompatibilities() {
 
         console.log("Loading CarModels Ajax..");
 
         $.ajax({
             url: '@Url.Action("GetModels", "CarModels")',
             type: "POST",
-           
-            sucess: function (view)
-            {
+
+            sucess: function (view) {
                 console.log("Success");
                 $("#divComp").html(view);
                 $("#divCompModal").modal();
@@ -293,8 +322,7 @@
         });
     }
 
-    function SetPrice()
-    {
+    function SetPrice() {
         console.log("KeyPressed");
 
         var sp = (1 + $("#StorePercentage").val() / 100);
@@ -308,8 +336,7 @@
 
 
 
-    function EditCode(checkBox)
-    {
+    function EditCode(checkBox) {
         console.log($(checkBox).is(':checked'));
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
@@ -319,8 +346,7 @@
         $("#divImagesLoaded").modal();
     }
 
-    function DropImage(index)
-    {
+    function DropImage(index) {
         console.log("Drop #div" + index);
         $("#div" + index).remove();
 
@@ -337,8 +363,7 @@
 
     }
 
-    function ImageLoaded(input)
-    {
+    function ImageLoaded(input) {
         var files = input.files;
 
         var reader = new FileReader();
@@ -356,8 +381,7 @@
         $(input).closest("label").hide();
     }
 
-    function AddUploader()
-    {
+    function AddUploader() {
         console.log("Creating Upload " + imgLoaded);
 
         var ctrl = ' <label id="upl' + imgLoaded + '" class="btn btn-warning btn-file ">' +
@@ -369,7 +393,7 @@
 
         count++;
         console.log(count);
-            $("#lblMessage").text("Imagenes a cargar " + count);
+        $("#lblMessage").text("Imagenes a cargar " + count);
     }
 
     function Preview(input) {

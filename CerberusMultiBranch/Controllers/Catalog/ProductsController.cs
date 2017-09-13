@@ -8,6 +8,9 @@ using CerberusMultiBranch.Models.Entities.Catalog;
 using System.IO;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
+using System;
+using CerberusMultiBranch.Models.Entities.Config;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -19,7 +22,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = db.Products.Include(p => p.Images);
+            model.Products = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).ToList();
+            model.Products.OrderCarModels();
+           
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
@@ -32,19 +37,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                          where (categoryId == null || p.CategoryId == categoryId)
                          && (name == null || p.Name.Contains(name))
                          && (code == null || p.Code == code)
-                         && (carYear == null || p.Compatibilities.Where(c=> c.CarYearId == carYear).ToList().Count > 0)
+                         && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+
                          select p
-                         ).Include(p=> p.Images).ToList();
+                         ).Include(p => p.Images).Include(p => p.Compatibilities).ToList();
 
-            //foreach (var prod in model)
-            //{
-            //    prod.Images = db.ProductImages.Where(p => p.ProductId == prod.ProductId).ToList();
-
-            //    foreach (var image in prod.Images)
-            //        image.File = GzipWrapper.Decompress(image.File);
-
-            //}
-
+            model.OrderCarModels();
             return PartialView("_List", model);
         }
 
@@ -57,9 +55,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 model = new ProductViewModel();
             else
             {
-                var product = db.Products.Find(id);
-                product.Images = db.ProductImages.Where(i => i.ProductId == product.ProductId).ToList();
-                product.Compatibilities = db.Compatibilites.Where(c => c.ProductId == product.ProductId).ToList();
+                var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
                 model = new ProductViewModel(product);
             }
 
@@ -88,12 +84,32 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 int i = Cons.Zero;
 
-                foreach(var carYearId in product.AvailableModels)
+                foreach (var c in product.NewCompatibilities)
                 {
-                    Compatibility comp = new Compatibility { CarYearId = carYearId, ProductId = product.ProductId };
-                    db.Compatibilites.Add(comp);
+                    var mArr = c.Split('-');
+                    var mId = Convert.ToInt32(mArr[0]);
+                    var yIni = Convert.ToInt32(mArr[1]);
+                    var yEnd = Convert.ToInt32(mArr[2]);
+
+                    for (int j = yIni; j < yEnd; j++)
+                    {
+                        var year = db.CarYears.FirstOrDefault(y => y.Year == j && y.CarModelId == mId);
+
+                        if (year == null)
+                        {
+                            year = new CarYear { Year = j, CarModelId = mId };
+                            db.CarYears.Add(year);
+                            db.SaveChanges();
+                        }
+
+
+                        Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
+                        db.Compatibilites.Add(comp);
+                    }
                 }
+
                 db.SaveChanges();
+                
 
                 //Guardado Imagenes
                 foreach (var file in product.Files)

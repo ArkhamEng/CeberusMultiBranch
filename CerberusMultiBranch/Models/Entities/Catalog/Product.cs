@@ -37,6 +37,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name="Cantidad Minima")]
         public double MinQuantity { get; set; }
 
+        [Display(Name = "Código de barras")]
         public string BarCode { get; set; }
 
         [Display(Name = "Precio de Compra")]
@@ -75,18 +76,24 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Unidad")]
         public string Unit { get; set; }
 
-        [NotMapped]
-        public List<int> AvailableModels { get; set; }
-
         public virtual Category Category { get; set; }
 
         public ICollection<ProductImage> Images { get; set; }
 
         public ICollection<Compatibility> Compatibilities { get; set; }
 
+        public ICollection<ProductInventory> ProductInventories { get; set; }
+
+        #region NotMapped Properties
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 
+        [NotMapped]
+        public List<CarModel> ModelCompatibilities { get; set; }
+
+        [NotMapped]
+        public List<string> NewCompatibilities { get; set; }
+        #endregion
     }
 
 }

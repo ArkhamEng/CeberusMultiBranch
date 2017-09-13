@@ -12,7 +12,7 @@ function SetCascade(ddlParent, ddlChild, action) {
     console.log("Setting Cascade Controls State/Cities");
     console.log("Child Value " + $(ddlChild).val());
 
-    if ($(ddlChild).val() != '')
+    if ($(ddlChild).val() == null)
         $(ddlChild).attr("readonly", false);
     else
         $(ddlChild).attr("readonly", true);
@@ -26,7 +26,7 @@ function SetCascade(ddlParent, ddlChild, action) {
 
             var AObj =
                 {
-                    url: "/Cascade/" + action,
+                    url: "/Json/" + action,
                     type: "POST",
                     data: { parentId: parentId },
 
@@ -43,7 +43,8 @@ function SetCascade(ddlParent, ddlChild, action) {
                         else
                             $(ddlChild).attr("readonly", true);
                     },
-                    error: function () {
+                    error: function ()
+                    {
                         console.log("Error on pupulating cascade");
                     }
                 };

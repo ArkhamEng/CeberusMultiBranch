@@ -5,113 +5,109 @@
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 
 
-    <table id="tbProducts" class="table  table-striped">
-        <thead class="panel-heading">
-            <tr hidden="hidden">
-                <th class="col-md-2"></th>
-                <th class="col-md-12"></th>
-                <th></th>
+<table id="tbProducts" class="table  table-striped">
+    <thead class="panel-heading">
+        <tr hidden="hidden">
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="col-md-2">
+
+                    @if (item.Images.Count > 0)
+                    {
+                        var base64 = Convert.ToBase64String(item.Images.FirstOrDefault().ClearImage);
+                        var imgSrc = String.Format("data:{0};base64,{1}", item.Images.FirstOrDefault().Type, base64);
+
+                        <img src="@imgSrc" class="img-thumbnail img-responsive" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
+                    }
+
+                </td>
+
+                <td class="col-md-9">
+                    <h3>
+                        @Html.DisplayFor(model => item.Name)
+
+                        @if (item.ModelCompatibilities.Count > 0)
+                        {
+                            string content = string.Empty;
+
+                            foreach (var m in item.ModelCompatibilities)
+                            {
+                                content += "<h5>" + m.CarMake.Name + " " + m.Name + " "+m.CarYears.Min(y=>y.Year)+'-'+m.CarYears.Max(y=>y.Year)+"</h5>";
+                            }
+
+                            <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover"
+                                  title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                            </span>
+                        }
+                    </h3>
+                    <h4>
+                        @Html.DisplayFor(model => item.StorePrice)
+                    </h4>
+                    @Html.DisplayFor(model => item.Description)
+
+                    <h5>
+                        Código: @Html.DisplayFor(model => item.Code)
+                    </h5>
+                </td>
+
+
+                <td class="form-group" align="center">
+                    <button type="button" class="btn btn-primary" onclick="Edit(@item.ProductId)">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td class="col-md-3">
+            index++;
+        }
+    </tbody>
+</table>
 
-                        @if (item.Images.Count > 0)
-                        {
-                            var base64 = Convert.ToBase64String(item.Images.FirstOrDefault().ClearImage);
-                            var imgSrc = String.Format("data:{0};base64,{1}", item.Images.FirstOrDefault().Type, base64);
-                            <div class="thumbnail">
-                                <img src="@imgSrc" />
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="item active thumbnail">
-                                <img src="~/Content/Images/sinimagen.jpg" />
-                            </div>
-                        }
-
-                    </td>
-
-                    <td>
-                        <h3>
-                            @Html.DisplayFor(model => item.Name)
-                        </h3>
-                        <h4>
-                            @Html.DisplayFor(model => item.StorePrice)
-                        </h4>
-                        @Html.DisplayFor(model => item.Description)
-                        <h5>
-                            Código: @Html.DisplayFor(model => item.Code)
-                        </h5>
-                    </td>
-
-                    <td class="form-group" align="center">
-                        @Html.ActionLink(" ", "Create", new { id = item.ProductId }, new { @class = "btn btn-primary glyphicon glyphicon-pencil" })
-
-                        @Html.ActionLink(" ", "Delete", new { id = item.ProductId }, new { @class = "btn btn-danger glyphicon glyphicon-trash" })
-                    </td>
-                </tr>
-                index++;
-            }
-        </tbody>
-    </table>
-
-
-
-<div id="divModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div id="divCarousel" class="carousel slide" data-ride="carousel">
-                <div id="divContent">
-
-                </div>
-
-                <a class="left carousel-control" href="#divCarousel" data-slide="prev">
-                    <span class="glyphicon glyphicon-chevron-left"></span>
-                    <span class="sr-only">Previous</span>
-                </a>
-                <a class="right carousel-control" href="#divCarousel" data-slide="next">
-                    <span class="glyphicon glyphicon-chevron-right"></span>
-                    <span class="sr-only">Next</span>
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetDataTable("#tbProducts");
     })
 
 
-    function RowCreated(row)
-    {
-
+    function Edit(id) {
+        console.log("redirect " + id);
+        window.location = '/Products/Create/' + id;
     }
 
-    function Show(carousel)
-    {
+    function Show(carousel) {
         console.log("Show Carousel");
         $(divContent).html($(carousel).clone());
         $(divModal).modal('show');
     }
 
-    function RowCreated2(row) {
-        var id = $(row).find('td:eq(0)').text();
-        var options = {
-            title: "Quieres borrar el registro?", placement: "left", buttons: [
-         { label: "Si", class: 'btn btn-primary', icon: 'glyphicon glyphicon-ok', onClick: function () { Delete(id, row); } },
-         { label: "No", class: 'btn btn-danger', icon: 'glyphicon glyphicon-remove' }]
+    function CompatibilitiesPop(content) {
+        console.log(content);
+
+
+        $('body').popover("destroy")
+
+        var popOverSettings =
+        {
+            placement: 'right',
+            container: 'body',
+            html: true,
+            selector: '[rel="popover"]', //Sepcify the selector here
+            content: content
         }
 
-        $(row).find('td:eq(6)').children("button").confirmation(options);
-        $(row).dblclick(Select);
+        $('body').popover(popOverSettings);
     }
+
 
 </script>

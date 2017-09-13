@@ -35,7 +35,7 @@
             LoadPopover();
         });
 
-        $("#btnNewSearch").click(function () { window.location.replace('@Url.Action("Index")') });
+        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")'; });
         $("#btnClear").click(function () { window.location = '@Url.Action("Create",new { id="" })'; });
     });
 

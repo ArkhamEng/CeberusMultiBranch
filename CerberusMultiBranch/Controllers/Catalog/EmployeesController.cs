@@ -93,6 +93,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         employee.Picture = employee.PostedFile.ToCompressedFile();
                     }
 
+                    employee.Code = db.Employees.Max(c => c.Code).ToCode();
                     db.Employees.Add(employee);
                     db.SaveChanges();
 

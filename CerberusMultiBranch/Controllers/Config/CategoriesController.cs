@@ -34,9 +34,16 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         // GET: Categories/Create
-        public ActionResult Create()
+        public ActionResult Create(int? id)
         {
-            return View();
+            Category model = null;
+            if (id == null)
+                model = new Category();
+
+            else
+                model = db.Categories.Find(id);
+
+            return View(model);
         }
 
         // POST: Categories/Create

@@ -1,0 +1,158 @@
+﻿
+
+<div class="form-group col-md-3">
+    @Html.Label("Clave", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("ClientCode", "", htmlAttributes: new { @class = "form-control" })
+    </div>
+</div>
+
+<div class="form-group col-md-9">
+    @Html.Label("Nombre del Cliente", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("ClientName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button id="btnClientQuick" type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-search" id="spClientQuick"></span>
+            </button>
+        </span>
+    </div>
+    <label id="lblClientQuick" class="text-danger" />
+</div>
+
+@Html.Hidden("ClientId")
+
+
+<div id="divModalQuickClient" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger ">
+            <div class="panel-heading">Doble Click Para Seleccionar</div>
+            <div class="panel-body">
+                <table id="tbQuickClient" class="table table-striped">
+                    <thead>
+                        <tr >
+                            <th hidden="hidden"/>
+                            <th>@Html.DisplayName("Clave")</th>
+                            <th>@Html.DisplayName("Nombre")</th>
+                            <th>@Html.DisplayName("Teléfono")</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyQuickClient">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnClientQuick").click(function () { ClientQuick(); });
+
+        //si el ClientId tiene un valor, ejecuto una busqueda rápida
+        if ($("#ClientId").val() != '' & $("#ClientId").val() > 0)
+        {
+            ClientQuick();
+        }
+    });
+
+    function SelectClient(row)
+    {
+        var cells = $(row).find('td');
+
+        $("#ClientId").val(cells[0].innerHTML);
+        $("#ClientCode").val(cells[1].innerHTML);
+        $("#ClientName").val(cells[2].innerHTML);
+
+        $("#ClientCode").attr("readonly", true);
+        $("#ClientName").attr("readonly", true);
+    
+        $("#spClientQuick").attr("class", "fa fa-refresh");
+        
+        $("#divModalQuickClient").modal('hide');
+    }
+
+    function ClientQuick()
+    {
+        $("#lblClientQuick").text("");
+
+        if ($("#ClientId").val() != '' & $("#ClientId").val() > 0)
+        {
+            $("#ClientId").val("");
+            $("#ClientCode").val("");
+            $("#ClientName").val("");
+
+            $("#ClientCode").attr("readonly", false);
+            $("#ClientName").attr("readonly", false);
+
+
+            $("#spClientQuick").attr("class", "glyphicon glyphicon-search");
+            return;
+        }
+
+        $("#tbodyQuickClient").empty();
+
+        var d = {
+            id:$("#ClientId").val(),
+            code: $("#ClientCode").val(),
+            name: $("#ClientName").val()
+        };
+
+        $.ajax({
+            url: '@Url.Action("QuickClient", "Json")',
+            type: "POST",
+            data: d,
+            success: function (data) { },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data)
+                {
+
+
+                    if (data.length == 1)
+                    {
+                        $("#ClientCode").val(data[0].Code);
+                        $("#ClientName").val(data[0].Name);
+                        $("#ClientId").val(data[0].Id);
+
+                        $("#ClientCode").attr("readonly", true);
+                        $("#ClientName").attr("readonly", true);
+                        $("#spClientQuick").attr("class", "fa fa-refresh");
+                    }
+                    else if (data.length > 1)
+                    {
+                        console.log("Objetos encontrados " + data.length);
+                        $.each(data, function (i, item)
+                        {
+                            var row = "<tr ondblclick='SelectClient(this)'><td hidden='hidden'>" + item.Id + "</td>" +
+                                          "<td>" + item.Code + "</td>" +
+                                             "<td>" + item.Name + "</td>" +
+                                          "<td>" + item.Phone + "</td></tr>";
+
+                            $("#tbodyQuickClient").append(row);
+
+                        });
+
+                        $("#divModalQuickClient").modal();
+                    }
+                    else
+                    {
+                        $("#lblClientQuick").text("No se encontraron coincidencias");
+                    }
+
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+</script>

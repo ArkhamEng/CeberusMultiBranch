@@ -4,11 +4,12 @@
     ViewBag.Title = "Clientes";
  }
 
-<h3>
-    <span class="fa fa-address-book" style="float:left"></span>
-    &nbsp;&nbsp;Edición de Clientes
-</h3>
-<hr />
+<div class="col-md-11">
+    <h3>
+        <span class="fa fa-address-book" style="float:left"></span>
+        &nbsp;&nbsp;Edición de Clientes
+    </h3>
+</div>
 @Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm())
@@ -38,7 +39,7 @@
                     <div class="form-group col-md-4 col-md-offset-4">
                         @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
                             <span class="input-group-addon"><input type="checkbox" id="cbCode"></span>
                         </div>
@@ -48,7 +49,7 @@
                     <div class="form-group col-md-12">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-user"></i></span>
                             @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Name) } })
                         </div>
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
@@ -108,6 +109,13 @@
                     </div>
                 </div>
             </div>
+
+            <div class="panel-footer">
+                <div class="btn-group">
+                    @Html.Partial("_CatalogButtonGroup")
+
+                </div>
+            </div>
         </div>
     </div>
 
@@ -118,7 +126,7 @@
                     <div class="form-group col-md-8">
                         @Html.LabelFor(model => model.FTR, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
                             @Html.EditorFor(model => model.FTR, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
                         @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
@@ -153,24 +161,15 @@
                     </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <div class="btn-group">
-                    @Html.Partial("_CatalogButtonGroup")
-
-                </div>
-            </div>
+          
         </div>
     </div>
-
-    
 }
 
 
 <script>
 
     $(document).ready(LoadCreate);
-
-
 
     function LoadCreate()
     {
@@ -182,7 +181,6 @@
             $("#Code").attr("readonly", !$(this).is(':checked'));
         })
 
-
         $("#Name").keyup(FillNames);
         $("#Address").keyup(FillTaxAddress);
         $("#ZipCode").keyup(FillTaxAddress);
@@ -193,7 +191,8 @@
         console.log("Create Client Loaded");
     }
 
-    function FillTaxAddress() {
+    function FillTaxAddress()
+    {
         var tAddress = $("#Address").val() + "\n";
 
         if ($("#CityId").val() != '')

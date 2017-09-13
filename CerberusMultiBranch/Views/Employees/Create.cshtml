@@ -4,12 +4,13 @@
     ViewBag.Title = "Empleados";
 }
 
-<h3>
-    <span class="fa fa-address-card" style="float:left"></span>
-    &nbsp;&nbsp;Registro de Empleados
-</h3>
+<div class="col-md-11">
+    <h3>
+        <span class="fa fa-address-card" style="float:left"></span>
+        &nbsp;&nbsp;Registro de Empleados
+    </h3>
+</div>
 
-<hr />
 @Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm("Create","Employees", FormMethod.Post, new { enctype = "multipart/form-data" }))

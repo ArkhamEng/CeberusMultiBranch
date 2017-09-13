@@ -19,13 +19,18 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList CarMakes { get; set; }
 
-        
+        public SelectList CarModels { get; set; }
+
 
         public ProductViewModel()
         {
             this.Categories    = new List<Category>().ToSelectList();
             this.Images        = new List<ProductImage>();
+            this.Compatibilities = new List<Compatibility>();
             this.CarMakes = new List<CarMake>().ToSelectList();
+            this.CarModels = new List<CarModel>().ToSelectList();
+            this.ModelCompatibilities = new List<CarModel>();
+
         }
 
         public ProductViewModel(Product product)
@@ -51,6 +56,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
    
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();
+            this.CarModels = new List<CarModel>().ToSelectList();
+            this.ModelCompatibilities = new List<CarModel>();
+
         }
     }
 } 

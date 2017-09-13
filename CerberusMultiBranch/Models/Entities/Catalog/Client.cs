@@ -44,7 +44,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string TaxAddress { get; set; }
 
         [Display(Name = "Dirección")]
-        [DataType(DataType.MultilineText)]
         [Required]
         public string Address { get; set; }
 
