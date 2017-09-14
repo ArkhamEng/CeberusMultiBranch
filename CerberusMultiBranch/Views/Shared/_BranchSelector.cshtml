@@ -1,0 +1,129 @@
+﻿
+
+<label id="lblBrachSelector" class="text-info"></label>
+
+<div id="divModalBranchSelector" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger ">
+            <div class="panel-heading">@Html.DisplayName("Selecciona tu sucursal")</div>
+            <div class="panel-body">
+
+                <div class="input-group">
+                    <select id="ddBranchSelector" class="col-md-10 form-control">
+                       
+                    </select>
+                    <span class="input-group-btn">
+                        <button id="btnBranchSelector" type="button" class="btn btn-danger">
+                            Ir <span class="fa fa-angle-double-right"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        GetBranchSession();
+        $("#btnBranchSelector").click(function () { ChooseBranch(); })
+    });
+
+    function LoadBranches()
+    {
+        console.log("Iniciando Branch Selector");
+        $.ajax({
+            url: '@Url.Action("GetAvailableBranches", "Json")',
+            type: "POST",
+            success: function (data) { },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data) {
+                    console.log("Objetos encontrados " + data.length);
+                    $.each(data, function (i, item) {
+                        var option = "<option value='" + item.BranchId + "'>" + item.Name + "</option>";
+
+                        $("#ddBranchSelector").append(option);
+                    });
+
+                    $("#divModalBranchSelector").modal({ backdrop: 'static', keyboard: false });
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+    function GetBranchSession() {
+        console.log("Getting Branch session");
+        $.ajax({
+            url: '@Url.Action("GetBenchSession", "Json")',
+            type: "POST",
+            success: function (data) { },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data) {
+                    console.log("Session " + data);
+                    
+                    if (data.Id == 0)
+                    {
+                        console.log("Load Branches");
+                        LoadBranches();
+                    }
+                    else
+                    {
+                        console.log(data.Name);
+                        $("#lblBrachSelector").text(data.Name);
+                    }
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+
+    function ChooseBranch()
+    {
+        console.log("Starting branch session");
+        $.ajax({
+            url: '@Url.Action("BeginBranchSession", "Json")',
+            type: "POST",
+            data: { branchId: $("#ddBranchSelector").val(), name:$("#ddBranchSelector option:selected").text() },
+            success: function (data) { },
+            error: function (data)
+            {
+                console.log("Error Executing");
+                console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data)
+                {
+                    console.log("Session started " + data);
+                    if (data)
+                    {
+                        $("#divModalBranchSelector").modal('hide');
+                        $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
+                    }
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+</script>
+
+
+
+

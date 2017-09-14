@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
+
+@{
+    ViewBag.Title = "Configuraciones";
+}
+
+<h3>
+    <span class="fa fa-cogs" style="float:left"></span>
+    &nbsp;&nbsp;Configuración del sistema
+</h3>
+
+
+
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" href="#Branches">
+                &nbsp;&nbsp;Sucursales<span class="fa fa-building-o" style="float:left" />
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#Categories">
+                &nbsp;&nbsp;Categorias<span class="glyphicon glyphicon-list-alt" style="float:left" />
+        </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#Models">
+                &nbsp;&nbsp;Modelos<span class="fa fa-car" style="float:left" />
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="Branches" class="tab-pane fade in active">
+        @Html.Partial("_Branches")
+    </div>
+    <div id="Categories" class="tab-pane fade">
+        @Html.Partial("_Categories")
+    </div>
+    <div id="Models" class="tab-pane fade">
+        <h3>Modelos de vehículos</h3>
+        <p>Some content in menu 2.</p>
+    </div>
+</div>
+
+
+

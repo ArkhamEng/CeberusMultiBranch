@@ -14,7 +14,7 @@
 <div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        @Html.TextBox("Filter", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
@@ -59,14 +59,14 @@
                     @Html.Label("Clave de Proveedor", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
+                        @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control"})
                     </div>
                 </div>
                 <div class="form-group col-md-7">
                     @Html.Label("Télefono", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Phone", "", htmlAttributes: new { @class = "form-control", id = "txtPhone" })
+                        @Html.TextBox("Phone", "", htmlAttributes: new { @class = "form-control"})
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                 phone: $("#Phone").val()
             };
 
-            Search("/Employees/Search", data, "#divEmployees");
+            Search('@Url.Action("Search")', data, "#divEmployees");
         });
     });
 </script>

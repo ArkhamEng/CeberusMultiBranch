@@ -186,13 +186,17 @@
     <Compile Include="Controllers\Catalog\ProvidersController.cs" />
     <Compile Include="Controllers\Common\JsonController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
-    <Compile Include="Controllers\Config\CategoriesController.cs" />
+    <Compile Include="Controllers\Config\ConfigurationController.cs" />
     <Compile Include="Controllers\Config\CarMakesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709132048104_Branches.cs" />
+    <Compile Include="Migrations\201709132048104_Branches.Designer.cs">
+      <DependentUpon>201709132048104_Branches.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -210,7 +214,7 @@
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
-    <Compile Include="Models\Entities\Inventory\ProductInventory.cs" />
+    <Compile Include="Models\Entities\Operative\ProductInventory.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
@@ -317,8 +321,8 @@
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
     <Content Include="Views\Products\Create.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
-    <Content Include="Views\Categories\Create.cshtml" />
-    <Content Include="Views\Categories\Index.cshtml" />
+    <Content Include="Views\Configuration\Create.cshtml" />
+    <Content Include="Views\Configuration\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
     <Content Include="Views\Clients\Create.cshtml" />
@@ -339,16 +343,27 @@
     <Content Include="Views\Employees\_List.cshtml" />
     <Content Include="Views\Shared\_CatalogButtonGroup.cshtml" />
     <Content Include="Views\Products\_CarModelSelector.cshtml" />
-    <Content Include="Views\Shared\_QuickSearch.cshtml" />
+    <Content Include="Views\Shared\_QuickClient.cshtml" />
+    <Content Include="Views\Shared\_QuickProvider.cshtml" />
+    <Content Include="Views\Configuration\_Categories.cshtml" />
+    <Content Include="Views\Configuration\_CategoryList.cshtml" />
+    <Content Include="Views\Configuration\_BranchList.cshtml" />
+    <Content Include="Views\Configuration\_Branches.cshtml" />
+    <Content Include="Views\Shared\_BranchSelector.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\Inventory\" />
+    <Folder Include="Controllers\Operative\" />
     <Folder Include="Views\Inventory\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201709132048104_Branches.resx">
+      <DependentUpon>201709132048104_Branches.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

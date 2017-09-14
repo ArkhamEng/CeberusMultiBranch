@@ -1,0 +1,44 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Branch>
+
+
+    <table id="tbBranches" class="table table-striped ">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+              
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr onmouseover="$(this).css('cursor', 'pointer')" onclick="SelectBranch('@item.BranchId','@item.Name')">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<script>
+    $(document).ready(function () 
+    {
+        SetDataTable("#tbBranches", "#BranchName")
+    });
+
+    function SelectBranch(id, name,address)
+    {
+        $("#BranchId").val(id);
+        $("#BranchName").val(name);
+
+        $("#btnClearBranch").show();
+        $("#spBranch").attr("class", "glyphicon glyphicon-floppy-disk");
+        $("#btnBranch").attr("class", "btn btn-success");
+    }
+
+
+
+
+</script>

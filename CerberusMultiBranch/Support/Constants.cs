@@ -11,6 +11,10 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
 
         public const string CodeMask = "000000";
+
+        public const string SessionBranchId = "SessionBranchId";
+
+        public const string SessionBranchName   = "SessionBranchName";
     }
 
     public struct FileStruct

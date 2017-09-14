@@ -1,8 +1,6 @@
-﻿$(document).ready(function ()
-{
+﻿$(document).ready(function () {
 
-    $('#sidebarCollapse').on('click', function ()
-    {
+    $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
 
@@ -17,8 +15,7 @@ function SetCascade(ddlParent, ddlChild, action) {
     else
         $(ddlChild).attr("readonly", true);
 
-    $(ddlParent).change(function ()
-    {
+    $(ddlParent).change(function () {
         console.log("Populating Cascade");
         if ($(ddlParent).val() != '') {
             var parentId = $(ddlParent).val();
@@ -30,8 +27,7 @@ function SetCascade(ddlParent, ddlChild, action) {
                     type: "POST",
                     data: { parentId: parentId },
 
-                    success: function (data)
-                    {
+                    success: function (data) {
                         console.log("cascade data adquired");
                         $(ddlChild).empty();
                         $(ddlChild).append($('<option></option>').val("").html(""));
@@ -43,8 +39,7 @@ function SetCascade(ddlParent, ddlChild, action) {
                         else
                             $(ddlChild).attr("readonly", true);
                     },
-                    error: function ()
-                    {
+                    error: function () {
                         console.log("Error on pupulating cascade");
                     }
                 };
@@ -56,21 +51,19 @@ function SetCascade(ddlParent, ddlChild, action) {
             $(ddlChild).attr("readonly", true);
         }
 
-        
+
     });
 }
 
-function Search(url,data,target)
-{
+function Search(url, data, target) {
     console.log("Executing Ajax..");
 
     $.ajax({
         url: url,
         type: "POST",
         data: data,
-        
-        sucess: function (view)
-        {
+
+        sucess: function (view) {
             console.log("Success");
             $(target).html(view);
         },
@@ -78,8 +71,7 @@ function Search(url,data,target)
         error: function (data) { console.log("Error Executing"); console.log(data); },
         statusCode:
         {
-            200: function (view)
-            {
+            200: function (view) {
                 console.log("200: Authenticated ");
                 $(target).html(view);
             },
@@ -91,13 +83,10 @@ function Search(url,data,target)
 }
 
 
-function SetDataTable(table)
-{
+function SetDataTable(table, filter) {
     var oTable = $(table).DataTable(
        {
            destroy: true,
-        //   "deferRender": true,
-          // "createdRow": function (row) { RowCreated(row); },
            "lengthChange": false,
            "searching": true,
            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
@@ -116,16 +105,13 @@ function SetDataTable(table)
            }
        });
 
-    $("#txtName").keyup(function ()
-    {
+
+    $(filter).keyup(function () {
         oTable.data().search(this.value).draw();
     });
-
-    $(table).css("visibility", "visible")
 }
 
-function SetFilterControls(filters,button,target)
-{
+function SetFilterControls(filters, button, target) {
     $(filters).on("hide.bs.collapse", function () {
         $(button).attr("class", "btn btn-warning");
         $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');

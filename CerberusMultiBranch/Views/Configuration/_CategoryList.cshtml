@@ -1,0 +1,39 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
+
+
+    <table id="tbCategories" class="table table-striped ">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr onmouseover="$(this).css('cursor', 'pointer')" onclick="SelectCategory('@item.CategoryId','@item.Name')">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<script>
+    $(document).ready(function () 
+    {
+        SetDataTable("#tbCategories", "#CategoryName")
+    });
+
+    function SelectCategory(id,name) 
+    {
+        $("#CategoryId").val(id);
+        $("#CategoryName").val(name);
+
+        $("#btnClearCategory").show();
+        $("#spCategory").attr("class","glyphicon glyphicon-floppy-disk");
+        $("#btnCategory").attr("class","btn btn-success");
+    }
+</script>

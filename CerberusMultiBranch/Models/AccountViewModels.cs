@@ -60,6 +60,8 @@ namespace CerberusMultiBranch.Models
 
         [Display(Name = "Recordarme?")]
         public bool RememberMe { get; set; }
+
+        public int BranchId { get; set; }
     }
 
     public class RegisterViewModel

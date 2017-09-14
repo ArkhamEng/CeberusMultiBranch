@@ -1,0 +1,85 @@
+﻿
+
+@Html.Hidden("BranchId")
+
+<h4>Sucursales</h4>
+
+
+<div class="col-md-6">
+    <div class="input-group ">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("BranchName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button class="btn btn-default" id="btnClearBranch">
+                <span class="fa fa-refresh" />
+            </button>
+            <button class="btn btn-warning" id="btnBranch">
+                <span class="glyphicon glyphicon-plus" id="spBranch" />
+            </button>
+        </span>
+    </div>
+    <label id="lblBranch" class="text-danger" />
+</div>
+<br />
+<div class="col-md-8">
+    <div id="divBranches"></div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $("#btnClearBranch").hide();
+
+        $("#btnClearBranch").click(function () { ClearBranch(); });
+
+        $("#btnBranch").click(function () {
+            if ($("#BranchName").val().length < 5) {
+                $("#lblBranch").text("El nombre de la sucursal debe tener mas de 5 caracteres");
+            }
+            else {
+                $("#lblBranch").text("");
+                ExecuteBranchAjax('@Url.Action("SaveBranch", "Configuration")',
+                { BranchId: $("#BranchId").val(), Name: $("#BranchName").val() });
+            }
+
+
+        });
+
+        ExecuteBranchAjax('@Url.Action("GetBranches", "Configuration")', null);
+    });
+
+    function ClearBranch() {
+        $("#BranchId").val("");
+        $("#BranchName").val("");
+        $("#BranchAddress").val("");
+        $("#btnClearBranch").hide();
+
+        $("#spBranch").attr("class", "glyphicon glyphicon-plus");
+        $("#btnBranch").attr("class", "btn btn-warning");
+    }
+
+    function ExecuteBranchAjax(url, data) {
+        console.log(url);
+        console.log(data);
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: data,
+
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view) {
+                    $("#divBranches").html(view);
+                    ClearBranch();
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+</script>

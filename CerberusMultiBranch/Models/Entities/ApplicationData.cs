@@ -1,12 +1,8 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
-using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
+using CerberusMultiBranch.Models.Entities.Operative;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities
 {
@@ -23,7 +19,6 @@ namespace CerberusMultiBranch.Models.Entities
         public DbSet<CarYear> CarYears { get; set; }
 
         public DbSet<Branch> Branches { get; set; }
-
         #endregion
 
         #region Common
@@ -46,14 +41,15 @@ namespace CerberusMultiBranch.Models.Entities
 
         public DbSet<Employee> Employees { get; set; }
 
+        public DbSet<ProductImage> ProductImages { get; set; }
+
         #endregion
 
         #region Inventory
         public DbSet<ProductInventory> ProductInventories { get; set; }
-
         #endregion
 
-        public DbSet<ProductImage> ProductImages { get; set; }
+       
 
         
 

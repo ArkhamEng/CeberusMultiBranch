@@ -1,13 +1,9 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
-using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Catalog;
-using Microsoft.AspNet.Identity;
-using System;
+﻿using CerberusMultiBranch.Models.Entities.Config;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Web;
+using CerberusMultiBranch.Models.Entities.Operative;
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {

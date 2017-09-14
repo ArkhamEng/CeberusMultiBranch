@@ -33,10 +33,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-
         public FileResult GetPicture()
         {
-
             string userId = User.Identity.GetUserId();
 
             var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
@@ -45,7 +43,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var employee = db.Employees.Where(e => e.EmployeeId == empId).FirstOrDefault();
 
             return new FileContentResult(employee.ClearImage, employee.PictureType);
-
         }
 
 

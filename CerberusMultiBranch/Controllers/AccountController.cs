@@ -9,6 +9,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers
 {
@@ -394,6 +396,7 @@ namespace CerberusMultiBranch.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            HttpContext.Session.RemoveAll();
             return RedirectToAction("Index", "Home");
         }
 

@@ -57,8 +57,8 @@
 
 <script>
     $(document).ready(function () {
-        LoadList();
-
+        
+        SetDataTable("#tbMarks", "Name");
         $("#btnCreate").click(function () { window.location.replace('@Url.Action("Create")') });
     })
 

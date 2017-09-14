@@ -1,14 +1,10 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
-namespace CerberusMultiBranch.Models.Entities.Catalog
+namespace CerberusMultiBranch.Models.Entities.Operative
 {
-    [Table("ProductInventory", Schema = "Inventory")]
+    [Table("ProductInventory", Schema = "Operative")]
     public class ProductInventory
     {
         public int ProductInventoryId { get; set; }
