@@ -1,18 +1,40 @@
-﻿using CerberusMultiBranch.Models.Entities;
-using System.Linq;
-using CerberusMultiBranch.Support;
-
-using System.Web.Mvc;
+﻿using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.ViewModels.Config;
+using CerberusMultiBranch.Support;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.IO;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Common
 {
     [Authorize]
     public class JsonController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
+        public FileResult GetPicture()
+        {
+            string userId = User.Identity.GetUserId();
+
+            var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
+            var user = bdUsers.Users.Find(userId);
+
+            FileContentResult picture = null;
+
+            if(user.Picture != null)
+                picture = new FileContentResult(user.ClearImage, user.PictureType);
+            else
+            {
+                byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath("/Content/images/sinimagen.jpg"));
+                picture = new FileContentResult(imgdata, "img/jpg");
+            }
+
+            return picture;
+        }
 
         [HttpPost]
         public JsonResult GetCities(int parentId)

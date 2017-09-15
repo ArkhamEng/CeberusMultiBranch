@@ -1,27 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.ViewModels.Catalog;
+using CerberusMultiBranch.Support;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
-using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.ViewModels.Catalog;
-using CerberusMultiBranch.Support;
-using CerberusMultiBranch.Models;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.AspNet.Identity;
-using System.IO;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     [Authorize]
     public class EmployeesController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Employees
         public ActionResult Index()
@@ -33,17 +30,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-        public FileResult GetPicture()
-        {
-            string userId = User.Identity.GetUserId();
-
-            var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
-            var empId = bdUsers.Users.Where(x => x.Id == userId).FirstOrDefault().EmployeeId;
-
-            var employee = db.Employees.Where(e => e.EmployeeId == empId).FirstOrDefault();
-
-            return new FileContentResult(employee.ClearImage, employee.PictureType);
-        }
+       
 
 
         // GET: Employees/Create
@@ -86,8 +73,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
                     if (employee.PostedFile != null)
                     {
-                        employee.PictureType = employee.PostedFile.ContentType;
-                        employee.Picture = employee.PostedFile.ToCompressedFile();
+                        register.PictureType = employee.PostedFile.ContentType;
+                        register.Picture = employee.PostedFile.ToCompressedFile();
                     }
 
                     employee.Code = db.Employees.Max(c => c.Code).ToCode();
@@ -102,17 +89,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
                     if (employee.PostedFile != null)
                     {
-                        employee.PictureType = employee.PostedFile.ContentType;
-                        employee.Picture = employee.PostedFile.ToCompressedFile();
+                        register.PictureType = employee.PostedFile.ContentType;
+                        register.Picture = employee.PostedFile.ToCompressedFile();
                     }
 
                     db.Entry(employee).State = EntityState.Modified;
 
-                    if (employee.PostedFile == null)
-                    {
-                        db.Entry(employee).Property(x => x.PictureType).IsModified = false;
-                        db.Entry(employee).Property(x => x.Picture).IsModified = false;
-                    }
+                    //if (employee.PostedFile == null)
+                    //{
+                    //    db.Entry(employee).Property(x => x.PictureType).IsModified = false;
+                    //    db.Entry(employee).Property(x => x.Picture).IsModified = false;
+                    //}
 
                     db.SaveChanges();
 

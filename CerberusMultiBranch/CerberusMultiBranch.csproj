@@ -194,13 +194,16 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201709132048104_Branches.cs" />
-    <Compile Include="Migrations\201709132048104_Branches.Designer.cs">
-      <DependentUpon>201709132048104_Branches.cs</DependentUpon>
+    <Compile Include="Migrations\201709142044454_Initial.cs" />
+    <Compile Include="Migrations\201709142044454_Initial.Designer.cs">
+      <DependentUpon>201709142044454_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709142112324_User Changes.cs" />
+    <Compile Include="Migrations\201709142112324_User Changes.Designer.cs">
+      <DependentUpon>201709142112324_User Changes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\Entities\ApplicationData.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
@@ -265,6 +268,8 @@
     <Content Include="fonts\fontawesome-webfont.woff" />
     <Content Include="fonts\fontawesome-webfont.ttf" />
     <Content Include="fonts\fontawesome-webfont.eot" />
+    <None Include="Properties\PublishProfiles\LocalSims.pubxml" />
+    <None Include="Properties\PublishProfiles\WebDeploy.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
     <Content Include="Scripts\bootstrap.js" />
@@ -361,8 +366,11 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201709132048104_Branches.resx">
-      <DependentUpon>201709132048104_Branches.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201709142044454_Initial.resx">
+      <DependentUpon>201709142044454_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709142112324_User Changes.resx">
+      <DependentUpon>201709142112324_User Changes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

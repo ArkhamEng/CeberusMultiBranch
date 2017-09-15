@@ -6,6 +6,9 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using System.ComponentModel.DataAnnotations.Schema;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using System.ComponentModel.DataAnnotations;
+using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Operative;
 
 namespace CerberusMultiBranch.Models
 {
@@ -16,7 +19,15 @@ namespace CerberusMultiBranch.Models
         
         public int? EmployeeId { get; set; }
 
- 
+        public byte[] Picture { get; set; }
+
+        public string PictureType { get; set; }
+
+        public virtual Employee Employee { get; set; }
+
+        [NotMapped]
+        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -33,6 +44,49 @@ namespace CerberusMultiBranch.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        #region Config
+
+        public DbSet<Category> Categories { get; set; }
+
+        public DbSet<CarMake> CarMakes { get; set; }
+
+        public DbSet<CarModel> CarModels { get; set; }
+
+        public DbSet<CarYear> CarYears { get; set; }
+
+        public DbSet<Branch> Branches { get; set; }
+        #endregion
+
+        #region Common
+
+        public DbSet<State> States { get; set; }
+
+        public DbSet<City> Cities { get; set; }
+
+        #endregion
+
+        #region Catalogs
+
+        public DbSet<Product> Products { get; set; }
+
+        public DbSet<Compatibility> Compatibilites { get; set; }
+
+        public DbSet<Client> Clients { get; set; }
+
+        public DbSet<Provider> Providers { get; set; }
+
+        public DbSet<Employee> Employees { get; set; }
+
+        public DbSet<ProductImage> ProductImages { get; set; }
+
+        #endregion
+
+        #region Operative
+        public DbSet<ProductInventory> ProductInventories { get; set; }
+        #endregion
+
+
+
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {

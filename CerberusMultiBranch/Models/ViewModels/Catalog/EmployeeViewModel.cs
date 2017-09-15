@@ -44,8 +44,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Phone        = employee.Phone;
             this.UpdDate      = employee.UpdDate;
             this.ZipCode      = employee.ZipCode;
-            this.Picture      = employee.Picture;
-
+            
             this.States   = new List<State>().ToSelectList();
             this.Cities   = new List<City>().ToSelectList();
             this.Register = new RegisterViewModel();

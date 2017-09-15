@@ -7,13 +7,13 @@ namespace CerberusMultiBranch.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class Branches : IMigrationMetadata
+    public sealed partial class UserChanges : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Branches));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(UserChanges));
         
         string IMigrationMetadata.Id
         {
-            get { return "201709132048104_Branches"; }
+            get { return "201709142112324_User Changes"; }
         }
         
         string IMigrationMetadata.Source

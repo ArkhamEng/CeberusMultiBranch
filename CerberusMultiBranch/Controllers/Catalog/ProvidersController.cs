@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Web;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
+using CerberusMultiBranch.Models;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     [Authorize]
     public class ProvidersController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Providers
         public ActionResult Index()

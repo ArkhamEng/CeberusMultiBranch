@@ -1,16 +1,16 @@
-﻿using System.Data.Entity;
+﻿using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities.Config;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
-using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
     [Authorize]
     public class CarMakesController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Makes
         public ActionResult Index()

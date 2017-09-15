@@ -86,6 +86,10 @@ namespace CerberusMultiBranch.Models
 
         public bool HasAccount { get; set; }
 
+        public string PictureType { get; set; }
+
+        public byte[] Picture { get; set; }
+
     }
 
     public class ResetPasswordViewModel

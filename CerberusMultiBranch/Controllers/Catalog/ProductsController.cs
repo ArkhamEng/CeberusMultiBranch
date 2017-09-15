@@ -3,21 +3,19 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Catalog;
-using System.IO;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
 using System;
 using CerberusMultiBranch.Models.Entities.Config;
-using System.Collections.Generic;
+using CerberusMultiBranch.Models;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     [Authorize]
     public class ProductsController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public ActionResult Index()
         {

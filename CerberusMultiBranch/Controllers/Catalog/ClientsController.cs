@@ -3,17 +3,17 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
+using CerberusMultiBranch.Models;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     [Authorize]
     public class ClientsController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Clients
         public ActionResult Index()

@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <setParameter name="IIS Web Application Name" value="http://localhost/sims" />
+  <setParameter name="DefaultConnection-Web.config Connection String" value="Data Source=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\aspnet-CerberusMultiBranch-20170816044551.mdf;Initial Catalog=aspnet-CerberusMultiBranch-20170816044551;Integrated Security=True" />
+</parameters>

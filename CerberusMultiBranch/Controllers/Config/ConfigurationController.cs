@@ -1,17 +1,15 @@
 ﻿using System.Data.Entity;
 using System.Linq;
-using System.Net;
 using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Support;
+using CerberusMultiBranch.Models;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
     [Authorize]
     public class ConfigurationController : Controller
     {
-        private ApplicationData db = new ApplicationData();
+        private ApplicationDbContext db = new ApplicationDbContext();
 
         public ActionResult Index()
         {

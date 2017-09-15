@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Support;
+using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -61,9 +62,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public int CityId { get; set; }
 
-
-        public byte[] Picture { get; set; }
-
         public bool IsActive { get; set; }
 
         [Required]
@@ -72,16 +70,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public DateTime UpdDate { get; set; }
 
-
         public virtual City City { get; set; }
+
+        public virtual IdentityUser User { get; set; }
 
         [NotMapped]
         public HttpPostedFileBase PostedFile { get; set; }
-
-        [NotMapped]
-        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
-
-        public string PictureType { get; set; }
 
 
         public Employee()
