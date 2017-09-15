@@ -1008,3 +1008,4 @@ INSERT INTO Config.CarModel(CarMakeId,CarModelId,Name)VALUES(79,1005,'353')
 INSERT INTO Config.CarModel(CarMakeId,CarModelId,Name)VALUES(53,1006,'Mini')
 INSERT INTO Config.CarModel(CarMakeId,CarModelId,Name)VALUES(53,1007,'Countryman')
 INSERT INTO Config.CarModel(CarMakeId,CarModelId,Name)VALUES(53,1008,'Paceman')
+SET IDENTITY_INSERT Config.CarModel OFF

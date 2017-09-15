@@ -2497,3 +2497,5 @@ INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
 (2490, 32, '056', 'Zacatecas', 1),
 (2491, 32, '057', 'Trancoso', 1),
 (2492, 32, '058', 'Santa María de la Paz', 1)
+
+SET IDENTITY_INSERT Common.City off

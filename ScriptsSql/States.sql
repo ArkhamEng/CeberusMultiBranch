@@ -34,3 +34,5 @@ INSERT INTO Common.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (30, '30', 'Veracruz de Ignacio de la Llave', 'Ver.', 1),
 (31, '31', 'Yucatán', 'Yuc.', 1),
 (32, '32', 'Zacatecas', 'Zac.', 1);
+
+SET IDENTITY_INSERT Common.State OFF

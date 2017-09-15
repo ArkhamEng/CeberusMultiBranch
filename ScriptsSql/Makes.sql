@@ -80,3 +80,5 @@ INSERT INTO Config.CarMake(CarMakeId,Name)Values(76,'Vaz')
 INSERT INTO Config.CarMake(CarMakeId,Name)Values(77,'Volkswagen')
 INSERT INTO Config.CarMake(CarMakeId,Name)Values(78,'Volvo')
 INSERT INTO Config.CarMake(CarMakeId,Name)Values(79,'Wartburg')
+
+SET IDENTITY_INSERT Config.CarMake OFF
