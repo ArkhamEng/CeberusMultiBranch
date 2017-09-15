@@ -23,7 +23,6 @@ namespace CerberusMultiBranch.Models
 
         public string PictureType { get; set; }
 
-        public virtual Employee Employee { get; set; }
 
         [NotMapped]
         public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }

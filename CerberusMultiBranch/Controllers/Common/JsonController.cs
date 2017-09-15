@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Common
 
             var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
             var user = bdUsers.Users.Find(userId);
-
+            
             FileContentResult picture = null;
 
             if(user.Picture != null)
@@ -105,7 +105,7 @@ namespace CerberusMultiBranch.Controllers.Common
             return Json(true);
         }
 
-        public JsonResult GetBenchSession()
+        public JsonResult GetBranchSession()
         {
             JCatalogEntity s;
 

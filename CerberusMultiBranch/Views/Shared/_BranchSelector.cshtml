@@ -69,7 +69,7 @@
     function GetBranchSession() {
         console.log("Getting Branch session");
         $.ajax({
-            url: '@Url.Action("GetBenchSession", "Json")',
+            url: '@Url.Action("GetBranchSession", "Json")',
             type: "POST",
             success: function (data) { },
             error: function (data) {

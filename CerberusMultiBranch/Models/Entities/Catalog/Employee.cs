@@ -72,7 +72,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual City City { get; set; }
 
-        public virtual IdentityUser User { get; set; }
 
         [NotMapped]
         public HttpPostedFileBase PostedFile { get; set; }

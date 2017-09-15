@@ -203,83 +203,17 @@ namespace CerberusMultiBranch.Migrations
                         Email = c.String(maxLength: 30),
                         Phone = c.String(nullable: false, maxLength: 20),
                         CityId = c.Int(nullable: false),
-                        Picture = c.Binary(),
                         IsActive = c.Boolean(nullable: false),
                         InsDate = c.DateTime(nullable: false),
                         UpdDate = c.DateTime(nullable: false),
-                        PictureType = c.String(),
-                        User_Id = c.String(maxLength: 128),
                     })
                 .PrimaryKey(t => t.EmployeeId)
                 .ForeignKey("Common.City", t => t.CityId, cascadeDelete: true)
-                .ForeignKey("Security.IdentityUsers", t => t.User_Id)
                 .Index(t => t.Code, unique: true, name: "IDX_Code")
                 .Index(t => t.FTR, name: "IDX_FTR")
                 .Index(t => t.Email, name: "IDX_Email")
                 .Index(t => t.Phone, unique: true, name: "IDX_Phone")
-                .Index(t => t.CityId)
-                .Index(t => t.User_Id);
-            
-            CreateTable(
-                "Security.IdentityUsers",
-                c => new
-                    {
-                        Id = c.String(nullable: false, maxLength: 128),
-                        Email = c.String(maxLength: 256),
-                        EmailConfirmed = c.Boolean(nullable: false),
-                        PasswordHash = c.String(),
-                        SecurityStamp = c.String(),
-                        PhoneNumber = c.String(),
-                        PhoneNumberConfirmed = c.Boolean(nullable: false),
-                        TwoFactorEnabled = c.Boolean(nullable: false),
-                        LockoutEndDateUtc = c.DateTime(),
-                        LockoutEnabled = c.Boolean(nullable: false),
-                        AccessFailedCount = c.Int(nullable: false),
-                        UserName = c.String(nullable: false, maxLength: 256),
-                    })
-                .PrimaryKey(t => t.Id)
-                .Index(t => t.UserName, unique: true, name: "UserNameIndex");
-            
-            CreateTable(
-                "Security.AspNetUserClaims",
-                c => new
-                    {
-                        Id = c.Int(nullable: false, identity: true),
-                        UserId = c.String(),
-                        ClaimType = c.String(),
-                        ClaimValue = c.String(),
-                        IdentityUser_Id = c.String(maxLength: 128),
-                    })
-                .PrimaryKey(t => t.Id)
-                .ForeignKey("Security.IdentityUsers", t => t.IdentityUser_Id)
-                .Index(t => t.IdentityUser_Id);
-            
-            CreateTable(
-                "Security.AspNetUserLogins",
-                c => new
-                    {
-                        LoginProvider = c.String(nullable: false, maxLength: 128),
-                        ProviderKey = c.String(nullable: false, maxLength: 128),
-                        UserId = c.String(nullable: false, maxLength: 128),
-                        IdentityUser_Id = c.String(maxLength: 128),
-                    })
-                .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
-                .ForeignKey("Security.IdentityUsers", t => t.IdentityUser_Id)
-                .Index(t => t.IdentityUser_Id);
-            
-            CreateTable(
-                "Security.AspNetUserRoles",
-                c => new
-                    {
-                        UserId = c.String(nullable: false, maxLength: 128),
-                        RoleId = c.String(nullable: false, maxLength: 128),
-                        IdentityUser_Id = c.String(maxLength: 128),
-                    })
-                .PrimaryKey(t => new { t.UserId, t.RoleId })
-                .ForeignKey("Security.IdentityUsers", t => t.IdentityUser_Id)
-                .ForeignKey("Security.AspNetRoles", t => t.RoleId, cascadeDelete: true)
-                .Index(t => t.RoleId)
-                .Index(t => t.IdentityUser_Id);
+                .Index(t => t.CityId);
             
             CreateTable(
                 "Catalog.Provider",
@@ -322,30 +256,75 @@ namespace CerberusMultiBranch.Migrations
                 .Index(t => t.Name, unique: true, name: "RoleNameIndex");
             
             CreateTable(
+                "Security.AspNetUserRoles",
+                c => new
+                    {
+                        UserId = c.String(nullable: false, maxLength: 128),
+                        RoleId = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => new { t.UserId, t.RoleId })
+                .ForeignKey("Security.AspNetRoles", t => t.RoleId, cascadeDelete: true)
+                .ForeignKey("Security.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId)
+                .Index(t => t.RoleId);
+            
+            CreateTable(
                 "Security.AspNetUsers",
                 c => new
                     {
                         Id = c.String(nullable: false, maxLength: 128),
                         EmployeeId = c.Int(),
+                        Picture = c.Binary(),
+                        PictureType = c.String(),
+                        Email = c.String(maxLength: 256),
+                        EmailConfirmed = c.Boolean(nullable: false),
+                        PasswordHash = c.String(),
+                        SecurityStamp = c.String(),
+                        PhoneNumber = c.String(),
+                        PhoneNumberConfirmed = c.Boolean(nullable: false),
+                        TwoFactorEnabled = c.Boolean(nullable: false),
+                        LockoutEndDateUtc = c.DateTime(),
+                        LockoutEnabled = c.Boolean(nullable: false),
+                        AccessFailedCount = c.Int(nullable: false),
+                        UserName = c.String(nullable: false, maxLength: 256),
                     })
                 .PrimaryKey(t => t.Id)
-                .ForeignKey("Security.IdentityUsers", t => t.Id)
-                .ForeignKey("Catalog.Employee", t => t.EmployeeId)
-                .Index(t => t.Id)
-                .Index(t => t.EmployeeId);
+                .Index(t => t.UserName, unique: true, name: "UserNameIndex");
+            
+            CreateTable(
+                "Security.AspNetUserClaims",
+                c => new
+                    {
+                        Id = c.Int(nullable: false, identity: true),
+                        UserId = c.String(nullable: false, maxLength: 128),
+                        ClaimType = c.String(),
+                        ClaimValue = c.String(),
+                    })
+                .PrimaryKey(t => t.Id)
+                .ForeignKey("Security.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId);
+            
+            CreateTable(
+                "Security.AspNetUserLogins",
+                c => new
+                    {
+                        LoginProvider = c.String(nullable: false, maxLength: 128),
+                        ProviderKey = c.String(nullable: false, maxLength: 128),
+                        UserId = c.String(nullable: false, maxLength: 128),
+                    })
+                .PrimaryKey(t => new { t.LoginProvider, t.ProviderKey, t.UserId })
+                .ForeignKey("Security.AspNetUsers", t => t.UserId, cascadeDelete: true)
+                .Index(t => t.UserId);
             
         }
         
         public override void Down()
         {
-            DropForeignKey("Security.AspNetUsers", "EmployeeId", "Catalog.Employee");
-            DropForeignKey("Security.AspNetUsers", "Id", "Security.IdentityUsers");
+            DropForeignKey("Security.AspNetUserRoles", "UserId", "Security.AspNetUsers");
+            DropForeignKey("Security.AspNetUserLogins", "UserId", "Security.AspNetUsers");
+            DropForeignKey("Security.AspNetUserClaims", "UserId", "Security.AspNetUsers");
             DropForeignKey("Security.AspNetUserRoles", "RoleId", "Security.AspNetRoles");
             DropForeignKey("Catalog.Provider", "CityId", "Common.City");
-            DropForeignKey("Catalog.Employee", "User_Id", "Security.IdentityUsers");
-            DropForeignKey("Security.AspNetUserRoles", "IdentityUser_Id", "Security.IdentityUsers");
-            DropForeignKey("Security.AspNetUserLogins", "IdentityUser_Id", "Security.IdentityUsers");
-            DropForeignKey("Security.AspNetUserClaims", "IdentityUser_Id", "Security.IdentityUsers");
             DropForeignKey("Catalog.Employee", "CityId", "Common.City");
             DropForeignKey("Catalog.Client", "CityId", "Common.City");
             DropForeignKey("Common.City", "StateId", "Common.State");
@@ -357,8 +336,11 @@ namespace CerberusMultiBranch.Migrations
             DropForeignKey("Config.CarModel", "CarMakeId", "Config.CarMake");
             DropForeignKey("Catalog.Product", "CategoryId", "Config.Category");
             DropForeignKey("Operative.ProductInventory", "BranchId", "Config.Branch");
-            DropIndex("Security.AspNetUsers", new[] { "EmployeeId" });
-            DropIndex("Security.AspNetUsers", new[] { "Id" });
+            DropIndex("Security.AspNetUserLogins", new[] { "UserId" });
+            DropIndex("Security.AspNetUserClaims", new[] { "UserId" });
+            DropIndex("Security.AspNetUsers", "UserNameIndex");
+            DropIndex("Security.AspNetUserRoles", new[] { "RoleId" });
+            DropIndex("Security.AspNetUserRoles", new[] { "UserId" });
             DropIndex("Security.AspNetRoles", "RoleNameIndex");
             DropIndex("Catalog.Provider", new[] { "CityId" });
             DropIndex("Catalog.Provider", "IDX_Phone");
@@ -366,12 +348,6 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Catalog.Provider", "IDX_FTR");
             DropIndex("Catalog.Provider", "IDX_BussinessName");
             DropIndex("Catalog.Provider", "IDX_Code");
-            DropIndex("Security.AspNetUserRoles", new[] { "IdentityUser_Id" });
-            DropIndex("Security.AspNetUserRoles", new[] { "RoleId" });
-            DropIndex("Security.AspNetUserLogins", new[] { "IdentityUser_Id" });
-            DropIndex("Security.AspNetUserClaims", new[] { "IdentityUser_Id" });
-            DropIndex("Security.IdentityUsers", "UserNameIndex");
-            DropIndex("Catalog.Employee", new[] { "User_Id" });
             DropIndex("Catalog.Employee", new[] { "CityId" });
             DropIndex("Catalog.Employee", "IDX_Phone");
             DropIndex("Catalog.Employee", "IDX_Email");
@@ -395,13 +371,12 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Catalog.Product", new[] { "CategoryId" });
             DropIndex("Operative.ProductInventory", new[] { "BranchId" });
             DropIndex("Operative.ProductInventory", new[] { "ProductId" });
-            DropTable("Security.AspNetUsers");
-            DropTable("Security.AspNetRoles");
-            DropTable("Catalog.Provider");
-            DropTable("Security.AspNetUserRoles");
             DropTable("Security.AspNetUserLogins");
             DropTable("Security.AspNetUserClaims");
-            DropTable("Security.IdentityUsers");
+            DropTable("Security.AspNetUsers");
+            DropTable("Security.AspNetUserRoles");
+            DropTable("Security.AspNetRoles");
+            DropTable("Catalog.Provider");
             DropTable("Catalog.Employee");
             DropTable("Catalog.Client");
             DropTable("Common.State");
