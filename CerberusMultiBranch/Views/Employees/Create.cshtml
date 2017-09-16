@@ -136,7 +136,16 @@
 
 
     <div id="divRegister" class="col-md-4">
-        @Html.Partial("_Register", Model.Register)
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <h4>
+                    <span class="fa fa-user-o" style="float:left"></span>
+                    &nbsp;&nbsp;Asignacion de usuario
+                </h4>
+                <hr />
+                @Html.Partial("_QuickUser")
+            </div>
+        </div>
     </div>
 }
 

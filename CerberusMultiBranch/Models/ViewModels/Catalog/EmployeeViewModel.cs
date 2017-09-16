@@ -8,6 +8,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+
 namespace CerberusMultiBranch.Models.ViewModels.Catalog
 {
     [NotMapped]
@@ -19,6 +20,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public int StateId { get; set; }
 
+        [NotMapped]
+        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
 
         public RegisterViewModel Register { get; set; }
 
@@ -44,7 +47,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Phone        = employee.Phone;
             this.UpdDate      = employee.UpdDate;
             this.ZipCode      = employee.ZipCode;
-            
+            this.PictureType  = employee.PictureType;
+            this.Picture      = employee.Picture;
+            this.UserId       = employee.UserId;
             this.States   = new List<State>().ToSelectList();
             this.Cities   = new List<City>().ToSelectList();
             this.Register = new RegisterViewModel();

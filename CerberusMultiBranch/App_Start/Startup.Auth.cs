@@ -54,15 +54,21 @@ namespace CerberusMultiBranch
             //   consumerKey: "",
             //   consumerSecret: "");
 
-            //app.UseFacebookAuthentication(
-            //   appId: "",
-            //   appSecret: "");
+            //Facebook
+            app.UseFacebookAuthentication(
+               appId: "682265415268211",
+               appSecret: "e41831950a04ba5a2875988a4faa7cea");
 
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
+            
+            //Google
+            var googleOAuth2AuthenticationOptions = new GoogleOAuth2AuthenticationOptions
+            {
+                ClientId = "158957339422-gptekjv51vfphis07vlqncfhmcc4ors2.apps.googleusercontent.com",
+                ClientSecret = "pg8SOBi9hnSUHkksCiKrZff-",
+                Provider = new GoogleOAuth2AuthenticationProvider()
+            };
+
+            app.UseGoogleAuthentication(googleOAuth2AuthenticationOptions);
         }
     }
 }

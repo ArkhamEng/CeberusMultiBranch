@@ -80,6 +80,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<ProductInventory> ProductInventories { get; set; }
 
+        
+
         #region NotMapped Properties
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
@@ -89,6 +91,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [NotMapped]
         public List<string> NewCompatibilities { get; set; }
+
+        public Product()
+        {
+            this.NewCompatibilities = new List<string>();
+        }
         #endregion
     }
 

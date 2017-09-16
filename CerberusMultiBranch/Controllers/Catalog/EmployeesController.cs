@@ -8,6 +8,7 @@ using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Data;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -44,13 +45,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 model.StateId = db.Cities.Find(model.CityId).StateId;
                 model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
-
-                var ap = new ApplicationDbContext();
-                var ui = ap.Users.FirstOrDefault(u => u.EmployeeId == id);
-
-
-                if (ui != null)
-                    model.Register = new Models.RegisterViewModel { EmployeeId = id, Email = ui.Email, HasAccount = true, Password = ui.Email, ConfirmPassword = ui.Email };
             }
             else
                 model = new EmployeeViewModel();
@@ -65,49 +59,54 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Employee employee, RegisterViewModel register)
+        public ActionResult Create(Employee employee)
         {
             if (ModelState.IsValid)
             {
-                if (employee.EmployeeId == Cons.Zero)
+                try
                 {
-                    if (employee.PostedFile != null)
+                    if (employee.EmployeeId == Cons.Zero)
                     {
-                        register.PictureType = employee.PostedFile.ContentType;
-                        register.Picture = employee.PostedFile.ToCompressedFile();
+                        if (employee.PostedFile != null)
+                        {
+                            employee.PictureType = employee.PostedFile.ContentType;
+                            employee.Picture = employee.PostedFile.ToCompressedFile();
+                        }
+
+                        employee.Code = db.Employees.Max(c => c.Code).ToCode();
+                        db.Employees.Add(employee);
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        if (employee.PostedFile != null)
+                        {
+                            employee.PictureType = employee.PostedFile.ContentType;
+                            employee.Picture = employee.PostedFile.ToCompressedFile();
+                        }
+                       
+                        db.Entry(employee).State = EntityState.Modified;
+
+                        if (employee.PostedFile == null)
+                        { 
+                            db.Entry(employee).Property(e => e.Picture).IsModified = false;
+                            db.Entry(employee).Property(e => e.PictureType).IsModified = false;
+                        }
+
+                        db.SaveChanges();
                     }
 
-                    employee.Code = db.Employees.Max(c => c.Code).ToCode();
-                    db.Employees.Add(employee);
-                    db.SaveChanges();
-
-                    register.EmployeeId = employee.EmployeeId;
-
-                    CreateUser(register);
+                    return RedirectToAction("Create", new { id = employee.EmployeeId });
                 }
-                else
+                catch (DbEntityValidationException e)
                 {
-                    if (employee.PostedFile != null)
-                    {
-                        register.PictureType = employee.PostedFile.ContentType;
-                        register.Picture = employee.PostedFile.ToCompressedFile();
-                    }
-
-                    db.Entry(employee).State = EntityState.Modified;
-
-                    //if (employee.PostedFile == null)
-                    //{
-                    //    db.Entry(employee).Property(x => x.PictureType).IsModified = false;
-                    //    db.Entry(employee).Property(x => x.Picture).IsModified = false;
-                    //}
-
-                    db.SaveChanges();
-
-                    if (register != null && !register.HasAccount)
-                        CreateUser(register);
                 }
+                catch (Exception)
+                {
 
-                return RedirectToAction("Create", new { id = employee.EmployeeId });
+                    throw;
+                }
+               
             }
 
             return RedirectToAction("Create", new { id = employee.EmployeeId });
@@ -123,7 +122,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 var manger = _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
-                var user = new ApplicationUser() { Email = register.Email, UserName = register.Email, EmployeeId = register.EmployeeId };
+                var user = new ApplicationUser() { Email = register.Email, UserName = register.Email };
                 var usmanger = manger.Create(user, register.Password);
             }
             catch (Exception ex)

@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var model = new SearchProductViewModel();
             model.Products = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).ToList();
             model.Products.OrderCarModels();
-           
+
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
@@ -84,10 +84,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 foreach (var c in product.NewCompatibilities)
                 {
-                    var mArr = c.Split('-');
-                    var mId = Convert.ToInt32(mArr[0]);
-                    var yIni = Convert.ToInt32(mArr[1]);
-                    var yEnd = Convert.ToInt32(mArr[2]);
+                    var mArr    = c.Split('-');
+                    var mId     = Convert.ToInt32(mArr[Cons.Zero]);
+                    var yIni    = Convert.ToInt32(mArr[Cons.One]);
+                    var yEnd    = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
 
                     for (int j = yIni; j < yEnd; j++)
                     {
@@ -100,14 +100,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             db.SaveChanges();
                         }
 
-
                         Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
                         db.Compatibilites.Add(comp);
                     }
                 }
 
                 db.SaveChanges();
-                
+
 
                 //Guardado Imagenes
                 foreach (var file in product.Files)

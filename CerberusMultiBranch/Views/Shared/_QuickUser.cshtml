@@ -1,0 +1,153 @@
+﻿
+
+<div class="form-group col-md-12">
+    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("UserName", "", htmlAttributes: new { @class = "form-control" })
+    </div>
+</div>
+
+<div class="form-group col-md-12">
+    @Html.Label("Correo Electrónico", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("Email", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button id="btnUserQuick" type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-search" id="spUserQuick"></span>
+            </button>
+        </span>
+    </div>
+    <label id="lblUserQuick" class="text-danger" />
+</div>
+
+@Html.Hidden("UserId")
+
+
+<div id="divModalQuickUser" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger ">
+            <div class="panel-heading">Doble Click Para Seleccionar</div>
+            <div class="panel-body">
+                <table id="tbQuickUser" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th hidden="hidden" />
+                            <th>@Html.DisplayName("Nombre de Usuario")</th>
+                            <th>@Html.DisplayName("Correo Electronico")</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyQuickUser"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnUserQuick").click(function ()
+        {
+            if ($("#UserId").val() != '')
+            {
+                $("#UserId").val("");
+                $("#UserName").val("");
+                $("#Email").val("");
+
+                $("#UserName").attr("readonly", false);
+                $("#Email").attr("readonly", false);
+
+
+                $("#spUserQuick").attr("class", "glyphicon glyphicon-search");
+                return;
+            }
+            UserQuick();
+        });
+
+        //si el ClientId tiene un valor, ejecuto una busqueda rápida
+        if ( $("#UserId").val().length > 10)
+            UserQuick();
+    });
+
+    function SelectUser(row)
+    {
+        var cells = $(row).find('td');
+
+        $("#UserId").val(cells[0].innerHTML);
+        $("#UserName").val(cells[1].innerHTML);
+        $("#Email").val(cells[2].innerHTML);
+
+        $("#UserName").attr("readonly", true);
+        $("#Email").attr("readonly", true);
+
+        $("#spUserQuick").attr("class", "fa fa-refresh");
+
+        $("#divModalQuickUser").modal('hide');
+    }
+
+    
+
+    function UserQuick()
+    {
+        $("#tbodyQuickUser").empty();
+
+        var d = {
+            id:$("#UserId").val(),
+            email: $("#Email").val(),
+            name: $("#UserName").val()
+        };
+
+        $.ajax({
+            url: '@Url.Action("QuickSearchUser", "Json")',
+            type: "POST",
+            data: d,
+            success: function (data) { },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data)
+                {
+                    if (data.length == 1)
+                    {
+                        $("#UserName").val(data[0].Name);
+                        $("#Email").val(data[0].Email);
+                        $("#UserId").val(data[0].Code);
+
+                        $("#UserName").attr("readonly", true);
+                        $("#Email").attr("readonly", true);
+                        $("#spUserQuick").attr("class", "fa fa-refresh");
+                    }
+                    else if (data.length > 1)
+                    {
+                        console.log("Objetos encontrados " + data.length);
+                        $.each(data, function (i, item)
+                        {
+                            var row = "<tr ondblclick='SelectUser(this)'><td hidden='hidden'>" + item.Code + "</td>" +
+                                             "<td>" + item.Name + "</td>" +
+                                          "<td>" + item.Email + "</td></tr>";
+
+                            $("#tbodyQuickUser").append(row);
+
+                        });
+
+                        $("#divModalQuickUser").modal();
+                    }
+                    else
+                    {
+                        $("#lblUserQuick").text("No se encontraron coincidencias");
+                    }
+
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+</script>
+

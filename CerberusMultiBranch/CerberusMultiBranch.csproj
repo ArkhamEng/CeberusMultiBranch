@@ -18,7 +18,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44384</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -49,6 +49,19 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.3.1.0\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -145,17 +158,8 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Owin">
-      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security">
-      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.Facebook">
-      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.3.0.1\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Cookies">
       <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
@@ -198,6 +202,30 @@
     <Compile Include="Migrations\201709150332198_Initial.Designer.cs">
       <DependentUpon>201709150332198_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709151907174_Change to Employee.cs" />
+    <Compile Include="Migrations\201709151907174_Change to Employee.Designer.cs">
+      <DependentUpon>201709151907174_Change to Employee.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709152002520_UserChanges.cs" />
+    <Compile Include="Migrations\201709152002520_UserChanges.Designer.cs">
+      <DependentUpon>201709152002520_UserChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709152141548_Change Employee Key.cs" />
+    <Compile Include="Migrations\201709152141548_Change Employee Key.Designer.cs">
+      <DependentUpon>201709152141548_Change Employee Key.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709152154395_Add-migration.cs" />
+    <Compile Include="Migrations\201709152154395_Add-migration.Designer.cs">
+      <DependentUpon>201709152154395_Add-migration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709152210183_Length Image.cs" />
+    <Compile Include="Migrations\201709152210183_Length Image.Designer.cs">
+      <DependentUpon>201709152210183_Length Image.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709152346471_UseChanges.cs" />
+    <Compile Include="Migrations\201709152346471_UseChanges.Designer.cs">
+      <DependentUpon>201709152346471_UseChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -206,6 +234,7 @@
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
     <Compile Include="Models\Entities\Common\City.cs" />
     <Compile Include="Models\Entities\Common\ISelectable.cs" />
+    <Compile Include="Models\Entities\Common\IUserAssignment.cs" />
     <Compile Include="Models\Entities\Common\State.cs" />
     <Compile Include="Models\Entities\Config\Branch.cs" />
     <Compile Include="Models\Entities\Config\Company.cs" />
@@ -215,6 +244,7 @@
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Operative\ProductInventory.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
+    <Compile Include="Models\Entities\Operative\Purchase.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
@@ -351,6 +381,7 @@
     <Content Include="Views\Configuration\_BranchList.cshtml" />
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
+    <Content Include="Views\Shared\_QuickUser.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -364,6 +395,24 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201709150332198_Initial.resx">
       <DependentUpon>201709150332198_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709151907174_Change to Employee.resx">
+      <DependentUpon>201709151907174_Change to Employee.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709152002520_UserChanges.resx">
+      <DependentUpon>201709152002520_UserChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709152141548_Change Employee Key.resx">
+      <DependentUpon>201709152141548_Change Employee Key.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709152154395_Add-migration.resx">
+      <DependentUpon>201709152154395_Add-migration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709152210183_Length Image.resx">
+      <DependentUpon>201709152210183_Length Image.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709152346471_UseChanges.resx">
+      <DependentUpon>201709152346471_UseChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -384,7 +433,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>18798</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:18798/</IISUrl>
+          <IISUrl>https://localhost:44384/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

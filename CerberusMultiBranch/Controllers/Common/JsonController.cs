@@ -4,6 +4,7 @@ using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -70,7 +71,8 @@ namespace CerberusMultiBranch.Controllers.Common
             var clients = (from c in db.Clients
                            where (code == null || code == string.Empty || c.Code == code) &&
                                  (name == null || name == string.Empty || c.Name.Contains(name)) &&
-                                 (id == null || id == Cons.Zero || c.ClientId == id)
+                                 (id == null || id == Cons.Zero || c.ClientId == id) 
+                                 
                            select new JCatalogEntity { Id = c.ClientId, Name = c.Name, Code = c.Code, Phone = c.Phone }
                 ).Take(20).ToList();
 
@@ -88,6 +90,33 @@ namespace CerberusMultiBranch.Controllers.Common
                 ).Take(20).ToList();
 
             return Json(providers);
+        }
+
+        [HttpPost]
+        public JsonResult QuickSearchUser(string id, string name, string email)
+        {
+            List<JCatalogEntity> users;
+
+            if (id != null && id != string.Empty)
+            {
+                users = (from u in db.Users where (u.Id == id)
+                          select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }).ToList();
+            }
+            else
+            { 
+                var idList = (from e in db.Employees
+                              select e.UserId).ToList();
+
+                users = (from u in db.Users
+                       where (email == null || email == string.Empty || u.Email.Contains(email)) &&
+                             (name == null || name == string.Empty || u.UserName.Contains(name)) &&
+                             (!idList.Contains(u.Id))
+
+                       select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }
+                ).Take(10).ToList();
+            }
+
+            return Json(users);
         }
 
         [HttpPost]

@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Operative;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Models
 {
@@ -16,9 +17,6 @@ namespace CerberusMultiBranch.Models
 
     public class ApplicationUser : IdentityUser
     {
-        
-        public int? EmployeeId { get; set; }
-
         public byte[] Picture { get; set; }
 
         public string PictureType { get; set; }
@@ -100,6 +98,7 @@ namespace CerberusMultiBranch.Models
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("Security");
+
             base.OnModelCreating(modelBuilder);
             
         }

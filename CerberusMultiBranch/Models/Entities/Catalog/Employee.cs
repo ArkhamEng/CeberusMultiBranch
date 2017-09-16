@@ -11,9 +11,14 @@ using System.Web;
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {
     [Table("Employee", Schema = "Catalog")]
-    public class Employee
+    public class Employee: IUserAssignment
     {
+        [Key]
         public int EmployeeId { get; set; }
+
+        
+        [MaxLength(128)]
+        public string UserId { get; set; }
 
         [Display(Name = "Clave")]
         [Required]
@@ -23,38 +28,43 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Nombre")]
         [Required]
+        [MaxLength(100)]
+        [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
       
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(13)]
-        [Index("IDX_FTR", IsUnique = false)]
+        [Index("IDX_FTR", IsUnique = true)]
         public string FTR { get; set; }
 
 
         [Display(Name = "Dirección")]
         [Required]
+        [MaxLength(100)]
         public string Address { get; set; }
 
         [Display(Name = "C.P.")]
         [DataType(DataType.PostalCode)]
+        [MaxLength(6)]
         public string ZipCode { get; set; }
 
         [Display(Name = "Fecha de Ingreso")]
         [DataType(DataType.Date)]
+        [Required]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Entrance { get; set; }
 
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress)]
         [MaxLength(30)]
-        [Index("IDX_Email", IsUnique = false)]
+        [Index("IDX_Email", IsUnique = true)]
         public string Email { get; set; }
 
         [Display(Name = "Teléfono")]
         [DataType(DataType.PhoneNumber)]
         [Required]
-        [MaxLength(20)]
+        [MaxLength(12)]
         [Index("IDX_Phone", IsUnique = true)]
         public string Phone { get; set; }
 
@@ -62,6 +72,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public int CityId { get; set; }
 
+        [Required]
         public bool IsActive { get; set; }
 
         [Required]
@@ -71,6 +82,14 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public DateTime UpdDate { get; set; }
 
         public virtual City City { get; set; }
+
+        public byte[] Picture { get; set; }
+
+        [MaxLength(20)]
+        public string PictureType { get; set; }
+
+        [ForeignKey("UserId")]
+        public ApplicationUser User { get; set; }
 
 
         [NotMapped]

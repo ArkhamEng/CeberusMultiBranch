@@ -9,6 +9,7 @@ namespace CerberusMultiBranch.Support
     {
         public const int Zero = 0;
         public const int One = 1;
+        public const int Two = 2;
 
         public const string CodeMask = "000000";
 

@@ -5,9 +5,14 @@ namespace CerberusMultiBranch.Models
 {
     public class ExternalLoginConfirmationViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
+        [Required(ErrorMessage = "Es correo electrónico es requerido")]
+        [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
+
+        [Required(ErrorMessage ="se requiere un nombre de usuario")]
+        [Display(Name = "Nombre de Usuario")]
+        
+        public string UserName { get; set; }
     }
 
     public class ExternalLoginListViewModel
@@ -42,16 +47,15 @@ namespace CerberusMultiBranch.Models
     public class ForgotViewModel
     {
         [Required]
-        [Display(Name = "Email")]
+        [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
     }
 
     public class LoginViewModel
     {
-        [Required]
-        [Display(Name = "Email")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required(ErrorMessage ="Debe ingresar su nombre de usuario")]
+        [Display(Name = "Nombre de Usuario")]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -66,12 +70,15 @@ namespace CerberusMultiBranch.Models
 
     public class RegisterViewModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
+        [Required(ErrorMessage ="Es necesario un nombre de usuario")]
+        [Display(Name = "Nombre de Usuario")]
+        public string UserName { get; set; }
+
+        [Required(ErrorMessage = "Es necesario una dirección de correo electrónico")]
+        [EmailAddress(ErrorMessage ="Debes ingresar una direccion de correo válida")]
+        [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
 
-        public int? EmployeeId { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "La contraseña {0} debe tener {2} caracteres como mínimo.", MinimumLength = 6)]
