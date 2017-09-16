@@ -43,7 +43,7 @@ namespace CerberusMultiBranch
             // Enables the application to remember the second login verification factor such as phone or email.
             // Once you check this option, your second step of verification during the login process will be remembered on the device where you logged in from.
             // This is similar to the RememberMe option when you log in.
-            app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
+            //app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
             // Uncomment the following lines to enable logging in with third party login providers
             //app.UseMicrosoftAccountAuthentication(
@@ -56,8 +56,8 @@ namespace CerberusMultiBranch
 
             //Facebook
             app.UseFacebookAuthentication(
-               appId: "1909025746090602",
-               appSecret: "0ed38373b70e200b65dd72681075784e");
+               appId: "1911499902510244",
+               appSecret: "03050a9d73c474097ebd82fd7fb72a7e"); 
 
             
             //Google
