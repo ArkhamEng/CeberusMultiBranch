@@ -18,19 +18,15 @@
         {
             <tr>
                 <td class="col-md-2">
-
                     @if (item.Images.Count > 0)
                     {
-                        var base64 = Convert.ToBase64String(item.Images.FirstOrDefault().ClearImage);
-                        var imgSrc = String.Format("data:{0};base64,{1}", item.Images.FirstOrDefault().Type, base64);
-
-                        <img src="@imgSrc" class="img-thumbnail img-responsive" />
+                        <img src="@item.Images.First().Path" class="img-thumbnail img-responsive"
+                             onmouseover="$(this).css('cursor', 'pointer')" onclick="ShowSlide('@item.ProductId')" />
                     }
                     else
                     {
                         <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
                     }
-
                 </td>
 
                 <td class="col-md-9">
@@ -43,21 +39,25 @@
 
                             foreach (var m in item.ModelCompatibilities)
                             {
-                                content += "<h5>" + m.CarMake.Name + " " + m.Name + " "+m.CarYears.Min(y=>y.Year)+'-'+m.CarYears.Max(y=>y.Year)+"</h5>";
+                                content += "<h5>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
                             }
 
-                            <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover"
+                            <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="$(this).css('cursor', 'pointer')"
                                   title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
                             </span>
                         }
                     </h3>
+                    <h5>
+                        Código: @Html.DisplayFor(model => item.Code)
+                    </h5>
                     <h4>
                         @Html.DisplayFor(model => item.StorePrice)
                     </h4>
-                    @Html.DisplayFor(model => item.Description) <label>Fabricante:</label>@Html.DisplayFor(model => item.TradeMark)
-
                     <h5>
-                        Código: @Html.DisplayFor(model => item.Code)
+                        <label>Descripcion: </label> @Html.DisplayFor(model => item.Description)
+                    </h5>
+                    <h5>
+                        <label>Fabricante: </label>@Html.DisplayFor(model => item.TradeMark)
                     </h5>
                 </td>
 
@@ -73,16 +73,47 @@
     </tbody>
 </table>
 
+<div id="divImagesModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger">
+            <div id="divImages" class="modal-body panel-body">
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
     $(document).ready(function () {
-        SetDataTable("#tbProducts","#txtName");
+        SetDataTable("#tbProducts", "#txtName");
     })
 
 
     function Edit(id) {
         console.log("redirect " + id);
         window.location = '/Products/Create/' + id;
+    }
+
+    function ShowSlide(id) {
+        $.ajax({
+            url: '@Url.Action("GetImages", "Products")',
+            type: "POST",
+            data: { productId: id },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view) {
+                    $("#divImages").html(view);
+                    $(".carousel-caption").hide()
+                    $("#divImagesModal").modal('show');
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
     }
 
     function Show(carousel) {
@@ -93,10 +124,7 @@
 
     function CompatibilitiesPop(content) {
         console.log(content);
-
-
         $('body').popover("destroy")
-
         var popOverSettings =
         {
             placement: 'right',

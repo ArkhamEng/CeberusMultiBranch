@@ -115,11 +115,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         ProductImage f = new ProductImage();
 
+                        f.Path = FileManager.SaveImage(file,product.ProductId,ImageType.Products);
                         f.ProductId = product.ProductId;
                         f.Name = file.FileName;
                         f.Type = file.ContentType;
-                        f.File = file.ToCompressedFile();
-                        f.Size = f.File.Length;
+                        f.Size = file.ContentLength;
 
                         db.ProductImages.Add(f);
 
@@ -132,6 +132,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
             return RedirectToAction("Create", new { id = product.ProductId });
+        }
+
+        [HttpPost]
+        public ActionResult GetImages(int productId)
+        {
+            var model = db.ProductImages.Where(pi => pi.ProductId == productId);
+            return PartialView("_ImagesLoaded", model);
         }
 
         [HttpPost]
@@ -149,14 +156,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             }
 
-
             db.ProductImages.Remove(image);
             db.SaveChanges();
 
             var model = db.ProductImages.Where(i => i.ProductId == pId).ToList();
-            foreach (var img in model)
-                img.File = GzipWrapper.Decompress(img.File);
-
+           
             ModelState.Clear();
 
             return PartialView("_ImagesLoaded", model);
@@ -176,12 +180,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
             return View(product);
         }
-
-
-
-
-
-
 
         protected override void Dispose(bool disposing)
         {

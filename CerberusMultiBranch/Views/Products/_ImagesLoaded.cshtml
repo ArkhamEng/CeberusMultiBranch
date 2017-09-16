@@ -7,12 +7,9 @@
 
 <div id="divCarousel" class="carousel slide" data-ride="carousel">
         <div id="imgContainer" class="carousel-inner">
-
-
             @foreach (var file in Model)
             {
-                var base64 = Convert.ToBase64String(file.ClearImage);
-                var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
+                var imgSrc = file.Path;
                 var a = imgIndex == Decimal.Zero ? "active" : "";
 
                 <div id="div+@file.ProductImageId" class="item @a thumbnail">
@@ -33,9 +30,7 @@
                     <img src="~/Content/Images/sinimagen.jpg" />
                 </div>
             }
-
         </div>
-
 
         <a class="left carousel-control" href="#divCarousel" data-slide="prev">
             <span class="glyphicon glyphicon-chevron-left"></span>
@@ -48,26 +43,6 @@
         </a>
     </div>
 
-@*@foreach (var file in Model)
-{
-    var base64 = Convert.ToBase64String(file.File);
-    var imgSrc = String.Format("data:{0};base64,{1}", file.Type, base64);
-    var a = imgIndex == Decimal.Zero ? "active" : "";
-    <div class="thumbnail">
-        <a class="close"  onclick="DeleteImage(@file.ProductImageId)">x</a>
-        <img src="@imgSrc" />
-    </div>
-    imgIndex++;
-}
-
-@if (imgIndex == 0)
-{
-    <div class="thumbnail">
-        <img src="~/Content/Images/sinimagen.jpg" />
-    </div>
-}*@
-
-  
 <script>
     $(document).ready(function () {
 
@@ -78,7 +53,6 @@
     function DeleteImage(id) {
         console.log("Deleting Image Id: " + id);
 
-    
         $.ajax({
             url: "/Products/DeleteImage",
             type: "POST",

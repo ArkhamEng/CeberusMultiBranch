@@ -15,18 +15,25 @@ namespace CerberusMultiBranch.Support
 
         public const string SessionBranchId = "SessionBranchId";
 
-        public const string SessionBranchName   = "SessionBranchName";
+        public const string SessionBranchName = "SessionBranchName";
+
+        public const string EmployeeProfilePath = "/Content/EmployeeProfile";
+
+        public const string UserProfilePath = "/Content/UserProfile";
+
+        public const string ProductImagesPath = "/Content/ProductImages";
+
     }
 
     public struct FileStruct
     {
-        public string Name { get;set;}
+        public string Name { get; set; }
 
         public string Type { get; set; }
 
         public byte[] Bytes { get; set; }
 
-        public int Size { get {return this.Bytes!=null? this.Bytes.Length : Cons.Zero; } }
+        public int Size { get { return this.Bytes != null ? this.Bytes.Length : Cons.Zero; } }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
@@ -14,18 +15,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public int ProductId { get; set; }
 
+        [Required]
+        [MaxLength(80)]
         public string Name { get; set; }
 
-        public byte[] File { get; set; }
+        [Required]
+        [MaxLength(150)]
+        public string Path { get; set; }
 
+        [Required]
+        [MaxLength(30)]
         public string Type { get; set; }
 
-        public double Size { get; set; }
+        public int Size { get; set; }
 
         public virtual Product Product { get; set; }
-        [NotMapped]
-        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.File); } }
-
-
     }
 }
