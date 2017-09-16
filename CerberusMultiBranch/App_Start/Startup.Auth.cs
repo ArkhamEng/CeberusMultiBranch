@@ -56,15 +56,15 @@ namespace CerberusMultiBranch
 
             //Facebook
             app.UseFacebookAuthentication(
-               appId: "682265415268211",
-               appSecret: "e41831950a04ba5a2875988a4faa7cea");
+               appId: "1909025746090602",
+               appSecret: "0ed38373b70e200b65dd72681075784e");
 
             
             //Google
             var googleOAuth2AuthenticationOptions = new GoogleOAuth2AuthenticationOptions
             {
-                ClientId = "158957339422-gptekjv51vfphis07vlqncfhmcc4ors2.apps.googleusercontent.com",
-                ClientSecret = "pg8SOBi9hnSUHkksCiKrZff-",
+                ClientId = "11126797159-ukefc1m76tlbsmje5fds86um31r4krlm.apps.googleusercontent.com",
+                ClientSecret = "w3WJzmoUlruAfimRW32ycc3U",
                 Provider = new GoogleOAuth2AuthenticationProvider()
             };
 
