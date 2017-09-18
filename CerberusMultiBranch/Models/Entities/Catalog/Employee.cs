@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -81,19 +82,25 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public DateTime UpdDate { get; set; }
 
-        public virtual City City { get; set; }
 
         public byte[] Picture { get; set; }
 
         [MaxLength(20)]
         public string PictureType { get; set; }
 
+        [NotMapped]
+        public HttpPostedFileBase PostedFile { get; set; }
+
+
+        #region Navigation Properties
+        public virtual City City { get; set; }
+
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
+        public ICollection<Purchase> Purchases { get; set; }
 
-        [NotMapped]
-        public HttpPostedFileBase PostedFile { get; set; }
+        #endregion
 
 
         public Employee()

@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 
+
 namespace CerberusMultiBranch.Support
 {
     public static class Extension
@@ -63,11 +64,5 @@ namespace CerberusMultiBranch.Support
             }
         }
 
-        public static string GetEmployeeId(this IIdentity identity)
-        {
-            var claim = ((ClaimsIdentity)identity).FindFirst("EmployeeId");
-            // Test for null to avoid issues during local testing
-            return (claim != null) ? claim.Value : string.Empty;
-        }
     }
 }

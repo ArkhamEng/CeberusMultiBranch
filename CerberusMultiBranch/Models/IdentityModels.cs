@@ -102,5 +102,7 @@ namespace CerberusMultiBranch.Models
             base.OnModelCreating(modelBuilder);
             
         }
+
+        public System.Data.Entity.DbSet<CerberusMultiBranch.Models.Entities.Operative.Purchase> Purchases { get; set; }
     }
 }

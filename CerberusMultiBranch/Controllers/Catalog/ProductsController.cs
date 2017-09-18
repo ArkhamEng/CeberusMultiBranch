@@ -84,10 +84,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 foreach (var c in product.NewCompatibilities)
                 {
-                    var mArr    = c.Split('-');
-                    var mId     = Convert.ToInt32(mArr[Cons.Zero]);
-                    var yIni    = Convert.ToInt32(mArr[Cons.One]);
-                    var yEnd    = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
+                    var mArr = c.Split('-');
+                    var mId = Convert.ToInt32(mArr[Cons.Zero]);
+                    var yIni = Convert.ToInt32(mArr[Cons.One]);
+                    var yEnd = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
 
                     for (int j = yIni; j < yEnd; j++)
                     {
@@ -115,7 +115,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         ProductImage f = new ProductImage();
 
-                        f.Path = FileManager.SaveImage(file,product.ProductId,ImageType.Products);
+                        f.Path = FileManager.SaveImage(file, product.ProductId, ImageType.Products);
                         f.ProductId = product.ProductId;
                         f.Name = file.FileName;
                         f.Type = file.ContentType;
@@ -160,26 +160,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
             db.SaveChanges();
 
             var model = db.ProductImages.Where(i => i.ProductId == pId).ToList();
-           
+
             ModelState.Clear();
 
             return PartialView("_ImagesLoaded", model);
         }
 
-        // GET: Products/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Product product = db.Products.Find(id);
-            if (product == null)
-            {
-                return HttpNotFound();
-            }
-            return View(product);
-        }
+     
 
         protected override void Dispose(bool disposing)
         {

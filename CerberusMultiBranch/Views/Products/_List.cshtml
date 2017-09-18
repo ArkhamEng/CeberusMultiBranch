@@ -21,7 +21,7 @@
                     @if (item.Images.Count > 0)
                     {
                         <img src="@item.Images.First().Path" class="img-thumbnail img-responsive"
-                             onmouseover="$(this).css('cursor', 'pointer')" onclick="ShowSlide('@item.ProductId')" />
+                             onmouseover="SetPointer(this)" onclick="ShowSlide('@item.ProductId')" />
                     }
                     else
                     {

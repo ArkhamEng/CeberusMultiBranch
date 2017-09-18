@@ -6,6 +6,12 @@
 
 });
 
+function SetPointer(element)
+{
+    console.log(element);
+    $(element).css('cursor', 'pointer');
+}
+
 function SetCascade(ddlParent, ddlChild, action) {
     console.log("Setting Cascade Controls State/Cities");
     console.log("Child Value " + $(ddlChild).val());

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th  class="col-md-1"></th>
+                <th  class="col-md-2">
+                    @Html.DisplayNameFor(model => model.Code)
+                </th>
+                <th class="col-md-4">
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th  class="col-md-2">
+                    @Html.DisplayNameFor(model => model.BuyPrice)
+                </th>
+                <th  class="col-md-2">
+                    @Html.DisplayNameFor(model => model.TradeMark)
+                </th>
+                <th  class="col-md-1">
+                    @Html.DisplayNameFor(model => model.Unit)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+        {
+                <tr onmouseover="SetPointer(this)" >
+                    <td>
+                        @if (item.Images != null && item.Images.Count > 0)
+                    {
+                            <img src="@item.Images.First().Path" class="img-responsive" />
+                    }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.BuyPrice)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TradeMark)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Unit)
+                    </td>
+                </tr>
+        }
+        </tbody>
+
+    </table>

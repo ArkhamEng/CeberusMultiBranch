@@ -1,7 +1,7 @@
 ﻿
 
 
-<div class="form-group col-md-3">
+<div class="hidden">
     @Html.Label("Cv Proveedor", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -9,7 +9,7 @@
     </div>
 </div>
 
-<div class="form-group col-md-9">
+
     @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -21,7 +21,7 @@
         </span>
     </div>
     <label id="lblQuickProvider" class="text-danger" />
-</div>
+
 
 @Html.Hidden("ProviderId")
 

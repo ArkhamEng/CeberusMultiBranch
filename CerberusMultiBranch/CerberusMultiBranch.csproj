@@ -195,6 +195,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -234,6 +235,18 @@
     <Compile Include="Migrations\201709161842251_ImagesChanges.Designer.cs">
       <DependentUpon>201709161842251_ImagesChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709162250260_Purchase.cs" />
+    <Compile Include="Migrations\201709162250260_Purchase.Designer.cs">
+      <DependentUpon>201709162250260_Purchase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709171552135_PurchaseDetail.cs" />
+    <Compile Include="Migrations\201709171552135_PurchaseDetail.Designer.cs">
+      <DependentUpon>201709171552135_PurchaseDetail.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709171940401_PurchaseDetail1.cs" />
+    <Compile Include="Migrations\201709171940401_PurchaseDetail1.Designer.cs">
+      <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -253,6 +266,7 @@
     <Compile Include="Models\Entities\Operative\ProductInventory.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\Entities\Operative\Purchase.cs" />
+    <Compile Include="Models\Entities\Operative\PurchaseDetail.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
@@ -391,13 +405,18 @@
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
     <Content Include="Views\Shared\_QuickUser.cshtml" />
+    <Content Include="Views\Purchases\Create.cshtml" />
+    <Content Include="Views\Purchases\Index.cshtml" />
+    <Content Include="Views\Shared\_QuickProduct.cshtml" />
+    <Content Include="Views\Purchases\_Details.cshtml" />
+    <Content Include="Views\Purchases\_ProductList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\EmployeeProfile\" />
     <Folder Include="Content\ProductImages\" />
     <Folder Include="Content\UserProfile\" />
-    <Folder Include="Controllers\Operative\" />
+    <Folder Include="Models\ViewModels\Operative\" />
     <Folder Include="Views\Inventory\" />
   </ItemGroup>
   <ItemGroup>
@@ -431,6 +450,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709161842251_ImagesChanges.resx">
       <DependentUpon>201709161842251_ImagesChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709162250260_Purchase.resx">
+      <DependentUpon>201709162250260_Purchase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709171552135_PurchaseDetail.resx">
+      <DependentUpon>201709171552135_PurchaseDetail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709171940401_PurchaseDetail1.resx">
+      <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

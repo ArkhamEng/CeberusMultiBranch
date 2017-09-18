@@ -1,11 +1,15 @@
-﻿using System;
+﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Config;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
+    [Table("Purchase", Schema = "Operative")]
     public class Purchase
     {
         public int PurchaseId { get; set; }
@@ -25,6 +29,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public string Bill { get; set; }
 
         [Required]
+        [DataType(DataType.Date)]
         [Display(Name ="Fecha de compra")]
         public string PurchaseDate { get; set; }
 
@@ -35,36 +40,25 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public DateTime UpdDate { get; set; }
 
         [Required]
+        [Display(Name="Empleado")]
         public int  EmployeeId { get; set; }
 
+        #region Navigation Properties
+
+        public virtual Employee Employee { get; set; }
+
+        public virtual Branch Branch { get; set; }
+
+        public virtual Provider Provider { get; set; }
+
         public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
-    }
+        #endregion
 
-    public class PurchaseDetail
-    {
-        public int PurchaseDetailId { get; set; }
-
-        public int PurchaseId { get; set; }
-
-        public int ProductId { get; set; }
-
-        public double Quantity { get; set; }
-
-        public double BuyPrice { get; set; }
-
-        [Required]
-        public bool Active { get; set; }
-
-        [Required]
-        public DateTime InsDate { get; set; }
-
-        [Required]
-        public DateTime UpdDate { get; set; }
-
-        [Required]
-        public int EmployeeId { get; set; }
-
-        public virtual Purchase Purchase { get; set; }
+        public Purchase()
+        {
+            this.PurchaseDetails = new List<PurchaseDetail>();
+        }
 
     }
+
 }
