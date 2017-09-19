@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities.Operative;
 using Microsoft.AspNet.Identity;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -29,32 +30,27 @@ namespace CerberusMultiBranch.Controllers.Operative
                          where (code == null || code == string.Empty || p.Code == code)
                          && (name == null || name == string.Empty || p.Name == name)
                          select p).Include(p => p.Images).ToList();
-            
+
             return PartialView("_ProductList", model);
         }
 
-
-        // GET: Purchases/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Purchase purchase = db.Purchases.Find(id);
-            if (purchase == null)
-            {
-                return HttpNotFound();
-            }
-            return View(purchase);
-        }
-
         // GET: Purchases/Create
-        public ActionResult Create()
+        public ActionResult Create(int? id)
         {
-            var model = new Purchase();
-            var UserId = User.Identity.GetUserId<string>();
-            model.Employee = db.Employees.FirstOrDefault(e => e.UserId == UserId );
+            Purchase model;
+
+            if (id != null)
+            {
+                model = db.Purchases.Include(p => p.PurchaseDetails.Select(d => d.Product.Images)).FirstOrDefault(p => p.PurchaseId == id);
+            }
+            else
+            {
+                model = new Purchase();
+                var UserId = User.Identity.GetUserId<string>();
+                model.BranchId = Extension.GetBranchSession().Id;
+                model.Employee = db.Employees.FirstOrDefault(e => e.UserId == UserId);
+                model.EmployeeId = model.Employee.EmployeeId;
+            }
             return View(model);
         }
 
@@ -63,7 +59,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "PurchaseId,ProviderId,BranchId,TotalAmount,Bill,PurchaseDate,InsDate,UpdDate,EmployeeId")] Purchase purchase)
+        public ActionResult Create([Bind(Exclude = "Employee")] Purchase purchase)
         {
             if (ModelState.IsValid)
             {
@@ -75,19 +71,47 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(purchase);
         }
 
-        // GET: Purchases/Edit/5
-        public ActionResult Edit(int? id)
+        [HttpPost]
+        public ActionResult AddDetail(int productId, int purchaseId, double buyprice, double quantity)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+
+                var detail = db.PurchaseDetails.FirstOrDefault(d => d.ProductId == productId);
+
+                if(detail != null)
+                {
+                    detail.Quantity += quantity;
+                    detail.Amount   = detail.Quantity * detail.BuyPrice;
+
+                    db.Entry(detail).State = EntityState.Modified;
+                }
+                else
+                {
+                    detail = new PurchaseDetail
+                    {
+                        ProductId  = productId,
+                        PurchaseId = purchaseId,
+                        Quantity   = quantity,
+                        BuyPrice   = buyprice,
+                        Amount     = buyprice * quantity
+                    };
+
+                    db.PurchaseDetails.Add(detail);
+                }
+                
+                db.SaveChanges();
             }
-            Purchase purchase = db.Purchases.Find(id);
-            if (purchase == null)
+            catch (Exception ex)
             {
-                return HttpNotFound();
+                ModelState.AddModelError("AddDetail", ex);
             }
-            return View(purchase);
+
+            var model = db.PurchaseDetails.Include(d=> d.Product.Images).
+                Where(d => d.PurchaseId == purchaseId).ToList();
+             
+
+            return PartialView("_Details", model);
         }
 
         // POST: Purchases/Edit/5

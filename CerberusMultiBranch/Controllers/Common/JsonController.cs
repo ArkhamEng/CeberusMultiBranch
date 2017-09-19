@@ -129,33 +129,20 @@ namespace CerberusMultiBranch.Controllers.Common
         [HttpPost]
         public JsonResult BeginBranchSession(int branchId, string name)
         {
-            System.Web.HttpContext.Current.Session.Add(Cons.SessionBranchId, branchId);
-            System.Web.HttpContext.Current.Session.Add(Cons.SessionBranchName, name);
+            JCatalogEntity session = new JCatalogEntity { Id = branchId, Name = name };
+
+            if(System.Web.HttpContext.Current.Session[Cons.BranchSession] != null)
+                System.Web.HttpContext.Current.Items[Cons.BranchSession] = session;
+            else
+                System.Web.HttpContext.Current.Session.Add(Cons.BranchSession,session);
+
             return Json(true);
         }
 
         public JsonResult GetBranchSession()
         {
-            JCatalogEntity s;
-
-            if (System.Web.HttpContext.Current.Session[Cons.SessionBranchId] != null)
-            {
-                s = new JCatalogEntity();
-                s.Id = Convert.ToInt32(System.Web.HttpContext.Current.Session[Cons.SessionBranchId]);
-                s.Name = System.Web.HttpContext.Current.Session[Cons.SessionBranchName].ToString();
-            }
-            else
-            { 
-                s = new JCatalogEntity
-                {
-                    Id = 0,
-                    Name = string.Empty
-                };
-            }
-
-            return Json(s);
+            var session = Extension.GetBranchSession();
+            return Json(session);
         }
-
-      
     }
 }

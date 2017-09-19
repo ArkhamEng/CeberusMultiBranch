@@ -21,17 +21,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public int BranchId { get; set; }
 
         [Display(Name = "Total")]
+        [Required]
         public double TotalAmount { get; set; }
 
         
         [Display(Name = "Factura")]
         [MaxLength(30)]
+        [Required]
         public string Bill { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [Display(Name ="Fecha de compra")]
-        public string PurchaseDate { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime PurchaseDate { get; set; }
 
         [Required]
         public DateTime InsDate { get; set; }
@@ -57,8 +60,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public Purchase()
         {
             this.PurchaseDetails = new List<PurchaseDetail>();
+            this.PurchaseDate = DateTime.Now;
+            this.InsDate = DateTime.Now;
+            this.UpdDate = DateTime.Now;
         }
-
     }
 
 }

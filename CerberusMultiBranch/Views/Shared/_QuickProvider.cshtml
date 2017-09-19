@@ -1,6 +1,6 @@
 ﻿
 
-
+@Html.Hidden("ProviderId")
 <div class="hidden">
     @Html.Label("Cv Proveedor", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
@@ -10,26 +10,28 @@
 </div>
 
 
-    @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
-    <div class="input-group">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("ProviderName", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button id="btnQuickProvider" type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-search" id="spQuickProvider"></span>
-            </button>
-        </span>
-    </div>
-    <label id="lblQuickProvider" class="text-danger" />
+@Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
+<div class="input-group">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+    @Html.TextBox("ProviderName", "", htmlAttributes: new { @class = "form-control" })
+    <span class="input-group-btn">
+        <button id="btnQuickProvider" type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-search" id="spQuickProvider"></span>
+        </button>
+    </span>
+</div>
+<label id="lblQuickProvider" class="text-danger" />
 
 
-@Html.Hidden("ProviderId")
+
 
 
 <div id="divModalQuickProvider" class="modal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger ">
-            <div class="panel-heading">Doble Click Para Seleccionar</div>
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">Búsqueda rápida de productos</h4>
+            </div>
             <div class="panel-body">
                 <table id="tbQuickProvider" class="table table-striped">
                     <thead>
@@ -50,14 +52,26 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnQuickProvider").click(function () { QuickProvider(); });
+        $("#btnQuickProvider").click(function () { ButtonAction(); });
 
-        //si el ClientId tiene un valor, ejecuto una busqueda rápida
-        if ($("#ProviderId").val() != '' & $("#ProviderId").val() > 0)
-        {
+        if ($("#ProviderId").val() != '' && $("#ProviderId").val() > 0)
             QuickProvider();
-        }
+
+   
     });
+
+    function ButtonAction()
+    {
+        if ($("#ProviderId").val() != '' && $("#ProviderId").val() > 0)
+        {
+            $("#ProviderId").val("");
+            $("#ProviderCode").val("");
+            $("#ProviderName").val("");
+            return;
+        }
+        else
+            QuickProvider();
+    }
 
     function SelectProvider(row)
     {
@@ -78,21 +92,6 @@
     function QuickProvider()
     {
         $("#lblQuickProvider").text("");
-
-        if ($("#ProviderId").val() != '' & $("#ProviderId").val() > 0)
-        {
-            $("#ProviderId").val("");
-            $("#ProviderCode").val("");
-            $("#ProviderName").val("");
-
-            $("#ProviderCode").attr("readonly", false);
-            $("#ProviderName").attr("readonly", false);
-
-
-            $("#spQuickProvider").attr("class", "glyphicon glyphicon-search");
-            return;
-        }
-
         $("#tbodyQuickProvider").empty();
 
         var d = {
@@ -105,29 +104,29 @@
             url: '@Url.Action("QuickSearchProvider", "Json")',
             type: "POST",
             data: d,
-            success: function (data) { },
             error: function (data) {
                 console.log("Error Executing"); console.log(data);
             },
             statusCode:
             {
-                200: function (data)
-                {
-                    if (data.length == 1)
-                    {
+                200: function (data) {
+                    if (data.length == 1) {
                         $("#ProviderCode").val(data[0].Code);
                         $("#ProviderName").val(data[0].Name);
                         $("#ProviderId").val(data[0].Id);
+
+                        console.log("ProviderCode " + $("#ProviderCode").val());
+                        console.log("ProviderName " + $("#ProviderName").val());
+                        console.log("ProviderId " + $("#ProviderId").val());
+                        console.log("ProviderId " + data[0].Id);
 
                         $("#ProviderCode").attr("readonly", true);
                         $("#ProviderName").attr("readonly", true);
                         $("#spQuickProvider").attr("class", "fa fa-refresh");
                     }
-                    else if (data.length > 1)
-                    {
+                    else if (data.length > 1) {
                         console.log("Objetos encontrados " + data.length);
-                        $.each(data, function (i, item)
-                        {
+                        $.each(data, function (i, item) {
                             var row = "<tr ondblclick='SelectProvider(this)'><td hidden='hidden'>" + item.Id + "</td>" +
                                           "<td>" + item.Code + "</td>" +
                                              "<td>" + item.Name + "</td>" +
@@ -139,8 +138,7 @@
 
                         $("#divModalQuickProvider").modal();
                     }
-                    else
-                    {
+                    else {
                         $("#lblQuickProvider").text("No se encontraron coincidencias");
                     }
 

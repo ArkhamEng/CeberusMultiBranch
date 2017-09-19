@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Cerberus 1.0 </title>
+    <title>@ViewBag.Title - Sims 1.0 </title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -51,12 +51,9 @@
         {
             <nav id="sidebar">
                 <!-- Sidebar Header -->
-
                 <div class="sidebar-header" style="text-align:center">
-
                     <img src="@Url.Action("GetPicture", "Json")" class="img-circle" style="max-height:90px" />
-
-                    @*@Html.Partial("_BranchSelector")*@
+                    @Html.Partial("_BranchSelector")
                 </div>
                 <ul class="list-unstyled components">
                     <li><a href="/Home/">&nbsp;Inicio<span class="glyphicon glyphicon-home" style="float:left" /></a></li>

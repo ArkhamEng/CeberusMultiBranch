@@ -13,9 +13,7 @@ namespace CerberusMultiBranch.Support
 
         public const string CodeMask = "000000";
 
-        public const string SessionBranchId = "SessionBranchId";
-
-        public const string SessionBranchName = "SessionBranchName";
+        public const string BranchSession = "BranchSession";
 
         public const string EmployeeProfilePath = "/Content/EmployeeProfile";
 

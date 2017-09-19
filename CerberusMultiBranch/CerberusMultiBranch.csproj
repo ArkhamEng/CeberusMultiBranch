@@ -247,6 +247,18 @@
     <Compile Include="Migrations\201709171940401_PurchaseDetail1.Designer.cs">
       <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709181606446_Purchase1.cs" />
+    <Compile Include="Migrations\201709181606446_Purchase1.Designer.cs">
+      <DependentUpon>201709181606446_Purchase1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709181609430_Purchase11.cs" />
+    <Compile Include="Migrations\201709181609430_Purchase11.Designer.cs">
+      <DependentUpon>201709181609430_Purchase11.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709182152235_Purchase2.cs" />
+    <Compile Include="Migrations\201709182152235_Purchase2.Designer.cs">
+      <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -459,6 +471,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709171940401_PurchaseDetail1.resx">
       <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709181606446_Purchase1.resx">
+      <DependentUpon>201709181606446_Purchase1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709181609430_Purchase11.resx">
+      <DependentUpon>201709181609430_Purchase11.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709182152235_Purchase2.resx">
+      <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

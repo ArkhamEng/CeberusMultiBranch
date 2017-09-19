@@ -3,41 +3,42 @@
 
 @{
     ViewBag.Title = "Compras";
-    
+
 }
 
-
+@Scripts.Render("~/bundles/jqueryval")
 <div class="col-md-12">
     <h3>
         <span class="fa fa-shopping-bag" style="float:left"></span>
         &nbsp;&nbsp;Registro de compras
     </h3>
 </div>
+
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    @Html.HiddenFor(m => m.EmployeeId);
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+
 
     <div class="panel-group col-md-11">
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="row">
+                    @Html.HiddenFor(m => m.EmployeeId)
+                    @Html.HiddenFor(m => m.BranchId)
+                    @Html.HiddenFor(m => m.PurchaseId)
                     <div class="col-md-5">
                         @Html.Partial("_QuickProvider")
                     </div>
-                    <div class="col-md-3 col-md-offset-1">
-                        @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
-                            @Html.EditorFor(model => model.Bill, new { htmlAttributes = new { @class = "form-control" } })
-                        </div>
-                    </div>
-                    <div class="col-md-2">
+
+                    <div class="col-md-2 col-md-offset-4">
                         @Html.LabelFor(model => model.PurchaseDate, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                             @Html.EditorFor(model => model.PurchaseDate, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
+                        @Html.ValidationMessageFor(model => model.PurchaseDate, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="row">
@@ -48,8 +49,23 @@
                             @Html.EditorFor(model => model.Employee.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
                         </div>
                     </div>
-                    <div class="form-group col-md-3 col-md-offset-4">
-                        @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label" })
+                    <div class="col-md-3 col-md-offset-4">
+                        @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                            @Html.EditorFor(model => model.Bill, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer col-md-12">
+                <div class="clearfix row">
+                    <div class="btn-group col-md-3">
+                        @Html.Partial("_CatalogButtonGroup")
+                    </div>
+                    <div class="form-group col-md-3 col-md-offset-6">
+                        @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-3" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                             @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
@@ -57,21 +73,17 @@
                     </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <div class="btn-group">
-                    <button id="btnBegin" class="btn btn-success btn-xs">
-                        <span class="fa fa-check-square-o"/>
-                    </button>
-                </div>
-            </div>
         </div>
         <div class="panel panel-default">
-            <div class="panel-body">
+            <div id="divDetails" class="panel-body">
                 @Html.Partial("_Details", Model.PurchaseDetails)
             </div>
         </div>
     </div>
 }
+
+
+@Html.Partial("_QuickProduct")
 
 <script>
     $(document).ready(function ()
@@ -79,14 +91,51 @@
         if ('@Model.PurchaseId' > 0)
         {
             $("#btnShowQuick").prop("disabled", false)
+            $("#btnBegin").prop("disabled", false)
         }
         else
         {
-            console.log("DIsable");
             $("#btnShowQuick").prop("disabled", true)
+            $("#btnBegin").prop("disabled", true)
         }
 
         $("#spShowQuick").click(function () { $("#ModalQuickProduct").modal('show'); });
+
+       
     });
+
+    function AddDetail(element)
+    {
+
+        var row = $(element).parent().parent().parent();
+        cells = row.find("td");
+
+        var buyprice = row.find("#txtBuyPrice").val();
+        var productId = row.find("#ProductId").val();
+        var quantity = row.find("#Quantity").val();
+        var purchaseId = $("#PurchaseId").val();
+
+     
+        $.ajax({
+            url: '@Url.Action("AddDetail", "Purchases")',
+            type: "POST",
+            data: { productId: productId, purchaseId: purchaseId, buyprice: buyprice, quantity: quantity },
+            error: function (data)
+            {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view)
+                {
+                    $("#divDetails").html(view);
+                },
+                401: function (data)
+                {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
 </script>
 

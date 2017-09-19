@@ -80,6 +80,10 @@ namespace CerberusMultiBranch.Models
 
         #region Operative
         public DbSet<ProductInventory> ProductInventories { get; set; }
+
+        public DbSet<Purchase> Purchases { get; set; }
+
+        public DbSet<PurchaseDetail> PurchaseDetails { get; set; }
         #endregion
 
 
@@ -103,6 +107,6 @@ namespace CerberusMultiBranch.Models
             
         }
 
-        public System.Data.Entity.DbSet<CerberusMultiBranch.Models.Entities.Operative.Purchase> Purchases { get; set; }
+        
     }
 }

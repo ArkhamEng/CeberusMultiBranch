@@ -14,17 +14,14 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int ProductId { get; set; }
 
+        [Display(Name = "Cantidad")]
         public double Quantity { get; set; }
 
+        [Display(Name = "Precio Compra")]
         public double BuyPrice { get; set; }
 
-        public double Amout { get; set; }
-
-        [MaxLength(29)]
-        public string Unit { get; set; }
-
-        [Required]
-        public bool Active { get; set; }
+        [Display(Name ="Importe")]
+        public double Amount { get; set; }
 
         [Required]
         public DateTime InsDate { get; set; }
@@ -36,5 +33,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual Product Product { get; set; }
 
+        public PurchaseDetail()
+        {
+            this.InsDate = DateTime.Now;
+            this.UpdDate = DateTime.Now;
+        }
     }
 }

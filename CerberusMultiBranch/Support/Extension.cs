@@ -1,6 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.ViewModels.Config;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -62,6 +63,18 @@ namespace CerberusMultiBranch.Support
                         p.ModelCompatibilities.Add(m.CarYear.CarModel);
                 }
             }
+        }
+
+        public static JCatalogEntity GetBranchSession()
+        {
+            JCatalogEntity session;
+
+            if (System.Web.HttpContext.Current.Session[Cons.BranchSession]!=null)
+                session = (JCatalogEntity)System.Web.HttpContext.Current.Session[Cons.BranchSession];
+            else
+                session = new JCatalogEntity { Id = 0, Name = string.Empty };
+
+            return session;
         }
 
     }
