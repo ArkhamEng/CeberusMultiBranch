@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -84,7 +85,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual City City { get; set; }
 
-
+        public ICollection<Sale> Sale { get; set; }
 
         public Client()
         {

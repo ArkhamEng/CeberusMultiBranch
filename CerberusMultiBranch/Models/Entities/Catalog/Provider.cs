@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -79,14 +80,14 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual City City { get; set; }
 
-
+        public ICollection<Purchase> Purchases { get; set; }
 
         public Provider()
         {
             this.IsActive = true;
-            this.InsDate = DateTime.Now;
-            this.UpdDate = DateTime.Now;
-            this.Code = Cons.CodeMask;
+            this.InsDate  = DateTime.Now;
+            this.UpdDate  = DateTime.Now;
+            this.Code     = Cons.CodeMask;
         }
 
         public Provider Copy()

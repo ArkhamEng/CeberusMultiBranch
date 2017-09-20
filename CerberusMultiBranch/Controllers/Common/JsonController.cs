@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -127,21 +129,21 @@ namespace CerberusMultiBranch.Controllers.Common
         }
 
         [HttpPost]
-        public JsonResult BeginBranchSession(int branchId, string name)
+        public async Task<JsonResult> BeginBranchSession(int branchId, string name)
         {
             JCatalogEntity session = new JCatalogEntity { Id = branchId, Name = name };
+            var um = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
-            if(System.Web.HttpContext.Current.Session[Cons.BranchSession] != null)
-                System.Web.HttpContext.Current.Items[Cons.BranchSession] = session;
-            else
-                System.Web.HttpContext.Current.Session.Add(Cons.BranchSession,session);
-
+            var s = branchId + "," + name;
+            var result = await um.AddClaimAsync(User.Identity.GetUserId(), new Claim(Cons.BranchSession, s));
+            
+            
             return Json(true);
         }
 
         public JsonResult GetBranchSession()
         {
-            var session = Extension.GetBranchSession();
+            var session = User.Identity.GetBranchSession();
             return Json(session);
         }
     }

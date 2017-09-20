@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.PurchaseDetail>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 <table class="table table-striped">
@@ -15,7 +15,7 @@
                 @Html.DisplayNameFor(model => model.Product.Unit)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BuyPrice)
+                @Html.DisplayNameFor(model => model.Price)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Quantity)
@@ -23,7 +23,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Amount)
             </th>
-            <th>
+            <th class="Compleated">
                 <button id="btnShowQuick" class="btn btn-warning btn-xs" type="button">
                     <span  class="glyphicon glyphicon-plus-sign" ></span>
                 </button>
@@ -54,7 +54,7 @@
                     @Html.DisplayFor(modelItem => item.Product.Unit)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.BuyPrice)
+                    @Html.DisplayFor(modelItem => item.Price)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
@@ -62,7 +62,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Amount)
                 </td>
-                <td>
+                <td  class="Compleated">
                     <div class="btn-group">
                         <button class="btn btn-danger btn-xs" type="button">
                             <span class="glyphicon glyphicon-trash"></span> 

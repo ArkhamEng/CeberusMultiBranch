@@ -98,8 +98,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
-        public ICollection<Purchase> Purchases { get; set; }
-
         #endregion
 
 

@@ -47,9 +47,20 @@
                             </span>
                         }
                     </h3>
-                    <h5>
-                        Código: @Html.DisplayFor(model => item.Code)
-                    </h5>
+                    @{ var quantity = item.TransactionDetailes.Sum(td => td.Quantity); }
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>
+                                <label>Código: </label> @Html.DisplayFor(model => item.Code)
+                            </h5>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>
+                                <label>Existencias: </label> @Html.DisplayFor(model => quantity)
+                            </h5>
+                        </div>
+                    </div>
                     <h4>
                         @Html.DisplayFor(model => item.StorePrice)
                     </h4>
@@ -68,8 +79,8 @@
                     </button>
                 </td>
             </tr>
-            index++;
-        }
+                                    index++;
+                                }
     </tbody>
 </table>
 

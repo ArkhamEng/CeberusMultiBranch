@@ -2,15 +2,17 @@
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.ViewModels.Config;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
+
 
 
 namespace CerberusMultiBranch.Support
@@ -65,17 +67,23 @@ namespace CerberusMultiBranch.Support
             }
         }
 
-        public static JCatalogEntity GetBranchSession()
+        public static JCatalogEntity GetBranchSession(this IIdentity user)
         {
+            var um = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            var userId = user.GetUserId();
+            var claim = um.GetClaims(userId).FirstOrDefault(c => c.Type == Cons.BranchSession);
+
             JCatalogEntity session;
 
-            if (System.Web.HttpContext.Current.Session[Cons.BranchSession]!=null)
-                session = (JCatalogEntity)System.Web.HttpContext.Current.Session[Cons.BranchSession];
+            if (claim != null)
+            {
+                var sArry = claim.Value.Split(',');
+                session = new JCatalogEntity { Id = Convert.ToInt32(sArry[0]), Name = sArry[1] };
+            }
             else
-                session = new JCatalogEntity { Id = 0, Name = string.Empty };
+                session = new JCatalogEntity();
 
             return session;
         }
-
     }
 }

@@ -259,6 +259,34 @@
     <Compile Include="Migrations\201709182152235_Purchase2.Designer.cs">
       <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709191902084_Transaction.cs" />
+    <Compile Include="Migrations\201709191902084_Transaction.Designer.cs">
+      <DependentUpon>201709191902084_Transaction.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709191904054_TransactionSchema.cs" />
+    <Compile Include="Migrations\201709191904054_TransactionSchema.Designer.cs">
+      <DependentUpon>201709191904054_TransactionSchema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709192047406_TestTransacntion.cs" />
+    <Compile Include="Migrations\201709192047406_TestTransacntion.Designer.cs">
+      <DependentUpon>201709192047406_TestTransacntion.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709192107070_TestTrans1.cs" />
+    <Compile Include="Migrations\201709192107070_TestTrans1.Designer.cs">
+      <DependentUpon>201709192107070_TestTrans1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709192146225_TestTrans2.cs" />
+    <Compile Include="Migrations\201709192146225_TestTrans2.Designer.cs">
+      <DependentUpon>201709192146225_TestTrans2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709192150200_TestTrans3.cs" />
+    <Compile Include="Migrations\201709192150200_TestTrans3.Designer.cs">
+      <DependentUpon>201709192150200_TestTrans3.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709200113489_ForeingKeyBranch.cs" />
+    <Compile Include="Migrations\201709200113489_ForeingKeyBranch.Designer.cs">
+      <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -275,10 +303,10 @@
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
-    <Compile Include="Models\Entities\Operative\ProductInventory.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
-    <Compile Include="Models\Entities\Operative\Purchase.cs" />
-    <Compile Include="Models\Entities\Operative\PurchaseDetail.cs" />
+    <Compile Include="Models\Entities\Operative\Transaction.cs" />
+    <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
+    <Compile Include="Models\Entities\Operative\TransactionType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
@@ -480,6 +508,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709182152235_Purchase2.resx">
       <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709191902084_Transaction.resx">
+      <DependentUpon>201709191902084_Transaction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709191904054_TransactionSchema.resx">
+      <DependentUpon>201709191904054_TransactionSchema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709192047406_TestTransacntion.resx">
+      <DependentUpon>201709192047406_TestTransacntion.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709192107070_TestTrans1.resx">
+      <DependentUpon>201709192107070_TestTrans1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709192146225_TestTrans2.resx">
+      <DependentUpon>201709192146225_TestTrans2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709192150200_TestTrans3.resx">
+      <DependentUpon>201709192150200_TestTrans3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709200113489_ForeingKeyBranch.resx">
+      <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

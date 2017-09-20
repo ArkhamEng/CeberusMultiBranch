@@ -21,7 +21,9 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Ubicación")]
         public string Location { get; set; }
 
-        public ICollection<ProductInventory> ProductInventories { get; set; }
+        public ICollection<Transference> Transferences { get; set; }
+
+        public ICollection<Transaction> Transactions { get; set; }
 
         [NotMapped]
         public int Id { get { return this.BranchId; } }

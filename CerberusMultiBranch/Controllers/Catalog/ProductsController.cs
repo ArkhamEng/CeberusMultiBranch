@@ -19,26 +19,42 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         public ActionResult Index()
         {
+            var branchId = User.Identity.GetBranchSession().Id;
+
+            var idList = (from td in db.TransactionsDetail
+                          where (td.Transaction.BranchId == branchId)
+                          select td.ProductId).ToList();
+
             var model = new SearchProductViewModel();
-            model.Products = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).ToList();
+            model.Products = db.Products.Where(p=> idList.Contains(p.ProductId)).
+                Include(p => p.Images).Include(p => p.Compatibilities).
+                Include(p=> p.TransactionDetailes).ToList();
+
             model.Products.OrderCarModels();
 
             model.Categories = db.Categories.ToSelectList();
-            model.Makes = db.CarMakes.ToSelectList();
+            model.Makes      = db.CarMakes.ToSelectList();
             return View(model);
         }
 
         [HttpPost]
         public ActionResult Search(int? categoryId, int? carYear, string name, string code)
         {
+            var branchId = User.Identity.GetBranchSession().Id;
+
+            var idList = (from td in db.TransactionsDetail
+                          where (td.Transaction.BranchId == branchId) 
+                          select td.ProductId).ToList();
+
             var model = (from p in db.Products
                          where (categoryId == null || p.CategoryId == categoryId)
                          && (name == null || p.Name.Contains(name))
                          && (code == null || p.Code == code)
                          && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                         && (idList.Contains(p.ProductId))
 
                          select p
-                         ).Include(p => p.Images).Include(p => p.Compatibilities).ToList();
+                         ).Include(p => p.Images).Include(p => p.Compatibilities).Include(p=> p.TransactionDetailes).ToList();
 
             model.OrderCarModels();
             return PartialView("_List", model);

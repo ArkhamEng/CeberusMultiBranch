@@ -21,6 +21,7 @@ namespace CerberusMultiBranch.Models
 
         public string PictureType { get; set; }
 
+        public ICollection<Transaction> Transactions { get; set; }
 
         [NotMapped]
         public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
@@ -79,11 +80,12 @@ namespace CerberusMultiBranch.Models
         #endregion
 
         #region Operative
-        public DbSet<ProductInventory> ProductInventories { get; set; }
+
+        public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<Purchase> Purchases { get; set; }
 
-        public DbSet<PurchaseDetail> PurchaseDetails { get; set; }
+        public DbSet<TransactionDetail> TransactionsDetail { get; set; }
         #endregion
 
 
