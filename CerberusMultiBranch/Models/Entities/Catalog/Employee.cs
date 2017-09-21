@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -98,6 +99,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
+        public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
+
         #endregion
 
 
@@ -108,8 +111,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.InsDate = DateTime.Now;
             this.UpdDate = DateTime.Now;
             this.Code    = Cons.CodeMask;
+            this.EmployeeBranches = new List<EmployeeBranch>();
         }
-
-       
     }
 }

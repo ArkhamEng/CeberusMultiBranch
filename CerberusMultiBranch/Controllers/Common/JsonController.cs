@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity;
@@ -11,6 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 
 namespace CerberusMultiBranch.Controllers.Common
 {
@@ -25,10 +27,10 @@ namespace CerberusMultiBranch.Controllers.Common
 
             var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
             var user = bdUsers.Users.Find(userId);
-            
+
             FileContentResult picture = null;
 
-            if(user.Picture != null)
+            if (user.Picture != null)
                 picture = new FileContentResult(user.ClearImage, user.PictureType);
             else
             {
@@ -73,8 +75,8 @@ namespace CerberusMultiBranch.Controllers.Common
             var clients = (from c in db.Clients
                            where (code == null || code == string.Empty || c.Code == code) &&
                                  (name == null || name == string.Empty || c.Name.Contains(name)) &&
-                                 (id == null || id == Cons.Zero || c.ClientId == id) 
-                                 
+                                 (id == null || id == Cons.Zero || c.ClientId == id)
+
                            select new JCatalogEntity { Id = c.ClientId, Name = c.Name, Code = c.Code, Phone = c.Phone }
                 ).Take(20).ToList();
 
@@ -101,20 +103,21 @@ namespace CerberusMultiBranch.Controllers.Common
 
             if (id != null && id != string.Empty)
             {
-                users = (from u in db.Users where (u.Id == id)
-                          select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }).ToList();
+                users = (from u in db.Users
+                         where (u.Id == id)
+                         select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }).ToList();
             }
             else
-            { 
+            {
                 var idList = (from e in db.Employees
                               select e.UserId).ToList();
 
                 users = (from u in db.Users
-                       where (email == null || email == string.Empty || u.Email.Contains(email)) &&
-                             (name == null || name == string.Empty || u.UserName.Contains(name)) &&
-                             (!idList.Contains(u.Id))
+                         where (email == null || email == string.Empty || u.Email.Contains(email)) &&
+                               (name == null || name == string.Empty || u.UserName.Contains(name)) &&
+                               (!idList.Contains(u.Id))
 
-                       select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }
+                         select new JCatalogEntity { Code = u.Id, Name = u.UserName, Email = u.Email }
                 ).Take(10).ToList();
             }
 
@@ -124,7 +127,10 @@ namespace CerberusMultiBranch.Controllers.Common
         [HttpPost]
         public JsonResult GetAvailableBranches()
         {
-            var list = db.Branches.ToList();
+            var userId = User.Identity.GetUserId();
+            var list = db.EmployeeBranches.Include(e => e.Branch).Where(e => e.Employee.UserId == userId).Select(e => e.Branch).ToList();
+
+            //var list = db.Branches.ToList();
             return Json(list);
         }
 
@@ -134,10 +140,17 @@ namespace CerberusMultiBranch.Controllers.Common
             JCatalogEntity session = new JCatalogEntity { Id = branchId, Name = name };
             var um = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
+            var claims = um.GetClaims(User.Identity.GetUserId()).Where(c => c.Type == Cons.BranchSession);
+
+            if (claims != null)
+            {
+                foreach (var c in claims)
+                    um.RemoveClaim(User.Identity.GetUserId(), c);
+            }
+
             var s = branchId + "," + name;
             var result = await um.AddClaimAsync(User.Identity.GetUserId(), new Claim(Cons.BranchSession, s));
-            
-            
+
             return Json(true);
         }
 

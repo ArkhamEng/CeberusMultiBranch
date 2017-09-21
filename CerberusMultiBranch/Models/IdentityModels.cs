@@ -23,6 +23,8 @@ namespace CerberusMultiBranch.Models
 
         public ICollection<Transaction> Transactions { get; set; }
 
+        public ICollection<Employee> Employees { get; set; }
+
         [NotMapped]
         public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
 
@@ -31,6 +33,7 @@ namespace CerberusMultiBranch.Models
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
             var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
             // Add custom user claims here
+            
             return userIdentity;
         }
     }
@@ -39,6 +42,8 @@ namespace CerberusMultiBranch.Models
     {
         public string Description { get; set; }
     }
+
+  
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
@@ -53,6 +58,8 @@ namespace CerberusMultiBranch.Models
         public DbSet<CarYear> CarYears { get; set; }
 
         public DbSet<Branch> Branches { get; set; }
+
+        public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
         #endregion
 
         #region Common

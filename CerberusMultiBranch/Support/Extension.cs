@@ -67,6 +67,8 @@ namespace CerberusMultiBranch.Support
             }
         }
 
+      
+
         public static JCatalogEntity GetBranchSession(this IIdentity user)
         {
             var um = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();

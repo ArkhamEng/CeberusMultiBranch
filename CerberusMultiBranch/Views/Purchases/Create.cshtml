@@ -30,8 +30,20 @@
                     @Html.HiddenFor(m => m.UserId)
                     @Html.HiddenFor(m => m.IsCompleated)
                     @Html.HiddenFor(m => m.EmployeeId)
+                    @Html.HiddenFor(m => m.ProviderId)
+
                     <div class="col-md-5">
-                        @Html.Partial("_QuickProvider")
+                        @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                            @Html.EditorFor(model=> model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                            
+                            <span class="input-group-btn">
+                                <button id="btnQuickProvider" type="button" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search" id="spQuickProvider"></span>
+                                </button>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="col-md-2 col-md-offset-4">
@@ -63,13 +75,13 @@
             </div>
             <div class="panel-footer col-md-12">
                 <div class="clearfix row">
-                    <div class="btn-group col-md-3">
+                    <div class="btn-group col-md-6">
                         @Html.Partial("_CatalogButtonGroup")
-                        <button id="btnCompleate" type="button" class="btn btn-danger Compleated" title="Terminar e inventariar?">
+                        <button id="btnCompleate" type="button" class="btn btn-warning Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">
                             <span class="fa fa-archive" ></span>
                         </button>
                     </div>
-                    <div class="form-group col-md-3 col-md-offset-6">
+                    <div class="form-group col-md-3 col-md-offset-3">
                         @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-3" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
@@ -101,7 +113,11 @@
 }
 
 
+
+
 @Html.Partial("_QuickProduct")
+
+@Html.Partial("_QuickProvider")
 
 <script>
     $(document).ready(function ()
@@ -134,6 +150,7 @@
 
     });
 
+    
 
     function SubmitCompleate()
     {

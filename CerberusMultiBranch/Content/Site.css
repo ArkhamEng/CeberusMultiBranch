@@ -201,7 +201,7 @@ a[aria-expanded="true"]::before {
 
 @media (max-width: 768px) {
     #sidebar {
-        margin-left: -250px;
+        margin-left: -200px;
     }
 
         #sidebar.active {
@@ -279,5 +279,5 @@ ul ul a {
     background: #6d7fcc;
 }
 
-
+.bgSidebar{background: #151515;}
 

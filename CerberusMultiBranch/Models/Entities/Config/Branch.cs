@@ -3,7 +3,6 @@ using CerberusMultiBranch.Models.Entities.Operative;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System;
 
 namespace CerberusMultiBranch.Models.Entities.Config
 {
@@ -21,12 +20,13 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Ubicación")]
         public string Location { get; set; }
 
-        public ICollection<Transference> Transferences { get; set; }
-
         public ICollection<Transaction> Transactions { get; set; }
+
+        public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
 
         [NotMapped]
         public int Id { get { return this.BranchId; } }
        
     }
+
 }

@@ -1,6 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.EmployeeViewModel
 
-@{ 
+@{
     ViewBag.Title = "Empleados";
 }
 
@@ -13,7 +13,7 @@
 
 @Scripts.Render("~/bundles/jqueryval")
 
-@using (Html.BeginForm("Create","Employees", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Create", "Employees", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -41,8 +41,9 @@
 
                                 <img id="imgEmployee" src="@imgSrc" class="btn" />
                             }
-                            <label id="uplEmployee" class="btn btn-warning btn-file btn-xs">
-                                <span class="fa fa-upload" />
+                            <label id="uplEmployee" class="btn btn-warning btn-xs">
+                                <span class="fa fa-upload"></span>
+                                Adjuntar foto
                                 <input type="file" name="PostedFile" onchange="ImageLoaded(this)" style="display: none;">
                             </label>
                         </div>
@@ -91,7 +92,7 @@
                         @Html.LabelFor(model => model.CityId, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
-                            @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })    
+                            @Html.DropDownListFor(mode => Model.CityId, Model.Cities, htmlAttributes: new { @class = "form-control" })
                         </div>
                         @Html.ValidationMessageFor(model => model.CityId, "", new { @class = "text-danger" })
                     </div>
@@ -118,7 +119,7 @@
                         @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control"} })
+                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
                         @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                     </div>
@@ -127,35 +128,64 @@
 
             <div class="panel-footer">
                 <div class="btn-group">
-                   
-                   @Html.Partial("_CatalogButtonGroup")
+                    @Html.Partial("_CatalogButtonGroup")
+                    <button type="button" class="btn btn-warning" onclick="ShowBranches()" id="btnBranches" disabled>
+                        <span class="fa fa-building-o"></span>
+                            Sucursales&nbsp;&nbsp; <span class="badge bg-danger">@Model.EmployeeBranches.Count</span> 
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
 
-    <div id="divRegister" class="col-md-4">
+    <div id="divRegister" class="col-md-4 panel-group">
         <div class="panel panel-danger">
             <div class="panel-body">
-                <h4>
+                <h5>
                     <span class="fa fa-user-o" style="float:left"></span>
                     &nbsp;&nbsp;Asignacion de usuario
-                </h4>
+                </h5>
                 <hr />
                 @Html.Partial("_QuickUser")
+            </div>
+        </div>
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <h5>
+                    <span class="fa fa-building-o" style="float:left"></span>
+                    &nbsp;&nbsp;Sucursales
+                </h5>
+                <hr />
+
             </div>
         </div>
     </div>
 }
 
+<div id="ModalBranchAssigment" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                    <span class="fa fa-building-o" style="float:left"></span>
+                    &nbsp;&nbsp;Asiganción de sucursales
+                </h4>
+            </div>
+            <div class="panel panel-danger">
+                <div id="divBranchesAssigment" class="panel-body">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
 
     $(document).ready(LoadCreate);
 
-    function EditCode(checkBox)
-    {
+    function EditCode(checkBox) {
         console.log($(checkBox).is(':checked'));
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
@@ -166,7 +196,54 @@
         console.log("Loading CreateClient");
         $("#Code").attr("readonly", true);
 
+        if ('@Model.EmployeeId' > 0)
+            $("#btnBranches").prop("disabled", false);
+
         console.log("Create Employee Loaded");
+    }
+
+    function AddRemoveBranch(branchId, add) {
+        var param = { employeeId: $("#EmployeeId").val(), branchId: branchId, add: add };
+
+        console.log(param);
+        $.ajax({
+            url: '@Url.Action("AddRemoveBranch", "Employees")',
+            type: "POST",
+            data: param,
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view) {
+                    $("#divBranchesAssigment").html(view);
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+    function ShowBranches() {
+        $.ajax({
+            url: '@Url.Action("GetBranchAssigment", "Employees")',
+            type: "POST",
+            data: { employeeId: $("#EmployeeId").val() },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view) {
+                    $("#divBranchesAssigment").html(view);
+                    $("#ModalBranchAssigment").modal('show');
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
     }
 
     function ImageLoaded(input) {

@@ -287,6 +287,14 @@
     <Compile Include="Migrations\201709200113489_ForeingKeyBranch.Designer.cs">
       <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709201528516_EmployeeBranches.cs" />
+    <Compile Include="Migrations\201709201528516_EmployeeBranches.Designer.cs">
+      <DependentUpon>201709201528516_EmployeeBranches.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709201736120_CompositeKey.cs" />
+    <Compile Include="Migrations\201709201736120_CompositeKey.Designer.cs">
+      <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -304,11 +312,13 @@
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Common\SubCategory.cs" />
+    <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
     <Compile Include="Models\Entities\Operative\TransactionType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
@@ -319,6 +329,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
+    <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
@@ -423,7 +434,6 @@
     <Content Include="Views\Clients\Index.cshtml" />
     <Content Include="Views\Employees\Create.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
-    <Content Include="Views\Employees\_Register.cshtml" />
     <Content Include="Views\CarMakes\Create.cshtml" />
     <Content Include="Views\CarMakes\Edit.cshtml" />
     <Content Include="Views\CarMakes\Index.cshtml" />
@@ -450,13 +460,13 @@
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Purchases\_ProductList.cshtml" />
+    <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Content\EmployeeProfile\" />
     <Folder Include="Content\ProductImages\" />
     <Folder Include="Content\UserProfile\" />
-    <Folder Include="Models\ViewModels\Operative\" />
     <Folder Include="Views\Inventory\" />
   </ItemGroup>
   <ItemGroup>
@@ -529,6 +539,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709200113489_ForeingKeyBranch.resx">
       <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709201528516_EmployeeBranches.resx">
+      <DependentUpon>201709201528516_EmployeeBranches.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709201736120_CompositeKey.resx">
+      <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

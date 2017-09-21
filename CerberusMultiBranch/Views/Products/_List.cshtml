@@ -47,8 +47,7 @@
                             </span>
                         }
                     </h3>
-                    @{ var quantity = item.TransactionDetailes.Sum(td => td.Quantity); }
-                    
+                
                     <div class="row">
                         <div class="col-md-6">
                             <h5>
@@ -57,7 +56,7 @@
                         </div>
                         <div class="col-md-6">
                             <h5>
-                                <label>Existencias: </label> @Html.DisplayFor(model => quantity)
+                                <label>Disponibles: </label> @Html.DisplayFor(model => item.Quantity)
                             </h5>
                         </div>
                     </div>
@@ -80,7 +79,7 @@
                 </td>
             </tr>
                                     index++;
-                                }
+         }
     </tbody>
 </table>
 
@@ -100,8 +99,8 @@
     })
 
 
-    function Edit(id) {
-        console.log("redirect " + id);
+    function Edit(id)
+    {
         window.location = '/Products/Create/' + id;
     }
 
@@ -127,14 +126,14 @@
         });
     }
 
-    function Show(carousel) {
-        console.log("Show Carousel");
+    function Show(carousel)
+    {
         $(divContent).html($(carousel).clone());
         $(divModal).modal('show');
     }
 
-    function CompatibilitiesPop(content) {
-        console.log(content);
+    function CompatibilitiesPop(content)
+    {
         $('body').popover("destroy")
         var popOverSettings =
         {

@@ -1,13 +1,10 @@
 ﻿
-<div style="text-align:center">
-    <h5>
-        <label id="lblBrachSelector" class="text-white"></label>
-    </h5>
-    <button class="btn btn-danger btn-sm">
-        <span class="fa fa-exchange" style="float:left"></span>
-        &nbsp;&nbsp;Cambiar
-    </button>
-</div>
+
+
+<button class="btn btn-danger btn-file btn-xs" onclick="LoadBranches()">
+    <span class="fa fa-exchange" style="float:left"></span>
+    <span id="lblBrachSelector"></span>
+</button>
 
 <div id="divModalBranchSelector" class="modal" role="dialog">
     <div class="modal-dialog">
@@ -30,25 +27,24 @@
 </div>
 
 <script>
-    $(document).ready(function () 
+    $(document).ready(function ()
     {
         console.log("Iniciando Branch Selector");
         GetBranchSession();
         $("#btnBranchSelector").click(function () { BeginBranchSession(); });
     });
 
-    function LoadBranches() 
+    function LoadBranches()
     {
         $.ajax({
             url: '@Url.Action("GetAvailableBranches", "Json")',
             type: "POST",
-            error: function (data) 
-            {
+            error: function (data) {
                 console.log("Error Executing"); console.log(data);
             },
             statusCode:
             {
-                200: function (data) 
+                200: function (data)
                 {
                     $.each(data, function (i, item)
                     {
@@ -70,67 +66,56 @@
         });
     }
 
-    function GetBranchSession() 
-    {
+    function GetBranchSession() {
         console.log("Getting Branch session");
         $.ajax({
             url: '@Url.Action("GetBranchSession", "Json")',
             type: "POST",
             success: function (data) { },
-            error: function (data) 
-            {
+            error: function (data) {
                 console.log("Error Executing"); console.log(data);
             },
             statusCode:
             {
-                200: function (data) 
-                {
+                200: function (data) {
                     console.log("Session " + data);
 
-                    if (data.Id == 0) 
-                    {
+                    if (data.Id == 0) {
                         console.log("Load Branches");
                         LoadBranches();
                     }
-                    else 
-                    {
+                    else {
                         console.log(data.Name);
                         $("#lblBrachSelector").text(data.Name);
                     }
                 },
-                401: function (data) 
-                {
+                401: function (data) {
                     alert('401: Unauthenticated');
                 }
             }
         });
     }
 
-    function BeginBranchSession() 
-    {
+    function BeginBranchSession() {
         console.log("Starting branch session");
         $.ajax({
             url: '@Url.Action("BeginBranchSession", "Json")',
             type: "POST",
             data: { branchId: $("#ddBranchSelector").val(), name: $("#ddBranchSelector option:selected").text() },
-            error: function (data) 
-            {
+            error: function (data) {
                 console.log("Error Executing");
                 console.log(data);
             },
             statusCode:
             {
-                200: function (data) 
-                {
+                200: function (data) {
                     console.log("Session started " + data);
-                    if (data) 
-                    {
+                    if (data) {
                         $("#divModalBranchSelector").modal('hide');
                         $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
                     }
                 },
-                401: function (data) 
-                {
+                401: function (data) {
                     alert('401: Unauthenticated');
                 }
             }

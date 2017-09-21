@@ -1,6 +1,5 @@
 ﻿
 
-
 <div id="ModalQuickProduct" class="modal" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content panel panel-danger panel-group">
@@ -44,7 +43,8 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#btnQuickProduct").click(function () { QuickSearchProduct(); });
     });
 
@@ -62,8 +62,68 @@
             },
             statusCode:
             {
-                200: function (view) {
+                200: function (view)
+                {
                     $("#divProductList").html(view);
+                },
+                401: function (data)
+                {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+
+    function QuickProvider()
+    {
+        $("#lblQuickProvider").text("");
+        $("#tbodyQuickProvider").empty();
+
+        var d = {
+            id: $("#ProviderId").val(),
+            code: $("#ProviderCode").val(),
+            name: $("#ProviderName").val()
+        };
+
+        $.ajax({
+            url: '@Url.Action("QuickSearchProvider", "Json")',
+            type: "POST",
+            data: d,
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data) {
+                    if (data.length == 1) {
+                        $("#ProviderCode").val(data[0].Code);
+                        $("#ProviderName").val(data[0].Name);
+                        $("#ProviderId").val(data[0].Id);
+
+                        console.log("ProviderCode " + $("#ProviderCode").val());
+                        console.log("ProviderName " + $("#ProviderName").val());
+                        console.log("ProviderId " + $("#ProviderId").val());
+                        console.log("ProviderId " + data[0].Id);
+
+                        $("#ProviderCode").attr("readonly", true);
+                        $("#ProviderName").attr("readonly", true);
+                        $("#spQuickProvider").attr("class", "fa fa-refresh");
+                    }
+                    else
+                    {
+                        console.log("Objetos encontrados " + data.length);
+
+                        $.each(data, function (i, item)
+                        {
+                            var row = "<tr ondblclick='SelectProvider(this)'><td hidden='hidden'>" + item.Id + "</td>" +
+                                          "<td>" + item.Code + "</td>" +
+                                             "<td>" + item.Name + "</td>" +
+                                          "<td>" + item.Phone + "</td></tr>";
+
+                            $("#tbodyQuickProvider").append(row);
+                        });
+                        
+                    }
                 },
                 401: function (data) {
                     alert('401: Unauthenticated');

@@ -31,8 +31,32 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-       
+        [HttpPost]
+        public ActionResult GetBranchAssigment(int employeeId)
+        {
+            var model = new BranchAssigmentViewModel();
 
+            model.Assigned = db.EmployeeBranches.Include(eb => eb.Branch).
+                Where(eb => eb.EmployeeId == employeeId).Select(ep => ep.Branch).ToList();
+
+            var idList = model.Assigned.Select(b => b.BranchId).ToList();
+
+            model.NotAssigned = db.Branches.Where(b => !idList.Contains(b.BranchId)).ToList();
+
+            return PartialView("_BranchesAssigned", model);
+        }
+
+        [HttpPost]
+        public ActionResult AddRemoveBranch(int employeeId, int branchId, bool add)
+        {
+            if (add)
+                db.EmployeeBranches.Add(new Models.Entities.Config.EmployeeBranch { BranchId = branchId, EmployeeId = employeeId });
+            else
+                db.EmployeeBranches.Remove(db.EmployeeBranches.FirstOrDefault(eb => eb.EmployeeId == employeeId && eb.BranchId == branchId));
+
+            db.SaveChanges();
+            return GetBranchAssigment(employeeId);
+        }
 
         // GET: Employees/Create
         public ActionResult Create(int? id)
@@ -41,7 +65,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             if (id != null)
             {
-                model = new EmployeeViewModel(db.Employees.Find(id));
+                model = new EmployeeViewModel(db.Employees.Include(e=> e.EmployeeBranches).FirstOrDefault(e=> e.EmployeeId==id));
 
                 model.StateId = db.Cities.Find(model.CityId).StateId;
                 model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
@@ -84,11 +108,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             employee.PictureType = employee.PostedFile.ContentType;
                             employee.Picture = employee.PostedFile.ToCompressedFile();
                         }
-                       
+
                         db.Entry(employee).State = EntityState.Modified;
 
                         if (employee.PostedFile == null)
-                        { 
+                        {
                             db.Entry(employee).Property(e => e.Picture).IsModified = false;
                             db.Entry(employee).Property(e => e.PictureType).IsModified = false;
                         }
@@ -106,31 +130,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     throw;
                 }
-               
+
             }
 
             return RedirectToAction("Create", new { id = employee.EmployeeId });
         }
-
-        public void CreateUser(RegisterViewModel register)
-        {
-            try
-            {
-                var store = new UserStore<ApplicationUser>(new ApplicationDbContext());
-
-                ApplicationUserManager _userManager = new ApplicationUserManager(store);
-
-                var manger = _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-
-                var user = new ApplicationUser() { Email = register.Email, UserName = register.Email };
-                var usmanger = manger.Create(user, register.Password);
-            }
-            catch (Exception ex)
-            {
-
-            }
-        }
-
 
         // GET: Employees/Edit/5
         public ActionResult Edit(int? id)

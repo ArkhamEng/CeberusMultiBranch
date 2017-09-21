@@ -1,0 +1,59 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.BranchAssigmentViewModel
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-stripped">
+            <thead>
+                <tr>
+                    <th colspan="2">
+                        @Html.DisplayName("Sucursales Disponibles")
+                        <span class="badge bg-danger">@Model.NotAssigned.Count</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var nbranch in Model.NotAssigned)
+                {
+                    <tr>
+                        <td class="col-md-1">
+                            <button type="button" class="btn btn-primary btn-xs" onclick="AddRemoveBranch('@nbranch.BranchId','true')">
+                                <span class="fa fa-arrow-right"></span>
+                            </button>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => nbranch.Name)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-md-6">
+        <table class="table table-stripped">
+            <thead>
+                <tr>
+                    <th colspan="2">
+                        @Html.DisplayName("Sucursales Asignadas")
+                        <span class="badge bg-danger">@Model.Assigned.Count</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var abranch in Model.Assigned)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(model => abranch.Name)
+                        </td>
+                        <td class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-xs" onclick="AddRemoveBranch('@abranch.BranchId','false')">
+                                <span class="fa fa-arrow-left"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

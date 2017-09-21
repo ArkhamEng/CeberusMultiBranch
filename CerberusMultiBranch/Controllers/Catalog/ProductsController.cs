@@ -23,13 +23,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var idList = (from td in db.TransactionsDetail
                           where (td.Transaction.BranchId == branchId)
-                          select td.ProductId).ToList();
+                          select td.TransactionDetailId).ToList();
 
             var model = new SearchProductViewModel();
-            model.Products = db.Products.Where(p=> idList.Contains(p.ProductId)).
-                Include(p => p.Images).Include(p => p.Compatibilities).
-                Include(p=> p.TransactionDetailes).ToList();
+            var products = (from p in db.Products.Include(p => p.Images).
+                            Include(p => p.Compatibilities).Include(p => p.TransactionDetailes)
+                            select p).ToList();
 
+            products.ForEach(p => p.Quantity = p.TransactionDetailes.Where(td => td.Transaction.BranchId == branchId).Sum(td => td.Quantity) );
+            model.Products = products;
             model.Products.OrderCarModels();
 
             model.Categories = db.Categories.ToSelectList();

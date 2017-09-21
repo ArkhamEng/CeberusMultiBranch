@@ -1,75 +1,99 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Purchase>
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.PurchaseHistoryViewModel
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Historial Compras";
 }
 
-<h2>Index</h2>
+<h3>
+    <span class="fa fa-shopping-bag" style="float:left"></span>
+    &nbsp;&nbsp;Historial de compras
+</h3>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.ProviderId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.BranchId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalAmount)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Bill)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.PurchaseDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.InsDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.UpdDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.EmployeeId)
-        </th>
-        <th></th>
-    </tr>
+<div class="col-md-7">
+    <div class="input-group ">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+                <span class="glyphicon glyphicon-eye-open"></span>
+            </button>
+            <button type="button" class="btn btn-success" id="btnCreate">
+                <span class="glyphicon  glyphicon-file"></span>
+            </button>
+        </span>
+    </div>
+</div>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.ProviderId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.BranchId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalAmount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Bill)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.PurchaseDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.InsDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.UpdDate)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EmployeeId)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.PurchaseId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.PurchaseId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.PurchaseId })
-        </td>
-    </tr>
-}
+<br /><br /><br />
 
-</table>
+<div id="divFilters" class="col-md-4  collapse">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-12">
+                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("BranchId", Model.Branches, "", new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.EditorFor(model=> model.BeginDate,"", new { htmlAttributes= new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Hasta", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.EditorFor(model => model.EndDate, "", new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control" })
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Factura", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("Bill", "", htmlAttributes: new { @class = "form-control" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12">
+                    @Html.Label("Empleado", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("Employee", "", htmlAttributes: new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer">
+            <div class="btn-group">
+                <button class="btn btn-default" type="button" id="btnSearch">
+                    <span class="glyphicon glyphicon-search" />
+                </button>
+                <button class="btn btn-default" type="button" id="btnClear">
+                    <span class="glyphicon glyphicon-refresh" />
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*<div id="divPurchases" class="col-md-12">
+    @Html.Partial("_List", Model.Purchases)
+</div>*@
+

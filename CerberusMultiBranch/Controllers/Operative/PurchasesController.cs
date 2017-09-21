@@ -11,6 +11,7 @@ using CerberusMultiBranch.Models.Entities.Operative;
 using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.Owin;
+using CerberusMultiBranch.Models.ViewModels.Operative;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -22,7 +23,14 @@ namespace CerberusMultiBranch.Controllers.Operative
         // GET: Purchases
         public ActionResult Index()
         {
-            return View(db.Transactions.ToList());
+            var userId   = User.Identity.GetUserId();
+            var branchId = User.Identity.GetBranchSession().Id;
+
+            PurchaseHistoryViewModel model = new PurchaseHistoryViewModel();
+            model.Branches = db.EmployeeBranches.Include(eb => eb.Employee).Where(eb => eb.Employee.UserId == userId).Select(eb => eb.Branch).ToSelectList();
+
+            model.Purchases = db.Purchases.Where(p => p.BranchId == branchId).ToList();
+            return View(model);
         }
 
         public ActionResult QuickSearch(string code, string name)
@@ -47,7 +55,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
                 model.EmployeeName = employee.Name;
-                model.EmployeeId   = employee.EmployeeId;
+                model.EmployeeId = employee.EmployeeId;
             }
             else
             {
@@ -68,7 +76,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Exclude = "User")] Purchase purchase)
+        public ActionResult Create([Bind(Exclude = "User,Provider")] Purchase purchase)
         {
             if (ModelState.IsValid)
             {
@@ -93,7 +101,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var detail = db.TransactionsDetail.FirstOrDefault(d => d.ProductId == productId);
+                var detail = db.TransactionsDetail.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
 
                 if (detail != null)
                 {
