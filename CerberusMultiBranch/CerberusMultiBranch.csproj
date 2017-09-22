@@ -461,6 +461,7 @@
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Purchases\_ProductList.cshtml" />
     <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
+    <Content Include="Views\Products\_StockInBranches.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

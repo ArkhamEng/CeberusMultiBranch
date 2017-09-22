@@ -45,7 +45,11 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnQuickProduct").click(function () { QuickSearchProduct(); });
+        $("#btnQuickProduct").click(function ()
+        {
+            BeginProgress();
+            QuickSearchProduct();
+        });
     });
 
     function QuickSearchProduct()

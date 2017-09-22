@@ -17,7 +17,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList Years { get; set; }
 
-        public IEnumerable<Product> Products { get; set; }
+        public IEnumerable<IEnumerable<Product>> Products { get; set; }
 
         public SearchProductViewModel()
         {
@@ -25,7 +25,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             Makes = new List<CarMake>().ToSelectList();
             Models = new List<CarModel>().ToSelectList();
             Years = new List<CarYear>().ToSelectList();
-            Products      = new List<Product>();
+            Products = new List<List<Product>>();
         }
     }
 }

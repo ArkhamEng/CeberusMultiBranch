@@ -4,7 +4,9 @@
     ViewBag.Title = "Cátalogo productos";
 }
 
-
+<script>
+    HalfProgress();
+</script>
 
 <h3>
     <span class="fa fa-car" style="float:left"></span>
@@ -21,6 +23,9 @@
             </button>
             <button type="button" class="btn btn-success" id="btnCreate">
                 <span class="glyphicon  glyphicon-file"></span>
+            </button>
+            <button id="btnSwitch" type="button" class="btn btn-default">
+                <span id="spSwitch" class="fa fa-th-large"></span>
             </button>
         </span>
     </div>
@@ -86,7 +91,7 @@
             </div>
         </div>
         <div class="panel-footer">
-            <div  class="btn-group">
+            <div class="btn-group">
                 <button class="btn btn-default" type="button" id="btnSearch">
                     <span class="glyphicon glyphicon-search" />
                 </button>
@@ -97,16 +102,16 @@
         </div>
     </div>
 </div>
+<input id="IsGrid" hidden />
 
 <div id="divProducts" class="col-md-12">
     @Html.Partial("_List", Model.Products)
 </div>
 
-
 <script>
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
+        $("#IsGrid").val('false');
         SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 
         SetCascade("#CarModelId", "#CarYearId", "GetYears");
@@ -115,20 +120,26 @@
 
         SetFilterControls("#divFilters", "#btnFilter", "#divProducts");
 
-        $("#btnSearch").click(function ()
+        $("#btnSearch").click(function () { LookFor(); });
+
+        $("#btnSwitch").click(function ()
         {
-            console.log("Searching Clients");
-
-            var data = {
-                categoryId: $("#CategoryId").val(),
-                carMakeId: $("#CarMakeId").val(),
-                carModelId: $("#CarModelId").val(),
-                carYear: $("#CarYearId").val(),
-                name: $("#Name").val(),
-                code: $("#Code").val(),
-            };
-
-            Search("/Products/Search", data, "#divProducts");
+            HalfProgress();
+            console.log($("#IsGrid").val());
+            if ($("#IsGrid").val() != 'false')
+            {
+                $("#IsGrid").val('false');
+                LookFor();
+                $("#spSwitch").attr("class", "fa fa-th-large");
+                
+            }
+            else
+            {
+                $("#IsGrid").val('true');
+                LookFor();
+                $("#spSwitch").attr("class", "fa fa-list");
+            }
+            
         });
 
         $("#btnClear").click(function () { window.location = '@Url.Action("Index",new { })' })
@@ -138,5 +149,22 @@
             $("#CarYearId").empty();
             $("#CarYearId").attr("readonly", true);
         });
+
+        CompleateProgress();
     });
+
+    function LookFor()
+    {
+        var data = {
+            categoryId: $("#CategoryId").val(),
+            carMakeId: $("#CarMakeId").val(),
+            carModelId: $("#CarModelId").val(),
+            carYear: $("#CarYearId").val(),
+            name: $("#Name").val(),
+            code: $("#Code").val(),
+            isGrid: $("#IsGrid").val()
+        };
+
+        Search("/Products/Search", data, "#divProducts");
+    }
 </script>

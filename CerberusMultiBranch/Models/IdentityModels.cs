@@ -92,7 +92,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<Purchase> Purchases { get; set; }
 
-        public DbSet<TransactionDetail> TransactionsDetail { get; set; }
+        public DbSet<TransactionDetail> TransactionDetailes { get; set; }
         #endregion
 
 

@@ -1,13 +1,15 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Purchase
 
-
 @{
     ViewBag.Title = "Compras";
 
 }
 
 @Scripts.Render("~/bundles/jqueryval")
-<div class="col-md-12">
+<script>
+        HalfProgress();
+</script>
+<div class="col-md-12" >
     <h3>
         <span class="fa fa-shopping-bag" style="float:left"></span>
         &nbsp;&nbsp;Registro de compras
@@ -19,7 +21,7 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-
+  
     <div class="panel-group col-md-11">
         <div class="panel panel-default">
             <div class="panel-body">
@@ -119,6 +121,7 @@
 
 @Html.Partial("_QuickProvider")
 
+
 <script>
     $(document).ready(function ()
     {
@@ -148,16 +151,16 @@
             $("#btnSave").hide();
         }
 
+        CompleateProgress();
     });
 
     
 
     function SubmitCompleate()
     {
-        console.log("Submit");
+        HidePopCompleate();
         $("#IsCompleated").val(true);
         $("#btnSubmit").click();
-        HidePopCompleate();
     }
 
     function LoadPopoverCompleate()
@@ -175,8 +178,8 @@
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element) {
-
+    function AddDetail(element)
+    {
         var row = $(element).parent().parent().parent();
         cells = row.find("td");
 

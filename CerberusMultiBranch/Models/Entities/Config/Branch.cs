@@ -26,7 +26,10 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         [NotMapped]
         public int Id { get { return this.BranchId; } }
-       
+
+        [NotMapped]
+        [Display(Name ="Disponibles")]
+        public double Quantity { get; set; }
     }
 
 }

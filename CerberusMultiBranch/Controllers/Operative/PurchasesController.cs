@@ -101,7 +101,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var detail = db.TransactionsDetail.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+                var detail = db.TransactionDetailes.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
 
                 if (detail != null)
                 {
@@ -121,7 +121,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Amount = price * quantity
                     };
 
-                    db.TransactionsDetail.Add(detail);
+                    db.TransactionDetailes.Add(detail);
                 }
 
                 db.SaveChanges();
@@ -131,7 +131,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 ModelState.AddModelError("AddDetail", ex);
             }
 
-            var model = db.TransactionsDetail.Include(d => d.Product.Images).
+            var model = db.TransactionDetailes.Include(d => d.Product.Images).
                 Where(d => d.TransactionId == transactionId).ToList();
 
 

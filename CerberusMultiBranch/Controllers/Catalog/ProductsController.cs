@@ -9,6 +9,7 @@ using CerberusMultiBranch.Support;
 using System;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -17,50 +18,97 @@ namespace CerberusMultiBranch.Controllers.Catalog
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        #region Index Methods
         public ActionResult Index()
         {
-            var branchId = User.Identity.GetBranchSession().Id;
-
-            var idList = (from td in db.TransactionsDetail
-                          where (td.Transaction.BranchId == branchId)
-                          select td.TransactionDetailId).ToList();
-
             var model = new SearchProductViewModel();
-            var products = (from p in db.Products.Include(p => p.Images).
-                            Include(p => p.Compatibilities).Include(p => p.TransactionDetailes)
-                            select p).ToList();
-
-            products.ForEach(p => p.Quantity = p.TransactionDetailes.Where(td => td.Transaction.BranchId == branchId).Sum(td => td.Quantity) );
-            model.Products = products;
-            model.Products.OrderCarModels();
+            model.Products = LookFor(null, null, null, null,false);
 
             model.Categories = db.Categories.ToSelectList();
-            model.Makes      = db.CarMakes.ToSelectList();
+            model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? carYear, string name, string code)
+        public ActionResult Search(int? categoryId, int? carYear, string name, string code,bool isGrid)
+        {
+            var model = LookFor(categoryId, carYear, name, code, isGrid);
+            return PartialView("_List", model);
+        }
+
+        [HttpPost]
+        public ActionResult GetStockInBranches(int productId)
+        {
+            var branches = db.Branches.ToList();
+            var details = db.TransactionDetailes.Include(td => td.Transaction).Where(td => td.ProductId == productId).ToList();
+
+            foreach (var branch in branches)
+                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId).Sum(dt => dt.Quantity);
+
+            return PartialView("_StockInBranches", branches);
+        }
+
+        private List<List<Product>> LookFor(int? categoryId, int? carYear, string name, string code, bool isGrid)
         {
             var branchId = User.Identity.GetBranchSession().Id;
 
-            var idList = (from td in db.TransactionsDetail
-                          where (td.Transaction.BranchId == branchId) 
-                          select td.ProductId).ToList();
+            var products = (from p in db.Products
+                            where (categoryId == null || p.CategoryId == categoryId)
+                            && (name == null || name == string.Empty || p.Name.Contains(name))
+                            && (code == null || code == string.Empty || p.Code == code)
+                            && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                            select p
+                         ).Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.TransactionDetailes).ToList();
 
-            var model = (from p in db.Products
-                         where (categoryId == null || p.CategoryId == categoryId)
-                         && (name == null || p.Name.Contains(name))
-                         && (code == null || p.Code == code)
-                         && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                         && (idList.Contains(p.ProductId))
+            products.OrderCarModels();
 
-                         select p
-                         ).Include(p => p.Images).Include(p => p.Compatibilities).Include(p=> p.TransactionDetailes).ToList();
-
-            model.OrderCarModels();
-            return PartialView("_List", model);
+            if (isGrid)
+                return OrderAsGrid(products);
+            else
+            {
+                List<List<Product>> ord = new List<List<Product>>();
+                foreach(var p in products)
+                {
+                    List<Product> pl = new List<Product>();
+                    pl.Add(p);
+                    ord.Add(pl);
+                }
+                return ord;
+            }
         }
+
+        private List<List<Product>> OrderAsGrid(List<Product> products)
+        {
+            List<List<Product>> prodMod = new List<List<Product>>();
+
+            bool newRow = true;
+            List<Product> list = null;
+
+            for (int i = Cons.Zero; i < products.Count; i++)
+            {
+                if (newRow)
+                {
+                    list = new List<Product>();
+                    list.Add(products[i]);
+
+                    if (i == products.Count - Cons.One)
+                        prodMod.Add(list);
+
+                    newRow = false;
+                }
+                else
+                {
+                    list.Add(products[i]);
+                    prodMod.Add(list);
+                    newRow = true;
+                }
+            }
+
+            return prodMod;
+        }
+
+        #endregion
+
 
 
         // GET: Products/Create
@@ -184,7 +232,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ImagesLoaded", model);
         }
 
-     
+
 
         protected override void Dispose(bool disposing)
         {

@@ -1,85 +1,91 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+﻿@*@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>*@
+@model IEnumerable<List<CerberusMultiBranch.Models.Entities.Catalog.Product>>
 
-@{var index = 0; }
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 
-
-<table id="tbProducts" class="table  table-striped">
+@{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count:1; }
+<table id="tbProducts" class="table table-condensed">
     <thead class="panel-heading">
         <tr hidden="hidden">
-            <th></th>
-            <th></th>
-            <th></th>
+            @for (var j = 0; j < i; j++)
+            {
+                <th></th>
+            }
         </tr>
     </thead>
     <tbody>
+
         @foreach (var item in Model)
         {
             <tr>
-                <td class="col-md-2">
-                    @if (item.Images.Count > 0)
-                    {
-                        <img src="@item.Images.First().Path" class="img-thumbnail img-responsive"
-                             onmouseover="SetPointer(this)" onclick="ShowSlide('@item.ProductId')" />
-                    }
-                    else
-                    {
-                        <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
-                    }
-                </td>
+                @foreach (var prod in item)
+                {
+                    string c = string.Format("col-md-{0}", (12 / i));
+                    <td class='@c'>
 
-                <td class="col-md-9">
-                    <h3>
-                        @Html.DisplayFor(model => item.Name)
+                        @{ string imgC = string.Format("col-md-{0}",(i*2)); }
 
-                        @if (item.ModelCompatibilities.Count > 0)
-                        {
-                            string content = string.Empty;
-
-                            foreach (var m in item.ModelCompatibilities)
+                        <div class='@imgC' style="vertical-align:central">
+                            @if (prod.Images.Count > 0)
                             {
-                                content += "<h5>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
+                            <img src="@prod.Images.First().Path" class="img-thumbnail img-responsive"
+                                 onmouseover="SetPointer(this)" onclick="ShowSlide('@prod.ProductId')" />
                             }
-
-                            <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="$(this).css('cursor', 'pointer')"
-                                  title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
-                            </span>
-                        }
-                    </h3>
-                
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>
-                                <label>Código: </label> @Html.DisplayFor(model => item.Code)
-                            </h5>
+                            else
+                            {
+                            <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
+                            }
                         </div>
-                        <div class="col-md-6">
+                        @{ string txtC = string.Format("col-md-{0}",(12-i*2)); }
+                        <div class='@txtC'>
+                            <h4>
+                                @Html.DisplayFor(model => prod.Name)
+
+                                @if (prod.ModelCompatibilities.Count > 0)
+                                {
+                                    string content = string.Empty;
+
+                                    foreach (var m in prod.ModelCompatibilities)
+                                    {
+                                        content += "<h6>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
+                                    }
+
+                                <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
+                                      title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                                </span>
+                                }
+                            </h4>
+                            @if (prod.TradeMark != null)
+                            {
+                            <h6>
+                                Por @prod.TradeMark
+                                <span class="fa fa-registered"></span>
+                            </h6>
+                            }
+                            <h4>
+                                <label>
+                                    @Html.DisplayFor(model => prod.StorePrice)
+                                </label>
+                            </h4>
                             <h5>
-                                <label>Disponibles: </label> @Html.DisplayFor(model => item.Quantity)
+                                <span class="badge bg-info" onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">
+                                    @prod.Quantity
+                                </span>
+                                disponibles
+                                <span class="fa fa-cubes"></span>
                             </h5>
+
+                            @Html.DisplayFor(model => prod.Description)
                         </div>
-                    </div>
-                    <h4>
-                        @Html.DisplayFor(model => item.StorePrice)
-                    </h4>
-                    <h5>
-                        <label>Descripcion: </label> @Html.DisplayFor(model => item.Description)
-                    </h5>
-                    <h5>
-                        <label>Fabricante: </label>@Html.DisplayFor(model => item.TradeMark)
-                    </h5>
-                </td>
-
-
-                <td class="form-group" align="center">
-                    <button type="button" class="btn btn-primary" onclick="Edit(@item.ProductId)">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                </td>
+                    </td>
+                }
+                @for (var g = item.Count; g < i; g++)
+                {
+                    <td class="col-md-6"></td>
+                }
             </tr>
-                                    index++;
-         }
+        }
     </tbody>
 </table>
 
@@ -92,16 +98,55 @@
     </div>
 </div>
 
+<div id="ModalStock" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                    <span class="fa fa-cubes"></span>
+                    Existencias en Sucursales
+                </h4>
+            </div>
+            <div id="divModalStock" class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <script>
     $(document).ready(function () {
         SetDataTable("#tbProducts", "#txtName");
-    })
+        CompleateProgress();
+    });
 
 
-    function Edit(id)
-    {
+    function Edit(id) {
+        BeginProgress();
         window.location = '/Products/Create/' + id;
+    }
+
+    function StockInBranches(id)
+    {
+        $.ajax({
+            url: '@Url.Action("GetStockInBranches", "Products")',
+            type: "POST",
+            data: { productId: id },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (view) {
+                    $("#divModalStock").html(view);
+                    $("#ModalStock").modal('show');
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
     }
 
     function ShowSlide(id) {
@@ -126,14 +171,12 @@
         });
     }
 
-    function Show(carousel)
-    {
+    function Show(carousel) {
         $(divContent).html($(carousel).clone());
         $(divModal).modal('show');
     }
 
-    function CompatibilitiesPop(content)
-    {
+    function CompatibilitiesPop(content) {
         $('body').popover("destroy")
         var popOverSettings =
         {

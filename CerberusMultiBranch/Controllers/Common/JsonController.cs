@@ -159,5 +159,14 @@ namespace CerberusMultiBranch.Controllers.Common
             var session = User.Identity.GetBranchSession();
             return Json(session);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
+        }
     }
 }

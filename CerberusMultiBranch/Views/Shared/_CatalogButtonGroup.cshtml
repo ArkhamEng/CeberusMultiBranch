@@ -12,6 +12,7 @@
 </button>
 
 <input type="submit" hidden="hidden" id="btnSubmit"/>
+
 <div id="divPopOverSubmit" style="display:none">
     <div class="text-center">
         <div class="btn-group">
@@ -35,8 +36,16 @@
             LoadPopover();
         });
 
-        $("#btnNewSearch").click(function () { window.location = '@Url.Action("Index")'; });
-        $("#btnClear").click(function () { window.location = '@Url.Action("Create",new { id="" })'; });
+        $("#btnNewSearch").click(function ()
+        {
+            BeginProgress();
+            window.location = '@Url.Action("Index")';
+        });
+        $("#btnClear").click(function ()
+        {
+            BeginProgress();
+            window.location = '@Url.Action("Create",new { id="" })';
+        });
     });
 
     function Hide()
@@ -45,7 +54,8 @@
         $("#btnSave").data("bs.popover").inState.click = false;
     }
 
-    function LoadPopover() {
+    function LoadPopover()
+    {
         $("#btnSave").popover({
             html: true,
             content: function () { return $("#divPopOverSubmit").html(); },
@@ -53,11 +63,12 @@
         });
     }
 
-    function Submit() {
-        console.log("Submit");
-       
-        $("#btnSubmit").click();
+    function Submit()
+    {
         Hide();
+        BeginProgress();
+        $("#btnSubmit").click();
+        HalfProgress();
     }
 
 </script>

@@ -1,14 +1,36 @@
-﻿$(document).ready(function () {
+﻿$(document).ready(function ()
+{
 
-    $('#sidebarCollapse').on('click', function () {
+    $('#sidebarCollapse').on('click', function ()
+    {
         $('#sidebar').toggleClass('active');
     });
 
 });
 
+function BeginProgress()
+{
+    $("#ModalProgress").modal();
+    $("#ProgressValue").width("33%");
+}
+
+function HalfProgress()
+{
+    $("#ModalProgress").modal();
+    $("#ProgressValue").width("66%");
+}
+
+function CompleateProgress()
+{
+    $("#ProgressValue").width("100%");
+    $("#ModalProgress").modal('hide');
+    $("#ProgressValue").width("0%");
+}
+
+
+
 function SetPointer(element)
 {
-    console.log(element);
     $(element).css('cursor', 'pointer');
 }
 
@@ -77,7 +99,7 @@ function Search(url, data, target) {
         error: function (data) { console.log("Error Executing"); console.log(data); },
         statusCode:
         {
-            200: function (view) {
+            200: function (view){
                 console.log("200: Authenticated ");
                 $(target).html(view);
             },

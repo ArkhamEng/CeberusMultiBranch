@@ -1,0 +1,31 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Branch>
+
+
+
+
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Sucursales")
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="col-md-10">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="col-md-2" align="center">
+                    <span class="badge bg-danger"> @item.Quantity</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
