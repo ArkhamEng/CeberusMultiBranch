@@ -38,7 +38,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(13)]
-        [Index("IDX_FTR", IsUnique = true)]
         public string FTR { get; set; }
 
 

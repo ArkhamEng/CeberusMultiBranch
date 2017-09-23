@@ -15,18 +15,18 @@
             [
             @if (Model.HasPassword)
             {
-                @Html.ActionLink("Change your password", "ChangePassword")
+                @Html.ActionLink("Cambiar contraseña", "ChangePassword")
             }
             else
             {
-                @Html.ActionLink("Create", "SetPassword")
+                @Html.ActionLink("Crear contraseña", "SetPassword")
             }
             ]
         </dd>
         <dt>External Logins:</dt>
         <dd>
             @Model.Logins.Count [
-            @Html.ActionLink("Manage", "ManageLogins") ]
+            @Html.ActionLink("Administrar", "ManageLogins") ]
         </dd>
         @*
             Phone Numbers can used as a second factor of verification in a two-factor authentication system.
@@ -59,8 +59,9 @@
         <dt>Two-Factor Authentication:</dt>
         <dd>
             <p>
-                There are no two-factor authentication providers configured. See <a href="http://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                for details on setting up this ASP.NET application to support two-factor authentication.
+                
+                Actualmente no existen proveedores de autentificacion two-factor. ve a <a href="http://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
+                para obtener detalles de como configurar esta aplicacion para soportar autentificacion two-factor.
             </p>
             @*@if (Model.TwoFactor)
                 {

@@ -67,7 +67,8 @@
                         <select multiple class="form-control" id="tcAssigned" ondrop="drop(event)" ondragover="allowDrop(event)" style="height:220px">
                             @foreach (var com in Model.Compatibilities)
                             {
-                                <option value="@com.CompatibilityId">@com.CarYear.CarModel.CarMake.Name - @com.CarYear.CarModel.Name - @com.CarYear.Year</option>
+                                var val = com.CarYearId + "-" + @com.ProductId;
+                                <option value="@val">@com.CarYear.CarModel.CarMake.Name - @com.CarYear.CarModel.Name - @com.CarYear.Year</option>
                             }
                         </select>
                         <button class="btn btn-danger btn-xs" type="button">

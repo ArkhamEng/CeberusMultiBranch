@@ -7,7 +7,6 @@ using System.Web.Mvc;
 namespace CerberusMultiBranch.Controllers
 {
     [Authorize]
-    [RequireHttps]
     public class HomeController : Controller
     {
         public ActionResult Index()

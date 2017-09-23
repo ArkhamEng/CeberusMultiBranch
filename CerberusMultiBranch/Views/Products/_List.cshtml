@@ -37,7 +37,7 @@
                             <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
                             }
                         </div>
-                        @{ string txtC = string.Format("col-md-{0}",(12-i*2)); }
+                        @{ string txtC = string.Format("col-md-{0}",(11-i*2)); }
                         <div class='@txtC'>
                             <h4>
                                 @Html.DisplayFor(model => prod.Name)
@@ -77,6 +77,11 @@
                             </h5>
 
                             @Html.DisplayFor(model => prod.Description)
+                        </div>
+                        <div class="col-md-1"  style="vertical-align:central">
+                            <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new {id = prod.ProductId})'">
+                                <span class="glyphicon glyphicon-edit"></span>
+                            </button>
                         </div>
                     </td>
                 }
