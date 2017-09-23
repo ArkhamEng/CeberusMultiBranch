@@ -1,27 +1,22 @@
-﻿$(document).ready(function ()
-{
+﻿$(document).ready(function () {
 
-    $('#sidebarCollapse').on('click', function ()
-    {
+    $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
-
 });
 
-function BeginProgress()
-{
+
+function BeginProgress() {
     $("#ModalProgress").modal();
     $("#ProgressValue").width("33%");
 }
 
-function HalfProgress()
-{
+function HalfProgress() {
     $("#ModalProgress").modal();
     $("#ProgressValue").width("66%");
 }
 
-function CompleateProgress()
-{
+function CompleateProgress() {
     $("#ProgressValue").width("100%");
     $("#ModalProgress").modal('hide');
     $("#ProgressValue").width("0%");
@@ -29,8 +24,7 @@ function CompleateProgress()
 
 
 
-function SetPointer(element)
-{
+function SetPointer(element) {
     $(element).css('cursor', 'pointer');
 }
 
@@ -99,7 +93,7 @@ function Search(url, data, target) {
         error: function (data) { console.log("Error Executing"); console.log(data); },
         statusCode:
         {
-            200: function (view){
+            200: function (view) {
                 console.log("200: Authenticated ");
                 $(target).html(view);
             },
@@ -139,13 +133,17 @@ function SetDataTable(table, filter) {
     });
 }
 
-function SetFilterControls(filters, button, target) {
-    $(filters).on("hide.bs.collapse", function () {
+function SetFilterControls(filters, button, target)
+{
+    $(filters).on("hide.bs.collapse", function ()
+    {
         $(button).attr("class", "btn btn-warning");
         $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');
         $(target).attr("class", "col-md-12");
     });
-    $(filters).on("show.bs.collapse", function () {
+
+    $(filters).on("show.bs.collapse", function ()
+    {
         $(button).attr("class", "btn btn-default");
         $(button).html('<span class="glyphicon glyphicon-eye-close"></span>');
         $(target).attr("class", "col-md-8");

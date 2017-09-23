@@ -20,12 +20,14 @@
 /*jslint white: true, browser: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: false */
 /*global document: false, jQuery: false */
 
-(function ($) {
+(function ($)
+{
     var $jQval = $.validator,
         adapters,
         data_validation = "unobtrusiveValidation";
 
-    function setValidationValues(options, ruleName, value) {
+    function setValidationValues(options, ruleName, value)
+    {
         options.rules[ruleName] = value;
         if (options.message) {
             options.messages[ruleName] = options.message;
@@ -52,15 +54,17 @@
         return value;
     }
 
-    function onError(error, inputElement) {  // 'this' is the form element
+    function onError(error, inputElement)
+    {  // 'this' is the form element
         var container = $(this).find("[data-valmsg-for='" + escapeAttributeValue(inputElement[0].name) + "']"),
             replaceAttrValue = container.attr("data-valmsg-replace"),
             replace = replaceAttrValue ? $.parseJSON(replaceAttrValue) !== false : null;
 
         container.removeClass("field-validation-valid").addClass("field-validation-error");
         error.data("unobtrusiveContainer", container);
-
-        if (replace) {
+        
+        if (replace)
+        {
             container.empty();
             error.removeClass("input-validation-error").appendTo(container);
         }

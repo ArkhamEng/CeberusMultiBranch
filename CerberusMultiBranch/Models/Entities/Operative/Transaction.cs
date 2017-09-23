@@ -14,18 +14,22 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         public int TransactionId { get; set; }
 
+        [Index("IDX_TransactionTypeId", IsUnique = false)]
         public int TransactionTypeId { get; set; }
 
         [Required]
+        [Index("IDX_BranchId", IsUnique = false)]
         public int BranchId { get; set; }
 
         [Display(Name = "Total")]
+        [DataType(DataType.Currency)]
         [Required]
         public double TotalAmount { get; set; }
 
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
 
         [Required]
@@ -36,7 +40,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Index("IDX_UserId", IsUnique = false)]
         public string UserId { get; set; }
 
-        [Required]
+        [Index("IDX_IsCompleated", IsUnique = false)]
         public bool IsCompleated { get; set; }
 
         #region Navigation Properties

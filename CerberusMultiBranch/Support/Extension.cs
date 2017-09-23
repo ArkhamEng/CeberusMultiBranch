@@ -19,6 +19,11 @@ namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+        public static string Val(this string value)
+        {
+            return (value == null || value == string.Empty) ? null : value;
+        }
+
         public static int ToInt(this string text)
         {
             if (text != null && text != string.Empty)

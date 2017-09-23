@@ -20,6 +20,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         
         [MaxLength(128)]
+        [Index("IDX_UserId", IsUnique = true)]
         public string UserId { get; set; }
 
         [Display(Name = "Clave")]
@@ -72,6 +73,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Ciudad/Municipio")]
         [Required]
+        [Index("IDX_CityId", IsUnique = false)]
         public int CityId { get; set; }
 
         [Required]

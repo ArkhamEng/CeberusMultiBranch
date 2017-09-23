@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Compras";
-
 }
 
 @Scripts.Render("~/bundles/jqueryval")
@@ -80,7 +79,7 @@
                     <div class="btn-group col-md-6">
                         @Html.Partial("_CatalogButtonGroup")
                         <button id="btnCompleate" type="button" class="btn btn-warning Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">
-                            <span class="fa fa-archive" ></span>
+                           <span class="fa fa-cubes"></span>
                         </button>
                     </div>
                     <div class="form-group col-md-3 col-md-offset-3">
@@ -144,7 +143,7 @@
         {
             LoadPopoverCompleate();
         });
-        
+
         if ('@Model.IsCompleated' == 'True')
         {
             $(".Compleated").hide();

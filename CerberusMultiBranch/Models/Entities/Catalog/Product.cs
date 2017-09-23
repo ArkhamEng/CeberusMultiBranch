@@ -13,6 +13,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public int ProductId { get; set; }
 
         [Display(Name="Categoría")]
+        [Index("IDX_CategoryId", IsUnique = false)]
         public int CategoryId { get; set; }
 
         [Display(Name = "Código")]
@@ -23,7 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Nombre")]
         [MaxLength(100)]
-        [Index("IDX_Name", IsUnique = true)]
+        [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
         [Display(Name = "Descripción")]
@@ -38,7 +39,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Precio de Compra")]
         [DataType(DataType.Currency)]
-        
         public double BuyPrice { get; set; }
 
         [Display(Name = "% Mostrador")]

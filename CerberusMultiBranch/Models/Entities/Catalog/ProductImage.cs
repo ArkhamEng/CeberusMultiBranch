@@ -13,6 +13,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ProductImageId { get; set; }
 
+        [Index("IDX_ProductId", IsUnique = false)]
         public int ProductId { get; set; }
 
         [Required]

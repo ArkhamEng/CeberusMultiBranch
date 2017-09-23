@@ -12,6 +12,7 @@ using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.Owin;
 using CerberusMultiBranch.Models.ViewModels.Operative;
+using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -23,14 +24,56 @@ namespace CerberusMultiBranch.Controllers.Operative
         // GET: Purchases
         public ActionResult Index()
         {
-            var userId   = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchSession().Id;
+            //obtengo las sucursales configuradas para el empleado
+            var branches = GetUserBranches();
 
             PurchaseHistoryViewModel model = new PurchaseHistoryViewModel();
-            model.Branches = db.EmployeeBranches.Include(eb => eb.Employee).Where(eb => eb.Employee.UserId == userId).Select(eb => eb.Branch).ToSelectList();
+            model.Branches = branches.ToSelectList();
 
-            model.Purchases = db.Purchases.Where(p => p.BranchId == branchId).ToList();
+            model.Purchases = LookFor(null,DateTime.Today, null, null, null, null, branches);
+
             return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee)
+        {
+            var branches = GetUserBranches();
+            var model =  LookFor(branchId, beginDate, endDate, bill, provider, employee, branches);
+
+            return PartialView("_PurchaseList", model);
+        }
+
+        private List<Branch> GetUserBranches()
+        {
+            var userId = User.Identity.GetUserId();
+
+            var branches = db.EmployeeBranches.Include(eb => eb.Employee).
+                            Where(eb => eb.Employee.UserId == userId).
+                            Select(eb => eb.Branch).ToList();
+
+            return branches;
+        }
+
+        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee, List<Branch> branches)
+        {
+            var bList = branches.Select(b=> b.BranchId).ToList();
+
+            //busco los userId de los empleados que coincidan con el filtro
+            var uList = (employee == null || employee == string.Empty)? 
+                db.Employees.Where(e=> e.Name.Contains(employee)).Select(e=> e.UserId).ToList() :null;
+
+            var purchases = (from p in db.Purchases.Include(p=> p.User).Include(p=> p.User.Employees).Include(p=> p.TransactionDetails)
+                             where (branchId == null && bList.Contains(p.BranchId)  
+                             || p.BranchId == branchId && bList.Contains(p.BranchId)) 
+                             &&    (beginDate == null || p.TransactionDate >= beginDate)
+                             &&    (endDate   == null || p.TransactionDate <= endDate)
+                             &&    (bill      == null || bill == string.Empty || p.Bill.Contains(bill))
+                             &&    (provider  == null || provider == string.Empty || p.Provider.Name.Contains(provider))
+                             &&    (employee  == null || employee == string.Empty || uList.Contains(p.UserId))
+                             select p).ToList();
+
+            return purchases;
         }
 
         public ActionResult QuickSearch(string code, string name)
@@ -38,7 +81,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = (from p in db.Products
                          where (code == null || code == string.Empty || p.Code == code)
                             && (name == null || name == string.Empty || p.Name.Contains(name))
-                         select p).Include(p => p.Images).ToList();
+                         select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
             return PartialView("_ProductList", model);
         }

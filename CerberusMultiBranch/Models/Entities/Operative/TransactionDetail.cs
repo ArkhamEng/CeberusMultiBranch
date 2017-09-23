@@ -10,8 +10,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         public int TransactionDetailId { get; set; }
 
+        [Index("IDX_TransactionId", IsUnique = false)]
         public int TransactionId { get; set; }
 
+        [Index("IDX_ProductId", IsUnique = false)]
         public int ProductId { get; set; }
 
         [Display(Name = "Cantidad")]
@@ -22,6 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public double Price { get; set; }
 
         [Display(Name ="Importe")]
+        [DataType(DataType.Currency)]
         public double Amount { get; set; }
 
         public virtual Transaction Transaction { get; set; }

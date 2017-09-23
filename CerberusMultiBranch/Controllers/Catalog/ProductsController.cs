@@ -60,6 +60,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             select p
                          ).Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.TransactionDetailes).ToList();
 
+            products.ForEach(p => p.Quantity = p.TransactionDetailes.
+                     Where(td=> td.Transaction.BranchId == branchId && td.Transaction.IsCompleated).Sum(td => td.Quantity));
+
             products.OrderCarModels();
 
             if (isGrid)

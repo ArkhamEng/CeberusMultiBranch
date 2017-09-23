@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 <table class="table table-striped">
@@ -6,22 +6,22 @@
         <tr>
             <th class="col-md-1"></th>
             <th>
-                @Html.DisplayNameFor(model => model.Product.Code)
+                @Html.DisplayNameFor(model => model.First().Product.Code)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Product.Name)
+                @Html.DisplayNameFor(model => model.First().Product.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Product.Unit)
+                @Html.DisplayNameFor(model => model.First().Product.Unit)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @Html.DisplayNameFor(model => model.First().Price)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @Html.DisplayNameFor(model => model.First().Quantity)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Amount)
+                @Html.DisplayNameFor(model => model.First().Amount)
             </th>
             <th class="Compleated">
                 <button id="btnShowQuick" class="btn btn-warning btn-xs" type="button">
@@ -79,6 +79,12 @@
 <script>
     $(document).ready(function ()
     {
+        if ('@Model.Count' > 0)
+            $("#btnCompleate").show();
+        else
+            $("#btnCompleate").hide();
+
+
         $("#btnShowQuick").click(function ()
         {
             $("#ModalQuickProduct").modal('show');

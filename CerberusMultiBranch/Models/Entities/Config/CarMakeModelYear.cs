@@ -29,6 +29,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public int Id { get { return this.CarModelId; } }
 
         [Display(Name="Marca")]
+        [Index("IDX_CarMakeId", IsUnique = false)]
         public int CarMakeId { get; set; }
 
         public int CarModelId { get; set; }
@@ -53,6 +54,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public int CarYearId { get; set; }
 
+        [Index("IDX_CarModelId", IsUnique = false)]
         public int CarModelId { get; set; }
 
         [Display(Name = "Año")]

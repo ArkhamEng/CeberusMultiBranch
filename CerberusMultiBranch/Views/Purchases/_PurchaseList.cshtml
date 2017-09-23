@@ -1,0 +1,41 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Purchase>
+
+<table id="tbPurchases" class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
+            <th class="col-md-3">@Html.DisplayName("Proveedor")</th>
+            <th class="col-md-2">@Html.DisplayName("Empleado")</th>
+            <th class="col-md-2">@Html.DisplayName("Fecha Compra")</th>
+            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+            <th class="col-md-1">@Html.DisplayName("Productos")</th>
+            <th class="col-md-1">@Html.DisplayName("Inventariado")</th>
+            <th class="col-md-1"/>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => item.Bill)</td>
+                <td>@Html.DisplayFor(m => item.Provider.Name)</td>
+                <td>@Html.DisplayFor(m => item.User.Employees.First().Name)</td>
+                <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
+                <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
+                @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
+                <td align="center">@Html.DisplayFor(m =>quantity )</td>
+                <td align="center">@Html.DisplayFor(m => item.IsCompleated)</td>
+                <td align="center">
+                    <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.TransactionId})'">
+                        <span class="glyphicon glyphicon-pencil" />
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<script>
+    $(document).ready(function () {
+        SetDataTable("#tbPurchases", "#Filter");
+    });
+</script> 

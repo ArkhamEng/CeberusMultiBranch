@@ -295,6 +295,10 @@
     <Compile Include="Migrations\201709201736120_CompositeKey.Designer.cs">
       <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709222326046_Indexes.cs" />
+    <Compile Include="Migrations\201709222326046_Indexes.Designer.cs">
+      <DependentUpon>201709222326046_Indexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -311,7 +315,6 @@
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
-    <Compile Include="Models\Entities\Common\SubCategory.cs" />
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
@@ -462,6 +465,7 @@
     <Content Include="Views\Purchases\_ProductList.cshtml" />
     <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -546,6 +550,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709201736120_CompositeKey.resx">
       <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709222326046_Indexes.resx">
+      <DependentUpon>201709222326046_Indexes.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

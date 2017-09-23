@@ -24,6 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Common
 
 
         [Display(Name = "Estado")]
+        [Index("IDX_StateId", IsUnique = false)]
         public int StateId { get; set; }
 
         public virtual State State { get; set; }

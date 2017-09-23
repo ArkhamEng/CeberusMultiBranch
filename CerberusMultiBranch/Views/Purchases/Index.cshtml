@@ -19,7 +19,7 @@
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
-            <button type="button" class="btn btn-success" id="btnCreate">
+            <button id="btnCreate" type="button" class="btn btn-success" >
                 <span class="glyphicon  glyphicon-file"></span>
             </button>
         </span>
@@ -94,20 +94,34 @@
         </div>
     </div>
 </div>
-<script>
-    $("#ProgressValue").width("70%");
-</script>
+
 
 <div id="divPurchases">
-
+    @Html.Partial("_PurchaseList",Model.Purchases)
 </div>
 <script>
-    $("#ProgressValue").width("100%");
-
     $(document).ready(function ()
     {
-        $("#ModalProgress").modal('hide');
+        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
+
+        SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
+
+        $("#btnSearch").click(function () {
+            var data = {
+                branchId: $("#BranchId").val(),
+                beginDate: $("#BeginDate").val(),
+                endDate: $("#EndDate").val(),
+                bill: $("#Bill").val(),
+                employee: $("#Employee").val()
+            };
+
+            Search('@Url.Action("Search")', data, "#divPurchases");
+        });
+
+        CompleateProgress();
     });
+
+
 </script>
 
 @*@Html.Partial("_List", Model.Purchases)*@

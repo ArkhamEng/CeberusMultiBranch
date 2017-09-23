@@ -90,17 +90,20 @@ $.extend($.fn, {
 				}
 
 				// prevent submit for invalid forms or custom submit handlers
-				if ( validator.cancelSubmit ) {
+				if (validator.cancelSubmit)
+				{
 					validator.cancelSubmit = false;
 					return handle();
 				}
-				if ( validator.form() ) {
+				if (validator.form())
+				{
 					if ( validator.pendingRequest ) {
 						validator.formSubmitted = true;
 						return false;
 					}
 					return handle();
-				} else {
+				} else
+				{
 					validator.focusInvalid();
 					return false;
 				}
@@ -110,10 +113,14 @@ $.extend($.fn, {
 		return validator;
 	},
 	// http://docs.jquery.com/Plugins/Validation/valid
-	valid: function() {
-		if ( $(this[0]).is("form")) {
+	valid: function ()
+	{
+	    if ($(this[0]).is("form"))
+	    {
 			return this.validate().form();
-		} else {
+	    }
+	    else
+	    {
 			var valid = true;
 			var validator = $(this[0].form).validate();
 			this.each(function() {

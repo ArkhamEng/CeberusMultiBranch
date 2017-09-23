@@ -23,11 +23,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Nombre")]
         [Required]
+        [MaxLength(100)]
+        [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
         [Display(Name = "Razón Social")]
         [MaxLength(50)]
-        [Index("IDX_BussinessName", IsUnique = false)]
         public string BusinessName { get; set; }
 
 
@@ -38,7 +39,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(13)]
-        [Index("IDX_FTR", IsUnique = false)]
         public string FTR { get; set; }
 
      
