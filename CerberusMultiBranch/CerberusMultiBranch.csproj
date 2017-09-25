@@ -303,6 +303,10 @@
     <Compile Include="Migrations\201709230618359_EmployeeFtr.Designer.cs">
       <DependentUpon>201709230618359_EmployeeFtr.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709231626230_pending.cs" />
+    <Compile Include="Migrations\201709231626230_pending.Designer.cs">
+      <DependentUpon>201709231626230_pending.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -469,6 +473,7 @@
     <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
     <Content Include="Views\Purchases\_PurchaseList.cshtml" />
+    <Content Include="Views\Products\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -559,6 +564,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709230618359_EmployeeFtr.resx">
       <DependentUpon>201709230618359_EmployeeFtr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709231626230_pending.resx">
+      <DependentUpon>201709231626230_pending.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

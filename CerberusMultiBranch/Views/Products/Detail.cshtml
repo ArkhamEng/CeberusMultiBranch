@@ -1,0 +1,157 @@
+﻿@model CerberusMultiBranch.Models.Entities.Catalog.Product
+
+@{
+    int imgIndex = 0;
+    ViewBag.Title = "Detalle de producto";
+}
+
+<h3>
+    <span class="glyphicon glyphicon-sunglasses" style="float:left"></span>
+    &nbsp;&nbsp;Detalle de producto
+</h3>
+
+
+
+<div class="panel panel-danger col-md-5">
+    <div class="panel-body">
+        @if (Model.Images != null && Model.Images.Count > 0)
+        {
+            <div id="divCarousel" class="carousel slide" data-ride="carousel">
+                <div id="imgContainer" class="carousel-inner">
+                    @foreach (var file in Model.Images)
+                    {
+                        var imgSrc = file.Path;
+                        var a = imgIndex == Decimal.Zero ? "active" : "";
+
+                        <div id="div+@file.ProductImageId" class="item @a">
+                            <img src="@imgSrc" />
+                            <div class="carousel-caption">
+                                <h5>
+                                    @Html.DisplayFor(model => model.Name)
+                                </h5>
+                            </div>
+                        </div>
+                        imgIndex++;
+                    }
+
+                    @if (imgIndex == 0)
+                    {
+                        <div class="item active thumbnail">
+                            <img src="~/Content/Images/sinimagen.jpg" />
+                        </div>
+                    }
+                </div>
+
+                <a class="left carousel-control" href="#divCarousel" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+
+                <a class="right carousel-control" href="#divCarousel" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+        }
+        else
+        {
+            <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
+        }
+    </div>
+</div>
+<div class="panel panel-danger col-md-7">
+    <div class="panel-body">
+        <h4>
+            <label>
+                @Html.DisplayFor(model => Model.Name)
+            </label>
+        </h4>
+        @if (Model.TradeMark != null)
+        {
+            <h5>
+                Por @Model.TradeMark
+                <span class="fa fa-registered"></span>
+            </h5>
+        }
+        <h3>
+            @Html.DisplayFor(model => Model.StorePrice)
+        </h3>
+        <h4>
+            <span class="badge bg-info">
+                @Model.Quantity
+            </span>
+            disponibles
+            <span class="fa fa-cubes"></span>
+        </h4>
+        <div class="col-md-2 row">
+            @Html.TextBox("txtQuantity", "", htmlAttributes: new { @class = "form-control", type = "number" })
+        </div>
+        <button class="btn btn-warning">
+            <span class="fa fa-cart-plus"></span>
+        </button>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#information">Existecias</a></li>
+        <li><a data-toggle="tab" href="#compatibilities">Compatibilidad</a></li>
+
+    </ul>
+
+    <div class="tab-content">
+        <div id="information" class="tab-pane fade in active">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayName("Sucursal")</th>
+                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
+                        <th>@Html.DisplayName("Sucursal")</th>
+                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int rows = (Model.Branches.Count % 2 == 0) ? (Model.Branches.Count / 2) : ((Model.Branches.Count + 1) / 2);
+                        var limit = 2;
+                        var begin = 0;
+                    }
+
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        <tr>
+                            @for (int j = begin; j < limit; j++)
+                            {
+                                if (j < Model.Branches.Count)
+                                {
+                                    <td class="col-md-4 danger">
+                                        @Html.DisplayFor(modelItem => Model.Branches[j].Name)
+                                    </td>
+                                    <td class="col-md-2" align="center">
+                                        <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
+                                    </td>
+                                }
+                                else
+                                {
+                                    <td class="col-md-4 danger"></td>
+                                    <td class="col-md-2"></td>
+                                }
+                            }
+                        </tr>
+                        limit = limit + 2;
+                        begin = begin + 2;
+
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="compatibilities" class="tab-pane fade">
+            <h3>Menu 1</h3>
+            <p>Some content in menu 1.</p>
+        </div>
+        <div id="existance" class="tab-pane fade">
+            <h3>Menu 2</h3>
+            <p>Some content in menu 2.</p>
+        </div>
+    </div>
+</div>

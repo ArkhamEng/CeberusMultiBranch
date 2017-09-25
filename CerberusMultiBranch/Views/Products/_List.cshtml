@@ -4,7 +4,7 @@
 <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
 <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 
-@{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count:1; }
+@{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
 <table id="tbProducts" class="table table-condensed">
     <thead class="panel-heading">
         <tr hidden="hidden">
@@ -24,23 +24,25 @@
                     string c = string.Format("col-md-{0}", (12 / i));
                     <td class='@c'>
 
-                        @{ string imgC = string.Format("col-md-{0}",(i*2)); }
+                        @{ string imgC = string.Format("col-md-{0}", (i * 2)); }
 
-                        <div class='@imgC' style="vertical-align:central">
+                        <div class='@imgC' style="vertical-align:central"  onmouseover="SetPointer(this)" 
+                             onclick="Detail('@prod.ProductId')" >
                             @if (prod.Images.Count > 0)
                             {
-                            <img src="@prod.Images.First().Path" class="img-thumbnail img-responsive"
-                                 onmouseover="SetPointer(this)" onclick="ShowSlide('@prod.ProductId')" />
+                            <img src="@prod.Images.First().Path" class="img-thumbnail img-responsive" />
                             }
                             else
                             {
                             <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
                             }
                         </div>
-                        @{ string txtC = string.Format("col-md-{0}",(11-i*2)); }
+                        @{ string txtC = string.Format("col-md-{0}", (11 - i * 2)); }
                         <div class='@txtC'>
                             <h4>
-                                @Html.DisplayFor(model => prod.Name)
+                                <i onmouseover="SetPointer(this)" onclick="Detail('@prod.ProductId')">
+                                    @Html.DisplayFor(model => prod.Name)
+                                </i>
 
                                 @if (prod.ModelCompatibilities.Count > 0)
                                 {
@@ -68,8 +70,8 @@
                                     @Html.DisplayFor(model => prod.StorePrice)
                                 </label>
                             </h4>
-                            <h5>
-                                <span class="badge bg-info" onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">
+                            <h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">
+                                <span class="badge bg-info"  >
                                     @prod.Quantity
                                 </span>
                                 disponibles
@@ -79,18 +81,18 @@
                             @Html.DisplayFor(model => prod.Description)
                         </div>
                         <div class="col-md-1"  style="vertical-align:central">
-                            <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new {id = prod.ProductId})'">
+                            <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </div>
                     </td>
-                }
+                            }
                 @for (var g = item.Count; g < i; g++)
                 {
                     <td class="col-md-6"></td>
                 }
             </tr>
-        }
+                            }
     </tbody>
 </table>
 
@@ -121,16 +123,17 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetDataTable("#tbProducts", "#txtName");
         CompleateProgress();
     });
 
-
-    function Edit(id) {
-        BeginProgress();
-        window.location = '/Products/Create/' + id;
+    function Detail(id)
+    {
+        window.location = '@Url.Action("Detail", "Products")/' + id;
     }
+
 
     function StockInBranches(id)
     {

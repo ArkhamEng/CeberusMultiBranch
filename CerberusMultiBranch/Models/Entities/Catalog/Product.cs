@@ -93,6 +93,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public List<string> NewCompatibilities { get; set; }
 
         [NotMapped]
+        public List<Branch> Branches { get; set; }
+
+        [NotMapped]
         public double Quantity { get; set; }
 
         public Product()

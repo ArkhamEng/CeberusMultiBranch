@@ -112,6 +112,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         #endregion
 
+        public ActionResult Detail(int id)
+        {
+            var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
+
+            model.Branches = db.Branches.ToList();
+            var details = db.TransactionDetailes.Include(td => td.Transaction).Where(td => td.ProductId == id).ToList();
+
+            foreach (var branch in model.Branches)
+                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId).Sum(dt => dt.Quantity);
+
+            return View(model);
+        }
 
 
         // GET: Products/Create
