@@ -1,0 +1,70 @@
+﻿
+
+<div id="ModalPayment" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">Selecciona la forma de págo</h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="radio">
+                    <h4>
+                        <span class="fa fa-credit-card"></span>
+                        &nbsp;
+                        <label>
+                            <input type="radio" id="rdCard" name="payment">
+                            Crédito / Débito
+                        </label>
+
+                    </h4>
+                </div>
+                <hr />
+                <div class="radio">
+                    <h4>
+                        <span class="fa fa-money"></span>
+                        &nbsp;
+                        <label>
+                            <input type="radio" id="rdCash" name="payment">
+                            Efectivo
+                        </label>
+                    </h4>
+                </div>
+                <div id="divCash" hidden>
+                    <div class="input-group col-md-3">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                        <input type="number" hidden id="txtCash" class="form-control" />
+                    </div>
+                </div>
+                <hr />
+                <div class="radio">
+                    <h4>
+                        <span class="fa fa-dollar"></span>
+                        &nbsp;&nbsp;&nbsp;
+                        <label>
+                            <input type="radio" id="rdMix" name="payment">
+                            Pago míxto
+                        </label>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#rdCash").change(function () {
+            $("#divCash").show();
+        });
+
+        $("#rdCard").change(function () {
+            $("#divCash").hide();
+            console.log("selected card");
+        });
+
+        $("#rdMix").change(function () {
+            $("#divCash").hide();
+            console.log("selected mix");
+        });
+    });
+</script>

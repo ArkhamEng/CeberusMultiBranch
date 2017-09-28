@@ -196,6 +196,7 @@
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
+    <Compile Include="Controllers\Operative\SalesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -307,6 +308,14 @@
     <Compile Include="Migrations\201709231626230_pending.Designer.cs">
       <DependentUpon>201709231626230_pending.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709262001151_detailsChanges.cs" />
+    <Compile Include="Migrations\201709262001151_detailsChanges.Designer.cs">
+      <DependentUpon>201709262001151_detailsChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709262002366_detailsChanges2.cs" />
+    <Compile Include="Migrations\201709262002366_detailsChanges2.Designer.cs">
+      <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -361,6 +370,7 @@
     <Content Include="Content\Images\backgroud_red.jpg" />
     <Content Include="Content\Images\header.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
+    <Content Include="Content\Images\warning.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -400,7 +410,9 @@
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -469,11 +481,19 @@
     <Content Include="Views\Purchases\Index.cshtml" />
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
-    <Content Include="Views\Purchases\_ProductList.cshtml" />
+    <Content Include="Views\Products\_ProductList.cshtml" />
     <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
     <Content Include="Views\Purchases\_PurchaseList.cshtml" />
     <Content Include="Views\Products\Detail.cshtml" />
+    <Content Include="Views\Shared\_MessageBox.cshtml" />
+    <Content Include="Views\Shared\_Progress.cshtml" />
+    <Content Include="Views\Shared\_SideBar.cshtml" />
+    <Content Include="Views\Sales\ShopingCart.cshtml" />
+    <Content Include="Views\Sales\_Details.cshtml" />
+    <Content Include="Views\Sales\Create - Copy.cshtml" />
+    <Content Include="Views\Clients\_QuickClientList.cshtml" />
+    <Content Include="Views\Shared\_ChoosePayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -567,6 +587,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709231626230_pending.resx">
       <DependentUpon>201709231626230_pending.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709262001151_detailsChanges.resx">
+      <DependentUpon>201709262001151_detailsChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709262002366_detailsChanges2.resx">
+      <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

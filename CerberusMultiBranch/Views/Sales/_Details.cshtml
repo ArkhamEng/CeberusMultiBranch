@@ -1,0 +1,111 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
+
+@Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
+
+<div class="row">
+    <table id="tbDetails" class="table table-striped">
+        <tbody>
+            @foreach (var item in Model)
+        {
+                <tr>
+                    <td class="col-md-1">
+                        @if (item.Product.Images != null)
+                    {
+                            <img src="@item.Product.Images.First().Path" class="img-responsive" />
+                    }
+                    else
+                    {
+                            <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                    }
+                    </td>
+                    <td>
+                        <h4>
+                            @Html.DisplayFor(modelItem => item.Product.Name)
+                        </h4>
+                        <h5>
+                            @Html.DisplayFor(modelItem => item.Product.Code)
+                        </h5>
+                    </td>
+
+                    <td class="col-md-2">
+                        <h4 id="txtPrice">
+                            @Html.DisplayFor(model => item.Price)
+                        </h4>
+                    </td>
+                    <td class="col-md-1 text-info">
+                        @Html.EditorFor(model => item.Quantity, new { htmlAttributes = new { @class = "form-control text-right", type = "number", min = "1", onkeydown = "return false", onmouseup = "QuantityChanged(this)" } })
+                    </td>
+                    <td>
+                        <h4 id="txtAmount" class="text-right">
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </h4>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-default btn-xs" type="button">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4" />
+                <td>
+                    <h4 class="text-danger text-right">
+                        <label id="lblTotalAmount">
+                            @Html.DisplayFor(model => model.First().Transaction.TotalAmount)
+                        </label>
+                    </h4>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
+
+        CompleateProgress();
+    });
+
+    function QuantityChanged(input)
+    {
+        quantity = $(input).val();
+
+        var row = $(input).parent().parent();
+        cells = row.find("td");
+
+        var price = row.find("#txtPrice").text();
+
+        price = price.replace(/[$,]+/g, "");
+       
+        //using two decimal, and regex for add comma each thousand
+        var amount = "$"+(quantity * price).toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+       
+        row.find("#txtAmount").text(amount);
+
+        SetTotalAmount();
+    }
+
+    function SetTotalAmount()
+    {
+        var totalAmount = 0;
+        $('#tbDetails > tbody  > tr').each(function ()
+        {
+            totalAmount += parseFloat( $(this).find("#txtAmount").text().replace(/[$,]+/g, "") );
+        });
+        
+
+        totalAmount = GetCurrency(totalAmount);
+        $("#lblTotalAmount").text(totalAmount);
+    }
+
+
+</script>

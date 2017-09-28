@@ -31,7 +31,10 @@
     {
         console.log("Iniciando Branch Selector");
         GetBranchSession();
-        $("#btnBranchSelector").click(function () { BeginBranchSession(); });
+        $("#btnBranchSelector").click(function ()
+        {
+            BeginBranchSession();
+        });
     });
 
     function LoadBranches()
@@ -66,7 +69,8 @@
         });
     }
 
-    function GetBranchSession() {
+    function GetBranchSession()
+    {
         console.log("Getting Branch session");
         $.ajax({
             url: '@Url.Action("GetBranchSession", "Json")',
@@ -96,7 +100,9 @@
         });
     }
 
-    function BeginBranchSession() {
+    function BeginBranchSession()
+    {
+        var current = window.location.href;
         console.log("Starting branch session");
         $.ajax({
             url: '@Url.Action("BeginBranchSession", "Json")',
@@ -108,11 +114,13 @@
             },
             statusCode:
             {
-                200: function (data) {
+                200: function (data)
+                {
                     console.log("Session started " + data);
                     if (data) {
                         $("#divModalBranchSelector").modal('hide');
                         $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
+                        window.location = current;
                     }
                 },
                 401: function (data) {

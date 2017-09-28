@@ -4,11 +4,14 @@
     int imgIndex = 0;
     ViewBag.Title = "Detalle de producto";
 }
-
+<script>
+        HalfProgress();
+</script>
 <h3>
     <span class="glyphicon glyphicon-sunglasses" style="float:left"></span>
     &nbsp;&nbsp;Detalle de producto
 </h3>
+
 
 
 
@@ -84,74 +87,155 @@
             <span class="fa fa-cubes"></span>
         </h4>
         <div class="col-md-2 row">
-            @Html.TextBox("txtQuantity", "", htmlAttributes: new { @class = "form-control", type = "number" })
+            @Html.TextBox("txtQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
         </div>
-        <button class="btn btn-warning">
+        <button class="btn btn-warning" onclick="AddToCart('@Model.TransactionId','@Model.ProductId','@Model.Quantity','@Model.StorePrice')">
             <span class="fa fa-cart-plus"></span>
+            Agregar al carrito
         </button>
     </div>
 </div>
 
 <div class="col-md-12">
-    <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#information">Existecias</a></li>
-        <li><a data-toggle="tab" href="#compatibilities">Compatibilidad</a></li>
+    <ul class="nav nav-pills">
+        <li class="active"><a data-toggle="pill" href="#information">Existecias</a></li>
+        <li><a data-toggle="pill" href="#compatibilities">Compatibilidad</a></li>
 
     </ul>
 
     <div class="tab-content">
         <div id="information" class="tab-pane fade in active">
-            <table class="table table-condensed">
-                <thead>
-                    <tr>
-                        <th>@Html.DisplayName("Sucursal")</th>
-                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
-                        <th>@Html.DisplayName("Sucursal")</th>
-                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int rows = (Model.Branches.Count % 2 == 0) ? (Model.Branches.Count / 2) : ((Model.Branches.Count + 1) / 2);
-                        var limit = 2;
-                        var begin = 0;
-                    }
-
-                    @for (int i = 0; i < rows; i++)
-                    {
-                        <tr>
-                            @for (int j = begin; j < limit; j++)
-                            {
-                                if (j < Model.Branches.Count)
-                                {
-                                    <td class="col-md-4 danger">
-                                        @Html.DisplayFor(modelItem => Model.Branches[j].Name)
-                                    </td>
-                                    <td class="col-md-2" align="center">
-                                        <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
-                                    </td>
-                                }
-                                else
-                                {
-                                    <td class="col-md-4 danger"></td>
-                                    <td class="col-md-2"></td>
-                                }
+            <div class="panel panel-danger">
+                <div class="panel-body">
+                    <table class="table table-condensed">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayName("Sucursal")</th>
+                                <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
+                                <th>@Html.DisplayName("Sucursal")</th>
+                                <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int rows = (Model.Branches.Count % 2 == 0) ? (Model.Branches.Count / 2) : ((Model.Branches.Count + 1) / 2);
+                                var limit = 2;
+                                var begin = 0;
                             }
-                        </tr>
-                        limit = limit + 2;
-                        begin = begin + 2;
 
-                    }
-                </tbody>
-            </table>
+                            @for (int i = 0; i < rows; i++)
+                            {
+                                <tr>
+                                    @for (int j = begin; j < limit; j++)
+                                    {
+                                        if (j < Model.Branches.Count)
+                                        {
+                                            <td class="col-md-4 danger">
+                                                @Html.DisplayFor(modelItem => Model.Branches[j].Name)
+                                            </td>
+                                            <td class="col-md-2" align="center">
+                                                <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td class="col-md-4 danger"></td>
+                                            <td class="col-md-2"></td>
+                                        }
+                                    }
+                                </tr>
+                                limit = limit + 2;
+                                begin = begin + 2;
+
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
         <div id="compatibilities" class="tab-pane fade">
-            <h3>Menu 1</h3>
-            <p>Some content in menu 1.</p>
-        </div>
-        <div id="existance" class="tab-pane fade">
-            <h3>Menu 2</h3>
-            <p>Some content in menu 2.</p>
+            <div class="panel panel-danger">
+                <div class="panel-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@Html.DisplayName("Modelo")</th>
+                                <th>@Html.DisplayName("Años")</th>
+                            </tr>
+                        </thead>
+                        @foreach (var item in Model.ModelCompatibilities)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayName(item.CarMake.Name + " " + item.Name)
+                                </td>
+                                <td>
+                                    @Html.DisplayName(item.CarYears.Min(y => y.Year).ToString() + " - " + item.CarYears.Max(y => y.Year).ToString())
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<div class="modal">
+
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#txtQuantity").val(1);
+
+        CompleateProgress();
+    });
+
+ 
+    function AddToCart(transactionId, productId, available, storePrice)
+    {
+        quantity = parseFloat($("#txtQuantity").val());
+        available = parseFloat(available);
+
+        if (available < quantity)
+        {
+            ShowMessage("Cantidad no permitida!", "La cantidad de articulos no puede ser mayor a la disponible", "warning")
+            return;
+        }
+
+        var data = {
+            transactionId: transactionId,
+            productId: productId,
+            quantity: $("#txtQuantity").val(),
+            price: storePrice
+        }
+
+        console.log(data);
+
+        $.ajax({
+            url: '@Url.Action("AddToCart", "Sales")',
+            type: "POST",
+            data: data,
+            success:function(data)
+            {
+                console.log("Success Added to cart " + data);
+            },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data)
+                {
+                    console.log("Code:200 Added to cart " + data);
+                    window.location = window.location.href;
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
+</script>

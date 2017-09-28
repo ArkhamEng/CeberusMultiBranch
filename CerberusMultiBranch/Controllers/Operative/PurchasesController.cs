@@ -27,7 +27,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             //obtengo las sucursales configuradas para el empleado
             var branches = GetUserBranches();
 
-            PurchaseHistoryViewModel model = new PurchaseHistoryViewModel();
+            TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
 
             model.Purchases = LookFor(null,DateTime.Today, null, null, null, null, branches);
@@ -76,15 +76,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return purchases;
         }
 
-        public ActionResult QuickSearch(string code, string name)
-        {
-            var model = (from p in db.Products
-                         where (code == null || code == string.Empty || p.Code == code)
-                            && (name == null || name == string.Empty || p.Name.Contains(name))
-                         select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
-
-            return PartialView("_ProductList", model);
-        }
+      
 
         // GET: Purchases/Create
         public ActionResult Create(int? id)
@@ -144,7 +136,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var detail = db.TransactionDetailes.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+                var detail = db.TransactionDetails.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
 
                 if (detail != null)
                 {
@@ -157,14 +149,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     detail = new TransactionDetail
                     {
-                        ProductId = productId,
+                        ProductId     = productId,
                         TransactionId = transactionId,
-                        Quantity = quantity,
-                        Price = price,
-                        Amount = price * quantity
+                        Quantity      = quantity,
+                        Price         = price,
+                        Amount        = price * quantity
                     };
 
-                    db.TransactionDetailes.Add(detail);
+                    db.TransactionDetails.Add(detail);
                 }
 
                 db.SaveChanges();
@@ -174,17 +166,30 @@ namespace CerberusMultiBranch.Controllers.Operative
                 ModelState.AddModelError("AddDetail", ex);
             }
 
-            var model = db.TransactionDetailes.Include(d => d.Product.Images).
+            var model = db.TransactionDetails.Include(d => d.Product.Images).
                 Where(d => d.TransactionId == transactionId).ToList();
 
 
             return PartialView("_Details", model);
         }
 
-        //[HttpPost]
-        //public ActionResult RemoveDetail(int transactionId, int transactionDetailId)
-        //{
-        //}
+        [HttpPost]
+        public ActionResult RemoveDetail(int transactionId, int productId)
+        {
+            var detail = db.TransactionDetails.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+
+            if(detail !=null)
+            {
+                db.TransactionDetails.Remove(detail);
+                db.SaveChanges();
+            }
+
+            var model = db.TransactionDetails.Include(d => d.Product.Images).
+              Where(d => d.TransactionId == transactionId).ToList();
+
+
+            return PartialView("_Details", model);
+        }
 
         // POST: Purchases/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 

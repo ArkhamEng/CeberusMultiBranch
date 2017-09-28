@@ -88,7 +88,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     public class Sale:Transaction
     {
-        public int ClientId { get; set; }
+        public int? ClientId { get; set; }
 
         [Display(Name = "Folio Venta")]
         [MaxLength(30)]

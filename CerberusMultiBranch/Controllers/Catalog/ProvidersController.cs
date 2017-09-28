@@ -6,6 +6,7 @@ using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.ViewModels.Config;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -83,6 +84,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 db.SaveChanges();
 
                 return RedirectToAction("Create",new { id = provider.ProviderId });            
+        }
+
+        [HttpPost]
+        public JsonResult QuickSearch(int? id, string code, string name)
+        {
+            var providers = (from p in db.Providers
+                             where (code == null || code == string.Empty || p.Code == code) &&
+                                   (name == null || name == string.Empty || p.Name.Contains(name)) &&
+                                   (id == null || id == Cons.Zero || p.ProviderId == id)
+                             select new JCatalogEntity { Id = p.ProviderId, Name = p.Name, Code = p.Code, Phone = p.Phone }
+                ).Take(20).ToList();
+
+            return Json(providers);
         }
 
         protected override void Dispose(bool disposing)

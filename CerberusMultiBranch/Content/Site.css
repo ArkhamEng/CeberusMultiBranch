@@ -281,3 +281,12 @@ ul ul a {
 
 .bgSidebar{background: #151515;}
 
+
+/*******PILLS******/
+ 
+.nav-pills > .active > a, .nav-pills > .active > a:hover {
+     color: #fff;
+    background-color: #c9302c;
+    border-color: #c9302c;
+}
+

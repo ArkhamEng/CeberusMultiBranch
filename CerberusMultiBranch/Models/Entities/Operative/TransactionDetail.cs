@@ -8,12 +8,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     [Table("TransactionDetail", Schema = "Operative")]
     public class TransactionDetail
     {
-        public int TransactionDetailId { get; set; }
-
-        [Index("IDX_TransactionId", IsUnique = false)]
+        [Column(Order = 0), Key, ForeignKey("Transaction")]
         public int TransactionId { get; set; }
 
-        [Index("IDX_ProductId", IsUnique = false)]
+        [Column(Order = 1), Key, ForeignKey("Product")]
         public int ProductId { get; set; }
 
         [Display(Name = "Cantidad")]
@@ -21,6 +19,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Required]
         [Display(Name = "Precio")]
+        [DataType(DataType.Currency)]
         public double Price { get; set; }
 
         [Display(Name ="Importe")]

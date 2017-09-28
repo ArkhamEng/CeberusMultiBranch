@@ -78,7 +78,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Compatibility> Compatibilities { get; set; }
 
-        public ICollection<TransactionDetail> TransactionDetailes { get; set; }
+        public ICollection<TransactionDetail> TransactionDetails { get; set; }
 
         
 
@@ -97,6 +97,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [NotMapped]
         public double Quantity { get; set; }
+
+        [NotMapped]
+        public int TransactionId { get; set; }
 
         public Product()
         {

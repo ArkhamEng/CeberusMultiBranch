@@ -1,0 +1,60 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Client>
+
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th class="col-md-1">
+                @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th class="col-md-4">
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="col-md-2">
+                @Html.DisplayNameFor(model => model.FTR)
+            </th>
+            <th class="col-md-2">
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th class="col-md-2">
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FTR)
+                </td>
+                <td>
+                   @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td style="text-align:right">
+                    <button type="button" class="btn btn-default btn-xs" onclick="ClientSelected('@item.ClientId','@item.Name','@item.FTR')">
+                        <span class="fa fa-plus-circle"></span>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        CompleateProgress();
+    });
+
+   
+</script>

@@ -24,7 +24,6 @@ namespace CerberusMultiBranch.Controllers.Common
         public FileResult GetPicture()
         {
             string userId = User.Identity.GetUserId();
-
             var bdUsers = HttpContext.GetOwinContext().Get<ApplicationDbContext>();
             var user = bdUsers.Users.Find(userId);
 
@@ -83,18 +82,7 @@ namespace CerberusMultiBranch.Controllers.Common
             return Json(clients);
         }
 
-        [HttpPost]
-        public JsonResult QuickSearchProvider(int? id, string code, string name)
-        {
-            var providers = (from p in db.Providers
-                             where (code == null || code == string.Empty || p.Code == code) &&
-                                   (name == null || name == string.Empty || p.Name.Contains(name)) &&
-                                   (id == null || id == Cons.Zero || p.ProviderId == id)
-                             select new JCatalogEntity { Id = p.ProviderId, Name = p.Name, Code = p.Code, Phone = p.Phone }
-                ).Take(20).ToList();
-
-            return Json(providers);
-        }
+      
 
         [HttpPost]
         public JsonResult QuickSearchUser(string id, string name, string email)
@@ -130,7 +118,6 @@ namespace CerberusMultiBranch.Controllers.Common
             var userId = User.Identity.GetUserId();
             var list = db.EmployeeBranches.Include(e => e.Branch).Where(e => e.Employee.UserId == userId).Select(e => e.Branch).ToList();
 
-            //var list = db.Branches.ToList();
             return Json(list);
         }
 

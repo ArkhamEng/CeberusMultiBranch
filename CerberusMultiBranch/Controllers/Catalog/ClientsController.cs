@@ -42,6 +42,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_List", model);
         }
 
+        [HttpPost]
+        public ActionResult QuickSearch(string code, string name)
+        {
+            var model = (from p in db.Clients
+                         where (code == null || code == string.Empty || p.Code == code)
+                            && (name == null || name == string.Empty || p.Name.Contains(name))
+                         select p).Take(Cons.QuickResults).ToList();
+
+            return PartialView("_QuickClientList", model);
+        }
+
 
         // GET: Clients/Create
         public ActionResult Create(int? id)

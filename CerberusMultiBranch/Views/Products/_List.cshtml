@@ -92,7 +92,8 @@
                     <td class="col-md-6"></td>
                 }
             </tr>
-                            }
+
+         }
     </tbody>
 </table>
 
@@ -157,7 +158,8 @@
         });
     }
 
-    function ShowSlide(id) {
+    function ShowSlide(id)
+    {
         $.ajax({
             url: '@Url.Action("GetImages", "Products")',
             type: "POST",

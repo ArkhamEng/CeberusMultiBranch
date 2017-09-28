@@ -6,6 +6,19 @@
 });
 
 
+function GetCurrency(value)
+{
+   return "$"+value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+}
+
+function ShowMessage(title, text, cls)
+{
+    $("#MessageTitle").html(title);
+    $("#MessageText").html(text);
+    $("#MessageImage").attr("src", "/Content/Images/" + cls + ".png");
+    $("#MessageBox").modal();
+}
+
 function BeginProgress() {
     $("#ModalProgress").modal();
     $("#ProgressValue").width("33%");

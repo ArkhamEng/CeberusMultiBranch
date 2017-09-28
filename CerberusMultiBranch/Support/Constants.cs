@@ -17,6 +17,8 @@ namespace CerberusMultiBranch.Support
 
         public const string BranchSession = "BranchSession";
 
+        public const string SaleSession   = "SaleSession";
+
         public const string EmployeeProfilePath = "/Content/EmployeeProfile";
 
         public const string UserProfilePath = "/Content/UserProfile";

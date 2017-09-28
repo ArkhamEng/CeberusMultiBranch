@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Models.ViewModels.Operative
 {
-    public class PurchaseHistoryViewModel
+    public class TransactionViewModel
     {
         public SelectList Branches { get; set; }
 
@@ -23,6 +23,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public ICollection<Purchase> Purchases { get; set; }
 
-
+        public ICollection<Sale> Sales { get; set; }
     }
 }
