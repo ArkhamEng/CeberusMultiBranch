@@ -25,4 +25,5 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         Sale = 2,
         Transfer=3
     }
+
 }

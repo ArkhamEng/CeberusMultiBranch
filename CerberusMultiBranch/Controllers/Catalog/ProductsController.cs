@@ -45,7 +45,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var details = db.TransactionDetails.Include(td => td.Transaction).Where(td => td.ProductId == productId).ToList();
 
             foreach (var branch in branches)
-                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId).Sum(dt => dt.Quantity);
+                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId && td.Transaction.IsCompleated).Sum(dt => dt.Quantity);
 
             return PartialView("_StockInBranches", branches);
         }
@@ -147,7 +147,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var details = db.TransactionDetails.Include(td => td.Transaction).Where(td => td.ProductId == id).ToList();
 
             foreach (var branch in model.Branches)
-                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId).Sum(dt => dt.Quantity);
+                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId && td.Transaction.IsCompleated).Sum(dt => dt.Quantity);
 
             return View(model);
         }

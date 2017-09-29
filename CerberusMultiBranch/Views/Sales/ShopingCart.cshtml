@@ -14,21 +14,35 @@
     &nbsp;&nbsp;Carrito de compras
 </h3>
 
-@using (Html.BeginForm())
+
+@if (Model == null)
 {
-    @Html.AntiForgeryToken()
-    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="col-md-offset-4 col-md-4">
+                <p>
+                    Aún no hay productos en el carrito, ve a @Html.ActionLink("Catálogo de productos","Index","Products") para comenzar a agregar
+                </p>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    using (Html.BeginForm("ShopingCart", "Sales"))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
+        @Html.HiddenFor(m => m.BranchId)
+        @Html.HiddenFor(m => m.TransactionId)
+        @Html.HiddenFor(m => m.TransactionTypeId)
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.IsCompleated)
+        @Html.HiddenFor(m => m.EmployeeId)
+        @Html.HiddenFor(m => m.ClientId)
 
-    @Html.HiddenFor(m => m.BranchId)
-    @Html.HiddenFor(m => m.TransactionId)
-    @Html.HiddenFor(m => m.TransactionTypeId)
-    @Html.HiddenFor(m => m.UserId)
-    @Html.HiddenFor(m => m.IsCompleated)
-    @Html.HiddenFor(m => m.EmployeeId)
-    @Html.HiddenFor(m => m.ClientId)
-
-    <h4 id="hClientName" class="text-danger"></h4>
+        <h4 id="hClientName" class="text-danger"></h4>
 
         <div class="panel panel-danger col-md-12">
             <div id="divDetails" class="panel-body">
@@ -57,16 +71,16 @@
             </div>
         </div>
 
+        @Html.Partial("_ChoosePayment")
+
+        @Html.Partial("_QuickClient")
+    }
+
 }
-
-@Html.Partial("_QuickClient")
-
-@Html.Partial("_ChoosePayment")
 
 <script>
     $(document).ready(function () {
-        $("#btnShowClients").click(function ()
-        {
+        $("#btnShowClients").click(function () {
             $("#ModalQuickClient").modal('show');
         });
 
@@ -74,19 +88,28 @@
             $("#ModalPayment").modal('show');
         });
 
-        
 
         CompleateProgress();
     });
 
     function ClientSelected(id, name, ftr) {
-        $("#ClientId").text(id);
+        $("#ClientId").val(id);
+
         var title = "Cliente:  " + name
+
         if (ftr != '')
-             title +="               RFC: " + ftr;
+            title += "               RFC: " + ftr;
 
         $("#hClientName").text(title);
         $("#ModalQuickClient").modal('hide');
+    }
+
+    function Calculate(val) {
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+
+        var result = (total - val);
+
+        return (total - parseFloat(val));
     }
 
 </script>

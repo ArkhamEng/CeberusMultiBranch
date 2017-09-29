@@ -316,6 +316,10 @@
     <Compile Include="Migrations\201709262002366_detailsChanges2.Designer.cs">
       <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709281630538_payment.cs" />
+    <Compile Include="Migrations\201709281630538_payment.Designer.cs">
+      <DependentUpon>201709281630538_payment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -325,6 +329,7 @@
     <Compile Include="Models\Entities\Common\City.cs" />
     <Compile Include="Models\Entities\Common\ISelectable.cs" />
     <Compile Include="Models\Entities\Common\IUserAssignment.cs" />
+    <Compile Include="Models\Entities\Common\JsonCode.cs" />
     <Compile Include="Models\Entities\Common\State.cs" />
     <Compile Include="Models\Entities\Config\Branch.cs" />
     <Compile Include="Models\Entities\Config\Company.cs" />
@@ -333,6 +338,7 @@
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
+    <Compile Include="Models\Entities\Operative\Payment.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
     <Compile Include="Models\Entities\Operative\TransactionType.cs" />
@@ -593,6 +599,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709262002366_detailsChanges2.resx">
       <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709281630538_payment.resx">
+      <DependentUpon>201709281630538_payment.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

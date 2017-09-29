@@ -12,7 +12,7 @@
                         <span class="fa fa-credit-card"></span>
                         &nbsp;
                         <label>
-                            <input type="radio" id="rdCard" name="payment">
+                            <input type="radio" id="rdCard"  name="payment" value="Card">
                             Crédito / Débito
                         </label>
 
@@ -24,16 +24,10 @@
                         <span class="fa fa-money"></span>
                         &nbsp;
                         <label>
-                            <input type="radio" id="rdCash" name="payment">
+                            <input type="radio" id="rdCash" name="payment" value="Cash" checked>
                             Efectivo
                         </label>
                     </h4>
-                </div>
-                <div id="divCash" hidden>
-                    <div class="input-group col-md-3">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input type="number" hidden id="txtCash" class="form-control" />
-                    </div>
                 </div>
                 <hr />
                 <div class="radio">
@@ -41,30 +35,88 @@
                         <span class="fa fa-dollar"></span>
                         &nbsp;&nbsp;&nbsp;
                         <label>
-                            <input type="radio" id="rdMix" name="payment">
+                            <input type="radio" id="rdMix" name="payment" value="Mixed">
                             Pago míxto
                         </label>
                     </h4>
                 </div>
+
+                <div id="divMix" hidden>
+                    <div class="input-group col-md-10">
+                        <span class="input-group-addon">Efectivo</span>
+                        <input type="number" hidden id="txtCash" class="form-control" name="Cash" value="0"  />
+                        <span class="input-group-addon">Tarjeta</span>
+                        <input type="number" hidden id="txtCard" class="form-control" name="Card" value="0" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="submit">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Aceptar 
+                </button>
+
+                <button class="btn btn-danger" type="button" id="btnCancel">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-        $("#rdCash").change(function () {
-            $("#divCash").show();
+    $(document).ready(function ()
+    {
+        $("#btnCancel").click(function ()
+        {
+            $("#txtCard").val("");
+            $("#txtCash").val("");
+            $("#divMix").hide();
+
+            $("#payment").val("cash");
+            $("#ModalPayment").modal("hide");
         });
 
-        $("#rdCard").change(function () {
-            $("#divCash").hide();
-            console.log("selected card");
+        $("#rdCash").change(function ()
+        {
+            $("#txtCard").val("");
+            $("#txtCash").val("");
+            $("#divMix").hide();
         });
 
-        $("#rdMix").change(function () {
-            $("#divCash").hide();
+        $("#rdCard").change(function ()
+        {
+            $("#txtCard").val("");
+            $("#txtCash").val("");
+            $("#divMix").hide();
+        });
+
+        $("#rdMix").change(function ()
+        {
+            $("#divMix").show();
             console.log("selected mix");
         });
+
+        $("#txtCash").keyup(function ()
+        {
+            var val = $("#txtCash").val();
+            var result = Calculate(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#txtCard").val(result);
+        });
+
+        $("#txtCard").keyup(function ()
+        {
+            var val = $("#txtCard").val();
+            var result = Calculate(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#txtCash").val(result);
+        });
     });
+
 </script>

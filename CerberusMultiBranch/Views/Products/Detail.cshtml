@@ -5,15 +5,12 @@
     ViewBag.Title = "Detalle de producto";
 }
 <script>
-        HalfProgress();
+    HalfProgress();
 </script>
 <h3>
     <span class="glyphicon glyphicon-sunglasses" style="float:left"></span>
     &nbsp;&nbsp;Detalle de producto
 </h3>
-
-
-
 
 <div class="panel panel-danger col-md-5">
     <div class="panel-body">
@@ -186,21 +183,18 @@
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#txtQuantity").val(1);
 
         CompleateProgress();
     });
 
- 
-    function AddToCart(transactionId, productId, available, storePrice)
-    {
+
+    function AddToCart(transactionId, productId, available, storePrice) {
         quantity = parseFloat($("#txtQuantity").val());
         available = parseFloat(available);
 
-        if (available < quantity)
-        {
+        if (available < quantity) {
             ShowMessage("Cantidad no permitida!", "La cantidad de articulos no puede ser mayor a la disponible", "warning")
             return;
         }
@@ -218,8 +212,7 @@
             url: '@Url.Action("AddToCart", "Sales")',
             type: "POST",
             data: data,
-            success:function(data)
-            {
+            success: function (data) {
                 console.log("Success Added to cart " + data);
             },
             error: function (data) {
@@ -229,8 +222,13 @@
             {
                 200: function (data)
                 {
-                    console.log("Code:200 Added to cart " + data);
-                    window.location = window.location.href;
+                    if (data == "OK")
+                    {
+                        console.log("Code:200 Added to cart " + data);
+                        window.location = window.location.href;
+                    }
+                    else
+                        ShowMessage("Error al agregar al carrito", data, "warning");
                 },
                 401: function (data) {
                     alert('401: Unauthenticated');

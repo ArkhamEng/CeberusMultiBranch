@@ -13,6 +13,7 @@ using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.Owin;
 using CerberusMultiBranch.Models.ViewModels.Operative;
 using CerberusMultiBranch.Models.Entities.Config;
+using System.Net.Http;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -20,7 +21,6 @@ namespace CerberusMultiBranch.Controllers.Operative
     public class SalesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-
 
         // GET: Purchases
         public ActionResult Index()
@@ -56,13 +56,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             return sales;
         }
 
-
         public ActionResult CheckCart()
         {
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchSession().Id;
 
-           var list = db.TransactionDetails.Where(td => td.Transaction.BranchId == branchId 
+           var list = db.TransactionDetails.Where(td => td.Transaction.BranchId == branchId && !td.Transaction.IsCompleated
            && td.Transaction.UserId == userId && td.Transaction.TransactionTypeId == (int)TransType.Sale).ToList();
 
             if (list != null)
@@ -79,6 +78,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = db.Sales.Include(s => s.TransactionDetails.Select(d => d.Product.Images)).
                     FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
 
+            if(model==null || model.TransactionDetails.Count < 0)
+                return View();
+            
             foreach (var detail in model.TransactionDetails)
                 detail.Quantity *= -Cons.One;
 
@@ -130,8 +132,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //if is sum the new quantity
                 if (detail != null)
                 {
-                    detail.Amount -= amount;
-                    detail.Quantity += quantity;
+                    detail.Amount += amount;
+                    detail.Quantity -= quantity;
+
+                    var existance = db.TransactionDetails.
+                        Where(td => td.ProductId == productId && td.Transaction.BranchId == branchId && td.Transaction.IsCompleated).
+                        Sum(td => td.Quantity);
+
+                    if (existance < -(detail.Quantity))
+                        return Json("La cantidad total del carrito: "+-(detail.Quantity)+" excede lo disponible en sucursal dispobiles:" +existance);
 
                     db.Entry(detail).State = EntityState.Modified;
                 }
@@ -147,7 +156,65 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.SaveChanges();
             }
 
-            return Json(true);
+            return Json("OK");
+        }
+
+        [HttpPost]
+        public ActionResult ShopingCart(Sale sale,string payment, double? cash, double? card)
+        {
+            var branchId = User.Identity.GetBranchSession().Id;
+
+            //Check for existance before to update
+            foreach(var detail in sale.TransactionDetails)
+            {
+                var ex = User.Identity.GetStock(detail.ProductId);
+                detail.Amount = detail.Price * detail.Quantity;
+                detail.Quantity = -detail.Quantity;
+
+                db.Entry(detail).State = EntityState.Modified;
+            }
+
+            sale.TotalAmount  = sale.TransactionDetails.Sum(td => td.Amount);
+            sale.Folio        = sale.TransactionId.ToString(Cons.CodeMask);
+            sale.IsCompleated = true;
+
+            sale.Payments    = new List<Payment>();
+
+            if(payment != PaymentType.Mixed.ToString() )
+            {
+                var p = new Payment
+                {
+                    TransactionId = sale.TransactionId,
+                    Amount = sale.TotalAmount,
+                    PaymentDate = DateTime.Now,
+
+                    PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType),payment),
+                };
+                sale.Payments.Add(p);
+            }
+            else
+            {
+                var pm = new Payment
+                {TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Cash };
+
+                var pc = new Payment
+                { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Card };
+
+                db.Payments.Add(pm);
+                db.Payments.Add(pc);
+            }
+
+            db.Sales.Attach(sale);
+            db.Entry(sale).State = EntityState.Modified;
+            db.SaveChanges();
+
+            //if (ex < (detail.Quantity))
+            //{
+            //    return new HttpStatusCodeResult(HttpStatusCode.Conflict, "Bla bla bla");
+            //}
+            //return Json("OK");
+
+            return RedirectToAction("ShopingCart");
         }
 
         protected override void Dispose(bool disposing)

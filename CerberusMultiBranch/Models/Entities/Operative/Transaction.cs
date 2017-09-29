@@ -53,6 +53,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public virtual TransactionType TransactionType { get; set; }
 
         public ICollection<TransactionDetail> TransactionDetails { get; set; }
+
+        public ICollection<Payment> Payments { get; set; }
         #endregion
 
         #region NotMapped
@@ -83,8 +85,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public string Bill { get; set; }
 
         public virtual Provider Provider { get; set; }
-
     }
+
 
     public class Sale:Transaction
     {
@@ -96,8 +98,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public string Folio { get; set; }
 
         public virtual Client Client { get; set; }
-
     }
+
 
     public class Transference : Transaction
     {
