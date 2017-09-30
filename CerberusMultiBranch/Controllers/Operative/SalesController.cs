@@ -173,7 +173,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.Entry(detail).State = EntityState.Modified;
 
-                var pb = db.BranchProducts.Find(detail.ProductId, branchId);
+                var pb = db.BranchProducts.Find(branchId, detail.ProductId);
                 pb.LastStock = pb.Stock;
                 pb.Stock -= detail.Quantity;
 
