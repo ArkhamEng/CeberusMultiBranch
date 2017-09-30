@@ -96,6 +96,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<TransactionDetail> TransactionDetails { get; set; }
 
+        public DbSet<BranchProduct> BranchProducts { get; set; }
+
         public DbSet<Payment> Payments { get; set; }
         #endregion
 

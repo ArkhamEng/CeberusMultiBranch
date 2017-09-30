@@ -140,13 +140,12 @@ namespace CerberusMultiBranch.Support
         public static double GetStock(this IIdentity user, int productId)
         {
             var branchId = user.GetBranchSession().Id;
-            double quantity = 0;
+            double quantity = Cons.Zero;
 
             using (var db = new ApplicationDbContext())
             {
-                quantity =  db.TransactionDetails.
-                             Where(td => td.ProductId == productId && td.Transaction.BranchId == branchId && td.Transaction.IsCompleated).
-                             Sum(td => td.Quantity);
+                var bprod = db.BranchProducts.FirstOrDefault(b => b.ProductId == productId && b.BranchId == branchId);
+                quantity = bprod != null ? bprod.Stock : Cons.Zero;
             }
 
             return quantity;

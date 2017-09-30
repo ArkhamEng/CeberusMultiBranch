@@ -320,6 +320,10 @@
     <Compile Include="Migrations\201709281630538_payment.Designer.cs">
       <DependentUpon>201709281630538_payment.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201709300114516_Bran_Prod.cs" />
+    <Compile Include="Migrations\201709300114516_Bran_Prod.Designer.cs">
+      <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -339,6 +343,7 @@
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Operative\Payment.cs" />
+    <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
     <Compile Include="Models\Entities\Operative\TransactionType.cs" />
@@ -500,6 +505,8 @@
     <Content Include="Views\Sales\Create - Copy.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
     <Content Include="Views\Shared\_ChoosePayment.cshtml" />
+    <Content Include="Views\Home\_ChartTest.cshtml" />
+    <Content Include="Views\Home\Chart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -602,6 +609,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709281630538_payment.resx">
       <DependentUpon>201709281630538_payment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709300114516_Bran_Prod.resx">
+      <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

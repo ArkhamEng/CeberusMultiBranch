@@ -133,14 +133,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (detail != null)
                 {
                     detail.Amount += amount;
-                    detail.Quantity -= quantity;
+                    detail.Quantity += quantity;
 
                     var existance = db.TransactionDetails.
                         Where(td => td.ProductId == productId && td.Transaction.BranchId == branchId && td.Transaction.IsCompleated).
                         Sum(td => td.Quantity);
 
                     if (existance < -(detail.Quantity))
-                        return Json("La cantidad total del carrito: "+-(detail.Quantity)+" excede lo disponible en sucursal dispobiles:" +existance);
+                        return Json("La cantidad total del carrito: "+detail.Quantity+" excede lo disponible en sucursal dispobiles:" +existance);
 
                     db.Entry(detail).State = EntityState.Modified;
                 }
@@ -167,11 +167,17 @@ namespace CerberusMultiBranch.Controllers.Operative
             //Check for existance before to update
             foreach(var detail in sale.TransactionDetails)
             {
-                var ex = User.Identity.GetStock(detail.ProductId);
-                detail.Amount = detail.Price * detail.Quantity;
-                detail.Quantity = -detail.Quantity;
+                var ex          = User.Identity.GetStock(detail.ProductId);
+                detail.Amount   = detail.Price * detail.Quantity;
+                detail.Quantity = detail.Quantity;
 
                 db.Entry(detail).State = EntityState.Modified;
+
+                var pb = db.BranchProducts.Find(detail.ProductId, branchId);
+                pb.LastStock = pb.Stock;
+                pb.Stock -= detail.Quantity;
+
+                db.Entry(pb).State = EntityState.Modified;
             }
 
             sale.TotalAmount  = sale.TransactionDetails.Sum(td => td.Amount);

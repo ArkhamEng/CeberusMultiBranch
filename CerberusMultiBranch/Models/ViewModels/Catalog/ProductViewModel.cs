@@ -1,6 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();
             this.ModelCompatibilities = new List<CarModel>();
-
+            this.BranchProducts = new List<BranchProduct>();
         }
 
         public ProductViewModel(Product product)
@@ -53,6 +54,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.TradeMark = product.TradeMark;
             this.Unit = product.Unit;
             this.Compatibilities = product.Compatibilities;
+            this.BranchProducts = product.BranchProducts;
    
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();

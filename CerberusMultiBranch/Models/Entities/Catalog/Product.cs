@@ -80,7 +80,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<TransactionDetail> TransactionDetails { get; set; }
 
-        
+        public ICollection<BranchProduct> BranchProducts { get; set; }
 
         #region NotMapped Properties
         [NotMapped]

@@ -123,7 +123,39 @@ namespace CerberusMultiBranch.Controllers.Operative
                     purchase.BranchId = User.Identity.GetBranchSession().Id;
                     db.Entry(purchase).State = EntityState.Modified;
                 }
-             
+
+                if(purchase.IsCompleated)
+                {
+                    var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
+
+                    foreach(var det in detailes)
+                    {
+                       var bProd = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == det.ProductId && bp.BranchId == purchase.BranchId);
+
+                        if (bProd == null)
+                        {
+                            bProd = new BranchProduct
+                            {
+                                ProductId = det.ProductId,
+                                BranchId = purchase.BranchId,
+                                LastStock = 0,
+                                Stock = det.Quantity,
+                                UpdDate = DateTime.Now
+                            };
+
+                            db.BranchProducts.Add(bProd);
+                        }
+                        else
+                        {
+                            bProd.LastStock = bProd.Stock;
+                            bProd.Stock += det.Quantity;
+                            bProd.UpdDate = DateTime.Now;
+
+                            db.Entry(bProd).State = EntityState.Modified;
+                        }
+                    }
+                }
+               
                 db.SaveChanges();
                 return RedirectToAction("Create", new { id = purchase.TransactionId });
             }

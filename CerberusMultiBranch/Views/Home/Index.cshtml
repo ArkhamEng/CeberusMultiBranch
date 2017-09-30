@@ -1,9 +1,30 @@
-﻿@{
+﻿
+@model ICollection<string>
+
+@{
     ViewBag.Title = "Home Page";
 }
 
+<h3>
+    <span class="fa fa-bar-chart-o" style="float:left"></span>
+    &nbsp;&nbsp;Resumen de ventas y compras por sucursal
+</h3>
 
-<div class="jumbotron">
+<hr />
+<div class="col-md-12 row">
+    @foreach (var s in Model)
+    {
+        <div class="col-md-6">
+            <img src="@s" class="img-responsive" />
+        </div>
+    }
+
+</div>
+
+
+
+
+@*<div class="jumbotron">
     <h1>
         
         <span class="fa fa-laptop" style="float:left"></span>
@@ -68,4 +89,4 @@
             </a>
         </p>
     </div>
-</div>
+</div>*@
