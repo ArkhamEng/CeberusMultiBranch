@@ -324,6 +324,10 @@
     <Compile Include="Migrations\201709300114516_Bran_Prod.Designer.cs">
       <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710030050486_isPayedField.cs" />
+    <Compile Include="Migrations\201710030050486_isPayedField.Designer.cs">
+      <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -507,6 +511,8 @@
     <Content Include="Views\Shared\_ChoosePayment.cshtml" />
     <Content Include="Views\Home\_ChartTest.cshtml" />
     <Content Include="Views\Home\Chart.cshtml" />
+    <Content Include="Views\Sales\Index.cshtml" />
+    <Content Include="Views\Sales\_SaleList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -612,6 +618,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201709300114516_Bran_Prod.resx">
       <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710030050486_isPayedField.resx">
+      <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

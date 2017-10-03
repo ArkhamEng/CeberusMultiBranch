@@ -26,6 +26,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
+        public bool IsPayed { get; set; }
+
         [Required]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
@@ -84,8 +86,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
+        public int PaymentType { get; set; }
+
         public virtual Provider Provider { get; set; }
     }
+
+    
 
 
     public class Sale:Transaction

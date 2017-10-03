@@ -1,15 +1,15 @@
-﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Purchase>
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
 
-<table id="tbPurchases" class="table table-striped">
+<table id="tbSales" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
-            <th class="col-md-3">@Html.DisplayName("Proveedor")</th>
+            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Folio)</th>
+            <th class="col-md-3">@Html.DisplayName("Cliente")</th>
             <th class="col-md-2">@Html.DisplayName("Empleado")</th>
             <th class="col-md-2">@Html.DisplayName("Fecha Compra")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
             <th class="col-md-1">@Html.DisplayName("Productos")</th>
-            <th class="col-md-1">@Html.DisplayName("Inventariado")</th>
+            <th class="col-md-1">@Html.DisplayName("Pagado")</th>
             <th class="col-md-1"/>
         </tr>
     </thead>
@@ -17,8 +17,8 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Bill)</td>
-                <td>@Html.DisplayFor(m => item.Provider.Name)</td>
+                <td>@Html.DisplayFor(m => item.Folio)</td>
+                <td>@Html.DisplayFor(m => item.Client.Name)</td>
                 <td>@Html.DisplayFor(m => item.User.Employees.First().Name)</td>
                 <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
@@ -33,18 +33,21 @@
             </tr>
         }
     </tbody>
+    @{
+        var totalQuantity = Model.Sum(sale => sale.TransactionDetails.Sum(s => s.Quantity));
+        var totalAmount = Model.Sum(sale => sale.TotalAmount);
+    }
 </table>
-@{
-    var totalQuantity = Model.Sum(purchase => purchase.TransactionDetails.Sum(s => s.Quantity));
-    var totalAmount = Model.Sum(purchase => purchase.TotalAmount);
-}
+
+
 <script>
-    $(document).ready(function () {
-        SetDataTable("#tbPurchases", "#Filter");
+    $(document).ready(function ()
+    {
+        SetDataTable("#tbSales", "#Filter");
 
-        var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
+        var tAmount = "Monto Total: "+ GetCurrency(parseFloat('@totalAmount'));
 
-        var tQuantity = "Articulos: " + '@totalQuantity';
+        var tQuantity = "Articulos: " +'@totalQuantity';
 
         $("#lblTotalAmount").text(tAmount);
         $("#lblTotalQuantity").text(tQuantity);

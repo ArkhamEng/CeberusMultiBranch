@@ -35,7 +35,16 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(model);
         }
 
-        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string client, string employee, List<Branch> branches)
+        [HttpPost]
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee)
+        {
+            var branches = User.Identity.GetBranches();
+            var model = LookFor(branchId, beginDate, endDate, folio, client, employee, branches);
+
+            return PartialView("_SaleList", model);
+        }
+
+        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee, List<Branch> branches)
         {
             var bList = branches.Select(b => b.BranchId).ToList();
 
@@ -48,9 +57,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                              || p.BranchId == branchId && bList.Contains(p.BranchId))
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
-                             && (bill == null || bill == string.Empty || p.Folio.Contains(bill))
+                             && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
                              && (client == null || client == string.Empty || p.Client.Name.Contains(client))
                              && (employee == null || employee == string.Empty || uList.Contains(p.UserId))
+                             && (p.IsCompleated)
                              select p).ToList();
 
             return sales;
@@ -65,7 +75,7 @@ namespace CerberusMultiBranch.Controllers.Operative
            && td.Transaction.UserId == userId && td.Transaction.TransactionTypeId == (int)TransType.Sale).ToList();
 
             if (list != null)
-                return Content((list.Sum(td => td.Quantity)*(-Cons.One)).ToString());
+                return Content((list.Sum(td => td.Quantity)).ToString());
             else
                 return Content(Cons.Zero.ToString());
         }

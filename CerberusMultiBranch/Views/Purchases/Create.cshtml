@@ -6,9 +6,9 @@
 
 @Scripts.Render("~/bundles/jqueryval")
 <script>
-        HalfProgress();
+    HalfProgress();
 </script>
-<div class="col-md-12" >
+<div class="col-md-12">
     <h3>
         <span class="fa fa-shopping-bag" style="float:left"></span>
         &nbsp;&nbsp;Registro de compras
@@ -20,7 +20,7 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-  
+
     <div class="panel-group col-md-11">
         <div class="panel panel-default">
             <div class="panel-body">
@@ -38,7 +38,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                             @Html.EditorFor(model=> model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
-                            
+
                             <span class="input-group-btn">
                                 <button id="btnQuickProvider" type="button" class="btn btn-default">
                                     <span class="glyphicon glyphicon-search" id="spQuickProvider"></span>
@@ -46,8 +46,15 @@
                             </span>
                         </div>
                     </div>
+                    <div class="col-md-3 col-md-offset-1">
+                        @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
+                        <div class="form-control">
+                            <label class="radio-inline"><input type="radio" value="Cash" name="payment">Crédito</label>
+                            <label class="radio-inline"><input type="radio" value="Credit" name="payment">Contado</label>
+                        </div>
+                    </div>
 
-                    <div class="col-md-2 col-md-offset-4">
+                    <div class="col-md-2">
                         @Html.LabelFor(model => model.TransactionDate, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -79,9 +86,10 @@
                     <div class="btn-group col-md-6">
                         @Html.Partial("_CatalogButtonGroup")
                         <button id="btnCompleate" type="button" class="btn btn-warning Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">
-                           <span class="fa fa-cubes"></span>
+                            <span class="fa fa-cubes"></span>
                         </button>
                     </div>
+                   
                     <div class="form-group col-md-3 col-md-offset-3">
                         @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-3" })
                         <div class="input-group">
@@ -99,13 +107,14 @@
         </div>
     </div>
 
+ 
     <div id="divPopCompleate" style="display:none">
         <div class="text-center">
             <div class="btn-group">
-                <button  class="btn btn-primary btn-sm"  onclick="SubmitCompleate()">
+                <button class="btn btn-primary btn-sm" onclick="SubmitCompleate()">
                     Si  <span class="fa fa-check"></span>
                 </button>
-                <button type="button" class="btn btn-danger  btn-sm"  onclick="HidePopCompleate()">
+                <button type="button" class="btn btn-danger  btn-sm" onclick="HidePopCompleate()">
                     No <span class="fa fa-times"></span>
                 </button>
             </div>
@@ -122,30 +131,25 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         LoadPopoverCompleate();
 
-        if ('@Model.TransactionId' > 0)
-        {
+        if ('@Model.TransactionId' > 0) {
             $("#btnShowQuick").prop("disabled", false)
             $("#btnBegin").prop("disabled", false)
         }
-        else
-        {
+        else {
             $("#btnShowQuick").prop("disabled", true)
             $("#btnBegin").prop("disabled", true)
         }
 
         $("#spShowQuick").click(function () { $("#ModalQuickProduct").modal('show'); });
 
-        $("#btnCompleate").click(function ()
-        {
+        $("#btnCompleate").click(function () {
             LoadPopoverCompleate();
         });
 
-        if ('@Model.IsCompleated' == 'True')
-        {
+        if ('@Model.IsCompleated' == 'True') {
             $(".Compleated").hide();
             $("#btnSave").hide();
         }
@@ -153,17 +157,15 @@
         CompleateProgress();
     });
 
-    
 
-    function SubmitCompleate()
-    {
+
+    function SubmitCompleate() {
         HidePopCompleate();
         $("#IsCompleated").val(true);
         $("#btnSubmit").click();
     }
 
-    function LoadPopoverCompleate()
-    {
+    function LoadPopoverCompleate() {
         $("#btnCompleate").popover({
             html: true,
             content: function () { return $("#divPopCompleate").html(); },
@@ -171,14 +173,12 @@
         });
     }
 
-    function HidePopCompleate()
-    {
+    function HidePopCompleate() {
         $("#btnCompleate").popover('hide');
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element)
-    {
+    function AddDetail(element) {
         var row = $(element).parent().parent().parent();
         cells = row.find("td");
 

@@ -7,8 +7,8 @@
         HalfProgress();
 </script>
 <h3>
-    <span class="fa fa-shopping-bag" style="float:left"></span>
-    &nbsp;&nbsp;Historial de compras
+    <span class="fa fa-shopping-cart" style="float:left"></span>
+    &nbsp;&nbsp;Historial de Ventas
 </h3>
 
 <div class="col-md-7">
@@ -35,7 +35,6 @@
         <label class="text-danger" id="lblTotalQuantity"></label>
     </h5>
 </div>
-
 
 <br /><br /><br />
 
@@ -68,7 +67,7 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Cliente", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control" })
@@ -77,10 +76,10 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Factura", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Folio", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Bill", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Folio", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
 
@@ -107,15 +106,15 @@
 </div>
 
 
-<div id="divPurchases">
-    @Html.Partial("_PurchaseList",Model.Purchases)
+<div id="divSales">
+    @Html.Partial("_SaleList",Model.Sales)
 </div>
 <script>
     $(document).ready(function ()
     {
         $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
 
-        SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
+        SetFilterControls("#divFilters", "#btnFilter", "#divSales");
 
         $("#btnSearch").click(function () {
             var data = {
@@ -123,11 +122,10 @@
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
                 bill: $("#Bill").val(),
-                employee: $("#Employee").val(),
-                provider: $("#Provider").val(),
+                employee: $("#Employee").val()
             };
 
-            Search('@Url.Action("Search")', data, "#divPurchases");
+            Search('@Url.Action("Search")', data, "#divSales");
         });
 
         CompleateProgress();
@@ -136,4 +134,3 @@
 
 </script>
 
-@*@Html.Partial("_List", Model.Purchases)*@

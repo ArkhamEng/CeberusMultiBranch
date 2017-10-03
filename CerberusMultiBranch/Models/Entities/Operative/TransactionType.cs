@@ -23,7 +23,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         Purchase = 1,
         Sale = 2,
-        Transfer=3
+        Transference=3
     }
 
 }
