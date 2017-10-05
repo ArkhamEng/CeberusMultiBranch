@@ -24,17 +24,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = LookFor(null, null, null, null,false);
-
+            model.Products   = LookFor(null,null, null, null, null,false);
+            model.Systems    = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? carYear, string name, string code,bool isGrid)
+        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, string name, string code,bool isGrid)
         {
-            var model = LookFor(categoryId, carYear, name, code, isGrid);
+            var model = LookFor(categoryId,partSystemId, carYear, name, code, isGrid);
             return PartialView("_List", model);
         }
 
@@ -50,16 +50,24 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_StockInBranches", branches);
         }
 
-        private List<List<Product>> LookFor(int? categoryId, int? carYear, string name, string code, bool isGrid)
+        private List<List<Product>> LookFor(int? categoryId,int? partSystemId, int? carYear, string name, string code, bool isGrid)
         {
             var branchId = User.Identity.GetBranchSession().Id;
 
+            string[] arr = null;
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+            else
+                arr = new List<string>().ToArray(); 
+
             var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
                             where (categoryId == null || p.CategoryId == categoryId)
-                            && (name == null || name == string.Empty || p.Name.Contains(name))
+                            && (partSystemId == null || p.PartSystemId == partSystemId)
+                            && (name == null || name == string.Empty || arr.All(s=> p.Name.Contains(s)))
                             && (code == null || code == string.Empty || p.Code == code)
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            select p ).ToList();
+                            select p ).Take(1000).ToList();
 
         //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach(var prod in products)
@@ -120,9 +128,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult QuickSearch(string code, string name)
         {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+         
+
             var model = (from p in db.Products
                          where (code == null || code == string.Empty || p.Code == code)
-                            && (name == null || name == string.Empty || p.Name.Contains(name))
+                            && (name == null || name == string.Empty || arr.All(s => p.Name.Contains(s)))
                          select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
             return PartialView("_ProductList", model);
@@ -168,7 +182,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             ProductViewModel model;
             if (id == null)
+            {
+                var variables = db.Variables;
                 model = new ProductViewModel();
+                model.DealerPercentage      = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                model.StorePercentage       = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                model.WholesalerPercentage  = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+            }
             else
             {
                 var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
@@ -177,7 +197,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             model.Categories = db.Categories.ToSelectList();
             model.CarMakes = db.CarMakes.ToSelectList();
-
+            model.Systems = db.Systems.ToSelectList();
             return View(model);
         }
 
@@ -273,6 +293,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
             }
+
+            var pPath = Server.MapPath(image.Path);
+            System.IO.File.Delete(pPath);
+
 
             db.ProductImages.Remove(image);
             db.SaveChanges();

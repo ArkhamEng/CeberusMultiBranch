@@ -34,4 +34,5 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public double Quantity { get; set; }
     }
 
+
 }

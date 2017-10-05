@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
@@ -16,23 +17,23 @@ namespace CerberusMultiBranch.Controllers.Config
             return View();
         }
 
-        //[HttpPost]
-        
-        //public ActionResult SaveCategory([Bind(Include = "CategoryId,Name")] Category category)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        if (category.CategoryId == Cons.Zero)
-        //            db.Categories.Add(category);
-        //        else
-        //            db.Entry(category).State = EntityState.Modified;
-                
-        //        db.SaveChanges();
-        //    }
+        [HttpPost]
 
-        //    var categories = db.Categories.OrderBy(c => c.CategoryId);
-        //    return PartialView("_CategoryList", categories);
-        //}
+        public ActionResult SaveConfigVariable(Variable variable)
+        {
+            if (ModelState.IsValid)
+            {
+                if (variable.VariableId == Cons.Zero)
+                    db.Variables.Add(variable);
+                else
+                    db.Entry(variable).State = EntityState.Modified;
+
+                db.SaveChanges();
+            }
+
+            var variables = db.Variables.OrderBy(c => c.VariableId);
+            return PartialView("_CategoryList", variables);
+        }
 
         [HttpPost]
         

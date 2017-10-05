@@ -16,11 +16,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_CategoryId", IsUnique = false)]
         public int CategoryId { get; set; }
 
+        [Display(Name = "Sistema")]
+        [Index("IDX_PartSystemId", IsUnique = false)]
+        public int? PartSystemId { get; set; }
+
         [Display(Name = "Código")]
         [Required]
-        [MaxLength(10)]
+        [MaxLength(30)]
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
+
+        [Display(Name = "Referencia")]
+        [Required]
+        [MaxLength(100)]
+        public string Reference { get; set; }
 
         [Display(Name = "Nombre")]
         [MaxLength(100)]
@@ -73,6 +82,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Unit { get; set; }
 
         public virtual Category Category { get; set; }
+
+        public virtual PartSystem System { get; set; }
 
         public ICollection<ProductImage> Images { get; set; }
 

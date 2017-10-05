@@ -49,8 +49,8 @@
                     <div class="col-md-3 col-md-offset-1">
                         @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
                         <div class="form-control">
-                            <label class="radio-inline"><input type="radio" value="Cash" name="payment">Crédito</label>
-                            <label class="radio-inline"><input type="radio" value="Credit" name="payment">Contado</label>
+                            <label class="radio-inline"><input id="rdCredit" type="radio" value="5" name="PaymentType">Crédito</label>
+                            <label class="radio-inline"><input id="rdCash" type="radio" value="2" name="PaymentType">Contado</label>
                         </div>
                     </div>
 
@@ -131,8 +131,15 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         LoadPopoverCompleate();
+
+        if('@Model.PaymentType' == 'Cash')
+            $("#rdCash").attr("checked", true);
+        else
+            $("#rdCredit").attr("checked", true);
+
 
         if ('@Model.TransactionId' > 0) {
             $("#btnShowQuick").prop("disabled", false)

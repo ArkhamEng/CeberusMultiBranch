@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
 
 
-<table class="table table-hover">
+<table id="tbQuickProduct" class="table table-hover">
     <thead>
         <tr>
             <th class="col-md-1"></th>
@@ -62,6 +62,7 @@
 <script>
     $(document).ready(function ()
     {
+        Paginate("#tbQuickProduct", 5)
         CompleateProgress();
     });
 </script>

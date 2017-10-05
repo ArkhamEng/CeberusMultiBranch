@@ -48,6 +48,7 @@ namespace CerberusMultiBranch.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         #region Config
+        public DbSet<Variable> Variables { get; set; }
 
         public DbSet<Category> Categories { get; set; }
 
@@ -58,6 +59,8 @@ namespace CerberusMultiBranch.Models
         public DbSet<CarYear> CarYears { get; set; }
 
         public DbSet<Branch> Branches { get; set; }
+
+        public DbSet<PartSystem> Systems { get; set; }
 
         public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
         #endregion

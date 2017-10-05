@@ -11,7 +11,9 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
         public const int Two = 2;
 
-        public const int QuickResults = 10;
+        public const int OneHundred = 100;
+
+        public const int QuickResults = 300;
 
         public const string CodeMask = "000000";
 

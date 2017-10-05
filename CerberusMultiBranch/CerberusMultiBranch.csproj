@@ -328,6 +328,38 @@
     <Compile Include="Migrations\201710030050486_isPayedField.Designer.cs">
       <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710031409453_isPayedFieldRemove.cs" />
+    <Compile Include="Migrations\201710031409453_isPayedFieldRemove.Designer.cs">
+      <DependentUpon>201710031409453_isPayedFieldRemove.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710032148180_configVar.cs" />
+    <Compile Include="Migrations\201710032148180_configVar.Designer.cs">
+      <DependentUpon>201710032148180_configVar.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710032153138_configVar1.cs" />
+    <Compile Include="Migrations\201710032153138_configVar1.Designer.cs">
+      <DependentUpon>201710032153138_configVar1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710032154459_configVar2.cs" />
+    <Compile Include="Migrations\201710032154459_configVar2.Designer.cs">
+      <DependentUpon>201710032154459_configVar2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710041518465_PartSys.cs" />
+    <Compile Include="Migrations\201710041518465_PartSys.Designer.cs">
+      <DependentUpon>201710041518465_PartSys.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710041718501_CodeL.cs" />
+    <Compile Include="Migrations\201710041718501_CodeL.Designer.cs">
+      <DependentUpon>201710041718501_CodeL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710042101290_CodeRef.cs" />
+    <Compile Include="Migrations\201710042101290_CodeRef.Designer.cs">
+      <DependentUpon>201710042101290_CodeRef.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710042132535_CodeRefL.cs" />
+    <Compile Include="Migrations\201710042132535_CodeRefL.Designer.cs">
+      <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -346,6 +378,8 @@
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
+    <Compile Include="Models\Entities\Config\System.cs" />
+    <Compile Include="Models\Entities\Config\Variable.cs" />
     <Compile Include="Models\Entities\Operative\Payment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
@@ -513,6 +547,8 @@
     <Content Include="Views\Home\Chart.cshtml" />
     <Content Include="Views\Sales\Index.cshtml" />
     <Content Include="Views\Sales\_SaleList.cshtml" />
+    <Content Include="Views\Configuration\_VariableList.cshtml" />
+    <Content Include="Views\Configuration\_Variables.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -621,6 +657,30 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710030050486_isPayedField.resx">
       <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710031409453_isPayedFieldRemove.resx">
+      <DependentUpon>201710031409453_isPayedFieldRemove.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710032148180_configVar.resx">
+      <DependentUpon>201710032148180_configVar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710032153138_configVar1.resx">
+      <DependentUpon>201710032153138_configVar1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710032154459_configVar2.resx">
+      <DependentUpon>201710032154459_configVar2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710041518465_PartSys.resx">
+      <DependentUpon>201710041518465_PartSys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710041718501_CodeL.resx">
+      <DependentUpon>201710041718501_CodeL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710042101290_CodeRef.resx">
+      <DependentUpon>201710042101290_CodeRef.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710042132535_CodeRefL.resx">
+      <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

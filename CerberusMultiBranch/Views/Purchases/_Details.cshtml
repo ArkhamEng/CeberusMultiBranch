@@ -35,7 +35,7 @@
         {
             <tr>
                 <td>
-                    @if (item.Product.Images != null)
+                    @if (item.Product.Images != null && item.Product.Images.Count > 0)
                     { 
                         <img src="@item.Product.Images.First().Path" class="img-responsive" />
                     }

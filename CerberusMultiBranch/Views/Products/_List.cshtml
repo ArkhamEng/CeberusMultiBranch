@@ -26,15 +26,15 @@
 
                         @{ string imgC = string.Format("col-md-{0}", (i * 2)); }
 
-                        <div class='@imgC' style="vertical-align:central"  onmouseover="SetPointer(this)" 
-                             onclick="Detail('@prod.ProductId')" >
+                        <div class='@imgC' style="vertical-align:central" onmouseover="SetPointer(this)"
+                             onclick="Detail('@prod.ProductId')">
                             @if (prod.Images.Count > 0)
                             {
-                            <img src="@prod.Images.First().Path" class="img-thumbnail img-responsive" />
+                                <img src="@prod.Images.First().Path" class="img-thumbnail img-responsive" />
                             }
                             else
                             {
-                            <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
+                                <img src="~/Content/Images/sinimagen.jpg" class="img-thumbnail .img-responsive" />
                             }
                         </div>
                         @{ string txtC = string.Format("col-md-{0}", (11 - i * 2)); }
@@ -53,17 +53,28 @@
                                         content += "<h6>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
                                     }
 
-                                <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
-                                      title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
-                                </span>
+                                    <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
+                                          title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                                    </span>
                                 }
                             </h4>
                             @if (prod.TradeMark != null)
                             {
-                            <h6>
-                                Por @prod.TradeMark
-                                <span class="fa fa-registered"></span>
-                            </h6>
+                                <h6>
+                                    Por @prod.TradeMark
+                                    <span class="fa fa-registered"></span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label class="text-danger">
+                                        Código @prod.Code
+                                    </label>
+                                </h6>
+                            }
+                            else
+                            {
+                                <h6>
+                                    Código @prod.Code
+                                </h6>
                             }
                             <h4>
                                 <label>
@@ -71,7 +82,7 @@
                                 </label>
                             </h4>
                             <h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">
-                                <span class="badge bg-info"  >
+                                <span class="badge bg-info">
                                     @prod.Quantity
                                 </span>
                                 disponibles
@@ -80,7 +91,7 @@
 
                             @Html.DisplayFor(model => prod.Description)
                         </div>
-                        <div class="col-md-1"  style="vertical-align:central">
+                        <div class="col-md-1" style="vertical-align:central">
                             <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
@@ -93,7 +104,7 @@
                 }
             </tr>
 
-         }
+                            }
     </tbody>
 </table>
 
@@ -124,20 +135,17 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetDataTable("#tbProducts", "#txtName");
         CompleateProgress();
     });
 
-    function Detail(id)
-    {
+    function Detail(id) {
         window.location = '@Url.Action("Detail", "Products")/' + id;
     }
 
 
-    function StockInBranches(id)
-    {
+    function StockInBranches(id) {
         $.ajax({
             url: '@Url.Action("GetStockInBranches", "Products")',
             type: "POST",
@@ -158,8 +166,7 @@
         });
     }
 
-    function ShowSlide(id)
-    {
+    function ShowSlide(id) {
         $.ajax({
             url: '@Url.Action("GetImages", "Products")',
             type: "POST",

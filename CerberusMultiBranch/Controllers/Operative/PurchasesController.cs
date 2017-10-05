@@ -130,7 +130,33 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     foreach(var det in detailes)
                     {
-                       var bProd = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == det.ProductId && bp.BranchId == purchase.BranchId);
+                        //var bProd = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == det.ProductId && bp.BranchId == purchase.BranchId);
+                        var prod = db.Products.Include(p=> p.BranchProducts).FirstOrDefault(p=> p.ProductId == det.ProductId);
+                        var bProd = prod.BranchProducts.FirstOrDefault(bp => bp.BranchId == purchase.BranchId);
+
+                        //if the new price is biger than the old one, just update it
+                        if (det.Price > prod.BuyPrice)
+                        {
+                            prod.BuyPrice      = det.Price;
+                            prod.DealerPrice   = det.Price.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice    = det.Price.GetPrice(prod.StorePercentage);
+                            prod.WholesalerPrice = det.Price.GetPrice(prod.WholesalerPercentage);
+                            db.Entry(prod).State = EntityState.Modified;
+                        }
+                        else
+                        {
+                            var oldAmount    = bProd.Stock * prod.BuyPrice;
+                            var newAmount   = det.Quantity * det.Price;
+                            var totQuantity = det.Quantity + prod.BranchProducts.Sum(bp=> bp.Stock);
+
+                            var newPrice = Math.Round( ((oldAmount + newAmount) / totQuantity),Cons.Two);
+
+                            prod.DealerPrice     = newPrice.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice      = newPrice.GetPrice(prod.StorePercentage);
+                            prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
+                            db.Entry(prod).State = EntityState.Modified;
+                        }
+                            
 
                         if (bProd == null)
                         {
@@ -138,7 +164,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             {
                                 ProductId = det.ProductId,
                                 BranchId = purchase.BranchId,
-                                LastStock = 0,
+                                LastStock = Cons.Zero,
                                 Stock = det.Quantity,
                                 UpdDate = DateTime.Now
                             };

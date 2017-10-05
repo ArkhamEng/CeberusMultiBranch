@@ -11,7 +11,7 @@
 
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
-    &nbsp;&nbsp;Carrito de compras
+    &nbsp;&nbsp;Carrito de Venta
 </h3>
 
 
@@ -80,7 +80,8 @@ else
 
 <script>
     $(document).ready(function () {
-        $("#btnShowClients").click(function () {
+        $("#btnShowClients").click(function ()
+        {
             $("#ModalQuickClient").modal('show');
         });
 
@@ -104,7 +105,8 @@ else
         $("#ModalQuickClient").modal('hide');
     }
 
-    function Calculate(val) {
+    function Calculate(val)
+    {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
 
         var result = (total - val);

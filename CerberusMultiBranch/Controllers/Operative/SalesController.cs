@@ -88,12 +88,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = db.Sales.Include(s => s.TransactionDetails.Select(d => d.Product.Images)).
                     FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
 
-            if(model==null || model.TransactionDetails.Count < 0)
+            if(model==null || model.TransactionDetails.Count == 0)
                 return View();
             
-            foreach (var detail in model.TransactionDetails)
-                detail.Quantity *= -Cons.One;
-
             if (model != null)
             {
                 var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
@@ -102,7 +99,33 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
             else
                 model = new Sale();
+
             return View(model);
+        }
+
+        [HttpPost]
+        public JsonResult RemoveFromCart(int transactionId, int productId)
+        {
+            var detail = db.TransactionDetails.Find(transactionId, productId);
+
+            if (detail != null)
+            {
+                try
+                {
+                    db.TransactionDetails.Remove(detail);
+                    db.SaveChanges();
+
+                    return Json("OK");
+                }
+                catch (Exception ex)
+                {
+                    return Json("Ocurrio un error al eliminar el registro det:"+ex.Message);
+                }
+            }
+            else
+            {
+                return Json("No se encontro el registro");
+            }
         }
 
         [HttpPost]
@@ -149,7 +172,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Where(td => td.ProductId == productId && td.Transaction.BranchId == branchId && td.Transaction.IsCompleated).
                         Sum(td => td.Quantity);
 
-                    if (existance < -(detail.Quantity))
+                    if (existance < detail.Quantity)
                         return Json("La cantidad total del carrito: "+detail.Quantity+" excede lo disponible en sucursal dispobiles:" +existance);
 
                     db.Entry(detail).State = EntityState.Modified;
@@ -157,7 +180,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                 {
                     detail = new TransactionDetail { ProductId = productId, TransactionId = sale.TransactionId,
-                        Price = price,Quantity = -quantity, Amount = amount };
+                        Price = price,Quantity = quantity, Amount = amount };
                     db.TransactionDetails.Add(detail);
                 }
                 sale.TotalAmount += amount;

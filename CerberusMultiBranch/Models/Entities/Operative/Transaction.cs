@@ -26,9 +26,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
-        public bool IsPayed { get; set; }
 
         [Required]
+        [Display(Name = "Fecha de Operación")]
         [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
@@ -86,7 +86,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
-        public int PaymentType { get; set; }
+        public  PaymentType PaymentType { get; set; }
 
         public virtual Provider Provider { get; set; }
     }

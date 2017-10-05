@@ -11,6 +11,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
     {
         public SelectList Categories { get; set; }
 
+        public SelectList Systems { get; set; }
+
         public SelectList Makes { get; set; }
 
         public SelectList Models { get; set; }

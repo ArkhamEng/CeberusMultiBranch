@@ -18,6 +18,13 @@ namespace CerberusMultiBranch
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+               name: "Venta",
+               url: "Venta/{id}",
+               defaults: new { controller = "Sales", action = "ShopingCart", id = UrlParameter.Optional }
+           );
+
         }
     }
 }

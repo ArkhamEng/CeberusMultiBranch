@@ -183,9 +183,9 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#txtQuantity").val(1);
-
         CompleateProgress();
     });
 
@@ -194,7 +194,8 @@
         quantity = parseFloat($("#txtQuantity").val());
         available = parseFloat(available);
 
-        if (available < quantity) {
+        if (available < quantity)
+        {
             ShowMessage("Cantidad no permitida!", "La cantidad de articulos no puede ser mayor a la disponible", "warning")
             return;
         }

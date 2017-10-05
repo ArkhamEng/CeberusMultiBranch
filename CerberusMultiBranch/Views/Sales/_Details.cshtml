@@ -4,19 +4,19 @@
 
 
 
-<div class="row" >
+<div class="row">
     <table id="tbDetails" class="table table-striped">
         <tbody>
             @{int i = 0; }
             @foreach (var item in Model)
             {
-               
-                    var ProductId = "TransactionDetails[" + i + "].ProductId";
-                    var TransactionId = "TransactionDetails[" + i + "].TransactionId";
-                    var Amount = "TransactionDetails[" + i + "].Amount";
-                    var Price = "TransactionDetails[" + i + "].Price";
-                    var Quantity = "TransactionDetails[" + i + "].Quantity";
-              
+
+                var ProductId = "TransactionDetails[" + i + "].ProductId";
+                var TransactionId = "TransactionDetails[" + i + "].TransactionId";
+                var Amount = "TransactionDetails[" + i + "].Amount";
+                var Price = "TransactionDetails[" + i + "].Price";
+                var Quantity = "TransactionDetails[" + i + "].Quantity";
+
 
                 <tr>
                     <td class="col-md-1">
@@ -44,8 +44,8 @@
                         </h4>
                     </td>
                     <td class="col-md-1 text-info">
-                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" 
-                               type="number"  min = "1" onkeydown = "return false" onmouseup = "QuantityChanged(this)" />
+                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity"
+                               type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
                     </td>
                     <td>
                         <h4 id="txtAmount" class="text-right">
@@ -54,7 +54,7 @@
                     </td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-default btn-xs" type="button">
+                            <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
@@ -92,11 +92,11 @@
     $(document).ready(function () {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
 
+
         CompleateProgress();
     });
 
-    function QuantityChanged(input)
-    {
+    function QuantityChanged(input) {
         quantity = $(input).val();
 
         var row = $(input).parent().parent();
@@ -115,11 +115,9 @@
         SetTotalAmount();
     }
 
-    function SetTotalAmount()
-    {
+    function SetTotalAmount() {
         var totalAmount = 0;
-        $('#tbDetails > tbody  > tr').each(function ()
-        {
+        $('#tbDetails > tbody  > tr').each(function () {
             totalAmount += parseFloat($(this).find("#txtAmount").text().replace(/[$,]+/g, ""));
         });
 
@@ -127,5 +125,38 @@
         $("#lblTotalAmount").text(totalAmount);
     }
 
+    function RemoveFromCart(productId, transactionId)
+    {
+        var data = {
+            transactionId: transactionId,
+            productId: productId
+        }
+
+        console.log(data);
+
+        $.ajax({
+            url: '@Url.Action("RemoveFromCart", "Sales")',
+            type: "POST",
+            data: data,
+            success: function (data) {
+                console.log("Success Removed from cart " + data);
+            },
+            error: function (data) {
+                console.log("Error Executing"); console.log(data);
+            },
+            statusCode:
+            {
+                200: function (data) {
+                    if (data != 'OK')
+                        ShowMessage("Upps algo salío mal", data, "warning");
+                    else
+                        window.location = window.location.href;
+                },
+                401: function (data) {
+                    alert('401: Unauthenticated');
+                }
+            }
+        });
+    }
 
 </script>
