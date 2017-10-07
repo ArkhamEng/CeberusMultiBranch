@@ -30,7 +30,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
 
-            model.Purchases = LookFor(null,DateTime.Today, null, null, null, null, branches);
+            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null, branches);
 
             return View(model);
         }
@@ -39,7 +39,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee)
         {
             var branches = GetUserBranches();
-            var model =  LookFor(branchId, beginDate, endDate, bill, provider, employee, branches);
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, employee, branches);
 
             return PartialView("_PurchaseList", model);
         }
@@ -57,53 +57,51 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee, List<Branch> branches)
         {
-            var bList = branches.Select(b=> b.BranchId).ToList();
+            var bList = branches.Select(b => b.BranchId).ToList();
 
             //busco los userId de los empleados que coincidan con el filtro
-            var uList = (employee == null || employee == string.Empty)? 
-                db.Employees.Where(e=> e.Name.Contains(employee)).Select(e=> e.UserId).ToList() :null;
+            var uList = (employee == null || employee == string.Empty) ?
+                db.Employees.Where(e => e.Name.Contains(employee)).Select(e => e.UserId).ToList() : null;
 
-            var purchases = (from p in db.Purchases.Include(p=> p.User).Include(p=> p.User.Employees).Include(p=> p.TransactionDetails)
-                             where (branchId == null && bList.Contains(p.BranchId)  
-                             || p.BranchId == branchId && bList.Contains(p.BranchId)) 
-                             &&    (beginDate == null || p.TransactionDate >= beginDate)
-                             &&    (endDate   == null || p.TransactionDate <= endDate)
-                             &&    (bill      == null || bill == string.Empty || p.Bill.Contains(bill))
-                             &&    (provider  == null || provider == string.Empty || p.Provider.Name.Contains(provider))
-                             &&    (employee  == null || employee == string.Empty || uList.Contains(p.UserId))
+            var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
+                             where (branchId == null && bList.Contains(p.BranchId)
+                             || p.BranchId == branchId && bList.Contains(p.BranchId))
+                             && (beginDate == null || p.TransactionDate >= beginDate)
+                             && (endDate == null || p.TransactionDate <= endDate)
+                             && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
+                             && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
+                             && (employee == null || employee == string.Empty || uList.Contains(p.UserId))
                              select p).ToList();
 
             return purchases;
         }
 
-      
+   
 
-        // GET: Purchases/Create
+     
         public ActionResult Create(int? id)
         {
-            Transaction model;
+            Transaction model = null;
 
             if (id != null)
             {
                 model = db.Purchases.Include(p => p.TransactionDetails.Select(d => d.Product.Images)).
                     FirstOrDefault(p => p.TransactionId == id);
-
-                var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
-                model.EmployeeName = employee.Name;
-                model.EmployeeId = employee.EmployeeId;
             }
-            else
+
+            if (model == null)
             {
                 model = new Purchase();
                 model.UserId = User.Identity.GetUserId<string>();
                 model.BranchId = User.Identity.GetBranchSession().Id;
                 model.TransactionTypeId = (int)TransType.Purchase;
-                var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
-
-                model.EmployeeName = employee.Name;
-                model.EmployeeId = employee.EmployeeId;
             }
-            return View(model);
+
+            var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
+            model.EmployeeName = employee.Name;
+            model.EmployeeId = employee.EmployeeId;
+
+            return View("Create",model);
         }
 
         // POST: Purchases/Create
@@ -115,7 +113,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             if (ModelState.IsValid)
             {
-                if(purchase.TransactionId == Cons.Zero)
+                if (purchase.TransactionId == Cons.Zero)
                     db.Purchases.Add(purchase);
                 else
                 {
@@ -124,39 +122,39 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.Entry(purchase).State = EntityState.Modified;
                 }
 
-                if(purchase.IsCompleated)
+                if (purchase.IsCompleated)
                 {
                     var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
 
-                    foreach(var det in detailes)
+                    foreach (var det in detailes)
                     {
                         //var bProd = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == det.ProductId && bp.BranchId == purchase.BranchId);
-                        var prod = db.Products.Include(p=> p.BranchProducts).FirstOrDefault(p=> p.ProductId == det.ProductId);
+                        var prod = db.Products.Include(p => p.BranchProducts).FirstOrDefault(p => p.ProductId == det.ProductId);
                         var bProd = prod.BranchProducts.FirstOrDefault(bp => bp.BranchId == purchase.BranchId);
 
                         //if the new price is biger than the old one, just update it
                         if (det.Price > prod.BuyPrice)
                         {
-                            prod.BuyPrice      = det.Price;
-                            prod.DealerPrice   = det.Price.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice    = det.Price.GetPrice(prod.StorePercentage);
+                            prod.BuyPrice = det.Price;
+                            prod.DealerPrice = det.Price.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice = det.Price.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = det.Price.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
-                        else
+                        else if (det.Price < prod.BuyPrice)
                         {
-                            var oldAmount    = bProd.Stock * prod.BuyPrice;
-                            var newAmount   = det.Quantity * det.Price;
-                            var totQuantity = det.Quantity + prod.BranchProducts.Sum(bp=> bp.Stock);
+                            var oldAmount = bProd.Stock * prod.BuyPrice;
+                            var newAmount = det.Quantity * det.Price;
+                            var totQuantity = det.Quantity + prod.BranchProducts.Sum(bp => bp.Stock);
 
-                            var newPrice = Math.Round( ((oldAmount + newAmount) / totQuantity),Cons.Two);
+                            var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
 
-                            prod.DealerPrice     = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice      = newPrice.GetPrice(prod.StorePercentage);
+                            prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
-                            
+
 
                         if (bProd == null)
                         {
@@ -181,7 +179,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         }
                     }
                 }
-               
+
                 db.SaveChanges();
                 return RedirectToAction("Create", new { id = purchase.TransactionId });
             }
@@ -207,11 +205,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     detail = new TransactionDetail
                     {
-                        ProductId     = productId,
+                        ProductId = productId,
                         TransactionId = transactionId,
-                        Quantity      = quantity,
-                        Price         = price,
-                        Amount        = price * quantity
+                        Quantity = quantity,
+                        Price = price,
+                        Amount = price * quantity
                     };
 
                     db.TransactionDetails.Add(detail);
@@ -236,7 +234,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var detail = db.TransactionDetails.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
 
-            if(detail !=null)
+            if (detail != null)
             {
                 db.TransactionDetails.Remove(detail);
                 db.SaveChanges();

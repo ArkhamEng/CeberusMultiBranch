@@ -15,8 +15,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data;
 using System.Data.Entity;
-
-
+using CerberusMultiBranch.Models.Entities.Operative;
 
 namespace CerberusMultiBranch.Support
 {
@@ -90,7 +89,20 @@ namespace CerberusMultiBranch.Support
             }
         }
 
-      
+        public static CashRegister GetCashRegister(this IIdentity user)
+        {
+            var brachId = user.GetBranchId();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                return db.CashRegisters.Include(cr=> cr.CashDeatails).
+                    OrderByDescending(cr=> cr.CashRegisterId).FirstOrDefault(cr => cr.BranchId == brachId);
+            }
+        }
+
+        public static int GetBranchId(this IIdentity user)
+        {
+            return user.GetBranchSession().Id;
+        }
 
         public static JCatalogEntity GetBranchSession(this IIdentity user)
         {

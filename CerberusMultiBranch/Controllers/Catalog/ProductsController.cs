@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products   = LookFor(null,null, null, null, null,false);
+            model.Products = new List<List<Product>>();//LookFor(null,null, null, null, null,false);
             model.Systems    = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
@@ -54,18 +54,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var branchId = User.Identity.GetBranchSession().Id;
 
-            string[] arr = null;
+            string[] arr = new List<string>().ToArray(); 
 
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
-            else
-                arr = new List<string>().ToArray(); 
+       
 
             var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s=> p.Name.Contains(s)))
-                            && (code == null || code == string.Empty || p.Code == code)
+                            && (name == null || name == string.Empty || arr.All(s=> (p.Code+"" + p.Name).Contains(s)))
+                            //&& (code == null || code == string.Empty || p.Code == code)
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             select p ).Take(1000).ToList();
 
@@ -126,7 +125,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         #endregion
 
         [HttpPost]
-        public ActionResult QuickSearch(string code, string name)
+        public ActionResult QuickSearch(string name)
         {
             string[] arr = new List<string>().ToArray();
 
@@ -135,8 +134,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
          
 
             var model = (from p in db.Products
-                         where (code == null || code == string.Empty || p.Code == code)
-                            && (name == null || name == string.Empty || arr.All(s => p.Name.Contains(s)))
+                         where 
+                           (name == null || name == string.Empty || arr.All(s => (p.Code+" "+ p.Name).Contains(s)))
                          select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
             return PartialView("_ProductList", model);

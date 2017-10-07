@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Client>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Provider>
 
 
 <table class="table table-hover">
@@ -35,13 +35,13 @@
                     @Html.DisplayFor(modelItem => item.FTR)
                 </td>
                 <td>
-                   @Html.DisplayFor(modelItem => item.Email)
+                    @*@Html.DisplayFor(modelItem => item.Email)*@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
                 <td style="text-align:right">
-                    <button type="button" class="btn btn-warning btn-xs" onclick="ClientSelected('@item.ClientId','@item.Name','@item.FTR')">
+                    <button type="button" class="btn btn-warning btn-xs" onclick="ProviderSelected('@item.ProviderId','@item.Name')">
                         <span class="fa fa-plus-circle"></span>
                     </button>
                 </td>
@@ -56,5 +56,5 @@
         CompleateProgress();
     });
 
-   
+
 </script>

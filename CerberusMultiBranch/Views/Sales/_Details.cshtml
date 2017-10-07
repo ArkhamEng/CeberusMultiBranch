@@ -20,7 +20,7 @@
 
                 <tr>
                     <td class="col-md-1">
-                        @if (item.Product.Images != null)
+                        @if (item.Product.Images.Count > 0)
                         {
                             <img src="@item.Product.Images.First().Path" class="img-responsive" />
                         }
@@ -44,8 +44,14 @@
                         </h4>
                     </td>
                     <td class="col-md-1 text-info">
-                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity"
+                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
                                type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
+                    </td>
+                    <td align="center">
+                        Disponibles
+                        <label id="lblAvailable" class="badge bg-danger">
+                            @item.Product.BranchProducts.FirstOrDefault().Stock
+                        </label>
                     </td>
                     <td>
                         <h4 id="txtAmount" class="text-right">
@@ -89,20 +95,28 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
-
 
         CompleateProgress();
     });
 
     function QuantityChanged(input) {
-        quantity = $(input).val();
+        quantity = parseFloat( $(input).val());
 
         var row = $(input).parent().parent();
         cells = row.find("td");
 
         var price = row.find("#txtPrice").text();
+
+        var available = parseFloat(row.find("#lblAvailable").text());
+
+        if (quantity > available)
+            ShowMessage("Cantidad Invalida", "Estas Tratando de vender mas productos de los diponibles, verifica existencias!", "warning");
+
+        //quantity = available;
+        //$(input).val(available);
 
         price = price.replace(/[$,]+/g, "");
 
@@ -125,37 +139,18 @@
         $("#lblTotalAmount").text(totalAmount);
     }
 
-    function RemoveFromCart(productId, transactionId)
-    {
+    function RemoveFromCart(productId, transactionId) {
         var data = {
             transactionId: transactionId,
             productId: productId
         }
 
-        console.log(data);
-
-        $.ajax({
-            url: '@Url.Action("RemoveFromCart", "Sales")',
-            type: "POST",
-            data: data,
-            success: function (data) {
-                console.log("Success Removed from cart " + data);
-            },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (data) {
-                    if (data != 'OK')
-                        ShowMessage("Upps algo salío mal", data, "warning");
-                    else
-                        window.location = window.location.href;
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")',data,function(data)
+        {
+            if (data != 'OK')
+                ShowMessage("Upps algo salío mal", data, "warning");
+            else
+                window.location = window.location.href;
         });
     }
 

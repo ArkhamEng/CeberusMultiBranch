@@ -26,6 +26,8 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
+        public ICollection<CashRegister> CashRegisters { get; set; }
+
         [NotMapped]
         public int Id { get { return this.BranchId; } }
 

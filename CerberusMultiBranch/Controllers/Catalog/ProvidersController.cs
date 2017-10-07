@@ -7,6 +7,7 @@ using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
 using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.ViewModels.Config;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -26,15 +27,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string code, string name, string phone)
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone)
         {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
             var model = (from c in db.Providers
                          where
-                             (name == null || c.Name.Contains(name)) &&
+                             (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
                              (stateId == null || c.City.StateId == stateId) &&
                              (cityId == null || c.CityId == cityId) &&
-                             (phone == null || c.Phone == phone) &&
-                             (code == null || c.Code == code)
+                             (phone == null || phone == string.Empty || c.Phone == phone) 
                          select c).ToList();
 
             return PartialView("_List", model);
@@ -87,16 +92,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public JsonResult QuickSearch(int? id, string code, string name)
+        public ActionResult QuickSearch(string name)
         {
-            var providers = (from p in db.Providers
-                             where (code == null || code == string.Empty || p.Code == code) &&
-                                   (name == null || name == string.Empty || p.Name.Contains(name)) &&
-                                   (id == null || id == Cons.Zero || p.ProviderId == id)
-                             select new JCatalogEntity { Id = p.ProviderId, Name = p.Name, Code = p.Code, Phone = p.Phone }
-                ).Take(20).ToList();
+            string[] arr = new List<string>().ToArray();
 
-            return Json(providers);
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
+            var providers = (from p in db.Providers
+                             where (name == null || name == string.Empty || arr.Any(n => (p.Code + " " + p.Name).Contains(name))) 
+                             select p).Take(Cons.QuickResults).ToList();
+
+            return PartialView("_QuickProviderList", providers);
         }
 
         protected override void Dispose(bool disposing)

@@ -15,6 +15,12 @@
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
+            <button class="btn btn-default" type="button" id="btnSearch">
+                <span class="glyphicon glyphicon-search" />
+            </button>
+            <button class="btn btn-default" type="button" id="btnClear">
+                <span class="glyphicon glyphicon-refresh" />
+            </button>
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
@@ -46,22 +52,8 @@
                         @Html.DropDownList("CityId", Model.Cities, "", new { @class = "form-control" })
                     </div>
                 </div>
+              
                 <div class="form-group col-md-12">
-                    @Html.Label("Nombre del Proveedor", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
-
-                <div class="form-group col-md-7">
-                    @Html.Label("Clave de Proveedor", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control", id = "txtCode" })
-                    </div>
-                </div>
-                <div class="form-group col-md-7">
                     @Html.Label("Télefono", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -69,11 +61,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="panel-footer">
-            <button class="btn btn-default" type="button" id="btnSearch">
-                <span class="glyphicon glyphicon-search" />
-            </button>
         </div>
     </div>
 </div>
@@ -87,6 +74,8 @@
     {
         $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
 
+        $("#btnClear").click(function () { window.location = '@Url.Action("Index",new { })' })
+
         SetFilterControls("#divFilters", "#btnFilter", "#divProviders");
 
         SetCascade("#StateId", "#CityId", "GetCities");
@@ -98,8 +87,7 @@
             var data = {
                 stateId: $("#StateId").val(),
                 cityId: $("#CityId").val(),
-                name: $("#Name").val(),
-                code: $("#Code").val(),
+                name: $("#txtName").val(),
                 phone: $("#Phone").val()
             };
 

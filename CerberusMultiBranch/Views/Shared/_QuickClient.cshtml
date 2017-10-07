@@ -8,16 +8,8 @@
             </div>
             <div class="panel panel-danger">
                 <div class="panel-body row">
-                    <div class="col-md-3">
-                        @Html.Label("Cv Cliente", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("FClientCode", "", htmlAttributes: new { @class = "form-control" })
-                        </div>
-                    </div>
-
                     <div class="col-md-8">
-                        @Html.Label("Nombre Cliente", htmlAttributes: new { @class = "control-label" })
+                        @Html.Label("Nombre Cliente / Clave", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                             @Html.TextBox("FClientName", "", htmlAttributes: new { @class = "form-control" })
@@ -51,25 +43,11 @@
     function QuickSearchClient()
     {
         HalfProgress();
-        var filter = { code: $("#FClientCode").val(), name: $("#FClientName").val() }
+        var filter = {  name: $("#FClientName").val() }
 
-        $.ajax({
-            url: '@Url.Action("QuickSearch", "Clients")',
-            type: "POST",
-            data: filter,
-            success: function (data) { },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (view) {
-                    $("#divClientList").html(view);
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
+        ExecuteAjax('@Url.Action("QuickSearch", "Clients")', filter, function (view)
+        {
+            $("#divClientList").html(view);
         });
     }
 

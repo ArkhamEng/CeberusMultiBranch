@@ -21,7 +21,7 @@
         <div class="panel-body">
             <div class="col-md-offset-4 col-md-4">
                 <p>
-                    Aún no hay productos en el carrito, ve a @Html.ActionLink("Catálogo de productos","Index","Products") para comenzar a agregar
+                    Aún no hay productos en el carrito, ve a @Html.ActionLink("Catálogo de productos", "Index", "Products") para comenzar a agregar
                 </p>
             </div>
         </div>
@@ -75,25 +75,33 @@ else
 
         @Html.Partial("_QuickClient")
     }
-
 }
 
 <script>
     $(document).ready(function () {
-        $("#btnShowClients").click(function ()
-        {
+        $("#btnShowClients").click(function () {
             $("#ModalQuickClient").modal('show');
         });
 
-        $("#btnChoosPayment").click(function () {
-            $("#ModalPayment").modal('show');
+        $("#btnChoosPayment").click(function ()
+        {
+            ExecuteAjax('@Url.Action("CashRegStatus","CashRegister")', {}, function (data)
+            {
+                if (data == "OK") {
+                    console.log(data);
+                    $("#ModalPayment").modal('show');
+                }
+                else {
+                    console.log(data);
+                    ShowMessage(data, "Antes de realizar una venta asegurese de abrir la caja", "warning");
+                }
+            });
         });
-
-
         CompleateProgress();
     });
 
-    function ClientSelected(id, name, ftr) {
+    function ClientSelected(id, name, ftr)
+    {
         $("#ClientId").val(id);
 
         var title = "Cliente:  " + name
@@ -105,13 +113,19 @@ else
         $("#ModalQuickClient").modal('hide');
     }
 
-    function Calculate(val)
-    {
+    function Calculate(val) {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
 
         var result = (total - val);
 
         return (total - parseFloat(val));
+    }
+
+    function GetChange(val) {
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+
+
+        return (parseFloat(val) - total);
     }
 
 </script>

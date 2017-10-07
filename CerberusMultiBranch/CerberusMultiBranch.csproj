@@ -195,6 +195,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\Operative\CashRegisterController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -360,6 +361,10 @@
     <Compile Include="Migrations\201710042132535_CodeRefL.Designer.cs">
       <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710062104068_CashR.cs" />
+    <Compile Include="Migrations\201710062104068_CashR.Designer.cs">
+      <DependentUpon>201710062104068_CashR.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -380,6 +385,7 @@
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
+    <Compile Include="Models\Entities\Operative\CashRegister.cs" />
     <Compile Include="Models\Entities\Operative\Payment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
@@ -549,6 +555,8 @@
     <Content Include="Views\Sales\_SaleList.cshtml" />
     <Content Include="Views\Configuration\_VariableList.cshtml" />
     <Content Include="Views\Configuration\_Variables.cshtml" />
+    <Content Include="Views\CashRegister\Index.cshtml" />
+    <Content Include="Views\Providers\_QuickProviderList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -681,6 +689,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710042132535_CodeRefL.resx">
       <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710062104068_CashR.resx">
+      <DependentUpon>201710062104068_CashR.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

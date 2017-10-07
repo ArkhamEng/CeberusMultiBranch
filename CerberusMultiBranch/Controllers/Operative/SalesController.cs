@@ -82,10 +82,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         public ActionResult ShopingCart()
         {
-            var userId = User.Identity.GetUserId();
+            var userId   = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchSession().Id;
 
             var model = db.Sales.Include(s => s.TransactionDetails.Select(d => d.Product.Images)).
+                Include(s=> s.TransactionDetails.Select(d=> d.Product.BranchProducts)).
                     FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
 
             if(model==null || model.TransactionDetails.Count == 0)
@@ -195,7 +196,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult ShopingCart(Sale sale,string payment, double? cash, double? card)
         {
-            var branchId = User.Identity.GetBranchSession().Id;
+            var branchId = User.Identity.GetBranchId();
+
+            var chasR = User.Identity.GetCashRegister();
 
             //Check for existance before to update
             foreach(var detail in sale.TransactionDetails)

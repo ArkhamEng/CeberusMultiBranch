@@ -40,7 +40,7 @@
                             @Html.EditorFor(model=> model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
 
                             <span class="input-group-btn">
-                                <button id="btnQuickProvider" type="button" class="btn btn-default">
+                                <button id="btnShowProviders" type="button" class="btn btn-default">
                                     <span class="glyphicon glyphicon-search" id="spQuickProvider"></span>
                                 </button>
                             </span>
@@ -135,20 +135,16 @@
     {
         LoadPopoverCompleate();
 
+        $("#btnShowProviders").click(function ()
+        {
+            $("#ModalQuickProvider").modal('show');
+        });
+
         if('@Model.PaymentType' == 'Cash')
             $("#rdCash").attr("checked", true);
         else
             $("#rdCredit").attr("checked", true);
 
-
-        if ('@Model.TransactionId' > 0) {
-            $("#btnShowQuick").prop("disabled", false)
-            $("#btnBegin").prop("disabled", false)
-        }
-        else {
-            $("#btnShowQuick").prop("disabled", true)
-            $("#btnBegin").prop("disabled", true)
-        }
 
         $("#spShowQuick").click(function () { $("#ModalQuickProduct").modal('show'); });
 
@@ -164,9 +160,16 @@
         CompleateProgress();
     });
 
+    function ProviderSelected(id, name)
+    {
+        $("#ProviderId").val(id);
+        $("#Provider_Name").val(name);
 
+        $("#ModalQuickProvider").modal('hide');
+    }
 
-    function SubmitCompleate() {
+    function SubmitCompleate()
+    {
         HidePopCompleate();
         $("#IsCompleated").val(true);
         $("#btnSubmit").click();
@@ -185,32 +188,21 @@
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element) {
-        var row = $(element).parent().parent().parent();
+    function AddDetail(element)
+    {
+        var row = $(element).parent().parent().parent().parent();
         cells = row.find("td");
 
-        var price = row.find("#txtBuyPrice").val();
-        var productId = row.find("#ProductId").val();
-        var quantity = row.find("#Quantity").val();
-        var transactionId = $("#TransactionId").val();
+        var param ={
+            price: row.find("#txtBuyPrice").val(),
+            productId: row.find("#ProductId").val(),
+            quantity: row.find("#Quantity").val(),
+            transactionId : $("#TransactionId").val()
+        };
 
-
-        $.ajax({
-            url: '@Url.Action("AddDetail", "Purchases")',
-            type: "POST",
-            data: { productId: productId, transactionId: transactionId, price: price, quantity: quantity },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (view) {
-                    $("#divDetails").html(view);
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
+        ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view)
+        {
+            $("#divDetails").html(view);
         });
     }
 </script>

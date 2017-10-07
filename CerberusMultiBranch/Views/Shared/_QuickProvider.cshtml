@@ -1,135 +1,53 @@
 ﻿
 <div id="ModalQuickProvider" class="modal" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog  modal-lg">
         <div class="modal-content panel panel-danger">
             <div class="modal-header panel-heading">
                 <h4 class="modal-title">Búsqueda rápida de proveedores</h4>
             </div>
-            <div class="panel-body">
-                <table id="tbQuickProvider" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th hidden="hidden" />
-                            <th>@Html.DisplayName("Clave")</th>
-                            <th>@Html.DisplayName("Nombre")</th>
-                            <th>@Html.DisplayName("Teléfono")</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyQuickProvider"></tbody>
-                </table>
+            <div class="panel panel-danger">
+                <div class="panel-body row">
+                    <div class="col-md-8">
+                        @Html.Label("Nombre Proveedor / Clave", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                            @Html.TextBox("FProviderName", "", htmlAttributes: new { @class = "form-control" })
+                            <span class="input-group-btn">
+                                <button id="btnQuickSearchProvider" type="button" class="btn btn-default">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                                <button id="btnAddProvider" type="button" class="btn btn-warning" onclick="window.open('@Url.Action("Create","Clients")','blank')">
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-danger">
+                <div class="panel-body row" id="divProviderList">
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+
     $(document).ready(function ()
     {
-        $("#btnQuickProvider").click(function ()
-        {
-            ButtonAction();
-        });
-
-        if ($("#ProviderId").val() != '' && $("#ProviderId").val() > 0)
-        {
-            $("#Provider_Name").attr("readonly", true);
-            $("#spQuickProvider").attr("class", "fa fa-refresh");
-        }
+        $("#btnQuickSearchProvider").click(function () { QuickSearchProvider(); });
     });
 
-    function ButtonAction()
+    function QuickSearchProvider()
     {
-        if ($("#ProviderId").val() != '' && $("#ProviderId").val() > 0)
+        HalfProgress();
+        var filter = {  name: $("#FProviderName").val() }
+
+        ExecuteAjax('@Url.Action("QuickSearch", "Providers")', filter, function (view)
         {
-            $("#ProviderId").val("");
-            $("#Provider_Name").val("");
-            $("#spQuickProvider").attr("class", "glyphicon glyphicon-search");
-            return;
-        }
-        else
-        {
-            $("#ModalQuickProvider").modal();
-            QuickProvider();
-        }
-            
-    }
-
-    function SelectProvider(row)
-    {
-        var cells = $(row).find('td');
-
-        $("#ProviderId").val(cells[0].innerHTML);
-        //$("#ProviderCode").val(cells[1].innerHTML);
-        $("#Provider_Name").val(cells[2].innerHTML);
-
-        //$("#ProviderCode").attr("readonly", true);
-        $("#Provider_Name").attr("readonly", true);
-
-        $("#spQuickProvider").attr("class", "fa fa-refresh");
-
-        $("#ModalQuickProvider").modal('hide');
-    }
-
-    function QuickProvider()
-    {
-        $("#lblQuickProvider").text("");
-        $("#tbodyQuickProvider").empty();
-
-        var d =
-        {
-            id: $("#ProviderId").val(),
-            code: $("#ProviderCode").val(),
-            name: $("#ProviderName").val()
-        };
-
-        $.ajax({
-            url: '@Url.Action("QuickSearch", "Providers")',
-            type: "POST",
-            data: d,
-            error: function (data)
-            {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (data)
-                {
-                    if (data.length == 1)
-                    {
-                        $("#ProviderCode").val(data[0].Code);
-                        $("#ProviderName").val(data[0].Name);
-                        $("#ProviderId").val(data[0].Id);
-
-                        console.log("ProviderCode " + $("#ProviderCode").val());
-                        console.log("ProviderName " + $("#ProviderName").val());
-                        console.log("ProviderId " + $("#ProviderId").val());
-                        console.log("ProviderId " + data[0].Id);
-
-                        $("#ProviderCode").attr("readonly", true);
-                        $("#ProviderName").attr("readonly", true);
-                        $("#spQuickProvider").attr("class", "fa fa-refresh");
-                    }
-                    else
-                    {
-                        console.log("Objetos encontrados " + data.length);
-
-                        $.each(data, function (i, item)
-                        {
-                            var row = "<tr ondblclick='SelectProvider(this)' onmouseover='SetPointer(this)'><td hidden='hidden'>" + item.Id + "</td>" +
-                                          "<td>" + item.Code + "</td>" +
-                                             "<td>" + item.Name + "</td>" +
-                                          "<td>" + item.Phone + "</td></tr>";
-
-                            $("#tbodyQuickProvider").append(row);
-
-                        });
-                    }
-                },
-                401: function (data)
-                {
-                    alert('401: Unauthenticated');
-                }
-            }
+            console.log(view);
+            $("#divProviderList").html(view);
         });
     }
 

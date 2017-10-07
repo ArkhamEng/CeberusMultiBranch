@@ -7,6 +7,7 @@ using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using CerberusMultiBranch.Support;
 using CerberusMultiBranch.Models;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -28,26 +29,34 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string code, string name, string phone)
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone)
         {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
             var model = (from c in db.Clients
                          where
-                             (name == null || c.Name.Contains(name)) &&
-                             (stateId == null || c.City.StateId == stateId) &&
-                             (cityId == null || c.CityId == cityId) &&
-                             (phone == null || c.Phone == phone) &&
-                             (code == null || c.Code == code)
+                             (name      == null || name == string.Empty || arr.Any(n=> (c.Code+" "+ c.Name).Contains(name))) &&
+                             (stateId   == null || c.City.StateId == stateId) &&
+                             (cityId    == null || c.CityId == cityId) &&
+                             (phone     == null || phone == string.Empty || c.Phone == phone) 
                          select c).ToList();
 
             return PartialView("_List", model);
         }
 
         [HttpPost]
-        public ActionResult QuickSearch(string code, string name)
+        public ActionResult QuickSearch(string name)
         {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
             var model = (from p in db.Clients
-                         where (code == null || code == string.Empty || p.Code == code)
-                            && (name == null || name == string.Empty || p.Name.Contains(name))
+                         where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
                          select p).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickClientList", model);

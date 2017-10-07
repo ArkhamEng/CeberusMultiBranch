@@ -1,6 +1,7 @@
-﻿$(document).ready(function () {
-
-    $('#sidebarCollapse').on('click', function () {
+﻿$(document).ready(function ()
+{
+    $('#sidebarCollapse').on('click', function ()
+    {
         $('#sidebar').toggleClass('active');
     });
 });
@@ -39,6 +40,32 @@ function CompleateProgress() {
 
 function SetPointer(element) {
     $(element).css('cursor', 'pointer');
+}
+
+
+function ExecuteAjax(url, parameters,callback)
+{
+    console.log("Executing Ajax..");
+ 
+   $.ajax({
+        url: url,
+        type: "POST",
+        data: parameters,
+        error: function (data)
+        {
+            callback("Error al ejecutar Ajax")
+        },
+        statusCode:
+        {
+            200: function (data)
+            {
+                callback(data);
+            },
+            401: function (data) {
+                callback(data);
+            }
+        }
+    });
 }
 
 function SetCascade(ddlParent, ddlChild, action) {
@@ -117,7 +144,8 @@ function Search(url, data, target) {
     });
 }
 
-function Paginate(table, records) {
+function Paginate(table, records)
+{
     var oTable = $(table).DataTable(
        {
            destroy: true,
