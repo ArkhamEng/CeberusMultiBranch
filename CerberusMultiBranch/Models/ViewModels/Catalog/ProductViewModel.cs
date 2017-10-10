@@ -1,5 +1,4 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;

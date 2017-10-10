@@ -14,21 +14,25 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Column(Order = 1), Key, ForeignKey("Product")]
         public int ProductId { get; set; }
 
-        [Display(Name = "Cantidad")]
-        public double Quantity { get; set; }
-
         [Required]
         [Display(Name = "Precio")]
         [DataType(DataType.Currency)]
         public double Price { get; set; }
+        [Display(Name = "Cantidad")]
+        public double Quantity { get; set; }
 
-        [Display(Name ="Importe")]
+        [Display(Name = "Importe")]
         [DataType(DataType.Currency)]
         public double Amount { get; set; }
 
-        public virtual Transaction Transaction { get; set; }
-
         public virtual Product Product { get; set; }
 
+        public virtual Sale Sale { get; set; }
+
+        public virtual Purchase  Purchase { get; set; }
+
+        public virtual Transaction Transaction { get; set; }
     }
+
+  
 }

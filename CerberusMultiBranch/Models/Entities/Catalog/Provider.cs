@@ -1,4 +1,4 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
+﻿using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
@@ -14,6 +14,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     public class Provider
     {
         public int ProviderId { get; set; }
+
+        [Display(Name = "Ciudad/Municipio")]
+        [Required]
+        public int CityId { get; set; }
 
         [Display(Name = "Clave")]
         [Required]
@@ -65,15 +69,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_Phone", IsUnique = true)]
         public string Phone { get; set; }
 
-        [Display(Name = "Ciudad/Municipio")]
-        [Required]
-        public int CityId { get; set; }
-
         public bool IsActive { get; set; }
 
-        [Required]
-        public DateTime InsDate { get; set; }
-
+     
         [Required]
         public DateTime UpdDate { get; set; }
 
@@ -85,7 +83,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public Provider()
         {
             this.IsActive = true;
-            this.InsDate  = DateTime.Now;
             this.UpdDate  = DateTime.Now;
             this.Code     = Cons.CodeMask;
         }
@@ -102,7 +99,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
                 Email = this.Email,
                 FTR = this.FTR,
                 IsActive = this.IsActive,
-                InsDate = this.InsDate,
                 UpdDate = this.UpdDate,
                 Name = this.Name,
                 Phone = this.Phone,

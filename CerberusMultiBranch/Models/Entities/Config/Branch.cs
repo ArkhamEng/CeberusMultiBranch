@@ -1,8 +1,8 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
-using CerberusMultiBranch.Models.Entities.Operative;
+﻿using CerberusMultiBranch.Models.Entities.Operative;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace CerberusMultiBranch.Models.Entities.Config
 {
@@ -22,6 +22,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<Transaction> Transactions { get; set; }
 
+
         public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
@@ -29,11 +30,22 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public ICollection<CashRegister> CashRegisters { get; set; }
 
         [NotMapped]
+        public ICollection<Sale> Sales { get { return this.Transactions.OfType<Sale>().ToList(); } }
+
+        [NotMapped]
+        public ICollection<Purchase> Purchases { get { return this.Transactions.OfType<Purchase>().ToList(); } }
+
+        [NotMapped]
         public int Id { get { return this.BranchId; } }
 
         [NotMapped]
         [Display(Name ="Disponibles")]
         public double Quantity { get; set; }
+
+        public Branch()
+        {
+            this.Transactions = new List<Transaction>();
+        }
     }
 
 

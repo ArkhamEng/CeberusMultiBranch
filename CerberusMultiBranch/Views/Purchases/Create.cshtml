@@ -27,7 +27,6 @@
                 <div class="row">
                     @Html.HiddenFor(m => m.BranchId)
                     @Html.HiddenFor(m => m.TransactionId)
-                    @Html.HiddenFor(m => m.TransactionTypeId)
                     @Html.HiddenFor(m => m.UserId)
                     @Html.HiddenFor(m => m.IsCompleated)
                     @Html.HiddenFor(m => m.EmployeeId)
@@ -135,6 +134,9 @@
     {
         LoadPopoverCompleate();
 
+        if ('@Model.TransactionId' == 0)
+            $("#btnShowQuick").hide();
+
         $("#btnShowProviders").click(function ()
         {
             $("#ModalQuickProvider").modal('show');
@@ -146,13 +148,18 @@
             $("#rdCredit").attr("checked", true);
 
 
-        $("#spShowQuick").click(function () { $("#ModalQuickProduct").modal('show'); });
+        $("#spShowQuick").click(function ()
+        {
+            $("#ModalQuickProduct").modal('show');
+        });
 
-        $("#btnCompleate").click(function () {
+        $("#btnCompleate").click(function ()
+        {
             LoadPopoverCompleate();
         });
 
-        if ('@Model.IsCompleated' == 'True') {
+        if ('@Model.IsCompleated' == 'True')
+        {
             $(".Compleated").hide();
             $("#btnSave").hide();
         }
@@ -175,7 +182,8 @@
         $("#btnSubmit").click();
     }
 
-    function LoadPopoverCompleate() {
+    function LoadPopoverCompleate()
+    {
         $("#btnCompleate").popover({
             html: true,
             content: function () { return $("#divPopCompleate").html(); },

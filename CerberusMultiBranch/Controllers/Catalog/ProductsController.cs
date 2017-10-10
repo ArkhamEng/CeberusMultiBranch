@@ -41,11 +41,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult GetStockInBranches(int productId)
         {
-            var branches = db.Branches.ToList();
-            var details = db.TransactionDetails.Include(td => td.Transaction).Where(td => td.ProductId == productId).ToList();
+            var branches = db.Branches.Include(b=> b.BranchProducts).ToList();
 
             foreach (var branch in branches)
-                branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId && td.Transaction.IsCompleated).Sum(dt => dt.Quantity);
+            {
+                var bp = branch.BranchProducts.FirstOrDefault(b => b.ProductId == productId);
+                branch.Quantity = bp != null ? bp.Stock : 0;
+            }
+              
 
             return PartialView("_StockInBranches", branches);
         }
@@ -146,30 +149,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchSession().Id;
             var userId   = User.Identity.GetUserId();
 
-            var trans = db.Transactions.FirstOrDefault(t => t.BranchId == branchId 
-            && t.UserId == userId &&  !t.IsCompleated && t.TransactionTypeId == (int)TransType.Sale);
-           
+            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
+
             var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p=> p.BranchProducts).
-                        Include(p=> p.TransactionDetails).FirstOrDefault(p => p.ProductId == id);
+                        FirstOrDefault(p => p.ProductId == id);
 
             model.TransactionId = trans == null ? Cons.Zero : trans.TransactionId;
 
-            //model.Quantity = model.TransactionDetails.
-            //    Where(td => td.Transaction.IsCompleated && td.Transaction.BranchId == branchId).Sum(td => td.Quantity);
-
+       
             var bProd = model.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
             model.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
 
             model.OrderCarModels();
 
             model.Branches = db.Branches.Include(b=> b.BranchProducts).ToList();
-            var details = db.TransactionDetails.Include(td => td.Transaction).Where(td => td.ProductId == id).ToList();
+            var details = db.Sales.Include(s=> s.TransactionDetails).Select(s => s.TransactionDetails.
+            Where(td=> td.ProductId == id)).ToList();
 
             foreach (var branch in model.Branches)
             {
                 var bpr = branch.BranchProducts.FirstOrDefault(bp => bp.ProductId == model.ProductId);
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
-                //branch.Quantity = details.Where(td => td.Transaction.BranchId == branch.BranchId && td.Transaction.IsCompleated).Sum(dt => dt.Quantity);
             }
 
             return View(model);

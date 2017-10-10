@@ -1,5 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -43,7 +43,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Entrance     = employee.Entrance;
             this.FTR          = employee.FTR;
             this.IsActive     = employee.IsActive;
-            this.InsDate      = employee.InsDate;
             this.Name         = employee.Name;
             this.Phone        = employee.Phone;
             this.UpdDate      = employee.UpdDate;

@@ -1,5 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Support;
 using System.Collections.Generic;
 using System.Web.Mvc;

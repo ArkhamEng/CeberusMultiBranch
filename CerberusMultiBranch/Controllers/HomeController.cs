@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers
             List<string> sources = new List<string>();
             using (var db = new ApplicationDbContext())
             {
-                var br = db.Branches.Include(b => b.Transactions).Where(b => bList.Contains(b.BranchId));
+                var br = db.Branches.Include(b => b.Transactions).Where(b => bList.Contains(b.BranchId)).ToList();
 
                 var cSales    = new Chart(800, 500, theme: ChartTheme.Blue);
                 var cPurchase = new Chart(800, 500, theme: ChartTheme.Yellow);
@@ -36,10 +36,10 @@ namespace CerberusMultiBranch.Controllers
 
                 foreach (var branch in br)
                 {
-                    sValues.Add(branch.Transactions.Where(t => t.TransactionTypeId == 2).Sum(t=> t.TotalAmount));
+                    sValues.Add(branch.Sales.Sum(t=> t.TotalAmount));
 
                     names.Add(branch.Name);
-                    pValues.Add(branch.Transactions.Where(t=> t.TransactionTypeId == 1).Sum(t => t.TotalAmount));
+                    pValues.Add(branch.Purchases.Sum(t => t.TotalAmount));
 
                     cSales.AddLegend("Sucursales");
                     cPurchase.AddLegend("Sucursales");

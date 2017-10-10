@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using System.ComponentModel.DataAnnotations;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System.Collections.Generic;
 
@@ -63,15 +62,12 @@ namespace CerberusMultiBranch.Models
         public DbSet<PartSystem> Systems { get; set; }
 
         public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
-        #endregion
-
-        #region Common
 
         public DbSet<State> States { get; set; }
 
         public DbSet<City> Cities { get; set; }
-
         #endregion
+
 
         #region Catalogs
 
@@ -91,7 +87,7 @@ namespace CerberusMultiBranch.Models
 
         #region Operative
 
-        public DbSet<Transaction> Transactions { get; set; }
+        //public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<Purchase> Purchases { get; set; }
 
@@ -99,7 +95,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<CashRegister> CashRegisters { get; set; }
 
-        public DbSet<CashDetail> CashDetails { get; set; }
+        public DbSet<Income> Incomes { get; set; }
 
         public DbSet<Withdrawal> Withdrawals { get; set; }
 

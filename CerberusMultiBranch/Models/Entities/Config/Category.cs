@@ -1,5 +1,4 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

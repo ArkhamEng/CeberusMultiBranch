@@ -201,169 +201,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201709150332198_Initial.cs" />
-    <Compile Include="Migrations\201709150332198_Initial.Designer.cs">
-      <DependentUpon>201709150332198_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709151907174_Change to Employee.cs" />
-    <Compile Include="Migrations\201709151907174_Change to Employee.Designer.cs">
-      <DependentUpon>201709151907174_Change to Employee.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709152002520_UserChanges.cs" />
-    <Compile Include="Migrations\201709152002520_UserChanges.Designer.cs">
-      <DependentUpon>201709152002520_UserChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709152141548_Change Employee Key.cs" />
-    <Compile Include="Migrations\201709152141548_Change Employee Key.Designer.cs">
-      <DependentUpon>201709152141548_Change Employee Key.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709152154395_Add-migration.cs" />
-    <Compile Include="Migrations\201709152154395_Add-migration.Designer.cs">
-      <DependentUpon>201709152154395_Add-migration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709152210183_Length Image.cs" />
-    <Compile Include="Migrations\201709152210183_Length Image.Designer.cs">
-      <DependentUpon>201709152210183_Length Image.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709152346471_UseChanges.cs" />
-    <Compile Include="Migrations\201709152346471_UseChanges.Designer.cs">
-      <DependentUpon>201709152346471_UseChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709160239274_Recent Changes.cs" />
-    <Compile Include="Migrations\201709160239274_Recent Changes.Designer.cs">
-      <DependentUpon>201709160239274_Recent Changes.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709161842251_ImagesChanges.cs" />
-    <Compile Include="Migrations\201709161842251_ImagesChanges.Designer.cs">
-      <DependentUpon>201709161842251_ImagesChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709162250260_Purchase.cs" />
-    <Compile Include="Migrations\201709162250260_Purchase.Designer.cs">
-      <DependentUpon>201709162250260_Purchase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709171552135_PurchaseDetail.cs" />
-    <Compile Include="Migrations\201709171552135_PurchaseDetail.Designer.cs">
-      <DependentUpon>201709171552135_PurchaseDetail.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709171940401_PurchaseDetail1.cs" />
-    <Compile Include="Migrations\201709171940401_PurchaseDetail1.Designer.cs">
-      <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709181606446_Purchase1.cs" />
-    <Compile Include="Migrations\201709181606446_Purchase1.Designer.cs">
-      <DependentUpon>201709181606446_Purchase1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709181609430_Purchase11.cs" />
-    <Compile Include="Migrations\201709181609430_Purchase11.Designer.cs">
-      <DependentUpon>201709181609430_Purchase11.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709182152235_Purchase2.cs" />
-    <Compile Include="Migrations\201709182152235_Purchase2.Designer.cs">
-      <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709191902084_Transaction.cs" />
-    <Compile Include="Migrations\201709191902084_Transaction.Designer.cs">
-      <DependentUpon>201709191902084_Transaction.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709191904054_TransactionSchema.cs" />
-    <Compile Include="Migrations\201709191904054_TransactionSchema.Designer.cs">
-      <DependentUpon>201709191904054_TransactionSchema.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709192047406_TestTransacntion.cs" />
-    <Compile Include="Migrations\201709192047406_TestTransacntion.Designer.cs">
-      <DependentUpon>201709192047406_TestTransacntion.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709192107070_TestTrans1.cs" />
-    <Compile Include="Migrations\201709192107070_TestTrans1.Designer.cs">
-      <DependentUpon>201709192107070_TestTrans1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709192146225_TestTrans2.cs" />
-    <Compile Include="Migrations\201709192146225_TestTrans2.Designer.cs">
-      <DependentUpon>201709192146225_TestTrans2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709192150200_TestTrans3.cs" />
-    <Compile Include="Migrations\201709192150200_TestTrans3.Designer.cs">
-      <DependentUpon>201709192150200_TestTrans3.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709200113489_ForeingKeyBranch.cs" />
-    <Compile Include="Migrations\201709200113489_ForeingKeyBranch.Designer.cs">
-      <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709201528516_EmployeeBranches.cs" />
-    <Compile Include="Migrations\201709201528516_EmployeeBranches.Designer.cs">
-      <DependentUpon>201709201528516_EmployeeBranches.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709201736120_CompositeKey.cs" />
-    <Compile Include="Migrations\201709201736120_CompositeKey.Designer.cs">
-      <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709222326046_Indexes.cs" />
-    <Compile Include="Migrations\201709222326046_Indexes.Designer.cs">
-      <DependentUpon>201709222326046_Indexes.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709230618359_EmployeeFtr.cs" />
-    <Compile Include="Migrations\201709230618359_EmployeeFtr.Designer.cs">
-      <DependentUpon>201709230618359_EmployeeFtr.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709231626230_pending.cs" />
-    <Compile Include="Migrations\201709231626230_pending.Designer.cs">
-      <DependentUpon>201709231626230_pending.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709262001151_detailsChanges.cs" />
-    <Compile Include="Migrations\201709262001151_detailsChanges.Designer.cs">
-      <DependentUpon>201709262001151_detailsChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709262002366_detailsChanges2.cs" />
-    <Compile Include="Migrations\201709262002366_detailsChanges2.Designer.cs">
-      <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709281630538_payment.cs" />
-    <Compile Include="Migrations\201709281630538_payment.Designer.cs">
-      <DependentUpon>201709281630538_payment.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201709300114516_Bran_Prod.cs" />
-    <Compile Include="Migrations\201709300114516_Bran_Prod.Designer.cs">
-      <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710030050486_isPayedField.cs" />
-    <Compile Include="Migrations\201710030050486_isPayedField.Designer.cs">
-      <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710031409453_isPayedFieldRemove.cs" />
-    <Compile Include="Migrations\201710031409453_isPayedFieldRemove.Designer.cs">
-      <DependentUpon>201710031409453_isPayedFieldRemove.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710032148180_configVar.cs" />
-    <Compile Include="Migrations\201710032148180_configVar.Designer.cs">
-      <DependentUpon>201710032148180_configVar.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710032153138_configVar1.cs" />
-    <Compile Include="Migrations\201710032153138_configVar1.Designer.cs">
-      <DependentUpon>201710032153138_configVar1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710032154459_configVar2.cs" />
-    <Compile Include="Migrations\201710032154459_configVar2.Designer.cs">
-      <DependentUpon>201710032154459_configVar2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710041518465_PartSys.cs" />
-    <Compile Include="Migrations\201710041518465_PartSys.Designer.cs">
-      <DependentUpon>201710041518465_PartSys.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710041718501_CodeL.cs" />
-    <Compile Include="Migrations\201710041718501_CodeL.Designer.cs">
-      <DependentUpon>201710041718501_CodeL.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710042101290_CodeRef.cs" />
-    <Compile Include="Migrations\201710042101290_CodeRef.Designer.cs">
-      <DependentUpon>201710042101290_CodeRef.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710042132535_CodeRefL.cs" />
-    <Compile Include="Migrations\201710042132535_CodeRefL.Designer.cs">
-      <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710062104068_CashR.cs" />
-    <Compile Include="Migrations\201710062104068_CashR.Designer.cs">
-      <DependentUpon>201710062104068_CashR.cs</DependentUpon>
+    <Compile Include="Migrations\201710091922583_Initial.cs" />
+    <Compile Include="Migrations\201710091922583_Initial.Designer.cs">
+      <DependentUpon>201710091922583_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -371,11 +211,10 @@
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
-    <Compile Include="Models\Entities\Common\City.cs" />
-    <Compile Include="Models\Entities\Common\ISelectable.cs" />
-    <Compile Include="Models\Entities\Common\IUserAssignment.cs" />
-    <Compile Include="Models\Entities\Common\JsonCode.cs" />
-    <Compile Include="Models\Entities\Common\State.cs" />
+    <Compile Include="Models\Entities\Config\City.cs" />
+    <Compile Include="Models\Entities\Config\ISelectable.cs" />
+    <Compile Include="Models\Entities\Config\IUserAssignment.cs" />
+    <Compile Include="Models\Entities\Config\State.cs" />
     <Compile Include="Models\Entities\Config\Branch.cs" />
     <Compile Include="Models\Entities\Config\Company.cs" />
     <Compile Include="Models\Entities\Config\Category.cs" />
@@ -385,12 +224,13 @@
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
+    <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
+    <Compile Include="Models\Entities\Operative\Debt.cs" />
     <Compile Include="Models\Entities\Operative\Payment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
-    <Compile Include="Models\Entities\Operative\TransactionType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
@@ -557,6 +397,7 @@
     <Content Include="Views\Configuration\_Variables.cshtml" />
     <Content Include="Views\CashRegister\Index.cshtml" />
     <Content Include="Views\Providers\_QuickProviderList.cshtml" />
+    <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -570,128 +411,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201709150332198_Initial.resx">
-      <DependentUpon>201709150332198_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709151907174_Change to Employee.resx">
-      <DependentUpon>201709151907174_Change to Employee.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709152002520_UserChanges.resx">
-      <DependentUpon>201709152002520_UserChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709152141548_Change Employee Key.resx">
-      <DependentUpon>201709152141548_Change Employee Key.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709152154395_Add-migration.resx">
-      <DependentUpon>201709152154395_Add-migration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709152210183_Length Image.resx">
-      <DependentUpon>201709152210183_Length Image.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709152346471_UseChanges.resx">
-      <DependentUpon>201709152346471_UseChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709160239274_Recent Changes.resx">
-      <DependentUpon>201709160239274_Recent Changes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709161842251_ImagesChanges.resx">
-      <DependentUpon>201709161842251_ImagesChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709162250260_Purchase.resx">
-      <DependentUpon>201709162250260_Purchase.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709171552135_PurchaseDetail.resx">
-      <DependentUpon>201709171552135_PurchaseDetail.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709171940401_PurchaseDetail1.resx">
-      <DependentUpon>201709171940401_PurchaseDetail1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709181606446_Purchase1.resx">
-      <DependentUpon>201709181606446_Purchase1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709181609430_Purchase11.resx">
-      <DependentUpon>201709181609430_Purchase11.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709182152235_Purchase2.resx">
-      <DependentUpon>201709182152235_Purchase2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709191902084_Transaction.resx">
-      <DependentUpon>201709191902084_Transaction.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709191904054_TransactionSchema.resx">
-      <DependentUpon>201709191904054_TransactionSchema.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709192047406_TestTransacntion.resx">
-      <DependentUpon>201709192047406_TestTransacntion.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709192107070_TestTrans1.resx">
-      <DependentUpon>201709192107070_TestTrans1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709192146225_TestTrans2.resx">
-      <DependentUpon>201709192146225_TestTrans2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709192150200_TestTrans3.resx">
-      <DependentUpon>201709192150200_TestTrans3.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709200113489_ForeingKeyBranch.resx">
-      <DependentUpon>201709200113489_ForeingKeyBranch.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709201528516_EmployeeBranches.resx">
-      <DependentUpon>201709201528516_EmployeeBranches.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709201736120_CompositeKey.resx">
-      <DependentUpon>201709201736120_CompositeKey.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709222326046_Indexes.resx">
-      <DependentUpon>201709222326046_Indexes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709230618359_EmployeeFtr.resx">
-      <DependentUpon>201709230618359_EmployeeFtr.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709231626230_pending.resx">
-      <DependentUpon>201709231626230_pending.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709262001151_detailsChanges.resx">
-      <DependentUpon>201709262001151_detailsChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709262002366_detailsChanges2.resx">
-      <DependentUpon>201709262002366_detailsChanges2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709281630538_payment.resx">
-      <DependentUpon>201709281630538_payment.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201709300114516_Bran_Prod.resx">
-      <DependentUpon>201709300114516_Bran_Prod.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710030050486_isPayedField.resx">
-      <DependentUpon>201710030050486_isPayedField.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710031409453_isPayedFieldRemove.resx">
-      <DependentUpon>201710031409453_isPayedFieldRemove.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710032148180_configVar.resx">
-      <DependentUpon>201710032148180_configVar.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710032153138_configVar1.resx">
-      <DependentUpon>201710032153138_configVar1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710032154459_configVar2.resx">
-      <DependentUpon>201710032154459_configVar2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710041518465_PartSys.resx">
-      <DependentUpon>201710041518465_PartSys.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710041718501_CodeL.resx">
-      <DependentUpon>201710041718501_CodeL.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710042101290_CodeRef.resx">
-      <DependentUpon>201710042101290_CodeRef.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710042132535_CodeRefL.resx">
-      <DependentUpon>201710042132535_CodeRefL.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710062104068_CashR.resx">
-      <DependentUpon>201710062104068_CashR.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710091922583_Initial.resx">
+      <DependentUpon>201710091922583_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

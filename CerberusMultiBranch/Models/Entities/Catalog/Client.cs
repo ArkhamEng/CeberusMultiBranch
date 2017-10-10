@@ -1,4 +1,4 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
+﻿using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
@@ -15,6 +15,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ClientId { get; set; }
 
+        [Display(Name = "Ciudad/Municipio")]
+        [Required]
+        public int CityId { get; set; }
+
         [Display(Name = "Clave")]
         [Required]
         [MaxLength(12)]
@@ -27,7 +31,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Razón Social")]
         [MaxLength(50)]
-        [Index("IDX_BussinessName", IsUnique = false)]
         public string BusinessName { get; set; }
 
         [Display(Name = "Representante Legal")]
@@ -37,7 +40,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(13)]
-        [Index("IDX_FTR", IsUnique = false)]
         public string FTR { get; set; }
 
         [Display(Name = "Dirección Fiscal")]
@@ -60,30 +62,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress)]
         [MaxLength(30)]
-        [Index("IDX_Email", IsUnique = false)]
         public string Email { get; set; }
 
         [Display(Name = "Teléfono")]
         [DataType(DataType.PhoneNumber)]
         [Required]
         [MaxLength(20)]
-        [Index("IDX_Phone", IsUnique = true)]
         public string Phone { get; set; }
-
-        [Display(Name = "Ciudad/Municipio")]
-        [Required]
-        [Index("IDX_CityId", IsUnique = false)]
-        public int CityId { get; set; }
 
         public bool IsActive { get; set; }
 
         [Required]
-        public DateTime InsDate { get; set; }
-
-        [Required]
         public DateTime UpdDate { get; set; }
 
-
+        
         public virtual City City { get; set; }
 
         public ICollection<Sale> Sale { get; set; }
@@ -92,7 +84,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         {
             this.IsActive  = true;
             this.Entrance  = DateTime.Now;
-            this.InsDate   = DateTime.Now;
             this.UpdDate   = DateTime.Now;
             this.Code      = Cons.CodeMask;
         }
@@ -110,7 +101,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
                 Entrance = this.Entrance,
                 FTR = this.FTR,
                 IsActive = this.IsActive,
-                InsDate = this.InsDate,
                 UpdDate = this.UpdDate,
                 LegalRepresentative = this.LegalRepresentative,
                 Name = this.Name,

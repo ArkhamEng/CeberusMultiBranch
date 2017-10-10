@@ -13,9 +13,9 @@ namespace ExcelUploader
         static void Main(string[] args)
         {
 
-            DataManager.AddTypes();
+           DataManager.AddTypes();
 
-            DataManager.ExportProducts();
+           DataManager.ExportProducts();
 
 
             Console.Write("Operación completa.. presiona cualquier tecla para cerrar!");

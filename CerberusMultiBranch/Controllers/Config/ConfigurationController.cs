@@ -7,7 +7,6 @@ using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    [Authorize]
     public class ConfigurationController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

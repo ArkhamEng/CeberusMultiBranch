@@ -1,6 +1,6 @@
-﻿SET IDENTITY_INSERT Common.City ON
+﻿SET IDENTITY_INSERT Config.City ON
 
-INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
+INSERT INTO Config.City(CityId,StateId,Code,Name,IsActive) VALUES
 (1, 1, '001', 'Aguascalientes', 1),
 (2, 1, '002', 'Asientos', 1),
 (3, 1, '003', 'Calvillo', 1),
@@ -1001,7 +1001,7 @@ INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
 (998, 19, '051', 'Villaldama', 1),
 (999, 20, '001', 'Abejones', 1)
 
-INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
+INSERT INTO Config.City(CityId,StateId,Code,Name,IsActive) VALUES
 (1000, 20, '002', 'Acatlán de Pérez Figueroa', 1),
 (1001, 20, '003', 'Asunción Cacalotepec', 1),
 (1002, 20, '004', 'Asunción Cuyotepeji', 1),
@@ -2003,7 +2003,7 @@ INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
 (1998, 27, '002', 'Cárdenas', 1),
 (1999, 27, '003', 'Centla', 1)
 
-INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
+INSERT INTO Config.City(CityId,StateId,Code,Name,IsActive) VALUES
 (2000, 27, '004', 'Centro', 1),
 (2001, 27, '005', 'Comalcalco', 1),
 (2002, 27, '006', 'Cunduacán', 1),
@@ -2498,4 +2498,4 @@ INSERT INTO Common.City(CityId,StateId,Code,Name,IsActive) VALUES
 (2491, 32, '057', 'Trancoso', 1),
 (2492, 32, '058', 'Santa María de la Paz', 1)
 
-SET IDENTITY_INSERT Common.City off
+SET IDENTITY_INSERT Config.City off

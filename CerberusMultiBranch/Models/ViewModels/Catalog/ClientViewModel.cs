@@ -1,5 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
+using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -36,7 +36,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Entrance     = client.Entrance;
             this.FTR          = client.FTR;
             this.IsActive     = client.IsActive;
-            this.InsDate      = client.InsDate;
             this.LegalRepresentative = client.LegalRepresentative;
             this.Name         = client.Name;
             this.Phone        = client.Phone;

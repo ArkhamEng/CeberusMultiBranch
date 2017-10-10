@@ -30,53 +30,34 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public DateTime BeginDate { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public virtual Branch Branch { get; set; }
 
-        public ICollection<CashDetail> CashDeatails { get; set; }
+        public ICollection<CashDetail> CashDetails { get; set; }
+
+        [NotMapped]
+        public ICollection<Withdrawal> Withdrawals { get { return this.CashDetails.OfType<Withdrawal>().ToList(); } }
+
+        [NotMapped]
+        public ICollection<Income> Incomes { get { return this.CashDetails.OfType<Income>().ToList(); } }
+
+        [NotMapped]
+        public string ChartSource { get; set; }
 
         public CashRegister()
         {
             this.Fill();
+            this.CashDetails = new List<CashDetail>();
         }
     
 
         private void Fill()
         {
             this.BeginDate = DateTime.Now;
-            this.EndDate = DateTime.Now;
             this.InitialAmount = Cons.Zero;
             this.FinalAmount = Cons.Zero;
-            this.CashDeatails = new List<CashDetail>();
             this.IsClosed = true;
         }
-    }
-
-    [Table("CashDetail", Schema = "Operative")]
-    public class CashDetail
-    {
-        public int CashDetailId { get; set; }
-
-        public int CashRegisterId { get; set; }
-
-        public string User { get; set; }
-
-        public double Amount { get; set; }
-
-        [DataType(DataType.Time)]
-        public DateTime Date { get; set; }
-
-        public virtual CashRegister CashRegister { get; set; }
-
-    }
-
-    
-    public class Withdrawal:CashDetail
-    {
-        [Display(Name ="Comentario")]
-        [Required]
-        [MaxLength(100)]
-        public string Comment { get; set; }
     }
 }

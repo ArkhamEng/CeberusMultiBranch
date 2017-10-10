@@ -1,7 +1,7 @@
 
-SET IDENTITY_INSERT Common.State ON
+SET IDENTITY_INSERT Config.State ON
 
-INSERT INTO Common.State (StateId, Code, Name, ShorName, IsActive) VALUES
+INSERT INTO Config.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (1, '01', 'Aguascalientes', 'Ags.', 1),
 (2, '02', 'Baja California', 'BC', 1),
 (3, '03', 'Baja California Sur', 'BCS', 1),
@@ -35,4 +35,4 @@ INSERT INTO Common.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (31, '31', 'Yucatán', 'Yuc.', 1),
 (32, '32', 'Zacatecas', 'Zac.', 1);
 
-SET IDENTITY_INSERT Common.State OFF
+SET IDENTITY_INSERT Config.State OFF

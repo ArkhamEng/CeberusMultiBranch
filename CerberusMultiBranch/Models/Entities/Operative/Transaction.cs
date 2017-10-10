@@ -14,18 +14,23 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         public int TransactionId { get; set; }
 
-        [Index("IDX_TransactionTypeId", IsUnique = false)]
-        public int TransactionTypeId { get; set; }
-
         [Required]
         [Index("IDX_BranchId", IsUnique = false)]
+        [ForeignKey("Branch")]
         public int BranchId { get; set; }
+
+        [Required]
+        [MaxLength(128)]
+        [Index("IDX_UserId", IsUnique = false)]
+        public string UserId { get; set; }
+
 
         [Display(Name = "Total")]
         [DataType(DataType.Currency)]
         [Required]
         public double TotalAmount { get; set; }
 
+        public PaymentType? PaymentType { get; set; }
 
         [Required]
         [Display(Name = "Fecha de Operación")]
@@ -37,13 +42,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public DateTime UpdDate { get; set; }
 
-        [Required]
-        [MaxLength(128)]
-        [Index("IDX_UserId", IsUnique = false)]
-        public string UserId { get; set; }
-
         [Index("IDX_IsCompleated", IsUnique = false)]
         public bool IsCompleated { get; set; }
+
+
+        public ICollection<TransactionDetail> TransactionDetails { get; set; }
+
 
         #region Navigation Properties
 
@@ -52,11 +56,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual Branch Branch { get; set; }
 
-        public virtual TransactionType TransactionType { get; set; }
-
-        public ICollection<TransactionDetail> TransactionDetails { get; set; }
-
-        public ICollection<Payment> Payments { get; set; }
         #endregion
 
         #region NotMapped
@@ -86,17 +85,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
-        public  PaymentType PaymentType { get; set; }
-
         public virtual Provider Provider { get; set; }
+
     }
-
-    
-
 
     public class Sale:Transaction
     {
-        public int? ClientId { get; set; }
+        public int ClientId { get; set; }
 
         [Display(Name = "Folio Venta")]
         [MaxLength(30)]
@@ -104,16 +99,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public string Folio { get; set; }
 
         public virtual Client Client { get; set; }
-    }
 
-
-    public class Transference : Transaction
-    {
-        public int OriginBranchId { get; set; }
-
-       [ForeignKey("OriginBranchId")]
-        public virtual Branch OriginBranch { get; set; }
+        public ICollection<Payment> Payments { get; set; }
 
     }
-
 }

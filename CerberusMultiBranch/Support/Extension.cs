@@ -1,6 +1,5 @@
 ﻿using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Common;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using Microsoft.AspNet.Identity;
@@ -94,7 +93,7 @@ namespace CerberusMultiBranch.Support
             var brachId = user.GetBranchId();
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                return db.CashRegisters.Include(cr=> cr.CashDeatails).
+                return db.CashRegisters.Include(cr=> cr.CashDetails).
                     OrderByDescending(cr=> cr.CashRegisterId).FirstOrDefault(cr => cr.BranchId == brachId);
             }
         }

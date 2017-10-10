@@ -1,27 +1,104 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.CashRegister
 
-<h3>
-    <span class="fa fa-dollar" style="float:left"></span>
-    &nbsp;&nbsp;Modúdulo de caja
-</h3>
-
 <hr />
 
 @if (Model.IsClosed)
 {
-
     <div class="btn-group-vertical col-md-3">
         <label class="control-label">
             Cantidad Inicial
         </label>
-        <input class="form-control" type="number" />
+        <input id="txtInitialAmount" class="form-control" type="number" />
 
-        <button class="btn-danger btn">
+        <button id="btnStart" class="btn-danger btn" type="button">
             <span class="glyphicon glyphicon-log-out"></span>
             Abrir Caja
         </button>
-
     </div>
-
 }
+else
+{
+        <div class="col-md-3">
+            <div class="col-md-12  text-center  alert alert-info">
+                <h3>
+                    Monto Apertura <br />
+                    @Model.InitialAmount.ToString("c")
+                </h3>
+            </div>
+          
+            <div class="text-center col-md-12 alert btn btn-danger" id="btnWithdrawal">
+                <h3>
+                    Retiros<br />
+                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                </h3>
+            </div>
 
+            <div class="text-center col-md-12  alert  btn-success">
+                @{
+                    var total = (Model.Incomes.Sum(d => d.Amount) - Model.Withdrawals.Sum(w => w.Amount)).ToString("c");
+                }
+                <h3>
+                    Balance total <br />
+                    @total
+                </h3>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="col-md-5  text-center   btn-primary">
+                <h3>
+                    @{
+                        var cash = (Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Cash).Sum(d => d.Amount) - Model.InitialAmount).ToString("c");
+                    }
+                    Ventas Efectivo<br />
+                   @cash
+                </h3>
+            </div>
+            <div class="col-md-5 col-md-offset-1 text-center   btn-warning">
+                <h3>
+                    Ventas Tarjeta<br />
+                    @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Card).Sum(d => d.Amount).ToString("c")
+                </h3>
+            </div>
+
+            <div class="col-md-11">
+                <img class="img-responsive" src="@Model.ChartSource" />
+            </div>
+
+        </div>
+        <div id="divDetails"></div>
+        @*@Html.Partial("_Details")*@
+  }
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnStart").click(function () { OpenCashRegister(); });
+
+        $("#btnWithdrawal").click(function ()
+        {
+            $("#hTitle").text("Detalle de retiros");
+
+            ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view)
+            {
+                HalfProgress();
+                $("#divDetails").html(view);
+            })
+            
+        });
+
+       
+    });
+
+    function OpenCashRegister()
+    {
+        ExecuteAjax('@Url.Action("OpenCashRegister","CashRegister")',
+                { initialAmount: $("#txtInitialAmount").val() },
+                function (data) {
+                    if (data == "OK")
+                        window.location = '@Url.Action("Index")';
+                    else
+                        ShowMessage("Error Inesperado", data, "warning");
+                });
+    }
+
+</script>

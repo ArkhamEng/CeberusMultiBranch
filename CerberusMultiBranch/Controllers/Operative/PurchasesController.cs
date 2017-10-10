@@ -94,7 +94,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model = new Purchase();
                 model.UserId = User.Identity.GetUserId<string>();
                 model.BranchId = User.Identity.GetBranchSession().Id;
-                model.TransactionTypeId = (int)TransType.Purchase;
             }
 
             var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
@@ -270,7 +269,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Transaction purchase = db.Transactions.Find(id);
+            Transaction purchase = db.Purchases.Find(id);
             if (purchase == null)
             {
                 return HttpNotFound();
@@ -283,8 +282,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Transaction purchase = db.Transactions.Find(id);
-            db.Transactions.Remove(purchase);
+            var purchase = db.Purchases.Find(id);
+            db.Purchases.Remove(purchase);
             db.SaveChanges();
             return RedirectToAction("Index");
         }

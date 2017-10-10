@@ -37,95 +37,53 @@
         });
     });
 
-    function LoadBranches()
+       function LoadBranches()
     {
-        $.ajax({
-            url: '@Url.Action("GetAvailableBranches", "Json")',
-            type: "POST",
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
+           ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (result)
+        {
+            $.each(result, function (i, item)
             {
-                200: function (data)
-                {
-                    $.each(data, function (i, item)
-                    {
-                        var option = "<option value='" + item.BranchId + "'>" + item.Name + "</option>";
+                var option = "<option value='" + item.BranchId + "'>" + item.Name + "</option>";
 
-                        $("#ddBranchSelector").append(option);
-                    });
+                $("#ddBranchSelector").append(option);
+            });
 
-                    if (data.length > 1)
-                        $("#divModalBranchSelector").modal({ backdrop: 'static', keyboard: false });
-                    else
-                        BeginBranchSession();
-
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
+            if (result.length > 1)
+                $("#divModalBranchSelector").modal({ backdrop: 'static', keyboard: false });
+            else
+                BeginBranchSession();
         });
     }
 
     function GetBranchSession()
     {
-        console.log("Getting Branch session");
-        $.ajax({
-            url: '@Url.Action("GetBranchSession", "Json")',
-            type: "POST",
-            success: function (data) { },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
+        ExecuteAjax('@Url.Action("GetBranchSession", "Json")', {}, function (result)
+        {
+            if (result.Id == 0)
             {
-                200: function (data) {
-                    console.log("Session " + data);
-
-                    if (data.Id == 0) {
-                        console.log("Load Branches");
-                        LoadBranches();
-                    }
-                    else {
-                        console.log(data.Name);
-                        $("#lblBrachSelector").text(data.Name);
-                    }
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
+                console.log("Load Branches");
+                LoadBranches();
+            }
+            else
+            {
+                $("#lblBrachSelector").text(result.Name);
             }
         });
     }
 
     function BeginBranchSession()
     {
-        var current = window.location.href;
-        console.log("Starting branch session");
-        $.ajax({
-            url: '@Url.Action("BeginBranchSession", "Json")',
-            type: "POST",
-            data: { branchId: $("#ddBranchSelector").val(), name: $("#ddBranchSelector option:selected").text() },
-            error: function (data) {
-                console.log("Error Executing");
-                console.log(data);
-            },
-            statusCode:
+        var data = { branchId: $("#ddBranchSelector").val(), name: $("#ddBranchSelector option:selected").text() }
+
+        ExecuteAjax('@Url.Action("BeginBranchSession", "Json")', data, function (result)
+        {
+            var current = window.location.href;
+
+            if (result)
             {
-                200: function (data)
-                {
-                    console.log("Session started " + data);
-                    if (data) {
-                        $("#divModalBranchSelector").modal('hide');
-                        $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
-                        window.location = current;
-                    }
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
+                $("#divModalBranchSelector").modal('hide');
+                $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
+                window.location = current;
             }
         });
     }

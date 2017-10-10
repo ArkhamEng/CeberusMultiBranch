@@ -8,12 +8,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 {
     public enum PaymentType
     {
-        Card   = 1,
-        Cash   = 2,
-        Check  = 3,
-        Mixed  = 4,
-        Credit = 5
+        Card   = 1, //Tarjeda Credito o débito
+        Cash   = 2, // Contado o Efectivo
+        Check  = 3, // Con cheque
+        Mixed  = 4, //Efectivo y Tarjeta
+        Credit = 5  //Acuerdo de credito
     }
+
 
     [Table("Payment", Schema = "Operative")]
     public class Payment
@@ -29,5 +30,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public DateTime PaymentDate { get; set; }
 
         public virtual Transaction Transaction { get; set; }
+
     }
 }

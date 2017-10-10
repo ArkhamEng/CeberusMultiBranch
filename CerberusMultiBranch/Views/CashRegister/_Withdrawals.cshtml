@@ -1,0 +1,96 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Withdrawal>
+
+<div id="ModalDetails" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                    Retiros de caja
+                </h4>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label class="control-label">
+                    Cantidad
+                </label>
+                <input class="form-control" type="number" id="txtAmount" />
+            </div>
+
+            <div class="form-group col-md-9">
+                <label class="control-label">
+                    Comentario
+                </label>
+                <div class="input-group">
+                    <input class="form-control" id="txtComment" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-warning" id="btnAdd">
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </button>
+                    </span>
+                </div>
+
+            </div>
+
+
+            <div class="panel panel-danger">
+                <table id="tbWithdrawals" class="table">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(m => m.User)</th>
+                            <th>@Html.DisplayNameFor(m => m.InsDate)</th>
+                            <th>@Html.DisplayNameFor(m => m.Amount)</th>
+                            <th>@Html.DisplayNameFor(m => m.Comment)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(m => item.User)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.InsDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Amount)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Comment)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbWithdrawals", 5);
+
+        $("#ModalDetails").modal("show");
+
+        $("#btnAdd").click(function ()
+        {
+            var data = { amount: $("#txtAmount").val(), comment: $("#txtComment").val() };
+
+            ExecuteAjax('@Url.Action("AddWithdrawal","CashRegister")', data, function (data)
+            {
+                if (data == "OK")
+                    window.location = '@Url.Action("Index")';
+                else
+                {
+                    $("#ModalDetails").modal("hide");
+                    ShowMessage("Error al retirar", "Ocurrio un error al agregar el retiro", "warning");
+                }
+            });
+        });
+
+        CompleateProgress();
+    });
+</script>

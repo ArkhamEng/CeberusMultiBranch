@@ -1,5 +1,4 @@
-﻿using CerberusMultiBranch.Models.Entities.Common;
-using CerberusMultiBranch.Models.Entities.Config;
+﻿using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -18,7 +17,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Key]
         public int EmployeeId { get; set; }
 
-        
+        [Display(Name = "Ciudad/Municipio")]
+        [Required]
+        [Index("IDX_CityId", IsUnique = false)]
+        public int CityId { get; set; }
+
+
         [MaxLength(128)]
         [Index("IDX_UserId", IsUnique = true)]
         public string UserId { get; set; }
@@ -70,20 +74,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_Phone", IsUnique = true)]
         public string Phone { get; set; }
 
-        [Display(Name = "Ciudad/Municipio")]
-        [Required]
-        [Index("IDX_CityId", IsUnique = false)]
-        public int CityId { get; set; }
 
         [Required]
         public bool IsActive { get; set; }
 
         [Required]
-        public DateTime InsDate { get; set; }
-
-        [Required]
         public DateTime UpdDate { get; set; }
-
 
         public byte[] Picture { get; set; }
 
@@ -109,7 +105,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         {
             this.IsActive = true;
             this.Entrance = DateTime.Now;
-            this.InsDate = DateTime.Now;
             this.UpdDate = DateTime.Now;
             this.Code    = Cons.CodeMask;
             this.EmployeeBranches = new List<EmployeeBranch>();
