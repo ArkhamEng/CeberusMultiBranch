@@ -1,0 +1,53 @@
+﻿
+@model double
+<div id="ModalCloseCash" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                   Cierre de caja
+                </h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Esta accion realizara el corte de caja del turno y fecha correspondiente,
+                    si lo deseas puedes agregar un comentario.
+                </p>
+                <input class="form-control" id="txtCommentClose" />
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="btnClose">
+                    Cerrar caja
+                    <span class="glyphicon glyphicon-ok"></span>
+                </button>
+                <button class="btn btn-danger" data-dismiss="modal">
+                    Cancelar
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.Hidden("CashAmount", Model)
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnClose").click(function ()
+        {
+            var data = { amount: $("#CashAmount").val(), comment: $("#txtCommentClose").val() };
+
+            ExecuteAjax('@Url.Action("Close","CashRegister")', data, function (data)
+            {
+                if (data == "OK")
+                    window.location = '@Url.Action("Index")';
+                else
+                {
+                    $("#ModalCloseCash").modal("hide");
+                    ShowMessage("Error al cerrar la caja", "Ocurrio un error al cerrar la caja", "warning");
+                }
+            });
+        });
+
+        CompleateProgress();
+    });
+</script>

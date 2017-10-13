@@ -397,8 +397,10 @@ namespace CerberusMultiBranch.Migrations
                         IsClosed = c.Boolean(nullable: false),
                         InitialAmount = c.Double(nullable: false),
                         FinalAmount = c.Double(nullable: false),
+                        CloseComment = c.String(maxLength: 100),
                         BeginDate = c.DateTime(nullable: false),
-                        EndDate = c.DateTime(),
+                        EndDate = c.DateTime(nullable: false),
+                        ShiftNumber = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.CashRegisterId)
                 .ForeignKey("Config.Branch", t => t.BranchId, cascadeDelete: true)

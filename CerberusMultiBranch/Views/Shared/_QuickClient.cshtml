@@ -36,7 +36,11 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnQuickSearchClient").click(function () { QuickSearchClient(); });
+        $("#btnQuickSearchClient").click(function ()
+        {
+            $("#divClientList").html();
+            QuickSearchClient();
+        });
     });
 
 

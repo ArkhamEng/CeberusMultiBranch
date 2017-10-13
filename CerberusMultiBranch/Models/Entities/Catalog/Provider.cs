@@ -66,7 +66,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [DataType(DataType.PhoneNumber)]
         [Required]
         [MaxLength(20)]
-        [Index("IDX_Phone", IsUnique = true)]
         public string Phone { get; set; }
 
         public bool IsActive { get; set; }

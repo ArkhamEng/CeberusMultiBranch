@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Provider>
 
 
-<table class="table table-hover">
+<table id="tbQuickProvider" class="table table-hover">
     <thead>
         <tr>
             <th class="col-md-1">
@@ -19,6 +19,7 @@
             <th class="col-md-2">
                 @Html.DisplayNameFor(model => model.Phone)
             </th>
+            <th/>
         </tr>
     </thead>
     <tbody>
@@ -53,6 +54,7 @@
 <script>
     $(document).ready(function ()
     {
+        Paginate("#tbQuickProvider", 8);
         CompleateProgress();
     });
 

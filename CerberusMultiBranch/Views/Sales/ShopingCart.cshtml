@@ -78,29 +78,31 @@ else
 
 <script>
     $(document).ready(function () {
+
+        SetCascade("#CarMakeId", "#CarModelId", "GetModels");
+
+        SetCascade("#CarModelId", "#CarYearId", "GetYears");
+
         $("#btnShowClients").click(function () {
             $("#ModalQuickClient").modal('show');
         });
 
-        $("#btnChoosPayment").click(function ()
-        {
-            ExecuteAjax('@Url.Action("CashRegStatus","CashRegister")', {}, function (data)
-            {
+        $("#btnChoosPayment").click(function () {
+            ExecuteAjax('@Url.Action("CashRegStatus","CashRegister")', {}, function (data) {
                 if (data == "OK") {
                     console.log(data);
                     $("#ModalPayment").modal('show');
                 }
                 else {
                     console.log(data);
-                    ShowMessage(data, "Antes de realizar una venta asegurese de abrir la caja", "warning");
+                    ShowMessage("Error en modulo de caja!", data, "warning");
                 }
             });
         });
         CompleateProgress();
     });
 
-    function ClientSelected(id, name, ftr)
-    {
+    function ClientSelected(id, name, ftr) {
         $("#ClientId").val(id);
 
         var title = "Cliente:  " + name

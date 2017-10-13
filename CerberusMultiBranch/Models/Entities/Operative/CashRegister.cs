@@ -16,21 +16,26 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int BranchId { get; set; }
 
+        [MaxLength(50)]
         public string UserOpen { get; set; }
 
+        [MaxLength(50)]
         public string UserClose { get; set; }
 
-        public bool IsClosed { get; set; }
-
+        [DataType(DataType.Currency)]
         public double InitialAmount { get; set; }
 
+        [DataType(DataType.Currency)]
         public double FinalAmount { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime BeginDate { get; set; }
+        [MaxLength(100)]
+        public string CloseComment { get; set; }
 
         [DataType(DataType.DateTime)]
-        public DateTime? EndDate { get; set; }
+        public DateTime OpeningDate { get; set; }
+
+        [DataType(DataType.DateTime)]
+        public DateTime? ClosingDate { get; set; }
 
         public virtual Branch Branch { get; set; }
 
@@ -45,6 +50,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [NotMapped]
         public string ChartSource { get; set; }
 
+        public bool IsOpen { get; set; }
+    
         public CashRegister()
         {
             this.Fill();
@@ -54,10 +61,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         private void Fill()
         {
-            this.BeginDate = DateTime.Now;
+            this.OpeningDate = DateTime.Now;
             this.InitialAmount = Cons.Zero;
             this.FinalAmount = Cons.Zero;
-            this.IsClosed = true;
         }
     }
 }

@@ -201,9 +201,21 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710091922583_Initial.cs" />
-    <Compile Include="Migrations\201710091922583_Initial.Designer.cs">
-      <DependentUpon>201710091922583_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201710102231371_Initial.cs" />
+    <Compile Include="Migrations\201710102231371_Initial.Designer.cs">
+      <DependentUpon>201710102231371_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710111912009_ChangeCR.cs" />
+    <Compile Include="Migrations\201710111912009_ChangeCR.Designer.cs">
+      <DependentUpon>201710111912009_ChangeCR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710112003182_ChangeCR1.cs" />
+    <Compile Include="Migrations\201710112003182_ChangeCR1.Designer.cs">
+      <DependentUpon>201710112003182_ChangeCR1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710130233404_prov.cs" />
+    <Compile Include="Migrations\201710130233404_prov.Designer.cs">
+      <DependentUpon>201710130233404_prov.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -245,12 +257,14 @@
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
     <Compile Include="Support\Extension.cs" />
     <Compile Include="Support\FileManager.cs" />
     <Compile Include="Support\GzipWrapper.cs" />
+    <Compile Include="Support\Shift.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-theme.css" />
@@ -259,11 +273,8 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
-    <Content Include="Content\Images\argos wahit.gif" />
-    <Content Include="Content\Images\Argos.png" />
-    <Content Include="Content\Images\backgroud.jpg" />
-    <Content Include="Content\Images\backgroud_red.jpg" />
     <Content Include="Content\Images\header.png" />
+    <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\warning.png" />
     <Content Include="favicon.ico" />
@@ -398,6 +409,7 @@
     <Content Include="Views\CashRegister\Index.cshtml" />
     <Content Include="Views\Providers\_QuickProviderList.cshtml" />
     <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
+    <Content Include="Views\CashRegister\_CloseCash.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -411,8 +423,17 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710091922583_Initial.resx">
-      <DependentUpon>201710091922583_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710102231371_Initial.resx">
+      <DependentUpon>201710102231371_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710111912009_ChangeCR.resx">
+      <DependentUpon>201710111912009_ChangeCR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710112003182_ChangeCR1.resx">
+      <DependentUpon>201710112003182_ChangeCR1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710130233404_prov.resx">
+      <DependentUpon>201710130233404_prov.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

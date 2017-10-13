@@ -50,7 +50,7 @@
                     <td align="center">
                         Disponibles
                         <label id="lblAvailable" class="badge bg-danger">
-                            @item.Product.BranchProducts.FirstOrDefault().Stock
+                            @item.Product.BranchProducts.FirstOrDefault(bp=> bp.BranchId == item.Sale.BranchId).Stock
                         </label>
                     </td>
                     <td>

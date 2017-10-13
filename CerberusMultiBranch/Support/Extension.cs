@@ -20,7 +20,7 @@ namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
-        public static double GetPrice(this double buyPrice,int percentage)
+        public static double GetPrice(this double buyPrice, int percentage)
         {
             return buyPrice * (Cons.One + (percentage / Cons.OneHundred));
         }
@@ -91,10 +91,42 @@ namespace CerberusMultiBranch.Support
         public static CashRegister GetCashRegister(this IIdentity user)
         {
             var brachId = user.GetBranchId();
+
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                return db.CashRegisters.Include(cr=> cr.CashDetails).
-                    OrderByDescending(cr=> cr.CashRegisterId).FirstOrDefault(cr => cr.BranchId == brachId);
+                var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
+                    FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
+
+                return cash;
+            }
+        }
+
+      
+
+        public static Shift GetShift(this DateTime date)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                Shift shift = new Shift();
+                var variables = db.Variables.ToList();
+
+                var first = Array.ConvertAll(variables.FirstOrDefault(v => v.Name == Cons.FirstShift).Value.Split('-'), int.Parse);
+                var second = Array.ConvertAll(variables.FirstOrDefault(v => v.Name == Cons.SecondShift).Value.Split('-'), int.Parse);
+
+                if (date.Hour >= first[Cons.Zero] && date.Hour < first[Cons.One])
+                {
+                    shift.Number = Cons.One;
+                    shift.BeginDate = new DateTime(date.Year, date.Month, date.Day, first[Cons.Zero], Cons.Zero, Cons.Zero);
+                    shift.EndDate = new DateTime(date.Year, date.Month, date.Day, first[Cons.One], Cons.Zero, Cons.Zero);
+                }
+                else
+                {
+                    shift.Number = Cons.Two;
+                    shift.BeginDate = new DateTime(date.Year, date.Month, date.Day, second[Cons.Zero], Cons.Zero, Cons.Zero);
+                    shift.EndDate = new DateTime(date.Year, date.Month, date.Day, second[Cons.One], Cons.Zero, Cons.Zero);
+                }
+
+                return shift;
             }
         }
 
@@ -131,14 +163,14 @@ namespace CerberusMultiBranch.Support
             int session;
 
             if (claim != null)
-                session =  Convert.ToInt32(claim.Value);
+                session = Convert.ToInt32(claim.Value);
             else
                 session = Cons.Zero;
 
             return session;
         }
 
-        public static  List<Branch> GetBranches(this IIdentity user)
+        public static List<Branch> GetBranches(this IIdentity user)
         {
             var userId = user.GetUserId();
 

@@ -57,15 +57,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee, List<Branch> branches)
         {
-            var bList = branches.Select(b => b.BranchId).ToList();
+            //var bList = branches.Select(b => b.BranchId).ToList();
+            var bId = User.Identity.GetBranchId();
 
             //busco los userId de los empleados que coincidan con el filtro
             var uList = (employee == null || employee == string.Empty) ?
                 db.Employees.Where(e => e.Name.Contains(employee)).Select(e => e.UserId).ToList() : null;
 
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
-                             where (branchId == null && bList.Contains(p.BranchId)
-                             || p.BranchId == branchId && bList.Contains(p.BranchId))
+                             where (p.BranchId == bId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))

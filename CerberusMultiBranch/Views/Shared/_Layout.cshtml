@@ -20,18 +20,22 @@
     @Html.Partial("_MessageBox")
 
     <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="col-md-2 row">
+            <div class="col-md-12">
+                <img src="~/Content/Images/logo1.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+            </div>
+        </div>
         <div class="container">
             <div class="navbar-header">
+                @*<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn btn-xs">
+                    <i class="glyphicon glyphicon-align-left"></i>
+                    Refaccionaria Auto Bien
+                </button>*@
+             
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
-                </button>
-
-                
-                <button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn btn-xs">
-                    <i class="glyphicon glyphicon-align-left"></i>
-                    Refaccionaria Auto Bien
                 </button>
 
                 @*@Html.ActionLink("AutoBien Refaccionaria", "Index", "Home", new { area = "" }, new { @class = "navbar-brand navbar-btn", id = "sidebarCollapse" })*@

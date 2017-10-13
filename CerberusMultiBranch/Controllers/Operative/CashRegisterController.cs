@@ -16,6 +16,16 @@ namespace CerberusMultiBranch.Controllers.Operative
     public class CashRegisterController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+
+        private CashRegister GetNewCR()
+        {
+            // var cs = DateTime.Now.GetShift();
+            var cr = new CashRegister();
+            cr.OpeningDate = DateTime.Now;
+            cr.UserOpen = User.Identity.Name;
+            cr.BranchId = User.Identity.GetBranchId();
+            return cr;
+        }
         // GET: CashRegister
         public ActionResult Index()
         {
@@ -23,83 +33,72 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (cr == null)
             {
-                cr = new CashRegister();
-                cr.BranchId = User.Identity.GetBranchId();
-                db.CashRegisters.Add(cr);
-                db.SaveChanges();
+                cr = GetNewCR();
+                return View(cr);
             }
 
-            DateTime begin, end;
+            var shift = cr.OpeningDate.GetShift();
 
-            if (DateTime.Now.Hour < 14)
-            {
-                begin = new DateTime(cr.BeginDate.Year, cr.BeginDate.Month, cr.BeginDate.Day, 6, 0, 0);
-                end = new DateTime(cr.BeginDate.Year, cr.BeginDate.Month, cr.BeginDate.Day, 14, 0, 0);
-            }
-            else
-            {
-                begin = new DateTime(cr.BeginDate.Year, cr.BeginDate.Month, cr.BeginDate.Day, 14, 0, 0);
-                end = new DateTime(cr.BeginDate.Year, cr.BeginDate.Month, cr.BeginDate.Day, 22, 0, 0);
-            }
+            var range = shift.EndDate - shift.BeginDate;
+            var xVal = Enumerable.Range(0, (int)range.TotalHours).Select(i => shift.BeginDate.AddHours(i).Hour).ToList();
 
-            var range = end - begin;
-            var xVal = Enumerable.Range(0, (int)range.TotalHours).Select(i => begin.AddHours(i).Hour).ToList();
-
-            var incomes = cr.Incomes.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount), Key = cd.Key }).ToList();
-            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Cash).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount), Key = cd.Key }).ToList();
-            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Card).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount), Key = cd.Key }).ToList();
-            var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount), Key = cd.Key }).ToList();
+            var incomes = cr.Incomes.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Cash).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Card).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
 
             var accum = new List<double>();
             var accumN = new List<int>();
 
-            foreach (var hour in xVal)
-            {
-                if (!incomes.Select(c => c.Key).Contains(hour))
-                    incomes.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
+            incomes.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
+            cash.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
+            card.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
+            Withdrawals.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
 
-                if (!cash.Select(c => c.Key).Contains(hour))
-                    cash.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
+            //foreach (var hour in xVal)
+            //{
+            //    if (!incomes.Select(c => c.Key).Contains(hour))
+            //        incomes.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
 
-                if (!card.Select(c => c.Key).Contains(hour))
-                    card.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
+            //    if (!cash.Select(c => c.Key).Contains(hour))
+            //        cash.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
 
-                if (!Withdrawals.Select(c => c.Key).Contains(hour))
-                    Withdrawals.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
-            }
+            //    if (!card.Select(c => c.Key).Contains(hour))
+            //        card.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
+
+            //    if (!Withdrawals.Select(c => c.Key).Contains(hour))
+            //        Withdrawals.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
+            //}
 
 
-
+            incomes = incomes.OrderBy(c => c.Key).ToList();
             cash = cash.OrderBy(c => c.Key).ToList();
             card = card.OrderBy(c => c.Key).ToList();
             Withdrawals = Withdrawals.OrderBy(c => c.Key).ToList();
 
-            for (int i = 0; i < xVal.Count; i++)
-            {
-                double val = Cons.Zero;
+            //for (int i = 0; i < xVal.Count; i++)
+            //{
+            //    double val = Cons.Zero;
 
-                if (i == Cons.Zero)
-                    val = incomes[i].Total - Withdrawals[i].Total;
-                else
-                    val = accum[i - Cons.One] + (incomes[i].Total - Withdrawals[i].Total);
+            //    if (i == Cons.Zero)
+            //        val = cr.InitialAmount + incomes[i].Total - Withdrawals[i].Total;
+            //    else
+            //        val = accum[i - Cons.One] + (incomes[i].Total - Withdrawals[i].Total);
 
-                if (val != Cons.Zero)
-                {
-                    accum.Add(val);
-                    accumN.Add(incomes[i].Key);
-                }
-            }
+            //    accum.Add(val);
+            //    accumN.Add(incomes[i].Key);
+            //}
 
-           accumN = accumN.OrderBy(d=>d).ToList();
+            accumN = accumN.OrderBy(d => d).ToList();
 
             var balance = new Chart(800, 500, theme: ChartTheme.Green);
 
             balance.AddSeries("Efectivo", chartType: "Column", yValues: cash.Select(i => i.Total).ToList(), xValue: cash.Select(i => i.Key).ToList());
             balance.AddSeries("Tarjeta", chartType: "Column", yValues: card.Select(i => i.Total).ToList(), xValue: card.Select(i => i.Key).ToList());
             balance.AddSeries("Retiros", chartType: "Column", yValues: Withdrawals.Select(i => i.Total).ToList(), xValue: Withdrawals.Select(i => i.Key).ToList());
-            balance.AddSeries("Acumulado", chartType: "Line", yValues: accum, xValue: accumN,yFields:"Cantidad",xField:"Hora");
+            //balance.AddSeries("Acumulado", chartType: "Line", yValues: accum, xValue: accumN, yFields: "Cantidad", xField: "Hora");
 
-            balance.AddLegend("Turno " + begin.TimeOfDay.ToString() + "-" + end.TimeOfDay.ToString());
+            balance.AddLegend("Balance de Caja");
 
             var imgS = balance.GetBytes();
             var baseS = Convert.ToBase64String(imgS);
@@ -108,11 +107,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(cr);
         }
 
+        [HttpPost]
         public JsonResult CashRegStatus()
         {
             var cr = User.Identity.GetCashRegister();
 
-            if (cr != null && !cr.IsClosed)
+            if (cr != null)
                 return Json("OK");
             else
                 return Json("No se ha abierto el modulo de caja");
@@ -134,36 +134,16 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        public static void AddWithdrawal(double amount, IIdentity user)
-        {
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                var cr = user.GetCashRegister();
-                var dt = new Income();
-                dt.Amount = amount;
-                dt.InsDate = DateTime.Now;
-                dt.CashRegisterId = cr.CashRegisterId;
-                dt.User = user.Name;
-
-                db.Incomes.Add(dt);
-                db.SaveChanges();
-            }
-        }
-
         [HttpPost]
         public JsonResult OpenCashRegister(double initialAmount)
         {
             try
             {
-                var cr = User.Identity.GetCashRegister();
-                cr.BeginDate = DateTime.Now;
-                cr.UserOpen = User.Identity.Name;
-                cr.IsClosed = false;
+                var cr = GetNewCR();
+                cr.IsOpen = true;
                 cr.InitialAmount = Math.Round(initialAmount, Cons.Two);
 
-
-                db.Entry(cr).State = EntityState.Modified;
-
+                db.CashRegisters.Add(cr);
                 db.SaveChanges();
             }
             catch (Exception ex)
@@ -186,9 +166,26 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = User.Identity.GetCashRegister();
 
-            var wd = new Withdrawal { Amount = amount, InsDate= DateTime.Now, User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId };
+            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now, User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId };
 
             db.Withdrawals.Add(wd);
+            db.SaveChanges();
+
+            return Json("OK");
+        }
+
+        [HttpPost]
+        public ActionResult Close(double amount, string comment)
+        {
+            var cr = User.Identity.GetCashRegister();
+
+            cr.FinalAmount = Math.Round(amount, Cons.Two);
+            cr.UserClose = User.Identity.Name;
+            cr.ClosingDate = DateTime.Now;
+            cr.CloseComment = comment;
+            cr.IsOpen = false;
+
+            db.Entry(cr).State = EntityState.Modified;
             db.SaveChanges();
 
             return Json("OK");

@@ -27,6 +27,11 @@ namespace CerberusMultiBranch.Support
 
         public const string ProductImagesPath = "/Content/ProductImages";
 
+        //Variables de configuración
+        public const string FirstShift = "FirstShift";
+
+        public const string SecondShift = "SecondShift";
+
     }
 
     public struct FileStruct

@@ -6,30 +6,49 @@ using System.Threading.Tasks;
 
 namespace ExcelUploader
 {
+    public static class Ext
+    {
+        public static string Clear(this string data, int max)
+        {
+            data = data.Trim().Replace("*", string.Empty).Replace("-", string.Empty).
+                            Replace("_", string.Empty).Replace(" ", string.Empty).Replace("/", string.Empty);
+
+            if (data.Length > max)
+                return data.Substring(0, max);
+            else
+                return data;
+        }
+    }
     class DataManager
     {
+
         public static bool AddTypes()
         {
             Console.Write("Revisando categorias .. \n");
-            var sis = Excel.GetSystems();
 
+            var sqlSis = SQLServer.GetSystems();
+            var sqlCat = SQLServer.GetCategories();
+
+            var sis = Excel.GetSystems();
             var cat = Excel.GetCategories();
 
             foreach (var s in sis)
             {
-               if( SQLServer.GetSystemId(s)== 0)
+                var sys = sqlSis.FirstOrDefault(ss => ss.Name == s);
+                if (sys == null)
                 {
-                    Console.Write("\rSistemas Agregados:" + s);
                     SQLServer.AddSystem(s);
+                    Console.Write("\rSistemas Agregados:" + s);
                 }
             }
 
             foreach (var c in cat)
             {
-                if (SQLServer.GetCategoryId(c) == 0)
+                var cate = sqlCat.FirstOrDefault(ss => ss.Name == c);
+                if (cate == null)
                 {
-                    Console.Write("\rCategoría agregadas:" + c );
                     SQLServer.AddCategory(c);
+                    Console.Write("\rCategoría agregadas:" + c);
                 }
             }
 
@@ -60,38 +79,38 @@ namespace ExcelUploader
                         ok++;
                 }
                 else
-                { 
+                {
                     o++;
                     codes.Add(prod.Code + " " + prod.Name);
                 }
             }
 
             Console.WriteLine("Revision de productos terminada\n");
-            Console.WriteLine("Agregados {0}  Errores {1} Omitidos {2}", ok,error,o);
+            Console.WriteLine("Agregados {0}  Errores {1} Omitidos {2}", ok, error, o);
 
             Console.WriteLine("Productos omitidos:");
             foreach (var c in codes)
                 Console.WriteLine(c);
         }
 
-    //public static bool AddProducts()
-    //{
+        //public static bool AddProducts()
+        //{
 
-    //    List<Product> products = new List<Product>();
+        //    List<Product> products = new List<Product>();
 
-    //    foreach (var s in sis)
-    //    {
-    //        Console.Write("Agegando Sistema:" + s + "\n");
-    //        SQLServer.AddSystem(s);
-    //    }
+        //    foreach (var s in sis)
+        //    {
+        //        Console.Write("Agegando Sistema:" + s + "\n");
+        //        SQLServer.AddSystem(s);
+        //    }
 
-    //    foreach (var c in cat)
-    //    {
-    //        Console.Write("Agegando Categoría:" + c + "\n");
-    //        SQLServer.AddCategory(c);
-    //    }
+        //    foreach (var c in cat)
+        //    {
+        //        Console.Write("Agegando Categoría:" + c + "\n");
+        //        SQLServer.AddCategory(c);
+        //    }
 
-    //    return true;
-    //}
-}
+        //    return true;
+        //}
+    }
 }

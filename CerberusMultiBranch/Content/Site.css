@@ -243,12 +243,12 @@ a, a:hover, a:focus {
 }
 
     #sidebar .sidebar-header {
-        padding: 20px;
+        padding: 0px;
         background: #151515;
     }
 
     #sidebar ul.components {
-        padding: 20px 0;
+        padding: 0px 0;
         border-bottom: 1px solid #47748b;
     }
 

@@ -46,15 +46,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee, List<Branch> branches)
         {
-            var bList = branches.Select(b => b.BranchId).ToList();
+            var bId = User.Identity.GetBranchId();
 
             //busco los userId de los empleados que coincidan con el filtro
             var uList = (employee == null || employee == string.Empty) ?
                 db.Employees.Where(e => e.Name.Contains(employee)).Select(e => e.UserId).ToList() : null;
 
             var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
-                         where (branchId == null && bList.Contains(p.BranchId)
-                         || p.BranchId == branchId && bList.Contains(p.BranchId))
+                         where (p.BranchId == bId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
                          && (endDate == null || p.TransactionDate <= endDate)
                          && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
@@ -89,7 +88,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(s => s.TransactionDetails.Select(d => d.Product.BranchProducts)).
                     FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
 
-            if (model == null || model.TransactionDetails.Count == 0)
+            if (model == null || model.TransactionDetails.Count == Cons.Zero)
                 return View();
 
             if (model != null)

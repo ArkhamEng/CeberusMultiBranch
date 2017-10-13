@@ -3666,6 +3666,16 @@ INSERT INTO [Config].[Variable]
      VALUES
            ('WholesalerPercentage','20')
 
+INSERT INTO [Config].[Variable]
+           ([Name],[Value])
+     VALUES
+           ('FirstShift','8-14')
+
+INSERT INTO [Config].[Variable]
+           ([Name],[Value])
+     VALUES
+           ('SecondShift','14-10')
+
 
 --=============User Administrator================================== "Administrador01"
 INSERT INTO [Security].[AspNetUsers]
