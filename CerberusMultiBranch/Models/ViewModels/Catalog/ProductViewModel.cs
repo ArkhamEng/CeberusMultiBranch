@@ -57,7 +57,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Unit = product.Unit;
             this.Compatibilities = product.Compatibilities;
             this.BranchProducts = product.BranchProducts;
-            this.Reference = product.Reference;
             this.PartSystemId = product.PartSystemId;
    
             this.Categories = new List<Category>().ToSelectList();

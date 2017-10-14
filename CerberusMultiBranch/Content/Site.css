@@ -199,14 +199,19 @@ a[aria-expanded="true"]::before {
     content: '\e260';
 }
 
-@media (max-width: 768px) {
-    #sidebar {
+@media (max-width: 768px) 
+{
+    #sidebar 
+    {
         margin-left: -200px;
     }
 
-        #sidebar.active {
+        #sidebar.active 
+        {
             margin-left: 0;
         }
+
+        
 }
 
 

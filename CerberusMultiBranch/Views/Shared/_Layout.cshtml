@@ -20,35 +20,20 @@
     @Html.Partial("_MessageBox")
 
     <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="col-md-2 row">
-            <div class="col-md-12">
+        <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
+            <div class="col-xs-6 col-sm-4 col-md-12">
                 <img src="~/Content/Images/logo1.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
             </div>
         </div>
         <div class="container">
             <div class="navbar-header">
-                @*<button type="button" id="sidebarCollapse" class="btn btn-info navbar-btn btn-xs">
-                    <i class="glyphicon glyphicon-align-left"></i>
-                    Refaccionaria Auto Bien
-                </button>*@
-             
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-
-                @*@Html.ActionLink("AutoBien Refaccionaria", "Index", "Home", new { area = "" }, new { @class = "navbar-brand navbar-btn", id = "sidebarCollapse" })*@
             </div>
             <div class="navbar-collapse collapse">
-                @*<ul class="nav navbar-nav">
-                        <li>@Html.ActionLink("Proveedores", "Index", "Providers")</li>
-                        <li>@Html.ActionLink("Clientes", "Index", "Clients")</li>
-                        <li>@Html.ActionLink("Productos", "Index", "Products")</li>
-                        <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                        <li>@Html.ActionLink("About", "About", "Home")</li>
-                        <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
-                    </ul>*@
                 @Html.Partial("_LoginPartial")
             </div>
         </div>

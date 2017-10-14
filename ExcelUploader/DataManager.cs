@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,19 +10,145 @@ namespace ExcelUploader
 {
     public static class Ext
     {
+        public static DataTable ToDataDateble<T>(this IList<T> data)
+        {
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
+            DataTable table = new DataTable();
+            foreach (PropertyDescriptor prop in properties)
+                table.Columns.Add(prop.Name, Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType);
+
+            foreach (T item in data)
+            {
+                DataRow row = table.NewRow();
+                foreach (PropertyDescriptor prop in properties)
+                    row[prop.Name] = prop.GetValue(item) ?? DBNull.Value;
+                table.Rows.Add(row);
+            }
+            return table;
+
+        }
+
         public static string Clear(this string data, int max)
         {
             data = data.Trim().Replace("*", string.Empty).Replace("-", string.Empty).
-                            Replace("_", string.Empty).Replace(" ", string.Empty).Replace("/", string.Empty);
+                            Replace("_", string.Empty).Replace(" ", string.Empty).Replace("/", string.Empty).Replace("*",string.Empty);
 
             if (data.Length > max)
                 return data.Substring(0, max);
             else
                 return data;
         }
+
+        public static string Truncate(this string data, int max)
+        {
+            data = data.Trim();
+
+            if (data.Length > max)
+                return data.Substring(0, max);
+            else
+                return data;
+        }
+
+        public static int ToInt(this object data)
+        {
+            var dt = data.ToString().Trim();
+            int d;
+
+            return int.TryParse(dt, out d)? d: 0;
+           
+        }
+
+        public static double ToDouble(this object data)
+        {
+            var dt = data.ToString().Trim();
+            double d;
+
+            return  Math.Round((double.TryParse(dt, out d) ? d : 0),2);
+
+        }
     }
     class DataManager
     {
+        public static void AddCatalogs()
+        {
+            var providers = AccessServer.GetProviders();
+
+            var clients   = AccessServer.GetClients();
+
+            var categories = AccessServer.GetCategories();
+
+            Console.WriteLine("Proveedores {0}  Clientes {1}   Categorias {2}",providers.Count, clients.Count, categories.Count);
+            Console.WriteLine("Comenzando la exportación de proveedores");
+
+            int prC = 0;
+            foreach(var provider in providers)
+            {
+                var done = SQLServer.AddProvider(provider);
+                if (done)
+                {
+                    prC++;
+                    Console.Write("\rProveedores Agregados {0}", prC);
+                }
+            }
+
+            Console.WriteLine("Comenzando la exportación de clientes");
+
+            int cC = 0;
+            foreach (var client in clients)
+            {
+                var done = SQLServer.AddClient(client);
+                if (done)
+                {
+                    cC++;
+                    Console.Write("\rClientes Agregados {0}", cC);
+                }
+            }
+
+
+            Console.Write("Comenzando la exportación de Categorías");
+
+            int caC = 0;
+            foreach (var cat in categories)
+            {
+                var done = SQLServer.AddCategory(cat.Name);
+                if (done)
+                {
+                    caC++;
+                    Console.WriteLine("\rClientes Agregados {0}", caC);
+                }
+            }
+        }
+
+        public static void AddProducts()
+        {
+            Console.WriteLine("Obteninedo Catalogo de categorias");
+
+            var sCat = SQLServer.GetCategories();
+
+            Console.WriteLine("Categorias Cargadas {0}",sCat.Count);
+
+            Console.WriteLine("Obteniendo productos a exportar....");
+
+            var products = AccessServer.GetProducts(sCat);
+
+            Console.WriteLine("Productos encontrados {0} Presiona una tecla para continuar",products.Count);
+
+            Console.ReadLine();
+            Console.WriteLine("Comenzando la exporacion de productos...");
+
+            int pC = 0;
+            foreach(var product in products)
+            {
+                var done = SQLServer.AddProduct(product);
+
+                if (done)
+                {
+                    pC++;
+                    Console.Write("\rProductos Agregados {0}",pC);
+                }
+            }
+        }
+
 
         public static bool AddTypes()
         {

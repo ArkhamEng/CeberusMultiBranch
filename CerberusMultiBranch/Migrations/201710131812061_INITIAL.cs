@@ -3,7 +3,7 @@ namespace CerberusMultiBranch.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Initial : DbMigration
+    public partial class INITIAL : DbMigration
     {
         public override void Up()
         {
@@ -42,9 +42,8 @@ namespace CerberusMultiBranch.Migrations
                         CategoryId = c.Int(nullable: false),
                         PartSystemId = c.Int(),
                         Code = c.String(nullable: false, maxLength: 30),
-                        Reference = c.String(nullable: false, maxLength: 100),
-                        Name = c.String(maxLength: 100),
-                        Description = c.String(),
+                        Name = c.String(maxLength: 200),
+                        Description = c.String(maxLength: 200),
                         MinQuantity = c.Double(nullable: false),
                         BarCode = c.String(),
                         BuyPrice = c.Double(nullable: false),
@@ -54,9 +53,8 @@ namespace CerberusMultiBranch.Migrations
                         StorePrice = c.Double(nullable: false),
                         WholesalerPrice = c.Double(nullable: false),
                         DealerPrice = c.Double(nullable: false),
-                        MinimunPrice = c.Double(nullable: false),
-                        TradeMark = c.String(),
-                        Unit = c.String(),
+                        TradeMark = c.String(maxLength: 50),
+                        Unit = c.String(maxLength: 20),
                     })
                 .PrimaryKey(t => t.ProductId)
                 .ForeignKey("Config.Category", t => t.CategoryId, cascadeDelete: true)
@@ -71,9 +69,10 @@ namespace CerberusMultiBranch.Migrations
                 c => new
                     {
                         CategoryId = c.Int(nullable: false, identity: true),
-                        Name = c.String(),
+                        Name = c.String(maxLength: 100),
                     })
-                .PrimaryKey(t => t.CategoryId);
+                .PrimaryKey(t => t.CategoryId)
+                .Index(t => t.Name, name: "IDX_Name");
             
             CreateTable(
                 "Catalog.Compatibility",
@@ -197,25 +196,24 @@ namespace CerberusMultiBranch.Migrations
                     {
                         ProviderId = c.Int(nullable: false, identity: true),
                         CityId = c.Int(nullable: false),
-                        Code = c.String(nullable: false, maxLength: 12),
+                        Code = c.String(nullable: false, maxLength: 10),
                         Name = c.String(nullable: false, maxLength: 100),
-                        BusinessName = c.String(maxLength: 50),
-                        WebSite = c.String(),
-                        FTR = c.String(maxLength: 13),
-                        Address = c.String(nullable: false),
-                        ZipCode = c.String(),
+                        BusinessName = c.String(maxLength: 100),
+                        WebSite = c.String(maxLength: 30),
+                        FTR = c.String(maxLength: 15),
+                        Address = c.String(nullable: false, maxLength: 150),
+                        ZipCode = c.String(maxLength: 10),
                         Email = c.String(maxLength: 30),
                         Phone = c.String(nullable: false, maxLength: 20),
                         IsActive = c.Boolean(nullable: false),
                         UpdDate = c.DateTime(nullable: false),
                     })
                 .PrimaryKey(t => t.ProviderId)
-                .ForeignKey("Config.City", t => t.CityId, cascadeDelete: true)
+                .ForeignKey("Config.City", t => t.CityId, cascadeDelete: false)
                 .Index(t => t.CityId)
                 .Index(t => t.Code, unique: true, name: "IDX_Code")
                 .Index(t => t.Name, name: "IDX_Name")
-                .Index(t => t.Email, name: "IDX_Email")
-                .Index(t => t.Phone, unique: true, name: "IDX_Phone");
+                .Index(t => t.Email, name: "IDX_Email");
             
             CreateTable(
                 "Config.City",
@@ -223,7 +221,7 @@ namespace CerberusMultiBranch.Migrations
                     {
                         CityId = c.Int(nullable: false, identity: true),
                         StateId = c.Int(nullable: false),
-                        Code = c.String(),
+                        Code = c.String(maxLength: 15),
                         Name = c.String(nullable: false, maxLength: 50),
                         IsActive = c.Boolean(nullable: false),
                     })
@@ -236,9 +234,9 @@ namespace CerberusMultiBranch.Migrations
                 c => new
                     {
                         StateId = c.Int(nullable: false, identity: true),
-                        Code = c.String(),
+                        Code = c.String(maxLength: 15),
                         Name = c.String(nullable: false, maxLength: 50),
-                        ShorName = c.String(),
+                        ShorName = c.String(maxLength: 10),
                         IsActive = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.StateId)
@@ -300,7 +298,7 @@ namespace CerberusMultiBranch.Migrations
                         PictureType = c.String(maxLength: 20),
                     })
                 .PrimaryKey(t => t.EmployeeId)
-                .ForeignKey("Config.City", t => t.CityId, cascadeDelete: true)
+                .ForeignKey("Config.City", t => t.CityId, cascadeDelete: false)
                 .ForeignKey("Security.AspNetUsers", t => t.UserId)
                 .Index(t => t.CityId, name: "IDX_CityId")
                 .Index(t => t.UserId, unique: true, name: "IDX_UserId")
@@ -353,14 +351,14 @@ namespace CerberusMultiBranch.Migrations
                     {
                         ClientId = c.Int(nullable: false, identity: true),
                         CityId = c.Int(nullable: false),
-                        Code = c.String(nullable: false, maxLength: 12),
-                        Name = c.String(nullable: false),
-                        BusinessName = c.String(maxLength: 50),
-                        LegalRepresentative = c.String(maxLength: 50),
-                        FTR = c.String(maxLength: 13),
+                        Code = c.String(nullable: false, maxLength: 10),
+                        Name = c.String(nullable: false, maxLength: 100),
+                        BusinessName = c.String(maxLength: 100),
+                        LegalRepresentative = c.String(maxLength: 100),
+                        FTR = c.String(maxLength: 15),
                         TaxAddress = c.String(),
-                        Address = c.String(nullable: false),
-                        ZipCode = c.String(),
+                        Address = c.String(nullable: false, maxLength: 150),
+                        ZipCode = c.String(maxLength: 10),
                         Entrance = c.DateTime(nullable: false),
                         Email = c.String(maxLength: 30),
                         Phone = c.String(nullable: false, maxLength: 20),
@@ -392,15 +390,14 @@ namespace CerberusMultiBranch.Migrations
                     {
                         CashRegisterId = c.Int(nullable: false, identity: true),
                         BranchId = c.Int(nullable: false),
-                        UserOpen = c.String(),
-                        UserClose = c.String(),
-                        IsClosed = c.Boolean(nullable: false),
+                        UserOpen = c.String(maxLength: 50),
+                        UserClose = c.String(maxLength: 50),
                         InitialAmount = c.Double(nullable: false),
                         FinalAmount = c.Double(nullable: false),
                         CloseComment = c.String(maxLength: 100),
-                        BeginDate = c.DateTime(nullable: false),
-                        EndDate = c.DateTime(nullable: false),
-                        ShiftNumber = c.Int(nullable: false),
+                        OpeningDate = c.DateTime(nullable: false),
+                        ClosingDate = c.DateTime(),
+                        IsOpen = c.Boolean(nullable: false),
                     })
                 .PrimaryKey(t => t.CashRegisterId)
                 .ForeignKey("Config.Branch", t => t.BranchId, cascadeDelete: true)
@@ -499,7 +496,6 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Security.AspNetUsers", "UserNameIndex");
             DropIndex("Config.State", "IDX_Name");
             DropIndex("Config.City", "IDX_StateId");
-            DropIndex("Catalog.Provider", "IDX_Phone");
             DropIndex("Catalog.Provider", "IDX_Email");
             DropIndex("Catalog.Provider", "IDX_Name");
             DropIndex("Catalog.Provider", "IDX_Code");
@@ -517,6 +513,7 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Config.CarYear", "IDX_CarModelId");
             DropIndex("Catalog.Compatibility", new[] { "ProductId" });
             DropIndex("Catalog.Compatibility", new[] { "CarYearId" });
+            DropIndex("Config.Category", "IDX_Name");
             DropIndex("Catalog.Product", "IDX_Name");
             DropIndex("Catalog.Product", "IDX_Code");
             DropIndex("Catalog.Product", "IDX_PartSystemId");

@@ -149,7 +149,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchSession().Id;
             var userId   = User.Identity.GetUserId();
 
-            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
+            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsPayed);
 
             var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p=> p.BranchProducts).
                         FirstOrDefault(p => p.ProductId == id);

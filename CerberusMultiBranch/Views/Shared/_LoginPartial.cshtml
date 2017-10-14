@@ -6,9 +6,6 @@
     @Html.AntiForgeryToken()
 
     <ul class="nav navbar-nav navbar-right">
-        @*<li>
-            <img src="@Url.Action("GetPicture", "Employees")" class="img-rounded img-responsive" style="max-height:40px" />
-        </li>*@
             <li>
                 @Html.ActionLink(" " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage" })
             </li>

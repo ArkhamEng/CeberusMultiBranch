@@ -14,6 +14,8 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public int CategoryId { get; set; }
 
         [Display(Name="Categoría")]
+        [MaxLength(100)]
+        [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
 

@@ -26,21 +26,23 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
 
-        [Display(Name = "Referencia")]
-        [Required]
-        [MaxLength(100)]
-        public string Reference { get; set; }
+        //[Display(Name = "Referencia")]
+        //[Required]
+        //[MaxLength(100)]
+        //public string Reference { get; set; }
 
         [Display(Name = "Nombre")]
-        [MaxLength(100)]
+        [MaxLength(200)]
         [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
         [Display(Name = "Descripción")]
+        [MaxLength(200)]
         [DataType(DataType.MultilineText)]
         public string Description { get; set; }
 
         [Display(Name="Cantidad Minima")]
+        [Required]
         public double MinQuantity { get; set; }
 
         [Display(Name = "Código de barras")]
@@ -51,34 +53,40 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public double BuyPrice { get; set; }
 
         [Display(Name = "% Mostrador")]
+        [Required]
         public int StorePercentage { get; set; }
 
         [Display(Name = "% Distribuidor")]
+        [Required]
         public int DealerPercentage { get; set; }
 
         [Display(Name = "% Mayorista")]
+        [Required]
         public int WholesalerPercentage { get; set; }
 
         [Display(Name = "Precio Mostrador")]
         [DataType(DataType.Currency)]
+        [Required]
         public double StorePrice { get; set; }
 
         [Display(Name = "Precio Mayorista")]
         [DataType(DataType.Currency)]
+        [Required]
         public double WholesalerPrice { get; set; }
         
 
         [Display(Name = "Precio Distribuidor")]
         [DataType(DataType.Currency)]
+        [Required]
         public double DealerPrice { get; set; }
 
-        [DataType(DataType.Currency)]
-        public double MinimunPrice { get; set; }
-
+     
         [Display(Name = "Fabricante")]
+        [MaxLength(50)]
         public string TradeMark { get; set; }
 
         [Display(Name = "Unidad")]
+        [MaxLength(20)]
         public string Unit { get; set; }
 
         public virtual Category Category { get; set; }

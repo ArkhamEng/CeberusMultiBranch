@@ -112,31 +112,43 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             if (ModelState.IsValid)
             {
+                purchase.IsPayed = (purchase.PaymentType == PaymentType.Contado);
+
                 if (purchase.TransactionId == Cons.Zero)
                     db.Purchases.Add(purchase);
                 else
                 {
-                    purchase.UserId = User.Identity.GetUserId<string>();
-                    purchase.BranchId = User.Identity.GetBranchSession().Id;
+                    purchase.UserId = User.Identity.GetUserId();
+                    purchase.BranchId = User.Identity.GetBranchId();
                     db.Entry(purchase).State = EntityState.Modified;
                 }
 
-                if (purchase.IsCompleated)
+                if (purchase.Inventoried)
                 {
                     var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
 
+                    if(purchase.IsPayed)
+                    {
+                        Payment p       = new Payment();
+                        p.Amount        = purchase.TotalAmount;
+                        p.PaymentDate   = purchase.TransactionDate;
+                        p.TransactionId = purchase.TransactionId;
+                        p.PaymentType   = PaymentType.Contado;
+
+                        db.Payments.Add(p);
+                    }
+
                     foreach (var det in detailes)
                     {
-                        //var bProd = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == det.ProductId && bp.BranchId == purchase.BranchId);
                         var prod = db.Products.Include(p => p.BranchProducts).FirstOrDefault(p => p.ProductId == det.ProductId);
                         var bProd = prod.BranchProducts.FirstOrDefault(bp => bp.BranchId == purchase.BranchId);
 
                         //if the new price is biger than the old one, just update it
                         if (det.Price > prod.BuyPrice)
                         {
-                            prod.BuyPrice = det.Price;
-                            prod.DealerPrice = det.Price.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice = det.Price.GetPrice(prod.StorePercentage);
+                            prod.BuyPrice        = det.Price;
+                            prod.DealerPrice     = det.Price.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice      = det.Price.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = det.Price.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -160,10 +172,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                             bProd = new BranchProduct
                             {
                                 ProductId = det.ProductId,
-                                BranchId = purchase.BranchId,
+                                BranchId  = purchase.BranchId,
                                 LastStock = Cons.Zero,
-                                Stock = det.Quantity,
-                                UpdDate = DateTime.Now
+                                Stock     = det.Quantity,
+                                UpdDate   = DateTime.Now
                             };
 
                             db.BranchProducts.Add(bProd);
@@ -171,8 +183,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                         else
                         {
                             bProd.LastStock = bProd.Stock;
-                            bProd.Stock += det.Quantity;
-                            bProd.UpdDate = DateTime.Now;
+                            bProd.Stock     += det.Quantity;
+                            bProd.UpdDate   = DateTime.Now;
 
                             db.Entry(bProd).State = EntityState.Modified;
                         }

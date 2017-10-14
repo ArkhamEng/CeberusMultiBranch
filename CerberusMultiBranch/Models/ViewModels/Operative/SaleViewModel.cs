@@ -34,7 +34,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.EmployeeName = sale.EmployeeName;
             this.EmployeeId = sale.EmployeeId;
             this.Folio = sale.Folio;
-            this.IsCompleated = sale.IsCompleated;
+            this.IsPayed = sale.IsPayed;
             this.Payments = sale.Payments;
             this.PaymentType = sale.PaymentType;
             this.TotalAmount = sale.TotalAmount;

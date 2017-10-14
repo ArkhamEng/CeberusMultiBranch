@@ -37,14 +37,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return View(cr);
             }
 
-            var shift = cr.OpeningDate.GetShift();
+            //var shift = cr.OpeningDate.GetShift();
 
-            var range = shift.EndDate - shift.BeginDate;
-            var xVal = Enumerable.Range(0, (int)range.TotalHours).Select(i => shift.BeginDate.AddHours(i).Hour).ToList();
+            //var range = shift.EndDate - shift.BeginDate;
+            //var xVal = Enumerable.Range(0, (int)range.TotalHours).Select(i => shift.BeginDate.AddHours(i).Hour).ToList();
 
             var incomes = cr.Incomes.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
-            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Cash).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
-            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Card).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Efectivo).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Tarjeta).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
             var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
 
             var accum = new List<double>();
@@ -55,39 +55,11 @@ namespace CerberusMultiBranch.Controllers.Operative
             card.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
             Withdrawals.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
 
-            //foreach (var hour in xVal)
-            //{
-            //    if (!incomes.Select(c => c.Key).Contains(hour))
-            //        incomes.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
-
-            //    if (!cash.Select(c => c.Key).Contains(hour))
-            //        cash.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
-
-            //    if (!card.Select(c => c.Key).Contains(hour))
-            //        card.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
-
-            //    if (!Withdrawals.Select(c => c.Key).Contains(hour))
-            //        Withdrawals.Add(new { Total = Convert.ToDouble(Cons.Zero), Key = hour });
-            //}
-
 
             incomes = incomes.OrderBy(c => c.Key).ToList();
             cash = cash.OrderBy(c => c.Key).ToList();
             card = card.OrderBy(c => c.Key).ToList();
             Withdrawals = Withdrawals.OrderBy(c => c.Key).ToList();
-
-            //for (int i = 0; i < xVal.Count; i++)
-            //{
-            //    double val = Cons.Zero;
-
-            //    if (i == Cons.Zero)
-            //        val = cr.InitialAmount + incomes[i].Total - Withdrawals[i].Total;
-            //    else
-            //        val = accum[i - Cons.One] + (incomes[i].Total - Withdrawals[i].Total);
-
-            //    accum.Add(val);
-            //    accumN.Add(incomes[i].Key);
-            //}
 
             accumN = accumN.OrderBy(d => d).ToList();
 

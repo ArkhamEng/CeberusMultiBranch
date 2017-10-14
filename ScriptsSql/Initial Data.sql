@@ -3645,7 +3645,7 @@ SET IDENTITY_INSERT Catalog.Client ON
 INSERT INTO [Catalog].[Client]
            ([ClientId],[CityId],[Code],[Name],[BusinessName],[LegalRepresentative],[FTR],[TaxAddress],[Address],[ZipCode],[Entrance],[Email],[Phone],[IsActive],[UpdDate])
      VALUES
-           (0,2309,'0','Cliente por defecto','Cliente por defecto',null,'','','','',GETDATE(),'','',1,GETDATE())
+           (0,2309,'0000','CLIENTE POR DEFECTO','CLIENTE POR DEFECTO',null,'CAAA060615AA2','DIRECCION POR DEFECTO','DIRECCION POR DEFECTO','',GETDATE(),'','',1,GETDATE())
 
 SET IDENTITY_INSERT Catalog.Client OFF
 
@@ -3666,22 +3666,14 @@ INSERT INTO [Config].[Variable]
      VALUES
            ('WholesalerPercentage','20')
 
-INSERT INTO [Config].[Variable]
-           ([Name],[Value])
-     VALUES
-           ('FirstShift','8-14')
 
-INSERT INTO [Config].[Variable]
-           ([Name],[Value])
-     VALUES
-           ('SecondShift','14-10')
 
 
 --=============User Administrator================================== "Administrador01"
 INSERT INTO [Security].[AspNetUsers]
            ([Id],[Email],[EmailConfirmed],[PasswordHash],[SecurityStamp],[PhoneNumberConfirmed],[TwoFactorEnabled],[LockoutEnabled],[AccessFailedCount],[UserName])
      VALUES
-           ('384a8104-cbc6-40a5-a27c-2947263e0fcc','administrador@sims.com',1,'AK6X8N0K4cOnpKk8DOHYYocTWSNB/yLXybmoExtH1AE7+QsgZQ07NNg6NL5DXiKJqQ==','c7d38da5-c068-4838-97b1-b563eaf4a53b',0,0,1,0,'Administrador')
+           ('384a8104-cbc6-40a5-a27c-2947263e0fcc','arkhameng@gmail.com',1,'AK6X8N0K4cOnpKk8DOHYYocTWSNB/yLXybmoExtH1AE7+QsgZQ07NNg6NL5DXiKJqQ==','c7d38da5-c068-4838-97b1-b563eaf4a53b',0,0,1,0,'Administrador')
 
 --=============Employee========================================================================
 
@@ -3690,7 +3682,7 @@ SET IDENTITY_INSERT [Catalog].[Employee] ON
 INSERT INTO [Catalog].[Employee]
            ([EmployeeId],[UserId],[Code],[Name],[Address],[ZipCode],[Entrance],[Email],[Phone],[CityId],[IsActive],[UpdDate])
      VALUES
-           (0,'384a8104-cbc6-40a5-a27c-2947263e0fcc','0','Administrador','Paseo de Cuitlahuac 175','91826',GETDATE(),'administrador@sims.com','(229)1251761',2309,1,GETDATE())
+           (0,'384a8104-cbc6-40a5-a27c-2947263e0fcc','0000','ARIEL CAMACHO BARRIENTOS','PASEO DE CUITLAHUAC 175','91826',GETDATE(),'arkhameng@gmail.com','(229)1251761',2309,1,GETDATE())
 
 SET IDENTITY_INSERT [Catalog].[Employee] OFF
 
@@ -3728,7 +3720,7 @@ SET IDENTITY_INSERT [Catalog].[Provider] ON
 INSERT INTO [Catalog].[Provider]
            (ProviderId,[Code],[Name],[Address],[CityId],[Phone],[IsActive],[UpdDate])
      VALUES
-           (0,'0','Proveedor por defecto','Dirección por defecto',2309,'9999999999',1,GETDATE())
+           (0,'0000','PROVEEDOR POR DEFECTO','DIRECCION POR DEFECTO',2309,'9999999999',1,GETDATE())
 
 
 SET IDENTITY_INSERT [Catalog].[Provider] OFF

@@ -8,12 +8,13 @@
 <script>
     HalfProgress();
 </script>
-<div class="col-md-12">
-    <h3>
-        <span class="fa fa-shopping-bag" style="float:left"></span>
-        &nbsp;&nbsp;Registro de compras
-    </h3>
-</div>
+
+<h3>
+    <span class="fa fa-shopping-bag" style="float:left"></span>
+    &nbsp;&nbsp;Registro de compras
+</h3>
+
+
 
 @using (Html.BeginForm())
 {
@@ -21,14 +22,15 @@
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
 
-    <div class="panel-group col-md-11">
+    <div class="panel-group col-md-12">
         <div class="panel panel-default">
             <div class="panel-body">
                 <div class="row">
                     @Html.HiddenFor(m => m.BranchId)
                     @Html.HiddenFor(m => m.TransactionId)
                     @Html.HiddenFor(m => m.UserId)
-                    @Html.HiddenFor(m => m.IsCompleated)
+                    @Html.HiddenFor(m => m.Inventoried)
+                    @Html.HiddenFor(m => m.IsPayed)
                     @Html.HiddenFor(m => m.EmployeeId)
                     @Html.HiddenFor(m => m.ProviderId)
 
@@ -36,7 +38,7 @@
                         @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.EditorFor(model=> model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                            @Html.EditorFor(model => model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
 
                             <span class="input-group-btn">
                                 <button id="btnShowProviders" type="button" class="btn btn-default">
@@ -49,7 +51,7 @@
                         @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
                         <div class="form-control">
                             <label class="radio-inline"><input id="rdCredit" type="radio" value="5" name="PaymentType">Crédito</label>
-                            <label class="radio-inline"><input id="rdCash" type="radio" value="2" name="PaymentType">Contado</label>
+                            <label class="radio-inline"><input id="rdCash" type="radio" value="6" name="PaymentType">Contado</label>
                         </div>
                     </div>
 
@@ -70,7 +72,7 @@
                             @Html.EditorFor(model => model.EmployeeName, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
                         </div>
                     </div>
-                    <div class="col-md-3 col-md-offset-4">
+                    <div class="col-md-3 col-md-offset-1">
                         @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
@@ -78,9 +80,17 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
                     </div>
+                    <div class="col-md-2">
+                        @Html.LabelFor(model => model.Expiration, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            @Html.EditorFor(model => model.Expiration, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Expiration, "", new { @class = "text-danger" })
+                    </div>
                 </div>
             </div>
-            <div class="panel-footer col-md-12">
+            <div class="panel-footer">
                 <div class="clearfix row">
                     <div class="btn-group col-md-6">
                         @Html.Partial("_CatalogButtonGroup")
@@ -88,14 +98,13 @@
                             <span class="fa fa-cubes"></span>
                         </button>
                     </div>
-                   
-                    <div class="form-group col-md-3 col-md-offset-3">
-                        @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label col-md-3" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
+
+                    <div class="form-group col-md-3 col-md-offset-3">                            
+                            <div class="input-group col-md-10">
+                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
+                            </div>
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -106,7 +115,7 @@
         </div>
     </div>
 
- 
+
     <div id="divPopCompleate" style="display:none">
         <div class="text-center">
             <div class="btn-group">
@@ -130,36 +139,32 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         LoadPopoverCompleate();
 
         if ('@Model.TransactionId' == 0)
             $("#btnShowQuick").hide();
 
-        $("#btnShowProviders").click(function ()
-        {
+        $("#btnShowProviders").click(function () {
             $("#ModalQuickProvider").modal('show');
         });
 
-        if('@Model.PaymentType' == 'Cash')
+        if ('@Model.PaymentType' == 'Contado')
             $("#rdCash").attr("checked", true);
+
         else
             $("#rdCredit").attr("checked", true);
 
 
-        $("#spShowQuick").click(function ()
-        {
+        $("#spShowQuick").click(function () {
             $("#ModalQuickProduct").modal('show');
         });
 
-        $("#btnCompleate").click(function ()
-        {
+        $("#btnCompleate").click(function () {
             LoadPopoverCompleate();
         });
 
-        if ('@Model.IsCompleated' == 'True')
-        {
+        if ('@Model.Inventoried' == 'True') {
             $(".Compleated").hide();
             $("#btnSave").hide();
         }
@@ -167,23 +172,20 @@
         CompleateProgress();
     });
 
-    function ProviderSelected(id, name)
-    {
+    function ProviderSelected(id, name) {
         $("#ProviderId").val(id);
         $("#Provider_Name").val(name);
 
         $("#ModalQuickProvider").modal('hide');
     }
 
-    function SubmitCompleate()
-    {
+    function SubmitCompleate() {
         HidePopCompleate();
-        $("#IsCompleated").val(true);
+        $("#Inventoried").val(true);
         $("#btnSubmit").click();
     }
 
-    function LoadPopoverCompleate()
-    {
+    function LoadPopoverCompleate() {
         $("#btnCompleate").popover({
             html: true,
             content: function () { return $("#divPopCompleate").html(); },
@@ -196,20 +198,18 @@
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element)
-    {
+    function AddDetail(element) {
         var row = $(element).parent().parent().parent().parent();
         cells = row.find("td");
 
-        var param ={
+        var param = {
             price: row.find("#txtBuyPrice").val(),
             productId: row.find("#ProductId").val(),
             quantity: row.find("#Quantity").val(),
-            transactionId : $("#TransactionId").val()
+            transactionId: $("#TransactionId").val()
         };
 
-        ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view)
-        {
+        ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view) {
             $("#divDetails").html(view);
         });
     }

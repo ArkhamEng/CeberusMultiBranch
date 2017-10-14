@@ -201,21 +201,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710102231371_Initial.cs" />
-    <Compile Include="Migrations\201710102231371_Initial.Designer.cs">
-      <DependentUpon>201710102231371_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201710131812061_INITIAL.cs" />
+    <Compile Include="Migrations\201710131812061_INITIAL.Designer.cs">
+      <DependentUpon>201710131812061_INITIAL.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710111912009_ChangeCR.cs" />
-    <Compile Include="Migrations\201710111912009_ChangeCR.Designer.cs">
-      <DependentUpon>201710111912009_ChangeCR.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710112003182_ChangeCR1.cs" />
-    <Compile Include="Migrations\201710112003182_ChangeCR1.Designer.cs">
-      <DependentUpon>201710112003182_ChangeCR1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710130233404_prov.cs" />
-    <Compile Include="Migrations\201710130233404_prov.Designer.cs">
-      <DependentUpon>201710130233404_prov.cs</DependentUpon>
+    <Compile Include="Migrations\201710132308207_TransactionChanges.cs" />
+    <Compile Include="Migrations\201710132308207_TransactionChanges.Designer.cs">
+      <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -410,6 +402,7 @@
     <Content Include="Views\Providers\_QuickProviderList.cshtml" />
     <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
     <Content Include="Views\CashRegister\_CloseCash.cshtml" />
+    <Content Include="Views\Sales\_AddProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -423,17 +416,11 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710102231371_Initial.resx">
-      <DependentUpon>201710102231371_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710131812061_INITIAL.resx">
+      <DependentUpon>201710131812061_INITIAL.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710111912009_ChangeCR.resx">
-      <DependentUpon>201710111912009_ChangeCR.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710112003182_ChangeCR1.resx">
-      <DependentUpon>201710112003182_ChangeCR1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710130233404_prov.resx">
-      <DependentUpon>201710130233404_prov.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710132308207_TransactionChanges.resx">
+      <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

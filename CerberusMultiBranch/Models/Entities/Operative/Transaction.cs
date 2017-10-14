@@ -1,11 +1,13 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -42,11 +44,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public DateTime UpdDate { get; set; }
 
-        [Index("IDX_IsCompleated", IsUnique = false)]
-        public bool IsCompleated { get; set; }
+        [Index("IDX_IsPayed", IsUnique = false)]
+        public bool IsPayed { get; set; }
 
 
         public ICollection<TransactionDetail> TransactionDetails { get; set; }
+
+        public ICollection<Payment> Payments { get; set; }
 
 
         #region Navigation Properties
@@ -76,7 +80,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         }
     }
 
-    public class Purchase:Transaction
+    public class Purchase : Transaction
     {
         public int ProviderId { get; set; }
 
@@ -85,11 +89,24 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
+        [Display(Name = "Vencimiento")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime Expiration { get; set; }
+
+        [Index("IDX_Inventoried", IsUnique = false)]
+        public bool Inventoried { get; set; }
+
         public virtual Provider Provider { get; set; }
+
+        public Purchase() : base()
+        {
+            this.Expiration = DateTime.Now;
+        }
 
     }
 
-    public class Sale:Transaction
+    public class Sale : Transaction
     {
         public int ClientId { get; set; }
 
@@ -98,9 +115,29 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Folio { get; set; }
 
+        public bool Compleated { get; set; }
+
         public virtual Client Client { get; set; }
 
-        public ICollection<Payment> Payments { get; set; }
+        [NotMapped]
+        public SelectList Categories { get; set; }
+
+        [NotMapped]
+        public SelectList CarMakes { get; set; }
+
+        [NotMapped]
+        public SelectList CarModels { get; set; }
+
+        [NotMapped]
+        public SelectList CarYear { get; set; }
+
+        public Sale() : base()
+        {
+            this.CarMakes   = new List<ISelectable>().ToSelectList();
+            this.Categories = new List<ISelectable>().ToSelectList();
+            this.CarModels  = new List<ISelectable>().ToSelectList();
+            this.CarYear    = new List<ISelectable>().ToSelectList();
+        }
 
     }
 }

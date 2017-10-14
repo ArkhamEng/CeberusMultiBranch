@@ -8,7 +8,7 @@ namespace ExcelUploader
 {
     public class Person
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
 
         //[Display(Name = "Ciudad/Municipio")]
         //[Required]

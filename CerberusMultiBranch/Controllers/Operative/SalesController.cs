@@ -59,7 +59,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                          && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
                          && (client == null || client == string.Empty || p.Client.Name.Contains(client))
                          && (employee == null || employee == string.Empty || uList.Contains(p.UserId))
-                         && (p.IsCompleated)
+                         && (p.IsPayed)
                          select p).ToList();
 
             return sales;
@@ -68,38 +68,44 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult CheckCart()
         {
             var userId = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchSession().Id;
+            var branchId = User.Identity.GetBranchId();
 
-            var list = db.TransactionDetails.Where(td => td.Transaction.BranchId == branchId && !td.Transaction.IsCompleated
-            && td.Transaction.UserId == userId).ToList();
 
-            if (list != null)
+            var sale = db.Sales.Include(s => s.TransactionDetails).
+                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.Compleated);
+            ;
+
+            if (sale != null)
+            {
+                var list = sale.TransactionDetails;
                 return Content((list.Sum(td => td.Quantity)).ToString());
+            }
+                
             else
                 return Content(Cons.Zero.ToString());
         }
 
-        public ActionResult ShopingCart()
+        public ActionResult ShopingCart(int? id)
         {
-            var userId = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchSession().Id;
+            Sale model;
 
-            var model = db.Sales.Include(s => s.TransactionDetails.Select(d => d.Product.Images)).
-                Include(s => s.TransactionDetails.Select(d => d.Product.BranchProducts)).
-                    FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsCompleated);
-
-            if (model == null || model.TransactionDetails.Count == Cons.Zero)
-                return View();
-
-            if (model != null)
+            if(id!=null)
             {
-                var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
-                model.EmployeeName = employee.Name;
-                model.EmployeeId = employee.EmployeeId;
+                model = db.Sales.Include(s => s.TransactionDetails.Select(d => d.Product.Images)).
+                Include(s => s.TransactionDetails.Select(d => d.Product.BranchProducts)).
+                    FirstOrDefault(s => s.TransactionId == id);
             }
             else
-                model = new Sale();
+            {
+                var userId = User.Identity.GetUserId();
+                var branchId = User.Identity.GetBranchId();
 
+                model = new Sale();
+                model.UserId = userId;
+                model.BranchId = branchId;
+                model.TransactionDetails = new List<TransactionDetail>();
+            }
+    
             return View(model);
         }
 
@@ -223,11 +229,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
             sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
-            sale.IsCompleated = true;
+            sale.IsPayed = true;
 
             sale.Payments = new List<Payment>();
 
-            if (payment != PaymentType.Mixed.ToString())
+            if (payment != PaymentType.Mixto.ToString())
             {
                 var p = new Payment
                 {
@@ -242,10 +248,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             else
             {
                 var pm = new Payment
-                { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Cash };
+                { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
 
                 var pc = new Payment
-                { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Card };
+                { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
 
                 db.Payments.Add(pm);
                 db.Payments.Add(pc);

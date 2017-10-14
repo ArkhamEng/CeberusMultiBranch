@@ -51,7 +51,7 @@ else
             @{
 
                 var total = (Model.Incomes.
-                    Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Cash).Sum(d => d.Amount) + Model.InitialAmount - Model.Withdrawals.Sum(w => w.Amount));
+                    Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount) + Model.InitialAmount - Model.Withdrawals.Sum(w => w.Amount));
 
                 var totString = total.ToString("c");
             }
@@ -65,7 +65,7 @@ else
         <div class="col-md-5  text-center  alert bg-primary">
             <h3>
                 @{
-                    var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Cash).Sum(d => d.Amount).ToString("c");
+                    var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount).ToString("c");
                 }
                 Ventas Efectivo<br />
                 @cash
@@ -74,7 +74,7 @@ else
         <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
             <h3>
                 Ventas Tarjeta<br />
-                @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Card).Sum(d => d.Amount).ToString("c")
+                @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Tarjeta).Sum(d => d.Amount).ToString("c")
             </h3>
         </div>
 

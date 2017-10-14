@@ -21,25 +21,26 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Clave")]
         [Required]
-        [MaxLength(12)]
+        [MaxLength(10)]
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
 
         [Display(Name = "Nombre")]
         [Required]
+        [MaxLength(100)]
         public string Name { get; set; }
 
         [Display(Name = "Razón Social")]
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string BusinessName { get; set; }
 
         [Display(Name = "Representante Legal")]
-        [MaxLength(50)]
+        [MaxLength(100)]
         public string LegalRepresentative { get; set; }
 
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
-        [MaxLength(13)]
+        [MaxLength(15)]
         public string FTR { get; set; }
 
         [Display(Name = "Dirección Fiscal")]
@@ -47,10 +48,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string TaxAddress { get; set; }
 
         [Display(Name = "Dirección")]
+        [MaxLength(150)]
         [Required]
         public string Address { get; set; }
 
         [Display(Name = "C.P.")]
+        [MaxLength(10)]
         [DataType(DataType.PostalCode)]
         public string ZipCode { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -203,21 +204,29 @@ namespace ExcelUploader
             {
                 conn.Open();
                 SqlCommand com = conn.CreateCommand();
+                com.CommandText = "[Catalog].[LoadProduct]";
+                com.CommandType = CommandType.StoredProcedure;
 
-                com.CommandText = GetCommand(product);
+                com.Parameters.Add(new SqlParameter { Value = product.CategoryId, ParameterName = "@CategoryId" });
+                com.Parameters.Add(new SqlParameter { Value = product.Code, ParameterName = "@Code" });
+                com.Parameters.Add(new SqlParameter { Value = product.Name, ParameterName = "@Name" });
+                com.Parameters.Add(new SqlParameter { Value = product.Description, ParameterName = "@Description" });
+                com.Parameters.Add(new SqlParameter { Value = product.MinQuantity, ParameterName = "@MinQuantity" });
+                
+                com.Parameters.Add(new SqlParameter { Value = product.StorePercentage, ParameterName = "@StorePercentage" });
+                com.Parameters.Add(new SqlParameter { Value = product.DealerPercentage, ParameterName = "@DealerPercentage" });
+                com.Parameters.Add(new SqlParameter { Value = product.WholesalerPercentage, ParameterName = "@WholesalerPercentage" });
+
+                com.Parameters.Add(new SqlParameter { Value = product.BuyPrice, ParameterName = "@BuyPrice" });
+                com.Parameters.Add(new SqlParameter { Value = product.StorePrice, ParameterName = "@StorePrice" });
+                com.Parameters.Add(new SqlParameter { Value = product.WholesalerPrice, ParameterName = "@WholesalerPrice" });
+                com.Parameters.Add(new SqlParameter { Value = product.DealerPrice, ParameterName = "@DealerPrice" });
+                com.Parameters.Add(new SqlParameter { Value = product.TradeMark, ParameterName = "@TradeMark" });
+                com.Parameters.Add(new SqlParameter { Value = product.Unit, ParameterName = "@Unit" });
+
                 return com.ExecuteNonQuery() > 0 ? true : false;
             }
         }
 
-        private static string GetCommand(Product prod)
-        {
-            var text = "INSERT INTO [Catalog].[Product]";
-            text += "([CategoryId],[Code],[Name],[Description],[MinQuantity],[BarCode],[BuyPrice],[StorePercentage],[DealerPercentage],";
-            text += "[WholesalerPercentage],[StorePrice],[WholesalerPrice],[DealerPrice],[MinimunPrice],[TradeMark],[Unit],[PartSystemId],[Reference]) ";
-            text += string.Format("VALUES({0},'{1}','{2}','{3}',{4},'{5}',{6},{7},{8},{9},{10},{11},{12},{13},'{14}','{15}',{16},'{17}')",
-                prod.CategoryId,prod.Code,prod.Name,prod.Description,prod.MinQuantity,prod.BarCode,prod.BuyPrice,prod.StorePercentage,prod.DealerPercentage,
-                prod.WholesalerPercentage,prod.StorePrice,prod.WholesalerPrice,prod.DealerPrice,prod.MinimunPrice,prod.TradeMark,prod.Unit,prod.PartSystemId,prod.Reference);
-           return text;
-        }
     }
 }

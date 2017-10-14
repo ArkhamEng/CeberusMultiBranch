@@ -30,7 +30,7 @@
             <div class="panel-body">
                 @Html.HiddenFor(model => model.ProductId)
                 <div class="row">
-                    <div class="form-group col-md-6 ">
+                    <div class="form-group col-md-8">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-star-empty"></i></span>
@@ -39,20 +39,12 @@
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group col-md-2">
+                    <div class="form-group col-md-2 col-md-offset-2">
                         @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-tag"></i></span>
                             @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
                             @*<span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>*@
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group col-md-3 col-md-offset-1">
-                        @Html.LabelFor(model => model.Reference, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                            @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
                         @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
                     </div>
@@ -126,7 +118,7 @@
                         @Html.LabelFor(model => model.StorePercentage, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control", disabled = true } })
+                            @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -134,7 +126,7 @@
                         @Html.LabelFor(model => model.DealerPercentage, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control", disabled = true } })
+                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control"} })
                             @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -143,7 +135,7 @@
                         @Html.LabelFor(model => model.WholesalerPercentage, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control", disabled = true } })
+                            @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.WholesalerPercentage, "", new { @class = "text-danger" })
                         </div>
                     </div>

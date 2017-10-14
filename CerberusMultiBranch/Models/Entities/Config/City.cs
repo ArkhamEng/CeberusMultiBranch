@@ -17,6 +17,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Index("IDX_StateId", IsUnique = false)]
         public int StateId { get; set; }
 
+        [MaxLength(15)]
         public string Code { get; set; }
 
         [Display(Name = "Nombre")]

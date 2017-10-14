@@ -13,21 +13,9 @@ namespace ExcelUploader
         static void Main(string[] args)
         {
 
-            //DataManager.AddTypes();
+          //  DataManager.AddCatalogs();
 
-            //DataManager.ExportProducts();
-
-            var c = AccessServer.GetProviders();
-
-            foreach (var provider in c)
-            {
-               var done = SQLServer.AddProvider(provider);
-
-                if (done)
-                    Console.WriteLine("proveedor Agregado " + provider.Name);
-                else
-                    Console.WriteLine("ERROR AL AGREGAR PROVEEDOR " + provider.Name);
-            }
+            DataManager.AddProducts();
                
 
             Console.Write("Operación completa.. presiona cualquier tecla para cerrar!");
