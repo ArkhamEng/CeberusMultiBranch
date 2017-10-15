@@ -20,6 +20,7 @@ namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+
         public static double GetPrice(this double buyPrice, int percentage)
         {
             return buyPrice * (Cons.One + (percentage / Cons.OneHundred));

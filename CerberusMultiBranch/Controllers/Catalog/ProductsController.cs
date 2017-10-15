@@ -24,55 +24,55 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = new List<List<Product>>();//LookFor(null,null, null, null, null,false);
-            model.Systems    = db.Systems.ToSelectList();
+            model.Products = new List<List<Product>>();
+            model.Systems = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, string name, string code,bool isGrid)
+        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, string name, string code, bool isGrid)
         {
-            var model = LookFor(categoryId,partSystemId, carYear, name, code, isGrid);
+            var model = LookFor(categoryId, partSystemId, carYear, name, code, isGrid);
             return PartialView("_List", model);
         }
 
         [HttpPost]
         public ActionResult GetStockInBranches(int productId)
         {
-            var branches = db.Branches.Include(b=> b.BranchProducts).ToList();
+            var branches = db.Branches.Include(b => b.BranchProducts).ToList();
 
             foreach (var branch in branches)
             {
                 var bp = branch.BranchProducts.FirstOrDefault(b => b.ProductId == productId);
                 branch.Quantity = bp != null ? bp.Stock : 0;
             }
-              
+
 
             return PartialView("_StockInBranches", branches);
         }
 
-        private List<List<Product>> LookFor(int? categoryId,int? partSystemId, int? carYear, string name, string code, bool isGrid)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, string name, string code, bool isGrid)
         {
             var branchId = User.Identity.GetBranchSession().Id;
 
-            string[] arr = new List<string>().ToArray(); 
+            string[] arr = new List<string>().ToArray();
 
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
-       
+
 
             var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s=> (p.Code+"" + p.Name).Contains(s)))
+                            && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
                             //&& (code == null || code == string.Empty || p.Code == code)
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            select p ).Take(1000).ToList();
+                            select p).Take(1000).ToList();
 
-        //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
-            foreach(var prod in products)
+            //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
+            foreach (var prod in products)
             {
                 var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
                 prod.Quantity = bp != null ? bp.Stock : 0;
@@ -85,7 +85,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             else
             {
                 List<List<Product>> ord = new List<List<Product>>();
-                foreach(var p in products)
+                foreach (var p in products)
                 {
                     List<Product> pl = new List<Product>();
                     pl.Add(p);
@@ -134,11 +134,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
-         
+
 
             var model = (from p in db.Products
-                         where 
-                           (name == null || name == string.Empty || arr.All(s => (p.Code+" "+ p.Name).Contains(s)))
+                         where
+                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)))
                          select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
             return PartialView("_ProductList", model);
@@ -147,24 +147,24 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Detail(int id)
         {
             var branchId = User.Identity.GetBranchSession().Id;
-            var userId   = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
 
             var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsPayed);
 
-            var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p=> p.BranchProducts).
+            var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts).
                         FirstOrDefault(p => p.ProductId == id);
 
             model.TransactionId = trans == null ? Cons.Zero : trans.TransactionId;
 
-       
+
             var bProd = model.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
             model.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
 
             model.OrderCarModels();
 
-            model.Branches = db.Branches.Include(b=> b.BranchProducts).ToList();
-            var details = db.Sales.Include(s=> s.TransactionDetails).Select(s => s.TransactionDetails.
-            Where(td=> td.ProductId == id)).ToList();
+            model.Branches = db.Branches.Include(b => b.BranchProducts).ToList();
+            var details = db.Sales.Include(s => s.TransactionDetails).Select(s => s.TransactionDetails.
+             Where(td => td.ProductId == id)).ToList();
 
             foreach (var branch in model.Branches)
             {
@@ -184,9 +184,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 var variables = db.Variables;
                 model = new ProductViewModel();
-                model.DealerPercentage      = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
-                model.StorePercentage       = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
-                model.WholesalerPercentage  = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+                model.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                model.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                model.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
             }
             else
             {
@@ -307,6 +307,32 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ImagesLoaded", model);
         }
 
+        [HttpPost]
+        public ActionResult SearchForSale(int? categoryId, int? carYear, string name)
+        {
+            var branchId = User.Identity.GetBranchSession().Id;
+
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
+            var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
+                                     Include(p => p.BranchProducts)
+
+                            where (categoryId == null || p.CategoryId == categoryId)
+                               && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
+                               && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                            select p).Take(1000).ToList();
+
+            foreach (var prod in products)
+            {
+                var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
+            }
+
+            return PartialView("_ListForSale", products);
+        }
 
 
         protected override void Dispose(bool disposing)

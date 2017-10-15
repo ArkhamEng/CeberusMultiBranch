@@ -23,7 +23,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public SelectList CarYears { get; set; }
         public SaleViewModel()
-        { }
+        {
+            this.CarMakes = new List<ISelectable>().ToSelectList();
+            this.Categories = new List<ISelectable>().ToSelectList();
+            this.CarModels = new List<ISelectable>().ToSelectList();
+            this.CarYears = new List<ISelectable>().ToSelectList();
+        }
 
         public SaleViewModel(Sale sale)
         {
@@ -35,6 +40,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.EmployeeId = sale.EmployeeId;
             this.Folio = sale.Folio;
             this.IsPayed = sale.IsPayed;
+            this.Compleated = sale.Compleated;
             this.Payments = sale.Payments;
             this.PaymentType = sale.PaymentType;
             this.TotalAmount = sale.TotalAmount;
@@ -45,6 +51,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.User = sale.User;
             this.UserId = sale.UserId;
 
+            this.CarMakes = new List<ISelectable>().ToSelectList();
+            this.Categories = new List<ISelectable>().ToSelectList();
             this.CarModels = new List<ISelectable>().ToSelectList();
             this.CarYears = new List<ISelectable>().ToSelectList();
 

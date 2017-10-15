@@ -403,6 +403,7 @@
     <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
     <Content Include="Views\CashRegister\_CloseCash.cshtml" />
     <Content Include="Views\Sales\_AddProduct.cshtml" />
+    <Content Include="Views\Products\_ListForSale.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

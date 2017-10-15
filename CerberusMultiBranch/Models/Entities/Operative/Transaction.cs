@@ -36,7 +36,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Required]
         [Display(Name = "Fecha de Operación")]
-        [DataType(DataType.Date)]
+        [DataType(DataType.DateTime)]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
@@ -118,26 +118,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public bool Compleated { get; set; }
 
         public virtual Client Client { get; set; }
-
-        [NotMapped]
-        public SelectList Categories { get; set; }
-
-        [NotMapped]
-        public SelectList CarMakes { get; set; }
-
-        [NotMapped]
-        public SelectList CarModels { get; set; }
-
-        [NotMapped]
-        public SelectList CarYear { get; set; }
-
-        public Sale() : base()
-        {
-            this.CarMakes   = new List<ISelectable>().ToSelectList();
-            this.Categories = new List<ISelectable>().ToSelectList();
-            this.CarModels  = new List<ISelectable>().ToSelectList();
-            this.CarYear    = new List<ISelectable>().ToSelectList();
-        }
 
     }
 }

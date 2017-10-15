@@ -6,17 +6,33 @@
 
 <div class="row">
     <table id="tbDetails" class="table table-striped">
+        <thead>
+            <tr>
+                <th ></th>
+                <th class="text-center">@Html.DisplayName("Descripción")</th>
+                <th class="text-center">@Html.DisplayName("Precio")</th>
+                <th class="text-center">@Html.DisplayName("Cantidad")</th>
+                <th class="text-center">@Html.DisplayName("Disponibles")</th>
+                <th class="text-center">@Html.DisplayName("Total")</th>
+                <th hidden> </th>
+                <th hidden></th>
+            </tr>
+        </thead>
         <tbody>
             @{int i = 0; }
             @foreach (var item in Model)
             {
+                if (item == null)
+                {
+                    break;
+                }
+
 
                 var ProductId = "TransactionDetails[" + i + "].ProductId";
                 var TransactionId = "TransactionDetails[" + i + "].TransactionId";
                 var Amount = "TransactionDetails[" + i + "].Amount";
                 var Price = "TransactionDetails[" + i + "].Price";
                 var Quantity = "TransactionDetails[" + i + "].Quantity";
-
 
                 <tr>
                     <td class="col-md-1">
@@ -38,29 +54,29 @@
                         </h5>
                     </td>
 
-                    <td class="col-md-2">
+                    <td  class="col-md-2 text-center">
                         <h4 id="txtPrice">
-                            @Html.DisplayFor(model => item.Price)
+                            @Html.DisplayFor(modelItem => item.Price)
                         </h4>
                     </td>
-                    <td class="col-md-1 text-info">
+                    <td class="col-md-1 text-info text-center">
                         <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
                                type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
                     </td>
-                    <td align="center">
-                        Disponibles
+                    <td class="text-center">
                         <label id="lblAvailable" class="badge bg-danger">
-                            @item.Product.BranchProducts.FirstOrDefault(bp=> bp.BranchId == item.Sale.BranchId).Stock
+                            @item.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == item.Transaction.BranchId).Stock
                         </label>
                     </td>
-                    <td>
+                    <td class="text-right">
                         <h4 id="txtAmount" class="text-right">
                             @Html.DisplayFor(modelItem => item.Amount)
                         </h4>
                     </td>
                     <td>
                         <div class="btn-group">
-                            <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')">
+                            <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')"
+                                    title="Quitar del carritos">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
@@ -78,7 +94,7 @@
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4" />
+                <td colspan="5" />
                 <td>
                     <h4 class="text-danger text-right">
                         <label id="lblTotalAmount">
@@ -89,7 +105,6 @@
             </tr>
         </tfoot>
     </table>
-
 </div>
 
 
@@ -98,11 +113,13 @@
     {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
 
+        SetTotalAmount();
+        Paginate("#tbDetails", 4)
         CompleateProgress();
     });
 
     function QuantityChanged(input) {
-        quantity = parseFloat( $(input).val());
+        quantity = parseFloat($(input).val());
 
         var row = $(input).parent().parent();
         cells = row.find("td");
@@ -113,9 +130,6 @@
 
         if (quantity > available)
             ShowMessage("Cantidad Invalida", "Estas Tratando de vender mas productos de los diponibles, verifica existencias!", "warning");
-
-        //quantity = available;
-        //$(input).val(available);
 
         price = price.replace(/[$,]+/g, "");
 
@@ -144,8 +158,7 @@
             productId: productId
         }
 
-        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")',data,function(data)
-        {
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (data) {
             if (data != 'OK')
                 ShowMessage("Upps algo salío mal", data, "warning");
             else

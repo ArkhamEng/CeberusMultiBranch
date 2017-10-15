@@ -1,4 +1,4 @@
-﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.SaleViewModel
 
 @{
     ViewBag.Title = "Carrito";
@@ -16,7 +16,7 @@
 
 
 
-@using (Html.BeginForm("ShopingCart", "Sales"))
+@using (Html.BeginForm("Create", "Sales"))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -28,12 +28,23 @@
     @Html.HiddenFor(m => m.EmployeeId)
     @Html.HiddenFor(m => m.ClientId)
 
-    <h4 id="hClientName" class="text-danger"></h4>
+
+    if (Model.Client != null)
+    {   <h4 id="hClientName" class="text-danger">
+           @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RFC:&nbsp;&nbsp;@Model.Client.FTR
+        </h4>
+    }
+    else
+    {
+        <h4 id="hClientName" class="text-danger">
+        </h4>
+    }
+
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h4 class="panel-title">
-                <a data-toggle="collapse" href="#Filters">Filtros de Busqueda</a>
+                <a data-toggle="collapse" href="#Filters">Filtros de Búsqueda</a>
             </h4>
         </div>
 
@@ -47,17 +58,17 @@
                             @Html.DropDownList("CategoryId", Model.Categories, "", new { @class = "form-control" })
                         </div>
                     </div>
-                    <div class="col-md-8">
+                    <div class="col-md-6">
                         @Html.Label("Nombre o Clave", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                             @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
                             <span class="input-group-btn">
-                                <button id="btnQuickProduct" type="button" class="btn btn-default">
+                                <button id="btnAddProduct" type="button" class="btn btn-default">
                                     <span class="glyphicon glyphicon-search"></span>
                                 </button>
-                                <button id="btnAddProduct" type="button" class="btn btn-warning" onclick="window.open('@Url.Action("Create","Products")','blank')">
-                                    <span class="glyphicon glyphicon-plus"></span>
+                                <button type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Products")','blank')">
+                                    <span class="glyphicon glyphicon-file"></span>
                                 </button>
                             </span>
                         </div>
@@ -78,11 +89,11 @@
                             @Html.DropDownList("CarModelId", Model.CarModels, "", new { @class = "form-control" })
                         </div>
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         @Html.Label("Año", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.DropDownList("CarYearId", Model.CarYear, "", new { @class = "form-control" })
+                            @Html.DropDownList("CarYearId", Model.CarYears, "", new { @class = "form-control" })
                         </div>
                     </div>
                 </div>
@@ -102,9 +113,10 @@
     {
         <div class="panel panel-danger">
             <div class="panel-body">
-                <div class="col-md-offset-4 col-md-4">
+                <div class="col-md-offset-3 col-md-6">
                     <p>
-                        Aun no has agregado ningun producto a la venta, has click en el boton Agregar de la parte inferior para comenzar
+                        Aun no has agregado ningun producto a la venta, utiliza los filtros para buscar y agregar productos
+                        o navega a traves del Catálogo.
                     </p>
                 </div>
             </div>
@@ -114,10 +126,6 @@
     <div class="panel panel-danger">
         <div class="panel-body row">
             <div class="col-md-6 btn-group">
-                <button class="btn btn-warning" type="button" id="btnAddProduct">
-                    <span class="fa fa-plus"></span>
-                    Agregar
-                </button>
                 @if (Model.TransactionDetails.Count > 0)
                 {
                     <button class="btn btn-primary" type="button">
@@ -143,17 +151,20 @@
 
     @Html.Partial("_QuickClient")
 
-    @Html.Partial("_AddProduct")
+
+    <div id="divModal"></div>
 }
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
-        $("#btnAddProduct").click(function ()
-        {
-            $("#ModalProduct").modal('show');
+        $("#btnAddProduct").click(function () {
+            HalfProgress();
+            var filters = { categortyId: $("#CategoryId").val(), carYearId: $("#CarYearId").val(), name: $("#ProductName").val() }
+            ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view) {
+                $("#divModal").html(view);
+            });
         });
 
         SetCascade("#CarMakeId", "#CarModelId", "GetModels");
@@ -184,12 +195,14 @@
     function ClientSelected(id, name, ftr) {
         $("#ClientId").val(id);
 
-        var title = "Cliente:  " + name
-
-        if (ftr != '')
-            title += "               RFC: " + ftr;
-
-        $("#hClientName").text(title);
+       
+        //if (ftr != '')
+        //    title += "RFC:  " + ftr;
+        $("#hClientName").text('');
+        $("#hClientName").append(name);
+        $("#hClientName").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+        $("#hClientName").append("RFC:");
+        $("#hClientName").append(ftr);
         $("#ModalQuickClient").modal('hide');
     }
 
