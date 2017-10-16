@@ -1,0 +1,61 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.SaleViewModel
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title">
+            <a data-toggle="collapse" href="#Filters">Filtros de Búsqueda</a>
+        </h4>
+    </div>
+
+    <div id="Filters" class="panel-collapse collapse">
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("CategoryId", Model.Categories, "", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    @Html.Label("Nombre o Clave", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
+                        <span class="input-group-btn">
+                            <button id="btnAddProduct" type="button" class="btn btn-default">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Products")','blank')">
+                                <span class="glyphicon glyphicon-file"></span>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-4">
+                    @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("CarMakeId", Model.CarMakes, "", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group col-md-4">
+                    @Html.Label("Modelo", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("CarModelId", Model.CarModels, "", new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="form-group col-md-2">
+                    @Html.Label("Año", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                        @Html.DropDownList("CarYearId", Model.CarYears, "", new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

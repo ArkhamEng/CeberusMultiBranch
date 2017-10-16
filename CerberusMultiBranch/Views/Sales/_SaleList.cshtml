@@ -3,14 +3,15 @@
 <table id="tbSales" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Folio)</th>
-            <th class="col-md-3">@Html.DisplayName("Cliente")</th>
-            <th class="col-md-2">@Html.DisplayName("Usuario")</th>
-            <th class="col-md-2">@Html.DisplayName("Fecha venta")</th>
-            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="col-md-1">@Html.DisplayName("Productos")</th>
-            <th class="col-md-1">@Html.DisplayName("Pagado")</th>
-            <th class="col-md-1"/>
+            <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
+            <th class="col-md-3 text-center">@Html.DisplayName("Cliente")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Usuario")</th>
+            <th class="col-md-2 text-center">@Html.DisplayName("Fecha venta")</th>
+            <th class="col-md-2 text-center">@Html.DisplayName("Tipo pago")</th>
+            <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Productos")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Pagado")</th>
+            <th class="col-md-1 text-center"/>
         </tr>
     </thead>
     <tbody>
@@ -21,13 +22,14 @@
                 <td>@Html.DisplayFor(m => item.Client.Name)</td>
                 <td>@Html.DisplayFor(m => item.User.UserName)</td>
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td align="center">@item.PaymentType.ToString()</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
                 <td align="center">@Html.DisplayFor(m =>quantity )</td>
                 <td align="center">@Html.DisplayFor(m => item.IsPayed)</td>
                 <td align="center">
-                    <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.TransactionId})'">
-                        <span class="glyphicon glyphicon-pencil" />
+                    <button class="btn btn-success  btn-xs" onclick="window.location = '@Url.Action("Detail", new {id = item.TransactionId})'">
+                        <span class="fa fa-eye" />
                     </button>
                 </td>
             </tr>

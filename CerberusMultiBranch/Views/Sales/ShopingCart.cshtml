@@ -40,71 +40,13 @@
         </h4>
     }
 
-
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h4 class="panel-title">
-                <a data-toggle="collapse" href="#Filters">Filtros de Búsqueda</a>
-            </h4>
-        </div>
-
-        <div id="Filters" class="panel-collapse collapse">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.DropDownList("CategoryId", Model.Categories, "", new { @class = "form-control" })
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        @Html.Label("Nombre o Clave", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
-                            <span class="input-group-btn">
-                                <button id="btnAddProduct" type="button" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                                <button type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Products")','blank')">
-                                    <span class="glyphicon glyphicon-file"></span>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.DropDownList("CarMakeId", Model.CarMakes, "", new { @class = "form-control" })
-                        </div>
-                    </div>
-                    <div class="form-group col-md-4">
-                        @Html.Label("Modelo", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.DropDownList("CarModelId", Model.CarModels, "", new { @class = "form-control" })
-                        </div>
-                    </div>
-                    <div class="form-group col-md-2">
-                        @Html.Label("Año", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.DropDownList("CarYearId", Model.CarYears, "", new { @class = "form-control" })
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    @Html.Partial("_ProductSearchFilters",Model)
+    
 
     if (Model.TransactionDetails.Count > 0)
     {
         <div class="panel panel-danger col-md-12">
-            <div id="divDetails" class="panel-body">
+            <div id="divDetails" class="row">
                 @Html.Partial("_Details", Model.TransactionDetails)
             </div>
         </div>
@@ -157,9 +99,10 @@
 
 
 <script>
-    $(document).ready(function () {
-
-        $("#btnAddProduct").click(function () {
+    $(document).ready(function ()
+    {
+        $("#btnAddProduct").click(function ()
+        {
             HalfProgress();
             var filters = { categortyId: $("#CategoryId").val(), carYearId: $("#CarYearId").val(), name: $("#ProductName").val() }
             ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view) {
@@ -192,21 +135,27 @@
         CompleateProgress();
     });
 
-    function ClientSelected(id, name, ftr) {
+    function ClientSelected(id, name, ftr)
+    {
         $("#ClientId").val(id);
 
-       
-        //if (ftr != '')
-        //    title += "RFC:  " + ftr;
-        $("#hClientName").text('');
-        $("#hClientName").append(name);
-        $("#hClientName").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-        $("#hClientName").append("RFC:");
-        $("#hClientName").append(ftr);
-        $("#ModalQuickClient").modal('hide');
+        var param = { clientId: id, transactionId: $("#TransactionId").val() }
+        ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j) {
+            $("#ModalQuickClient").modal('hide');
+            if (j.Result != 'OK')
+                ShowMessage(j.Result, j.Data, 'warning');
+            else {
+                $("#hClientName").text('');
+                $("#hClientName").append(name);
+                $("#hClientName").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                $("#hClientName").append("RFC:");
+                $("#hClientName").append(ftr);
+            }
+        });
     }
 
-    function Calculate(val) {
+    function Calculate(val)
+    {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
 
         var result = (total - val);
@@ -214,10 +163,9 @@
         return (total - parseFloat(val));
     }
 
-    function GetChange(val) {
+    function GetChange(val)
+    {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
-
-
         return (parseFloat(val) - total);
     }
 

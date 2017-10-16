@@ -267,6 +267,7 @@
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\Images\header.png" />
     <Content Include="Content\Images\logo1.png" />
+    <Content Include="Content\Images\logo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\warning.png" />
     <Content Include="favicon.ico" />
@@ -305,6 +306,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\printThis.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
     <Content Include="Scripts\_references.js" />
@@ -404,6 +406,8 @@
     <Content Include="Views\CashRegister\_CloseCash.cshtml" />
     <Content Include="Views\Sales\_AddProduct.cshtml" />
     <Content Include="Views\Products\_ListForSale.cshtml" />
+    <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
+    <Content Include="Views\Sales\SaleDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

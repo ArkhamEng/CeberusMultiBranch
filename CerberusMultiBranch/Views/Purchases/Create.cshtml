@@ -139,7 +139,8 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         LoadPopoverCompleate();
 
         if ('@Model.TransactionId' == 0)
@@ -172,7 +173,8 @@
         CompleateProgress();
     });
 
-    function ProviderSelected(id, name) {
+    function ProviderSelected(id, name)
+    {
         $("#ProviderId").val(id);
         $("#Provider_Name").val(name);
 
@@ -193,7 +195,8 @@
         });
     }
 
-    function HidePopCompleate() {
+    function HidePopCompleate()
+    {
         $("#btnCompleate").popover('hide');
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
@@ -212,6 +215,18 @@
 
         ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view) {
             $("#divDetails").html(view);
+        });
+    }
+
+    function RemoveDetail(tid,pid)
+    {
+        HalfProgress();
+        var param = { transactionId: tid, productId:pid };
+
+        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view)
+        {
+            $("#divDetails").html(view);
+            CompleateProgress();
         });
     }
 </script>

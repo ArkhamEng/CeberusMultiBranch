@@ -36,7 +36,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Required]
         [Display(Name = "Fecha de Operación")]
-        [DataType(DataType.DateTime)]
+        [DataType(DataType.Date)]
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }

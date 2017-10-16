@@ -73,15 +73,38 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var sale = db.Sales.Include(s => s.TransactionDetails).
                 FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.Compleated);
-           
+
             if (sale != null)
             {
                 var list = sale.TransactionDetails;
                 return Content((list.Sum(td => td.Quantity)).ToString());
             }
-                
+
             else
                 return Content(Cons.Zero.ToString());
+        }
+
+        [HttpPost]
+        public JsonResult SetClient(int clientId, int transactionId)
+        {
+            try
+            {
+                var sale = db.Sales.Find(transactionId);
+
+                if (sale != null)
+                    sale.ClientId = clientId;
+
+                db.Entry(sale).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new { Result = "OK"});
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error Al asignar el cliente", Data=ex.Message });
+            }
+           
         }
 
         public ActionResult ShopingCart()
@@ -91,14 +114,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
-            var sale = db.Sales.Include(s=> s.TransactionDetails).Include(s => s.Client).
-                Include(s=> s.TransactionDetails.Select(td=> td.Product)).
-                Include(s=> s.TransactionDetails.Select(td=> td.Product.Images)).
-                Include(s=> s.TransactionDetails.Select(td=> td.Product.BranchProducts)).
-                FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && s.Compleated==false);
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
+                Include(s => s.TransactionDetails.Select(td => td.Product)).
+                Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+                FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && s.Compleated == false);
 
 
-            if (sale!=null)
+            if (sale != null)
                 model = new SaleViewModel(sale);
             else
             {
@@ -109,15 +132,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
 
             model.Categories = db.Categories.ToSelectList();
-            model.CarMakes   = db.CarMakes.ToSelectList();
-    
+            model.CarMakes = db.CarMakes.ToSelectList();
+
             return View(model);
         }
 
         [HttpPost]
         public JsonResult RemoveFromCart(int transactionId, int productId)
         {
-            var detail =  db.TransactionDetails.Find(transactionId, productId);
+            var detail = db.TransactionDetails.Find(transactionId, productId);
 
             if (detail != null)
             {
@@ -139,12 +162,26 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+       
+        public ActionResult Detail(int id)
+        {
+          
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s=> s.User).
+             Include(s => s.TransactionDetails.Select(td => td.Product)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+             FirstOrDefault(s => s.TransactionId == id);
+
+         
+            return View("SaleDetail", sale);
+        }
+
         [HttpPost]
         public JsonResult AddToCart(int transactionId, int productId, double quantity, double price)
         {
             Sale sale = null;
 
-            var userId   = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
             var amount = (quantity * price);
@@ -154,11 +191,11 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 sale = new Sale
                 {
-                    UserId          = userId,
-                    BranchId        = branchId,
+                    UserId = userId,
+                    BranchId = branchId,
                     TransactionDate = DateTime.Now,
-                    UpdDate         = DateTime.Now,
-                    Folio           = Cons.CodeMask
+                    UpdDate = DateTime.Now,
+                    Folio = Cons.CodeMask
                 };
 
                 db.Sales.Add(sale);
@@ -170,7 +207,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (sale.TransactionId > Cons.Zero)
             {
                 //check if the product is already added to the transaction
-                var detail = db.TransactionDetails.Include(td=>td.Product).Include(td=>td.Product.BranchProducts)
+                var detail = db.TransactionDetails.Include(td => td.Product).Include(td => td.Product.BranchProducts)
                     .FirstOrDefault(td => td.ProductId == productId && td.TransactionId == transactionId);
 
                 //if is sum the new quantity
@@ -184,8 +221,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (existance < detail.Quantity)
                     {
-                        var j = new { Result = "ERROR", Message = "Error:La cantidad total del carrito: " 
-                            + detail.Quantity + " excede lo disponible en sucursal dispobiles:" + existance };
+                        var j = new
+                        {
+                            Result = "ERROR",
+                            Message = "Error:La cantidad total del carrito: "
+                            + detail.Quantity + " excede lo disponible en sucursal dispobiles:" + existance
+                        };
 
                         return Json(j);
                     }
@@ -196,11 +237,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     detail = new TransactionDetail
                     {
-                        ProductId     = productId,
+                        ProductId = productId,
                         TransactionId = sale.TransactionId,
-                        Price         = price,
-                        Quantity      = quantity,
-                        Amount        = amount
+                        Price = price,
+                        Quantity = quantity,
+                        Amount = amount
                     };
 
                     db.TransactionDetails.Add(detail);
@@ -243,7 +284,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
             sale.IsPayed = true;
             sale.Compleated = true;
-            sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType),payment);
+            sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
             sale.Payments = new List<Payment>();
 
             if (payment != PaymentType.Mixto.ToString())

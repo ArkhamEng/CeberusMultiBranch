@@ -1,6 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
+    -webkit-print-color-adjust:exact;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -295,3 +296,28 @@ ul ul a {
     border-color: #c9302c;
 }
 
+.BkPrint {
+    color: #fff !important;
+    background-color: #c9302c !important;
+    border-color: #c9302c !important; 
+}
+
+.FtPrint
+{ background-color: #F5A9BC !important;
+    border-color: #c9302c; 
+
+}
+ @media print {
+.BkPrint div 
+{
+    color: #fff;
+    background-color: #c9302c !important;
+    border-color: #c9302c; 
+}
+
+.FtPrint td {
+    background-color: #F5A9BC !important;
+    border-color: #c9302c; 
+}
+
+ }
