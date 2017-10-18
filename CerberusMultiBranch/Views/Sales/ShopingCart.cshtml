@@ -15,8 +15,7 @@
 </h3>
 
 
-
-@using (Html.BeginForm("Create", "Sales"))
+@using (Html.BeginForm("Compleate", "Sales"))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -31,17 +30,17 @@
 
     if (Model.Client != null)
     {   <h4 id="hClientName" class="text-danger">
-           @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RFC:&nbsp;&nbsp;@Model.Client.FTR
-        </h4>
+        @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RFC:&nbsp;&nbsp;@Model.Client.FTR
+    </h4>
     }
     else
     {
-        <h4 id="hClientName" class="text-danger">
-        </h4>
+        <h4 id="hClientName" class="text-danger"></h4>
     }
-
-    @Html.Partial("_ProductSearchFilters",Model)
-    
+    if (!Model.Compleated)
+    {
+        @Html.Partial("_ProductSearchFilters", Model)
+    }
 
     if (Model.TransactionDetails.Count > 0)
     {
@@ -70,76 +69,69 @@
             <div class="col-md-6 btn-group">
                 @if (Model.TransactionDetails.Count > 0)
                 {
-                    <button class="btn btn-primary" type="button">
-                        <span class="fa fa-exchange"></span>
-                        Cambio de tarifa
-                    </button>
+                    if (!Model.Compleated)
+                    {
+                        <button class="btn btn-primary" type="button">
+                            <span class="fa fa-exchange"></span>
+                            Cambio de tarifa
+                        </button>
 
-                    <button id="btnShowClients" class="btn btn-success" type="button">
-                        <span class="fa fa-user-plus"></span>
-                        Cargo a cliente
-                    </button>
+                        <button id="btnShowClients" class="btn btn-success" type="button">
+                            <span class="fa fa-user-plus"></span>
+                            Cargo a cliente
+                        </button>
 
-                    <button class="btn btn-danger" type="button" id="btnChoosPayment">
-                        <span class="fa fa-usd"></span>
-                        Realizar Pago
-                    </button>
+                        <button class="btn btn-danger" type="submit" id="btnCompleate">
+                            <span class="fa fa-upload"></span>
+                            Cerrar Venta
+                        </button>
+                    }
                 }
             </div>
         </div>
     </div>
 
-    @Html.Partial("_ChoosePayment")
-
     @Html.Partial("_QuickClient")
-
 
     <div id="divModal"></div>
 }
 
-
+<input id="ipError" hidden value="0" />
 <script>
-    $(document).ready(function ()
-    {
-        $("#btnAddProduct").click(function ()
-        {
-            HalfProgress();
-            var filters = { categortyId: $("#CategoryId").val(), carYearId: $("#CarYearId").val(), name: $("#ProductName").val() }
-            ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view) {
-                $("#divModal").html(view);
-            });
-        });
-
+    $(document).ready(function () {
         SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 
         SetCascade("#CarModelId", "#CarYearId", "GetYears");
 
-        $("#btnShowClients").click(function () {
-            $("#ModalQuickClient").modal('show');
+
+        $('#MessageBox').on('hidden.bs.modal', function () {
+            if ($("#ipError").val() == '0')
+                window.location = '@Url.Action("Index")';
         });
 
-        $("#btnChoosPayment").click(function () {
-            ExecuteAjax('@Url.Action("CashRegStatus","CashRegister")', {}, function (data) {
-                if (data == "OK") {
-                    console.log(data);
-                    $("#ModalPayment").modal('show');
-                }
-                else {
-                    console.log(data);
-                    ShowMessage("Error en modulo de caja!", data, "warning");
-                }
-            });
+
+        $("#btnShowClients").click(function () {
+            $("#ModalQuickClient").modal('show');
         });
 
         $("#lblTotalAmount").val(' @Html.DisplayFor(model => model.TotalAmount)')
         CompleateProgress();
     });
 
-    function ClientSelected(id, name, ftr)
-    {
+    function SearchProduct() {
+        HalfProgress();
+        var filters = { categortyId: $("#CategoryId").val(), carYear: $("#CarYearId").val(), name: $("#ProductName").val() }
+
+        ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view) {
+            $("#divModal").html(view);
+        });
+    }
+
+    function ClientSelected(id, name, ftr) {
         $("#ClientId").val(id);
 
         var param = { clientId: id, transactionId: $("#TransactionId").val() }
+
         ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j) {
             $("#ModalQuickClient").modal('hide');
             if (j.Result != 'OK')
@@ -154,8 +146,7 @@
         });
     }
 
-    function Calculate(val)
-    {
+    function Calculate(val) {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
 
         var result = (total - val);
@@ -163,8 +154,7 @@
         return (total - parseFloat(val));
     }
 
-    function GetChange(val)
-    {
+    function GetChange(val) {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
         return (parseFloat(val) - total);
     }

@@ -1,0 +1,110 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.ApplicationUser>
+
+@{
+    ViewBag.Title = "UserList";
+}
+
+<h3>
+    <span class="fa fa-users" style="float:left"></span>
+    &nbsp;&nbsp;Cuentas de usuario
+</h3>
+
+<div class="col-md-7">
+    <div class="input-group ">
+        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button  type="button" class="btn btn-success" onclick="window.location='@Url.Action("Register")'" title="Registrar nuevo usuario">
+                <span class="glyphicon  glyphicon-file"></span>
+            </button>
+        </span>
+    </div>
+</div>
+
+<br /><br /><br />
+
+<table id="tbUsers" class="table  table-striped">
+    <thead>
+        <tr>
+            <th />
+            <th>
+                @Html.DisplayName("Nombre de usuario")
+            </th>
+            <th>
+                @Html.DisplayName("Correo electrónico")
+            </th>
+
+            <th>
+                @Html.DisplayName("Teléfono")
+            </th>
+            <th>
+                @Html.DisplayName("Comisión")
+            </th>
+            <th>
+                @Html.DisplayName("Roles")
+            </th>
+            <th>
+                @Html.DisplayName("Sucursales")
+            </th>
+            <th>
+                @Html.DisplayName("Fallos")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="col-md-1">
+                    <div class="col-md-12">
+                        @if (item.PicturePath != null && item.PicturePath != string.Empty)
+                        {
+                            <img src="@item.PicturePath" class="img-responsive" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                        }
+                    </div>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td class="text-center">
+                    @{ var com = ( item.ComissionForSale /100d).ToString("p1"); }
+                    @com
+                </td>
+                <td class="text-center">
+                    @item.Roles.Count.ToString()
+                </td>
+                <td class="text-center">
+                    @item.UserBranches.Count.ToString()
+                </td>
+                <td class="text-center">
+                    @Html.DisplayFor(modelItem => item.AccessFailedCount)
+                </td>
+
+                <td class="col-md-1 btn-group text-right">
+                   <button class="btn btn-warning btn-xs" title="Roles de usuario" onclick="window.location='@Url.Action("UserConfig",new {id=item.Id })'">
+                       <span class="fa fa-edit"></span>
+                   </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        SetDataTable("#tbUsers", "#txtName")
+    });
+</script>

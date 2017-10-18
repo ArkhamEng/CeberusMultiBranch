@@ -22,7 +22,6 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<Transaction> Transactions { get; set; }
 
-
         public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
@@ -31,6 +30,9 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         [NotMapped]
         public ICollection<Sale> Sales { get { return this.Transactions.OfType<Sale>().ToList(); } }
+
+        [NotMapped]
+        public ICollection<Transference> Transferences { get { return this.Transactions.OfType<Transference>().ToList(); } }
 
         [NotMapped]
         public ICollection<Purchase> Purchases { get { return this.Transactions.OfType<Purchase>().ToList(); } }

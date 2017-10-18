@@ -1,0 +1,229 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Config.UserInRole
+
+@{
+    ViewBag.Title = "Conf. Usuario";
+}
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+
+
+<h3 class="text-info">
+    <span class="fa fa-users" style="float:left"></span>
+    &nbsp;&nbsp;
+    <label>
+        Usuario:
+    </label> @Model.UserName
+</h3>
+
+
+<div class="panel-group">
+
+    @using (Html.BeginForm("SaveChanges", "Account"))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(m => m.Id)
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <div class="form-group col-md-5">
+                    @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group col-md-3 col-md-offset-2">
+                    @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-phone-square"></i></span>
+                        @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group col-md-2 ">
+                    @Html.LabelFor(m => m.ComissionForSale, new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                        @Html.TextBoxFor(m => m.ComissionForSale, new { @class = "form-control", type = "number", Min = "0" })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.ComissionForSale, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="panel-footer clearfix">
+                <div class="btn-group col-md-10">
+                    <button class="btn btn-primary" onclick="window.location='@Url.Action("UserList")'">
+                        <span class="fa fa-search-plus"></span>
+                    </button>
+                    <button class="btn btn-success" type="submit">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    }
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="col-md-5">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center">
+                        Roles Asignados
+                    </div>
+                    <div class="panel-body">
+                        @Html.ListBoxFor(model => model.SelIds, Model.SelectedRoles, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="btn-group-vertical col-md-8 col-md-offset-2">
+                    <button id="btnAdd" class="btn btn-primary" title="Asignar Roles" disabled>
+                        <span class="fa fa-angle-double-left"></span>
+                    </button>
+                    <button id="btnRemove" class="btn btn-danger" title="Remover Roles" disabled>
+                        <span class="fa fa-angle-double-right"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-5 ">
+                <div class="panel panel-danger">
+                    <div class="panel-heading text-center">
+                        Roles Disponibles
+                    </div>
+                    <div class="panel-body">
+                        @Html.ListBoxFor(model => model.AvIds, Model.AvailableRoles, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="col-md-5">
+                <div class="panel panel-primary">
+                    <div class="panel-heading text-center">
+                        Sucursales Asignadas
+                    </div>
+                    <div class="panel-body">
+                        @Html.ListBoxFor(model => model.SelBrn, Model.SelectedBranches, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="btn-group-vertical col-md-8 col-md-offset-2">
+                    <button id="btnAddBranch" class="btn btn-primary" title="Asignar Sucursales" disabled>
+                        <span class="fa fa-angle-double-left"></span>
+                    </button>
+                    <button id="btnRemoveBranch" class="btn btn-danger" title="Remover Sucursales" disabled>
+                        <span class="fa fa-angle-double-right"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-5 ">
+                <div class="panel panel-danger">
+                    <div class="panel-heading text-center">
+                        Sucursales Disponibles
+                    </div>
+                    <div class="panel-body">
+                        @Html.ListBoxFor(model => model.avBrn, Model.AvailableBranches, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#avBrn").change(function () {
+            if ($("#avBrn :selected").length > 0)
+                $("#btnAddBranch").prop("disabled", false)
+            else
+                $("#btnAddBranch").prop("disabled", true)
+        });
+
+        $("#SelBrn").change(function () {
+            if ($("#SelBrn :selected").length > 0)
+                $("#btnRemoveBranch").prop("disabled", false)
+            else
+                $("#btnRemoveBranch").prop("disabled", true)
+        });
+
+        $("#AvIds").change(function () {
+            if ($("#AvIds :selected").length > 0)
+                $("#btnAdd").prop("disabled", false)
+            else
+                $("#btnAdd").prop("disabled", true)
+        });
+
+        $("#SelIds").change(function () {
+            if ($("#SelIds :selected").length > 0)
+                $("#btnRemove").prop("disabled", false)
+            else
+                $("#btnRemove").prop("disabled", true)
+        });
+
+        $("#btnAdd").click(function () { Add(true) });
+
+        $("#btnRemove").click(function () { Add(false) });
+
+        $("#btnAddBranch").click(function () { AddBranch(true) });
+
+        $("#btnRemoveBranch").click(function () { AddBranch(false) });
+    });
+
+
+    function Add(a) {
+        HalfProgress();
+        var rr = [];
+
+        if (a) {
+            $('#AvIds :selected').each(function (i, selected) {
+                rr[i] = $(selected).text();
+            });
+        }
+        else {
+            $('#SelIds :selected').each(function (i, selected) {
+                rr[i] = $(selected).text();
+            });
+        }
+
+        var param = { userId: $("#Id").val(), roles: rr, add: a }
+
+        ExecuteAjax('@Url.Action("AddOrRemove")', param, function (j) {
+            if (j.Result != 'OK')
+                ShowMessage(j.Result, j.Data, 'warning');
+            else
+                window.location = window.location;
+        });
+    }
+
+    function AddBranch(a) {
+        BeginProgress();
+
+        var param = { userId: $("#Id").val(), branches: $("#avBrn").val(), add: a }
+
+        if (!a)
+            param.branches = $("#SelBrn").val();
+
+        ExecuteAjax('@Url.Action("AddOrRemoveBranches")', param, function (j) {
+            if (j.Result != 'OK') {
+                CompleateProgress();
+                ShowMessage(j.Result, j.Data, 'warning');
+            }
+            else {
+                HalfProgress();
+                window.location = window.location;
+            }
+
+        });
+    }
+
+</script>

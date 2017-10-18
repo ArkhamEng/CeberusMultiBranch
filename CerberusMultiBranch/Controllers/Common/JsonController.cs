@@ -29,8 +29,11 @@ namespace CerberusMultiBranch.Controllers.Common
 
             FileContentResult picture = null;
 
-            if (user.Picture != null)
-                picture = new FileContentResult(user.ClearImage, user.PictureType);
+            if (user.PicturePath != null)
+            {
+                byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath(user.PicturePath));
+                picture = new FileContentResult(imgdata, "img/jpg");
+            }
             else
             {
                 byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath("/Content/images/sinimagen.jpg"));
@@ -39,6 +42,8 @@ namespace CerberusMultiBranch.Controllers.Common
 
             return picture;
         }
+
+      
 
         [HttpPost]
         public JsonResult GetCities(int parentId)
@@ -116,7 +121,7 @@ namespace CerberusMultiBranch.Controllers.Common
         public JsonResult GetAvailableBranches()
         {
             var userId = User.Identity.GetUserId();
-            var list = db.EmployeeBranches.Include(e => e.Branch).Where(e => e.Employee.UserId == userId).Select(e => e.Branch).ToList();
+            var list = db.UserBranches.Include(e => e.Branch).Where(e => e.UserId == userId).Select(e => e.Branch).ToList();
 
             return Json(list);
         }

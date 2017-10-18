@@ -15,7 +15,7 @@
 </div>
 
 
-<div class="col-md-6 col-md-offset-2">
+<div class="col-md-6 col-md-offset-3">
     @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
     {
         @Html.AntiForgeryToken()
@@ -50,42 +50,45 @@
                 </div>
 
 
-                <div class="form-group col-md-11">
-                    <div class="checkbox">
-                        <label>
-                            @Html.CheckBoxFor(m => m.RememberMe)
-                            Recordarme?
-                        </label>
+                <div class="form-group col-md-9">
+                    <div class="col-md-6 row">
+                        <div class="checkbox form-control">
+                            <label>
+                                @Html.CheckBoxFor(m => m.RememberMe)
+                                Recordarme?
+                            </label>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group col-md-2">
+                <div class="form-group col-md-3">
                     <button class="btn btn-danger" type="submit">
-                        <span class="glyphicon glyphicon-log-in" />
+                        <span class="glyphicon glyphicon-log-in"></span>
+                        Iniciar Sesión
                     </button>
                 </div>
 
             </div>
         </div>
-        <div class="fb-like"
+        @*<div class="fb-like"
              data-share="true"
              data-width="450"
              data-show-faces="true">
-        </div>
+        </div>*@
         @*<p>
                 @Html.ActionLink("Registrar nuevo usuario", "Create", "Employees")
             </p>*@
         //Enable this once you have account confirmation enabled for password reset functionality
         <p>
-                @Html.ActionLink("Forgot your password?", "ForgotPassword")
+                @Html.ActionLink("¿Olvidaste tu contraseña?", "ForgotPassword")
             </p>
     }
 </div>
-<div class="col-md-4">
+@*<div class="col-md-4">
         <section id="socialLoginForm">
             @Html.Partial("_ExternalLoginsListPartial", new ExternalLoginListViewModel { ReturnUrl = ViewBag.ReturnUrl })
         </section>
-    </div>
+    </div>*@
 
 
 @section Scripts {

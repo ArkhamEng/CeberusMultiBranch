@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Purchases
+
         public ActionResult Index()
         {
             //obtengo las sucursales configuradas para el empleado
@@ -42,6 +42,42 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = LookFor(branchId, beginDate, endDate, folio, client, employee, branches);
 
             return PartialView("_SaleList", model);
+        }
+
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult MySales()
+        {
+            TransactionViewModel model = new TransactionViewModel();
+            model.Sales                = LookForPerUser(DateTime.Today, null, null, null);
+           
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult SearchPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
+        {
+            var model = LookForPerUser(beginDate, endDate, folio, client);
+
+            return PartialView("_MySaleList", model);
+        }
+
+
+        public List<Sale> LookForPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
+        {
+            var branchId = User.Identity.GetBranchId();
+            var userId   = User.Identity.GetUserId();
+
+            var model = (from s in db.Sales.Include(s => s.User).Include(s => s.User.Employees).Include(s => s.TransactionDetails)
+                         where (s.BranchId == branchId) && (s.UserId == userId)
+                         && (beginDate == null || s.TransactionDate >= beginDate)
+                         && (endDate == null || s.TransactionDate <= endDate)
+                         && (folio == null || folio == string.Empty || s.Folio.Contains(folio))
+                         && (client == null || client == string.Empty || s.Client.Name.Contains(client)
+                         && s.Compleated)
+                         select s).OrderByDescending(s => s.TransactionId).ToList();
+
+            return model;
         }
 
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee, List<Branch> branches)
@@ -65,6 +101,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return sales;
         }
 
+
         public ActionResult CheckCart()
         {
             var userId = User.Identity.GetUserId();
@@ -85,6 +122,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
+        [Authorize(Roles = "Vendedor")]
         public JsonResult SetClient(int clientId, int transactionId)
         {
             try
@@ -97,17 +135,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK"});
+                return Json(new { Result = "OK" });
 
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error Al asignar el cliente", Data=ex.Message });
+                return Json(new { Result = "Error Al asignar el cliente", Data = ex.Message });
             }
-           
+
         }
 
-        public ActionResult ShopingCart()
+
+
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult ShopingCart(int? id)
         {
             SaleViewModel model;
 
@@ -118,7 +159,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(s => s.TransactionDetails.Select(td => td.Product)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-                FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && s.Compleated == false);
+                FirstOrDefault(s => s.UserId == userId
+                               && (id!=null || s.Compleated == false) 
+                               && (id== null || s.TransactionId == id ) 
+                               && s.BranchId == branchId);
 
 
             if (sale != null)
@@ -130,14 +174,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.BranchId = branchId;
                 model.TransactionDetails = new List<TransactionDetail>();
             }
-
-            model.Categories = db.Categories.ToSelectList();
-            model.CarMakes = db.CarMakes.ToSelectList();
+            if(id==null)
+            {
+                model.Categories = db.Categories.ToSelectList();
+                model.CarMakes = db.CarMakes.ToSelectList();
+            }
 
             return View(model);
         }
 
+      
+
+
         [HttpPost]
+        [Authorize(Roles = "Vendedor")]
         public JsonResult RemoveFromCart(int transactionId, int productId)
         {
             var detail = db.TransactionDetails.Find(transactionId, productId);
@@ -162,21 +212,21 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-       
+        [Authorize(Roles = "Cajero")]
         public ActionResult Detail(int id)
         {
-          
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s=> s.User).
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
              Include(s => s.TransactionDetails.Select(td => td.Product)).
              Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
              Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
              FirstOrDefault(s => s.TransactionId == id);
 
-         
             return View("SaleDetail", sale);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Vendedor")]
         public JsonResult AddToCart(int transactionId, int productId, double quantity, double price)
         {
             Sale sale = null;
@@ -258,7 +308,45 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult Create(Sale sale, string payment, double? cash, double? card)
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult Compleate(Sale sale)
+        {
+            try
+            {
+                var branchId = User.Identity.GetBranchId();
+
+                foreach (var detail in sale.TransactionDetails)
+                {
+                    var ex = User.Identity.GetStock(detail.ProductId);
+                    detail.Amount = detail.Price * detail.Quantity;
+                    detail.Quantity = detail.Quantity;
+
+                    db.Entry(detail).State = EntityState.Modified;
+                }
+
+                sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
+                sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
+
+                //Setting comission values
+                sale.ComPer = User.Identity.GetSalePercentage();
+                sale.ComAmount = Math.Round(sale.TotalAmount * (1d / sale.ComPer), Cons.Two);
+
+                sale.Compleated = true;
+
+                db.Entry(sale).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return  RedirectToAction("ShopingCart"); 
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult PaySale(Sale sale, string payment, double? cash, double? card)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -283,7 +371,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
             sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
             sale.IsPayed = true;
-            sale.Compleated = true;
             sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
             sale.Payments = new List<Payment>();
 

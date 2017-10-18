@@ -1,19 +1,20 @@
-﻿$(document).ready(function ()
-{
-    $('#sidebarCollapse').on('click', function ()
-    {
+﻿$(document).ready(function () {
+    $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
 });
 
 
-function GetCurrency(value)
-{
-   return "$"+value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+function GetCurrency(value) {
+    return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
 
 function ShowMessage(title, text, cls)
 {
+   
+    if (cls == 'success')
+        $("#MessageContent").attr("class", "modal-content panel-success");
+
     $("#MessageTitle").html(title);
     $("#MessageText").html(text);
     $("#MessageImage").attr("src", "/Content/Images/" + cls + ".png");
@@ -43,22 +44,19 @@ function SetPointer(element) {
 }
 
 
-function ExecuteAjax(url, parameters,callback)
-{
+function ExecuteAjax(url, parameters, callback) {
     console.log("Executing Ajax..");
- 
-   $.ajax({
+
+    $.ajax({
         url: url,
         type: "POST",
         data: parameters,
-        error: function (data)
-        {
+        error: function (data) {
             callback("Error al ejecutar Ajax")
         },
         statusCode:
         {
-            200: function (data)
-            {
+            200: function (data) {
                 callback(data);
             },
             401: function (data) {
@@ -144,8 +142,7 @@ function Search(url, data, target) {
     });
 }
 
-function Paginate(table, records)
-{
+function Paginate(table, records) {
     var oTable = $(table).DataTable(
        {
            destroy: true,
@@ -196,17 +193,14 @@ function SetDataTable(table, filter) {
     });
 }
 
-function SetFilterControls(filters, button, target)
-{
-    $(filters).on("hide.bs.collapse", function ()
-    {
+function SetFilterControls(filters, button, target) {
+    $(filters).on("hide.bs.collapse", function () {
         $(button).attr("class", "btn btn-warning");
         $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');
         $(target).attr("class", "col-md-12");
     });
 
-    $(filters).on("show.bs.collapse", function ()
-    {
+    $(filters).on("show.bs.collapse", function () {
         $(button).attr("class", "btn btn-default");
         $(button).html('<span class="glyphicon glyphicon-eye-close"></span>');
         $(target).attr("class", "col-md-8");

@@ -79,6 +79,12 @@ namespace CerberusMultiBranch.Models
         [Display(Name = "Correo electrónico")]
         public string Email { get; set; }
 
+        [Display(Name = "Comision Venta")]
+        public int Comission { get; set; }
+
+        [Display(Name = "Telefono")]
+        [DataType(DataType.PhoneNumber)]
+        public string Phone { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "La contraseña {0} debe tener {2} caracteres como mínimo.", MinimumLength = 6)]

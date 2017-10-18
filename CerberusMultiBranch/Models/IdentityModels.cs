@@ -9,6 +9,8 @@ using System.ComponentModel.DataAnnotations;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System.Collections.Generic;
+using System.Web;
+using System;
 
 namespace CerberusMultiBranch.Models
 {
@@ -16,16 +18,21 @@ namespace CerberusMultiBranch.Models
 
     public class ApplicationUser : IdentityUser
     {
-        public byte[] Picture { get; set; }
+        public string PicturePath { get; set; }
 
-        public string PictureType { get; set; }
+        public int ComissionForSale { get; set; }
+
+        public  ICollection<UserBranch> UserBranches { get; set; }
 
         public ICollection<Transaction> Transactions { get; set; }
 
         public ICollection<Employee> Employees { get; set; }
 
+       
+
         [NotMapped]
-        public byte[] ClearImage { get { return Support.GzipWrapper.Decompress(this.Picture); } }
+        public HttpPostedFileBase PostedFile { get; set; }
+
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
@@ -40,93 +47,7 @@ namespace CerberusMultiBranch.Models
     public class ApplicationRole : IdentityRole
     {
         public string Description { get; set; }
+
     }
 
-  
-
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
-    {
-        #region Config
-        public DbSet<Variable> Variables { get; set; }
-
-        public DbSet<Category> Categories { get; set; }
-
-        public DbSet<CarMake> CarMakes { get; set; }
-
-        public DbSet<CarModel> CarModels { get; set; }
-
-        public DbSet<CarYear> CarYears { get; set; }
-
-        public DbSet<Branch> Branches { get; set; }
-
-        public DbSet<PartSystem> Systems { get; set; }
-
-        public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
-
-        public DbSet<State> States { get; set; }
-
-        public DbSet<City> Cities { get; set; }
-        #endregion
-
-
-        #region Catalogs
-
-        public DbSet<Product> Products { get; set; }
-
-        public DbSet<Compatibility> Compatibilites { get; set; }
-
-        public DbSet<Client> Clients { get; set; }
-
-        public DbSet<Provider> Providers { get; set; }
-
-        public DbSet<Employee> Employees { get; set; }
-
-        public DbSet<ProductImage> ProductImages { get; set; }
-
-        #endregion
-
-        #region Operative
-
-        //public DbSet<Transaction> Transactions { get; set; }
-
-        public DbSet<Purchase> Purchases { get; set; }
-
-        public DbSet<Sale> Sales { get; set; }
-
-        public DbSet<CashRegister> CashRegisters { get; set; }
-
-        public DbSet<Income> Incomes { get; set; }
-
-        public DbSet<Withdrawal> Withdrawals { get; set; }
-
-        public DbSet<TransactionDetail> TransactionDetails { get; set; }
-
-        public DbSet<BranchProduct> BranchProducts { get; set; }
-
-        public DbSet<Payment> Payments { get; set; }
-        #endregion
-
-
-
-        public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
-        {
-            
-        }
-
-        public static ApplicationDbContext Create()
-        {
-            return new ApplicationDbContext();
-        }
-
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.HasDefaultSchema("Security");
-
-            base.OnModelCreating(modelBuilder);
-            
-        }
-
-        
-    }
 }

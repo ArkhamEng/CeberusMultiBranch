@@ -5,22 +5,22 @@
 
 
 
-<table id="tbDetails" class="table table-striped" >
-        <thead >
-            <tr>
-                <th ></th>
-                <th class="text-center">@Html.DisplayName("Descripción")</th>
-                <th class="text-center">@Html.DisplayName("Precio")</th>
-                <th class="text-center">@Html.DisplayName("Cantidad")</th>
-                <th class="text-center">@Html.DisplayName("Disponibles")</th>
-                <th class="text-center">@Html.DisplayName("Total")</th>
-                <th hidden> </th>
-                <th hidden></th>
-            </tr>
-        </thead>
-        <tbody >
-            @{int i = 0; }
-            @foreach (var item in Model)
+<table id="tbDetails" class="table table-striped">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center">@Html.DisplayName("Descripción")</th>
+            <th class="text-center">@Html.DisplayName("Precio")</th>
+            <th class="text-center">@Html.DisplayName("Cantidad")</th>
+            <th class="text-center">@Html.DisplayName("Disponibles")</th>
+            <th class="text-center">@Html.DisplayName("Total")</th>
+            <th hidden> </th>
+            <th hidden></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{int i = 0; }
+        @foreach (var item in Model)
             {
                 if (item == null)
                 {
@@ -34,83 +34,94 @@
                 var Price = "TransactionDetails[" + i + "].Price";
                 var Quantity = "TransactionDetails[" + i + "].Quantity";
 
-                <tr>
-                    <td class="col-md-1">
-                        @if (item.Product.Images.Count > 0)
-                        {
-                            <img src="@item.Product.Images.First().Path" class="img-responsive" />
-                        }
-                        else
-                        {
-                            <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
-                        }
-                    </td>
-                    <td>
-                        <h4>
-                            @Html.DisplayFor(modelItem => item.Product.Name)
-                        </h4>
-                        <h5>
-                            @Html.DisplayFor(modelItem => item.Product.Code)
-                        </h5>
-                    </td>
+            <tr>
+                <td class="col-md-1">
+                    @if (item.Product.Images.Count > 0)
+                    {
+                        <img src="@item.Product.Images.First().Path" class="img-responsive" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                    }
+                </td>
+                <td>
+                    <h4>
+                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    </h4>
+                    <h5>
+                        @Html.DisplayFor(modelItem => item.Product.Code)
+                    </h5>
+                </td>
 
-                    <td  class="col-md-2 text-center">
-                        <h4 id="txtPrice">
-                            @Html.DisplayFor(modelItem => item.Price)
-                        </h4>
-                    </td>
-                    <td class="col-md-1 text-info text-center">
-                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
-                               type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
-                    </td>
-                    <td class="text-center">
-                        <label id="lblAvailable" class="badge bg-danger">
-                            @item.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == item.Transaction.BranchId).Stock
-                        </label>
-                    </td>
-                    <td class="text-right">
-                        <h4 id="txtAmount" class="text-right">
-                            @Html.DisplayFor(modelItem => item.Amount)
-                        </h4>
-                    </td>
-                    <td>
+                <td class="col-md-2 text-center">
+                    <h4 id="txtPrice">
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </h4>
+                </td>
+                <td class="col-md-1 text-info text-center">
+                   @if (!item.Sale.Compleated)
+                   {
+                    <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
+                           type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
+                   }
+                   else
+                   {<h4>
+                        @Html.DisplayFor(modelItem => item.Quantity)
+                    </h4>
+                   }
+
+                </td>
+                <td class="text-center">
+                    <label id="lblAvailable" class="badge bg-danger">
+                        @item.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == item.Transaction.BranchId).Stock
+                    </label>
+                </td>
+                <td class="text-right">
+                    <h4 id="txtAmount" class="text-right">
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </h4>
+                </td>
+                <td>
+                    @if (!item.Sale.Compleated)
+                    {
                         <div class="btn-group">
                             <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')"
                                     title="Quitar del carritos">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
-                    </td>
-                    <td hidden>
-                        <input name="@ProductId" value="@item.ProductId" />
-                        <input name="@TransactionId" value="@item.TransactionId" />
-                        <input name="@Amount" value="@item.Amount" />
-                        <input name="@Price" value="@item.Price" />
-                    </td>
-                </tr>
-
-                i++;
-            }
-        </tbody>
-        <tfoot>
-            <tr>
-                <td colspan="5" />
-                <td>
-                    <h4 class="text-danger text-right">
-                        <label id="lblTotalAmount">
-                        </label>
-                    </h4>
+                    }
                 </td>
-                <td></td>
+                <td hidden>
+                    <input name="@ProductId" value="@item.ProductId" />
+                    <input name="@TransactionId" value="@item.TransactionId" />
+                    <input name="@Amount" value="@item.Amount" />
+                    <input name="@Price" value="@item.Price" />
+                </td>
             </tr>
-        </tfoot>
-    </table>
+
+            i++;
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5" />
+            <td>
+                <h4 class="text-danger text-right">
+                    <label id="lblTotalAmount">
+                    </label>
+                </h4>
+            </td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
 
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
 
         SetTotalAmount();

@@ -209,8 +209,25 @@
     <Compile Include="Migrations\201710132308207_TransactionChanges.Designer.cs">
       <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710161502222_UserChanges.cs" />
+    <Compile Include="Migrations\201710161502222_UserChanges.Designer.cs">
+      <DependentUpon>201710161502222_UserChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710162149061_UserBranchess.cs" />
+    <Compile Include="Migrations\201710162149061_UserBranchess.Designer.cs">
+      <DependentUpon>201710162149061_UserBranchess.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710170021515_ComissionS.cs" />
+    <Compile Include="Migrations\201710170021515_ComissionS.Designer.cs">
+      <DependentUpon>201710170021515_ComissionS.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710172340500_Transfereces.cs" />
+    <Compile Include="Migrations\201710172340500_Transfereces.Designer.cs">
+      <DependentUpon>201710172340500_Transfereces.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
@@ -227,14 +244,18 @@
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
+    <Compile Include="Models\Entities\Config\UserBranch.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
     <Compile Include="Models\Entities\Operative\Debt.cs" />
     <Compile Include="Models\Entities\Operative\Payment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
+    <Compile Include="Models\Entities\Operative\Purchase.cs" />
+    <Compile Include="Models\Entities\Operative\Sale.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
+    <Compile Include="Models\Entities\Operative\Transference.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
@@ -248,6 +269,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
+    <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -269,6 +291,7 @@
     <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\logo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
+    <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
@@ -408,6 +431,10 @@
     <Content Include="Views\Products\_ListForSale.cshtml" />
     <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
     <Content Include="Views\Sales\SaleDetail.cshtml" />
+    <Content Include="Views\Account\UserConfig.cshtml" />
+    <Content Include="Views\Account\UserList.cshtml" />
+    <Content Include="Views\Sales\MySales.cshtml" />
+    <Content Include="Views\Sales\_MySaleList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -426,6 +453,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710132308207_TransactionChanges.resx">
       <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710161502222_UserChanges.resx">
+      <DependentUpon>201710161502222_UserChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710162149061_UserBranchess.resx">
+      <DependentUpon>201710162149061_UserBranchess.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710170021515_ComissionS.resx">
+      <DependentUpon>201710170021515_ComissionS.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710172340500_Transfereces.resx">
+      <DependentUpon>201710172340500_Transfereces.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -3,37 +3,93 @@
     ViewBag.Title = "Registro de usuario";
 }
 
-<h2>@ViewBag.Title.</h2>
-
-@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
-{
-    @Html.AntiForgeryToken()
-    <h4>Create a new account.</h4>
-    <hr />
-    @Html.ValidationSummary("", new { @class = "text-danger" })
-    <div class="form-group col-md-7">
-        @Html.LabelFor(m => m.UserName, new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
-    </div>
-    <div class="form-group col-md-7">
-        @Html.LabelFor(m => m.Email, new { @class = "control-label" })
-        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-    </div>
-    <div class="form-group col-md-7">
-        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
-            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
-    </div>
-    <div class="form-group col-md-7">
-        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
-        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <input type="submit" class="btn btn-success" value="Registrar usuario" />
-        </div>
-    </div>
-}
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+}
+
+
+<div class="col-md-12">
+    <h3 class="text-info">
+        <span class="fa fa-user" style="float:left"></span>
+        &nbsp;&nbsp;
+        Registro de usuario
+    </h3>
+    <hr />
+</div>
+
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="col-md-12">
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        @Html.LabelFor(m => m.UserName, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-user-circle"></i></span>
+                            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 col-md-offset-1">
+                        @Html.LabelFor(m => m.Comission, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.TextBoxFor(m => m.Comission, new { @class = "form-control", type = "number" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6 ">
+                        @Html.LabelFor(m => m.Email, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+                            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3 col-md-offset-1">
+                        @Html.LabelFor(m => m.Phone, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-phone-square"></i></span>
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        @Html.LabelFor(m => m.Password, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" onclick="window.location='@Url.Action("UserList")'" title="Volver al listado">
+                        <span class="fa fa-search-plus"></span>
+                    </button>
+                    <button type="submit" class="btn btn-warning" title="Registrar usuario">
+                        <span class="fa fa-user-plus"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row col-md-6">
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+    </div>
+
+    
 }

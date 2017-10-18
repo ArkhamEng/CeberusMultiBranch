@@ -1,5 +1,10 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.CashRegister
 
+@{
+    ViewBag.Title = "Caja";
+}
+
+
 @if (!Model.IsOpen)
 {
     <div class="col-md-12 panel-danger">

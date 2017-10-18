@@ -27,12 +27,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual Product Product { get; set; }
 
+        public virtual Transaction Transaction { get; set; }
+
         public virtual Sale Sale { get; set; }
 
         public virtual Purchase  Purchase { get; set; }
 
-        public virtual Transaction Transaction { get; set; }
     }
-
-  
 }

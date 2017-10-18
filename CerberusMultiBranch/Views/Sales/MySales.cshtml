@@ -8,10 +8,10 @@
 </script>
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
-    &nbsp;&nbsp;Historial de Ventas
+    &nbsp;&nbsp;Mis ventas
 </h3>
 
-<div class="col-md-7">
+<div class="col-md-4">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
@@ -19,20 +19,17 @@
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
-            <button id="btnCreate" type="button" class="btn btn-success" >
-                <span class="glyphicon  glyphicon-file"></span>
-            </button>
         </span>
     </div>
 </div>
-<div class="col-md-3">
+<div class="col-md-4">
     <h5>
         <label class="text-danger" id="lblTotalAmount"></label>
     </h5>
 </div>
-<div class="col-md-2">
+<div class="col-md-4">
     <h5>
-        <label class="text-danger" id="lblTotalQuantity"></label>
+        <label class="text-danger" id="lblComission"></label>
     </h5>
 </div>
 
@@ -42,14 +39,6 @@
     <div class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
-                <div class="form-group col-md-12">
-                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("BranchId", Model.Branches, "", new { @class = "form-control" })
-                    </div>
-                </div>
-
                 <div class="form-group col-md-12">
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
@@ -70,7 +59,7 @@
                     @Html.Label("Cliente", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Client", "", htmlAttributes: new { @class = "form-control" })
 
                     </div>
                 </div>
@@ -80,14 +69,6 @@
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.TextBox("Folio", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
-
-                <div class="form-group col-md-12">
-                    @Html.Label("Empleado", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Employee", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
             </div>
@@ -107,26 +88,23 @@
 
 
 <div id="divSales">
-    @Html.Partial("_SaleList",Model.Sales)
+    @Html.Partial("_MySaleList",Model.Sales)
 </div>
 <script>
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
-
         SetFilterControls("#divFilters", "#btnFilter", "#divSales");
 
         $("#btnSearch").click(function ()
         {
             var data = {
-                branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
-                bill: $("#Bill").val(),
-                employee: $("#Employee").val()
+                folio: $("#Bill").val(),
+                client: $("#Client").val()
             };
 
-            Search('@Url.Action("Search")', data, "#divSales");
+            Search('@Url.Action("SearchPerUser")', data, "#divSales");
         });
 
         CompleateProgress();

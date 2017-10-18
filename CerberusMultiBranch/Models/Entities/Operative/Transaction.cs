@@ -79,45 +79,4 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             this.UpdDate = DateTime.Now;
         }
     }
-
-    public class Purchase : Transaction
-    {
-        public int ProviderId { get; set; }
-
-        [Display(Name = "Factura")]
-        [MaxLength(30)]
-        [Required]
-        public string Bill { get; set; }
-
-        [Display(Name = "Vencimiento")]
-        [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime Expiration { get; set; }
-
-        [Index("IDX_Inventoried", IsUnique = false)]
-        public bool Inventoried { get; set; }
-
-        public virtual Provider Provider { get; set; }
-
-        public Purchase() : base()
-        {
-            this.Expiration = DateTime.Now;
-        }
-
-    }
-
-    public class Sale : Transaction
-    {
-        public int ClientId { get; set; }
-
-        [Display(Name = "Folio Venta")]
-        [MaxLength(30)]
-        [Required]
-        public string Folio { get; set; }
-
-        public bool Compleated { get; set; }
-
-        public virtual Client Client { get; set; }
-
-    }
 }

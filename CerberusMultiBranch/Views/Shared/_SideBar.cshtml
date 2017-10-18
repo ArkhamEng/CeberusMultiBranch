@@ -4,60 +4,84 @@
     <!-- Sidebar Header -->
     <div class="sidebar-header" style="text-align:center">
         <div class="btn-group-vertical thumbnail bgSidebar">
+
             <img src="@Url.Action("GetPicture", "Json")" class="btn" />
             @Html.Partial("_BranchSelector")
         </div>
     </div>
     <ul class="list-unstyled components">
-        <li><a href="/CashRegister/">&nbsp;Inicio<span class="glyphicon glyphicon-home" style="float:left" /></a></li>
-        <li><a href="/Products/">&nbsp;Productos<span class="fa fa-shopping-basket" style="float:left" /></a></li>
-        <li>
-            <!-- Link with dropdown items -->
-            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
-            <ul class="collapse list-unstyled" id="homeSubmenu">
-                <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
-                <li><a href="/Employees/">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
-                <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
-            </ul>
-        </li>
-        <li>
-            <a href="/Sales/ShopingCart">
-                &nbsp;Carrito
-                <span class="badge bg-info">@Html.Action("CheckCart", "Sales")</span>
-                <span class="glyphicon glyphicon-shopping-cart" style="float:left" />
-            </a>
-        <li>
-            <!-- Link with dropdown items -->
-            <a href="#operationsSubMenu" data-toggle="collapse" aria-expanded="false">
-                &nbsp;Operaciones<span class="fa fa-briefcase" style="float:left" />
-            </a>
-            <ul class="collapse list-unstyled" id="operationsSubMenu">
-                <li>
-                    <a href="/Sales/">
-                        &nbsp;Ventas
-                        <span class="badge bg-info"></span>
-                        <span class="fa fa-shopping-cart" style="float:left" />
-                    </a>
-                </li>
-                <li>
-                    <a href="/Purchases/">&nbsp;Compras<span class="fa fa-shopping-bag" style="float:left" /></a>
-                </li>
 
-                @*<li><a href="/CashRegister/">&nbsp;Balance<span class="fa fa-bar-chart-o" style="float:left" /></a></li>*@
-            </ul>
-        </li>
+        @if (User.IsInRole("Vendedor") || User.IsInRole("Almacenista"))
+        {
+            <li>
+                <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
+                <ul class="collapse list-unstyled" id="catalogsSm">
+                    @if (User.IsInRole("Vendedor"))
+                    {
+                        <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
+                    }
+                    @if (User.IsInRole("Almacenista"))
+                    {
+                        <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
+                        <li><a href="/Products/">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
+                    }
+                </ul>
+            </li>
+        }
 
-        <li>
-            <!-- Link with dropdown items -->
-            <a href="#configurationSubMenu" data-toggle="collapse" aria-expanded="false">
-                &nbsp;Configuraciones<span class="fa fa-cogs" style="float:left" />
-            </a>
-            <ul class="collapse list-unstyled" id="configurationSubMenu">
-                <li><a href="/Configuration/">&nbsp;Sucursales<span class="fa fa-industry" style="float:left" /></a></li>
-                <li><a href="/CarMakes/">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
-                <li><a href="/CarModels/">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
-            </ul>
-        </li>
+        @if (User.IsInRole("Cajero"))
+        {
+            <li><a href="/CashRegister/">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
+        }
+
+        @if (User.IsInRole("Vendedor"))
+        {
+            <li>
+                <a href="/Sales/ShopingCart">
+                    &nbsp;Carrito
+                    <span class="badge bg-info">@Html.Action("CheckCart", "Sales")</span>
+                    <span class="glyphicon glyphicon-shopping-cart" style="float:left" />
+                </a>
+            </li>
+            <li><a href="/Sales/MySales">&nbsp;Mis ventas<span class="fa fa-dollar" style="float:left" /></a></li>
+        }
+        @if (User.IsInRole("Cajero") || User.IsInRole("Almacenista"))
+        {
+            <li>
+                <a href="#operationsSubMenu" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Operaciones<span class="fa fa-briefcase" style="float:left" />
+                </a>
+                <ul class="collapse list-unstyled" id="operationsSubMenu">
+                    <li>
+                        <a href="/Sales/">&nbsp;Ventas<span class="badge bg-info"></span><span class="fa fa-shopping-cart" style="float:left" /></a>
+                    </li>
+                    @if (User.IsInRole("Almacenista"))
+                    {
+                        <li>
+                            <a href="/Purchases/">&nbsp;Compras<span class="fa fa-shopping-bag" style="float:left" /></a>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
+
+
+        @if (User.IsInRole("Administrador"))
+        {
+            <li>
+                <!-- Link with dropdown items -->
+                <a href="#configurationSubMenu" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Configuraciones<span class="fa fa-cogs" style="float:left" />
+                </a>
+                <ul class="collapse list-unstyled" id="configurationSubMenu">
+                    <li><a href="/Account/UserList">&nbsp;Cuentas de usuario<span class="fa fa-users" style="float:left" /></a></li>
+                    <li><a href="/Configuration/">&nbsp;Sucursales<span class="fa fa-industry" style="float:left" /></a></li>
+                    <li><a href="/CarMakes/">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
+                    <li><a href="/CarModels/">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
+                    <li><a href="/Employees/">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
+                </ul>
+            </li>
+        }
 
         <li><a href="/Home/About">&nbsp;Acerca de<span class="glyphicon glyphicon-question-sign" style="float:left" /></a></li>
     </ul>

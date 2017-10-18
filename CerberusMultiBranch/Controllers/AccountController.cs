@@ -11,18 +11,23 @@ using Microsoft.Owin.Security;
 using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Support;
+using System.Data.Entity;
+using CerberusMultiBranch.Models.ViewModels.Config;
+using Microsoft.AspNet.Identity.EntityFramework;
+using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers
 {
     [Authorize]
-    
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
+        #region Properties
         public AccountController()
         {
+
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -54,9 +59,10 @@ namespace CerberusMultiBranch.Controllers
                 _userManager = value;
             }
         }
+        #endregion
 
-        //
-        // GET: /Account/Login
+
+        #region Anonumouse Allowed
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -64,8 +70,7 @@ namespace CerberusMultiBranch.Controllers
             return View();
         }
 
-        //
-        // POST: /Account/Login
+    
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -94,8 +99,7 @@ namespace CerberusMultiBranch.Controllers
             }
         }
 
-        //
-        // GET: /Account/VerifyCode
+      
         [AllowAnonymous]
         public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
         {
@@ -107,8 +111,6 @@ namespace CerberusMultiBranch.Controllers
             return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
         }
 
-        //
-        // POST: /Account/VerifyCode
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
@@ -136,31 +138,182 @@ namespace CerberusMultiBranch.Controllers
                     return View(model);
             }
         }
+        #endregion
 
-        //
-        // GET: /Account/Register
-        [AllowAnonymous]
+
+
+        [Authorize(Roles = "Administrador")]
+        public ActionResult UserConfig(string id)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var user = db.Users.Include(u => u.Roles).Include(u=> u.UserBranches).FirstOrDefault(u => u.Id == id);
+                var model = new UserInRole(user);
+
+                var rId = user.Roles.Select(r => r.RoleId).ToList();
+
+                var rs = db.Roles.Where(r => !rId.Contains(r.Id)).ToList();
+                var ra = db.Roles.Where(r => rId.Contains(r.Id)).ToList();
+
+                model.AvailableRoles = rs.ToSelectList();
+                model.SelectedRoles = ra.ToSelectList();
+
+                var bIds = user.UserBranches.Select(ub => ub.BranchId).ToList();
+
+                var ubA = db.Branches.Where(ub => !bIds.Contains(ub.BranchId)).ToList();
+                var ubS = db.Branches.Where(ub => bIds.Contains(ub.BranchId)).ToList();
+
+                model.AvailableBranches = ubA.ToSelectList();
+                model.SelectedBranches = ubS.ToSelectList();
+
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public JsonResult AddRole(string role)
+        {
+            IdentityResult result = null;
+            var roleM = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+
+            if (!roleM.RoleExists("Administrador"))
+                result = roleM.Create(new IdentityRole("Administrador"));
+            else
+                return Json(new { Result = "Role duplicado", Data = "El rol " + role + " ya se encuntra dado de alta" });
+
+            return result.Succeeded ? Json(new { Result = "OK" }) :
+                Json(new { Result = "Ocurrio un error al agregar el rol", Data = result.Errors.Where(e => e.Length > Cons.Zero) });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public JsonResult AddOrRemove(string userId, string[] roles, bool add)
+        {
+            try
+            {
+                IdentityResult result = null;
+                if (add)
+                    result = UserManager.AddToRoles(userId, roles);
+                else
+                    result = UserManager.RemoveFromRoles(userId, roles);
+
+                if (result.Succeeded)
+                    return Json(new { Result = "OK" });
+                else
+                    return Json(new { Result = "Error al modificar los permisos", Data = result.Errors.Where(e => e.Length > 0) });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al modificar los permisos", Data = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public ActionResult SaveChanges([Bind(Include = "Id,Email,PhoneNumber,ComissionForSale")] ApplicationUser user)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                try
+                {
+                   var um = db.Users.Find(user.Id);
+                    um.Email = user.Email;
+                    um.PhoneNumber = user.PhoneNumber;
+                    um.ComissionForSale = user.ComissionForSale;
+
+                    db.Entry(um).State = EntityState.Modified;
+
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+
+                }
+              
+                return RedirectToAction("UserConfig", new { id = user.Id });
+            }
+               
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrador")]
+        public JsonResult AddOrRemoveBranches(string userId, int[] branches, bool add)
+        {
+            try
+            {
+                ApplicationDbContext db = new ApplicationDbContext();
+                if (add)
+                {
+                    foreach (var i in branches)
+                    {
+                        UserBranch us = new UserBranch { BranchId = i, UserId = userId };
+                        db.UserBranches.Add(us);
+                    }
+                }
+                else
+                {
+                    var bSession = UserManager.GetClaims(userId).FirstOrDefault(c => c.Type == Cons.BranchSession);
+
+                    foreach (var i in branches)
+                    {
+                        if (bSession != null && bSession.Value.Contains(i.ToString()))
+                            UserManager.RemoveClaim(userId, bSession);
+
+                        var us = db.UserBranches.Find(i, userId);
+                        db.UserBranches.Remove(us);
+                    }
+                }
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK" });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al modificar las sucursales", Data = ex.Message });
+            }
+        }
+
+        [Authorize(Roles = "Administrador")]
+        public ActionResult UserList()
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var users = db.Users.Include(u => u.Roles).Include(u=> u.UserBranches).ToList();
+                return View(users);
+            }
+        }
+
+
+        [Authorize(Roles = "Administrador")]
         public ActionResult Register()
         {
             return View();
         }
 
-
         //
         // POST: /Account/Register
         [HttpPost]
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrador")]
         public async Task<ActionResult> Register(RegisterViewModel model)
         {
             if (ModelState.IsValid)
             {
-
-                var user = new ApplicationUser { UserName = model.UserName, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    ComissionForSale = model.Comission,
+                    PhoneNumber = model.Phone
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
+                    //await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
@@ -168,7 +321,7 @@ namespace CerberusMultiBranch.Controllers
                     // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
                     // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("UserList", "Account");
                 }
                 AddErrors(result);
             }
@@ -363,7 +516,7 @@ namespace CerberusMultiBranch.Controllers
             {
                 return RedirectToAction("Index", "Manage");
             }
-            
+
             if (ModelState.IsValid)
             {
                 // Get the information about the user from the external login provider
