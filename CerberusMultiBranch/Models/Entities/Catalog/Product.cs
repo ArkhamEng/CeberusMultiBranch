@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
 using CerberusMultiBranch.Models.Entities.Operative;
+using System;
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {
@@ -25,11 +26,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(30)]
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
-
-        //[Display(Name = "Referencia")]
-        //[Required]
-        //[MaxLength(100)]
-        //public string Reference { get; set; }
 
         [Display(Name = "Nombre")]
         [MaxLength(200)]
@@ -88,6 +84,22 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Unidad")]
         [MaxLength(20)]
         public string Unit { get; set; }
+
+        [Display(Name = "Fila")]
+        [MaxLength(30)]
+        public string Row { get; set; }
+
+        [Display(Name = "Anaquel")]
+        [MaxLength(30)]
+        public string Ledge { get; set; }
+
+        public bool IsActive { get; set; }
+
+        [Required]
+        public DateTime UpdDate { get; set; }
+
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
 
         public virtual Category Category { get; set; }
 

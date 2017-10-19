@@ -7,7 +7,7 @@ INSERT INTO Config.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (2, '02', 'Baja California', 'BC', 1),
 (3, '03', 'Baja California Sur', 'BCS', 1),
 (4, '04', 'Campeche', 'Camp.', 1),
-(5, '05', 'Coahuila de Zaragoza', 'Coah.', 1),
+(5, '05', 'Coahuila', 'Coah.', 1),
 (6, '06', 'Colima', 'Col.', 1),
 (7, '07', 'Chiapas', 'Chis.', 1),
 (8, '08', 'Chihuahua', 'Chih.', 1),
@@ -18,7 +18,7 @@ INSERT INTO Config.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (13, '13', 'Hidalgo', 'Hgo.', 1),
 (14, '14', 'Jalisco', 'Jal.', 1),
 (15, '15', 'México', 'Mex.', 1),
-(16, '16', 'Michoacán de Ocampo', 'Mich.', 1),
+(16, '16', 'Michoacán', 'Mich.', 1),
 (17, '17', 'Morelos', 'Mor.', 1),
 (18, '18', 'Nayarit', 'Nay.', 1),
 (19, '19', 'Nuevo León', 'NL', 1),
@@ -32,7 +32,7 @@ INSERT INTO Config.State (StateId, Code, Name, ShorName, IsActive) VALUES
 (27, '27', 'Tabasco', 'Tab.', 1),
 (28, '28', 'Tamaulipas', 'Tamps.', 1),
 (29, '29', 'Tlaxcala', 'Tlax.', 1),
-(30, '30', 'Veracruz de Ignacio de la Llave', 'Ver.', 1),
+(30, '30', 'Veracruz', 'Ver.', 1),
 (31, '31', 'Yucatán', 'Yuc.', 1),
 (32, '32', 'Zacatecas', 'Zac.', 1);
 
@@ -3643,9 +3643,9 @@ SET IDENTITY_INSERT Config.CarModel OFF
 SET IDENTITY_INSERT Catalog.Client ON
 
 INSERT INTO [Catalog].[Client]
-           ([ClientId],[CityId],[Code],[Name],[BusinessName],[LegalRepresentative],[FTR],[TaxAddress],[Address],[ZipCode],[Entrance],[Email],[Phone],[IsActive],[UpdDate])
+           ([ClientId],[CityId],[Code],[Name],[BusinessName],[LegalRepresentative],[FTR],[TaxAddress],[Address],[ZipCode],[Entrance],[Email],[Phone],[IsActive],[UpdDate],UpdUser)
      VALUES
-           (0,2309,'0000','CLIENTE POR DEFECTO','CLIENTE POR DEFECTO',null,'CAAA060615AA2','DIRECCION POR DEFECTO','DIRECCION POR DEFECTO','',GETDATE(),'','',1,GETDATE())
+           (0,2309,'0000','CLIENTE POR DEFECTO','CLIENTE POR DEFECTO',null,'CAAA060615AA2','DIRECCION POR DEFECTO','DIRECCION POR DEFECTO','',GETDATE(),'','',1,GETDATE(),'Administrador')
 
 SET IDENTITY_INSERT Catalog.Client OFF
 
@@ -3669,58 +3669,85 @@ INSERT INTO [Config].[Variable]
 
 
 
---=============User Administrator================================== "Administrador01"
+--=============User Administrator================================== "Administrador01."======================================================================
 INSERT INTO [Security].[AspNetUsers]
-           ([Id],[Email],[EmailConfirmed],[PasswordHash],[SecurityStamp],[PhoneNumberConfirmed],[TwoFactorEnabled],[LockoutEnabled],[AccessFailedCount],[UserName])
+           ([Id],[Email],[EmailConfirmed],[PasswordHash],[SecurityStamp],[PhoneNumberConfirmed],[TwoFactorEnabled],[LockoutEnabled],[AccessFailedCount],[UserName],ComissionForSale)
      VALUES
-           ('384a8104-cbc6-40a5-a27c-2947263e0fcc','arkhameng@gmail.com',1,'AK6X8N0K4cOnpKk8DOHYYocTWSNB/yLXybmoExtH1AE7+QsgZQ07NNg6NL5DXiKJqQ==','c7d38da5-c068-4838-97b1-b563eaf4a53b',0,0,1,0,'Administrador')
+           (N'384a8104-cbc6-40a5-a27c-2947263e0fcc','arkhameng@gmail.com',1,N'AK6X8N0K4cOnpKk8DOHYYocTWSNB/yLXybmoExtH1AE7+QsgZQ07NNg6NL5DXiKJqQ==',N'c7d38da5-c068-4838-97b1-b563eaf4a53b',0,0,1,0,'Administrador',0)
 
---=============Employee========================================================================
 
-SET IDENTITY_INSERT [Catalog].[Employee] ON
 
-INSERT INTO [Catalog].[Employee]
-           ([EmployeeId],[UserId],[Code],[Name],[Address],[ZipCode],[Entrance],[Email],[Phone],[CityId],[IsActive],[UpdDate])
-     VALUES
-           (0,'384a8104-cbc6-40a5-a27c-2947263e0fcc','0000','ARIEL CAMACHO BARRIENTOS','PASEO DE CUITLAHUAC 175','91826',GETDATE(),'arkhameng@gmail.com','(229)1251761',2309,1,GETDATE())
-
-SET IDENTITY_INSERT [Catalog].[Employee] OFF
-
---====================BRANCHES=================================================================
+--====================BRANCHES===============================================================================================================================
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('ZAPOPAN, JAL')
+     VALUES('ZAPOPAN')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('COSAMALOAPAN, VER')
+     VALUES('COSAMALOAPAN')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('CUAHUTEMOC, VER')
+     VALUES('CUAHUTEMOC')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('MIGUEL ALEMAN, VER')
+     VALUES('MIGUEL ALEMAN')
 
---====================EMPLOYEE BRANCHES==========================================================
+--====================USER BRANCHES==========================================================
 
-INSERT INTO [Config].[EmployeeBranch]([BranchId],[EmployeeId])
-     VALUES(1,0)
+INSERT INTO [Config].[UserBranch]([BranchId],[UserId])
+     VALUES(1,N'384a8104-cbc6-40a5-a27c-2947263e0fcc')
 
-INSERT INTO [Config].[EmployeeBranch]([BranchId],[EmployeeId])
-     VALUES(2,0)
+INSERT INTO [Config].[UserBranch]([BranchId],[UserId])
+     VALUES(2,N'384a8104-cbc6-40a5-a27c-2947263e0fcc')
 
-INSERT INTO [Config].[EmployeeBranch]([BranchId],[EmployeeId])
-     VALUES(3,0)
+INSERT INTO [Config].[UserBranch]([BranchId],[UserId])
+     VALUES(3,N'384a8104-cbc6-40a5-a27c-2947263e0fcc')
 
-INSERT INTO [Config].[EmployeeBranch]([BranchId],[EmployeeId])
-     VALUES(4,0)
+INSERT INTO [Config].[UserBranch]([BranchId],[UserId])
+     VALUES(4,N'384a8104-cbc6-40a5-a27c-2947263e0fcc')
 
 --=================PROVIDER DEFAULT==================================================
-SET IDENTITY_INSERT [Catalog].[Provider] ON
+--SET IDENTITY_INSERT [Catalog].[Provider] ON
 
-INSERT INTO [Catalog].[Provider]
-           (ProviderId,[Code],[Name],[Address],[CityId],[Phone],[IsActive],[UpdDate])
-     VALUES
-           (0,'0000','PROVEEDOR POR DEFECTO','DIRECCION POR DEFECTO',2309,'9999999999',1,GETDATE())
+--INSERT INTO [Catalog].[Provider]
+--           (ProviderId,[Code],[Name],[Address],[CityId],[Phone],[IsActive],[UpdDate])
+--     VALUES
+--           (0,'0000','PROVEEDOR POR DEFECTO','DIRECCION POR DEFECTO',2309,'9999999999',1,GETDATE())
 
 
-SET IDENTITY_INSERT [Catalog].[Provider] OFF
+--SET IDENTITY_INSERT [Catalog].[Provider] OFF
+
+--==============ROLES======================================
+
+
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'6a25bb08-f81d-4d7e-8b4b-b1aaa2c73b19', N'Vendedor', NULL, N'IdentityRole')
+GO
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'8c30e201-5f65-42ab-95a3-9a673c543de7', N'Almacenista', NULL, N'IdentityRole')
+GO
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'a2bd31ac-7150-41f2-b875-3a01eb2ff518', N'Cajero', NULL, N'IdentityRole')
+GO
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'b0468515-731b-4cce-98ef-caf3e4a86cd9', N'Administrador', NULL, N'IdentityRole')
+GO
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'b7ca23c8-6f3d-4ecb-976a-b8ef33563d9b', N'Supervisor', NULL, N'IdentityRole')
+GO
+INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'e0219f0a-25e2-4c93-a718-b143a0450c0a', N'Capturista', NULL, N'IdentityRole')
+
+--======================USER ROLES================================
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'6a25bb08-f81d-4d7e-8b4b-b1aaa2c73b19')
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'8c30e201-5f65-42ab-95a3-9a673c543de7')
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'a2bd31ac-7150-41f2-b875-3a01eb2ff518')
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'b0468515-731b-4cce-98ef-caf3e4a86cd9')
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'b7ca23c8-6f3d-4ecb-976a-b8ef33563d9b')
+
+INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
+     VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'e0219f0a-25e2-4c93-a718-b143a0450c0a')
+

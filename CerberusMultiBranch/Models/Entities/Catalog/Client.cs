@@ -69,7 +69,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Teléfono")]
         [DataType(DataType.PhoneNumber)]
-        [Required]
         [MaxLength(20)]
         public string Phone { get; set; }
 
@@ -78,7 +77,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public DateTime UpdDate { get; set; }
 
-        
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
+
         public virtual City City { get; set; }
 
         public ICollection<Sale> Sale { get; set; }

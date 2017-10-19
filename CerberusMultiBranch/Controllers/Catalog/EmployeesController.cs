@@ -31,32 +31,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-        [HttpPost]
-        public ActionResult GetBranchAssigment(int employeeId)
-        {
-            var model = new BranchAssigmentViewModel();
-
-            model.Assigned = db.EmployeeBranches.Include(eb => eb.Branch).
-                Where(eb => eb.EmployeeId == employeeId).Select(ep => ep.Branch).ToList();
-
-            var idList = model.Assigned.Select(b => b.BranchId).ToList();
-
-            model.NotAssigned = db.Branches.Where(b => !idList.Contains(b.BranchId)).ToList();
-
-            return PartialView("_BranchesAssigned", model);
-        }
-
-        [HttpPost]
-        public ActionResult AddRemoveBranch(int employeeId, int branchId, bool add)
-        {
-            if (add)
-                db.EmployeeBranches.Add(new Models.Entities.Config.EmployeeBranch { BranchId = branchId, EmployeeId = employeeId });
-            else
-                db.EmployeeBranches.Remove(db.EmployeeBranches.FirstOrDefault(eb => eb.EmployeeId == employeeId && eb.BranchId == branchId));
-
-            db.SaveChanges();
-            return GetBranchAssigment(employeeId);
-        }
 
         // GET: Employees/Create
         public ActionResult Create(int? id)
@@ -65,7 +39,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             if (id != null)
             {
-                model = new EmployeeViewModel(db.Employees.Include(e=> e.EmployeeBranches).FirstOrDefault(e=> e.EmployeeId==id));
+                model = new EmployeeViewModel(db.Employees.FirstOrDefault(e=> e.EmployeeId==id));
 
                 model.StateId = db.Cities.Find(model.CityId).StateId;
                 model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();

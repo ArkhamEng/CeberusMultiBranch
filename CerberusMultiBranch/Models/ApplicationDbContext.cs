@@ -16,6 +16,8 @@ namespace CerberusMultiBranch.Models
         #region Config
         public DbSet<Variable> Variables { get; set; }
 
+        public DbSet<WithdrawalCause> WithdrawalCauses { get; set; }
+
         public DbSet<Category> Categories { get; set; }
 
         public DbSet<CarMake> CarMakes { get; set; }
@@ -27,8 +29,6 @@ namespace CerberusMultiBranch.Models
         public DbSet<Branch> Branches { get; set; }
 
         public DbSet<PartSystem> Systems { get; set; }
-
-        public DbSet<EmployeeBranch> EmployeeBranches { get; set; }
 
         public DbSet<UserBranch> UserBranches { get; set; }
 
@@ -90,5 +90,6 @@ namespace CerberusMultiBranch.Models
             base.OnModelCreating(modelBuilder);
 
         }
+
     }
 }

@@ -1,0 +1,41 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.WithdrawalCause>
+
+
+<table id="tbCauses" class="table table-striped">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Casusa de retiro")
+            </th>
+            <th>
+                @Html.DisplayName("Agregado por")
+            </th>
+            <th>
+                @Html.DisplayName("Fecha")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserAdd)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InsDate)
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+<script>
+    $(document).ready(function () {
+        Paginate("#tbCauses", 10);
+    });
+</script>

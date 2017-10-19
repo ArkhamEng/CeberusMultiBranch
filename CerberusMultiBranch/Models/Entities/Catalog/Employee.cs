@@ -41,9 +41,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
       
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
-        [MaxLength(13)]
+        [MaxLength(15)]
         public string FTR { get; set; }
 
+        [Display(Name = "N.S.S")]
+        [MaxLength(15)]
+        public string NSS { get; set; }
 
         [Display(Name = "Dirección")]
         [Required]
@@ -69,17 +72,22 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Teléfono")]
         [DataType(DataType.PhoneNumber)]
-        [Required]
-        [MaxLength(12)]
-        [Index("IDX_Phone", IsUnique = true)]
+        [MaxLength(20)]
         public string Phone { get; set; }
 
+        [Display(Name = "Tel. Emergencia")]
+        [DataType(DataType.PhoneNumber)]
+        [MaxLength(20)]
+        public string EmergencyPhone { get; set; }
 
         [Required]
         public bool IsActive { get; set; }
 
         [Required]
         public DateTime UpdDate { get; set; }
+
+        [MaxLength(100)]
+        public string UdpUser { get; set; }
 
         public byte[] Picture { get; set; }
 
@@ -89,25 +97,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         public HttpPostedFileBase PostedFile { get; set; }
 
-
         #region Navigation Properties
         public virtual City City { get; set; }
 
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
-        public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
 
         #endregion
-
-
         public Employee()
         {
             this.IsActive = true;
             this.Entrance = DateTime.Now;
             this.UpdDate = DateTime.Now;
             this.Code    = Cons.CodeMask;
-            this.EmployeeBranches = new List<EmployeeBranch>();
         }
     }
 }

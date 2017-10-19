@@ -25,7 +25,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Index()
         {
             //obtengo las sucursales configuradas para el empleado
-            var branches = GetUserBranches();
+            var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
@@ -38,22 +38,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee)
         {
-            var branches = GetUserBranches();
+            var branches = User.Identity.GetBranches();
             var model = LookFor(branchId, beginDate, endDate, bill, provider, employee, branches);
 
             return PartialView("_PurchaseList", model);
         }
 
-        private List<Branch> GetUserBranches()
-        {
-            var userId = User.Identity.GetUserId();
-
-            var branches = db.EmployeeBranches.Include(eb => eb.Employee).
-                            Where(eb => eb.Employee.UserId == userId).
-                            Select(eb => eb.Branch).ToList();
-
-            return branches;
-        }
+     
 
         private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string employee, List<Branch> branches)
         {

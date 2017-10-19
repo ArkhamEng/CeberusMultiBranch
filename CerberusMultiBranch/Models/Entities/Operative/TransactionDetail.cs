@@ -33,5 +33,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual Purchase  Purchase { get; set; }
 
+        public virtual Transference Transference { get; set; }
+
     }
 }

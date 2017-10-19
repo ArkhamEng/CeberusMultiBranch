@@ -48,8 +48,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult MySales()
         {
             TransactionViewModel model = new TransactionViewModel();
-            model.Sales                = LookForPerUser(DateTime.Today, null, null, null);
-           
+            model.Sales = LookForPerUser(DateTime.Today, null, null, null);
+
             return View(model);
         }
 
@@ -66,15 +66,16 @@ namespace CerberusMultiBranch.Controllers.Operative
         public List<Sale> LookForPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
             var branchId = User.Identity.GetBranchId();
-            var userId   = User.Identity.GetUserId();
+            var userId = User.Identity.GetUserId();
 
             var model = (from s in db.Sales.Include(s => s.User).Include(s => s.User.Employees).Include(s => s.TransactionDetails)
-                         where (s.BranchId == branchId) && (s.UserId == userId)
+                         where (s.BranchId == branchId)
+                         && (s.UserId == userId)
                          && (beginDate == null || s.TransactionDate >= beginDate)
                          && (endDate == null || s.TransactionDate <= endDate)
                          && (folio == null || folio == string.Empty || s.Folio.Contains(folio))
-                         && (client == null || client == string.Empty || s.Client.Name.Contains(client)
-                         && s.Compleated)
+                         && (client == null || client == string.Empty || s.Client.Name.Contains(client))
+                         && s.Compleated
                          select s).OrderByDescending(s => s.TransactionId).ToList();
 
             return model;
@@ -160,8 +161,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
                 FirstOrDefault(s => s.UserId == userId
-                               && (id!=null || s.Compleated == false) 
-                               && (id== null || s.TransactionId == id ) 
+                               && (id != null || s.Compleated == false)
+                               && (id == null || s.TransactionId == id)
                                && s.BranchId == branchId);
 
 
@@ -174,7 +175,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.BranchId = branchId;
                 model.TransactionDetails = new List<TransactionDetail>();
             }
-            if(id==null)
+            if (id == null)
             {
                 model.Categories = db.Categories.ToSelectList();
                 model.CarMakes = db.CarMakes.ToSelectList();
@@ -183,7 +184,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(model);
         }
 
-      
+
 
 
         [HttpPost]
@@ -309,40 +310,81 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
-        public ActionResult Compleate(Sale sale)
+        public ActionResult ShopingCart(Sale sale)
         {
-            try
+            if (ModelState.IsValid)
             {
-                var branchId = User.Identity.GetBranchId();
-
-                foreach (var detail in sale.TransactionDetails)
+                try
                 {
-                    var ex = User.Identity.GetStock(detail.ProductId);
-                    detail.Amount = detail.Price * detail.Quantity;
-                    detail.Quantity = detail.Quantity;
+                    foreach (var detail in sale.TransactionDetails)
+                    {
+                        var ex = User.Identity.GetStock(detail.ProductId);
+                        detail.Amount = detail.Price * detail.Quantity;
+                        detail.Quantity = detail.Quantity;
 
-                    db.Entry(detail).State = EntityState.Modified;
+                        db.Entry(detail).State = EntityState.Modified;
+                    }
+
+                    sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
+                    sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
+
+                    //Setting comission values
+                    sale.ComPer = User.Identity.GetSalePercentage();
+
+                    if (sale.ComPer > Cons.Zero)
+                        sale.ComAmount = Math.Round(sale.TotalAmount * (1d / sale.ComPer), Cons.Two);
+
+                    sale.TransactionDate = DateTime.Now;
+                    sale.Compleated      = true;
+
+                    db.Entry(sale).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    return RedirectToAction("MySales");
                 }
+                catch (Exception ex)
+                {
+                    db.Dispose();
+                    db = null;
 
-                sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
-                sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
-
-                //Setting comission values
-                sale.ComPer = User.Identity.GetSalePercentage();
-                sale.ComAmount = Math.Round(sale.TotalAmount * (1d / sale.ComPer), Cons.Two);
-
-                sale.Compleated = true;
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-
-                return RedirectToAction("Index");
+                    var model = GetVM(sale.TransactionId);
+                    ViewBag.Header  = "Error al cerrar la venta!";
+                    ViewBag.Message = "Ocurrio un error iniesperado al concretar la venta detalle de la excepcion:"+ex.Message;
+                    return View("ShopingCart", model);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                return  RedirectToAction("ShopingCart"); 
+                db.Dispose();
+                db = null;
+
+                var model = GetVM(sale.TransactionId);
+                ViewBag.Header  = "Datos inválidos!";
+                ViewBag.Message = "No se pudo concretar venta debido un error en los datos de ingreso";
+                return View("ShopingCart", model);
             }
         }
+
+
+
+        private SaleViewModel GetVM(int id)
+        {
+            if (db == null)
+                db = new ApplicationDbContext();
+
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
+                                     Include(s => s.TransactionDetails.Select(td => td.Product)).
+                                     Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                                     Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).FirstOrDefault(s => s.TransactionId == id);
+
+            SaleViewModel model = new SaleViewModel(sale);
+            model.Categories = db.Categories.ToSelectList();
+            model.CarMakes = db.CarMakes.ToSelectList();
+
+            return model;
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]

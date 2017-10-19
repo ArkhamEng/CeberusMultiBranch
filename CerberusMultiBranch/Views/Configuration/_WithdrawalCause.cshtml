@@ -1,0 +1,38 @@
+﻿
+
+<h4>Motivos de Retiro</h4>
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="form-group col-md-6">
+    <div class="input-group">
+        @Html.TextBox("CauseName", "", htmlAttributes: new { @class = "form-control" })
+        <span class="input-group-btn">
+            <button class="btn btn-warning" type="button" onclick="AddCause()">
+                <span class="glyphicon glyphicon-plus" />
+            </button>
+        </span>
+    </div>
+</div>
+
+@Html.Hidden("CauseUpdUser")
+
+@Html.Hidden("CauseUpdDate")
+
+
+<div id="divCauses">
+</div>
+
+<script>
+    
+
+    function AddCause()
+    {
+        HalfProgress();
+        ExecuteAjax('@Url.Action("SaveCause")', { name: $("#CauseName").val() }, function (view)
+        {
+            $("#CauseName").val('');
+            $("#divCauses").html(view);
+            CompleateProgress();
+        })
+    }
+
+</script>

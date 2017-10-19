@@ -23,6 +23,11 @@
         </a>
     </li>
     <li>
+        <a data-toggle="tab" href="#Causes">
+            &nbsp;&nbsp;Causas de retiro<span class="glyphicon glyphicon-list-alt" style="float:left" />
+        </a>
+    </li>
+    <li>
         <a data-toggle="tab" href="#Variables">
                 &nbsp;&nbsp;Variables<span class="fa fa-cog" style="float:left" />
         </a>
@@ -36,6 +41,10 @@
     <div id="Categories" class="tab-pane fade">
         @Html.Partial("_Categories")
     </div>
+    <div id="Causes" class="tab-pane fade">
+        @Html.Partial("_WithdrawalCause")
+    </div>
+
     <div id="Variables" class="tab-pane fade">
         @Html.Partial("_Variables")
     </div>

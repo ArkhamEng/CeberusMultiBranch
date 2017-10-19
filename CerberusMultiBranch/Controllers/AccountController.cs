@@ -66,6 +66,27 @@ namespace CerberusMultiBranch.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+
+            var roleM = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
+
+            if (!roleM.RoleExists("Administrador"))
+                roleM.Create(new IdentityRole("Administrador"));
+
+            if (!roleM.RoleExists("Cajero"))
+                roleM.Create(new IdentityRole("Cajero"));
+
+            if (!roleM.RoleExists("Vendedor"))
+                roleM.Create(new IdentityRole("Vendedor"));
+
+            if (!roleM.RoleExists("Almacenista"))
+                roleM.Create(new IdentityRole("Almacenista"));
+
+            if (!roleM.RoleExists("Capturista"))
+                roleM.Create(new IdentityRole("Capturista"));
+
+            if (!roleM.RoleExists("Supervisor"))
+                roleM.Create(new IdentityRole("Supervisor"));
+
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -177,8 +198,8 @@ namespace CerberusMultiBranch.Controllers
             IdentityResult result = null;
             var roleM = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
-            if (!roleM.RoleExists("Administrador"))
-                result = roleM.Create(new IdentityRole("Administrador"));
+            if (!roleM.RoleExists(role))
+                result = roleM.Create(new IdentityRole(role));
             else
                 return Json(new { Result = "Role duplicado", Data = "El rol " + role + " ya se encuntra dado de alta" });
 

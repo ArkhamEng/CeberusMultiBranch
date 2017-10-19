@@ -4,7 +4,11 @@
     ViewBag.Title = "Carrito";
 }
 
-@Scripts.Render("~/bundles/jqueryval")
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+
+
 <script>
     HalfProgress();
 </script>
@@ -15,7 +19,7 @@
 </h3>
 
 
-@using (Html.BeginForm("Compleate", "Sales"))
+@using (Html.BeginForm("ShopingCart", "Sales"))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -26,6 +30,7 @@
     @Html.HiddenFor(m => m.IsPayed)
     @Html.HiddenFor(m => m.EmployeeId)
     @Html.HiddenFor(m => m.ClientId)
+    @Html.HiddenFor(m => m.Folio)
 
 
     if (Model.Client != null)
@@ -94,11 +99,18 @@
     @Html.Partial("_QuickClient")
 
     <div id="divModal"></div>
+
+    
 }
 
 <input id="ipError" hidden value="0" />
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
+
+        if ('@ViewBag.Message'.length > 0)
+            ShowMessage("Error inesperado", '@ViewBag.Message', 'warning');
+
         SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 
         SetCascade("#CarModelId", "#CarYearId", "GetYears");
@@ -117,6 +129,8 @@
         $("#lblTotalAmount").val(' @Html.DisplayFor(model => model.TotalAmount)')
         CompleateProgress();
     });
+
+
 
     function SearchProduct() {
         HalfProgress();

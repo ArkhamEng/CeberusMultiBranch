@@ -1,20 +1,22 @@
-﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.CashRegister>
 
 @{
-    ViewBag.Title = "Historial Compras";
+    ViewBag.Title = "History";
 }
+
+
 <script>
         HalfProgress();
 </script>
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
-    &nbsp;&nbsp;Mis ventas
+    &nbsp;&nbsp;Historial de Ventas
 </h3>
 
-<div class="col-md-6">
+<div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        @Html.TextBox("txtUser", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
@@ -27,9 +29,9 @@
         <label class="text-danger" id="lblTotalAmount"></label>
     </h5>
 </div>
-<div class="col-md-3">
+<div class="col-md-2">
     <h5>
-        <label class="text-danger" id="lblComission"></label>
+        <label class="text-danger" id="lblTotalQuantity"></label>
     </h5>
 </div>
 
@@ -43,7 +45,7 @@
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.EditorFor(model => model.BeginDate, "", new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.TextBox("BeginDate", "", new { htmlAttributes = new { @class = "form-control", type = "date" } })
                     </div>
                 </div>
 
@@ -51,24 +53,15 @@
                     @Html.Label("Hasta", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.EditorFor(model => model.EndDate, "", new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.TextBox("EndDate", "", new { htmlAttributes = new { @class = "form-control", type = "date" } })
                     </div>
                 </div>
-
+ 
                 <div class="form-group col-md-12">
-                    @Html.Label("Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Client", "", htmlAttributes: new { @class = "form-control" })
-
-                    </div>
-                </div>
-
-                <div class="form-group col-md-12">
-                    @Html.Label("Folio", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Folio", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
             </div>
@@ -88,28 +81,5 @@
 
 
 <div id="divSales">
-    @Html.Partial("_MySaleList",Model.Sales)
+    @Html.Partial("_CashRegisterList", Model)
 </div>
-<script>
-    $(document).ready(function ()
-    {
-        SetFilterControls("#divFilters", "#btnFilter", "#divSales");
-
-        $("#btnSearch").click(function ()
-        {
-            var data = {
-                beginDate: $("#BeginDate").val(),
-                endDate: $("#EndDate").val(),
-                folio: $("#Bill").val(),
-                client: $("#Client").val()
-            };
-
-            Search('@Url.Action("SearchPerUser")', data, "#divSales");
-        });
-
-        CompleateProgress();
-    });
-
-
-</script>
-

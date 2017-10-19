@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Support;
+using System;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
@@ -14,6 +15,19 @@ namespace CerberusMultiBranch.Controllers.Config
         public ActionResult Index()
         {
             return View();
+        }
+
+
+        [HttpPost]
+
+        public ActionResult SaveCause(string name)
+        {
+            db.WithdrawalCauses.Add(new Models.Entities.Operative.WithdrawalCause { Name = name, UserAdd = User.Identity.Name, InsDate = DateTime.Now });
+            db.SaveChanges();
+
+            var model = db.WithdrawalCauses.ToList();
+
+            return PartialView("_WithdrawalCauseList", model);
         }
 
         [HttpPost]

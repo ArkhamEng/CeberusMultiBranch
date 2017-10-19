@@ -201,29 +201,21 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710131812061_INITIAL.cs" />
-    <Compile Include="Migrations\201710131812061_INITIAL.Designer.cs">
-      <DependentUpon>201710131812061_INITIAL.cs</DependentUpon>
+    <Compile Include="Migrations\201710190038176_Initial.cs" />
+    <Compile Include="Migrations\201710190038176_Initial.Designer.cs">
+      <DependentUpon>201710190038176_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710132308207_TransactionChanges.cs" />
-    <Compile Include="Migrations\201710132308207_TransactionChanges.Designer.cs">
-      <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
+    <Compile Include="Migrations\201710190048001_UpdUserClient.cs" />
+    <Compile Include="Migrations\201710190048001_UpdUserClient.Designer.cs">
+      <DependentUpon>201710190048001_UpdUserClient.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710161502222_UserChanges.cs" />
-    <Compile Include="Migrations\201710161502222_UserChanges.Designer.cs">
-      <DependentUpon>201710161502222_UserChanges.cs</DependentUpon>
+    <Compile Include="Migrations\201710190052541_UpdUserProd.cs" />
+    <Compile Include="Migrations\201710190052541_UpdUserProd.Designer.cs">
+      <DependentUpon>201710190052541_UpdUserProd.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710162149061_UserBranchess.cs" />
-    <Compile Include="Migrations\201710162149061_UserBranchess.Designer.cs">
-      <DependentUpon>201710162149061_UserBranchess.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710170021515_ComissionS.cs" />
-    <Compile Include="Migrations\201710170021515_ComissionS.Designer.cs">
-      <DependentUpon>201710170021515_ComissionS.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710172340500_Transfereces.cs" />
-    <Compile Include="Migrations\201710172340500_Transfereces.Designer.cs">
-      <DependentUpon>201710172340500_Transfereces.cs</DependentUpon>
+    <Compile Include="Migrations\201710190219236_UpdUserProd1.cs" />
+    <Compile Include="Migrations\201710190219236_UpdUserProd1.Designer.cs">
+      <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -242,7 +234,6 @@
     <Compile Include="Models\Entities\Catalog\Product.cs" />
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
-    <Compile Include="Models\Entities\Config\EmployeeBranch.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
     <Compile Include="Models\Entities\Config\UserBranch.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
@@ -405,7 +396,6 @@
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Products\_ProductList.cshtml" />
-    <Content Include="Views\Employees\_BranchesAssigned.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
     <Content Include="Views\Purchases\_PurchaseList.cshtml" />
     <Content Include="Views\Products\Detail.cshtml" />
@@ -435,6 +425,10 @@
     <Content Include="Views\Account\UserList.cshtml" />
     <Content Include="Views\Sales\MySales.cshtml" />
     <Content Include="Views\Sales\_MySaleList.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCause.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCauseList.cshtml" />
+    <Content Include="Views\CashRegister\_CashRegisterList.cshtml" />
+    <Content Include="Views\CashRegister\History.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -448,23 +442,17 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710131812061_INITIAL.resx">
-      <DependentUpon>201710131812061_INITIAL.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710190038176_Initial.resx">
+      <DependentUpon>201710190038176_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710132308207_TransactionChanges.resx">
-      <DependentUpon>201710132308207_TransactionChanges.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710190048001_UpdUserClient.resx">
+      <DependentUpon>201710190048001_UpdUserClient.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710161502222_UserChanges.resx">
-      <DependentUpon>201710161502222_UserChanges.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710190052541_UpdUserProd.resx">
+      <DependentUpon>201710190052541_UpdUserProd.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710162149061_UserBranchess.resx">
-      <DependentUpon>201710162149061_UserBranchess.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710170021515_ComissionS.resx">
-      <DependentUpon>201710170021515_ComissionS.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710172340500_Transfereces.resx">
-      <DependentUpon>201710172340500_Transfereces.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710190219236_UpdUserProd1.resx">
+      <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -77,6 +77,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public DateTime UpdDate { get; set; }
 
+        [MaxLength(100)]
+        public string UdpUser { get; set; }
+
 
         public virtual City City { get; set; }
 

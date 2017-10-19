@@ -26,6 +26,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             cr.BranchId = User.Identity.GetBranchId();
             return cr;
         }
+        public ActionResult History()
+        {
+            var branchId = User.Identity.GetBranchId();
+            var model = db.CashRegisters.Include(cr=> cr.CashDetails).Where(cr => cr.BranchId == branchId);
+            
+            return View(model);
+        }
+
+
         // GET: CashRegister
         public ActionResult Index()
         {
@@ -130,15 +139,18 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult GetWithdrawals()
         {
             var cr = User.Identity.GetCashRegister();
-            return PartialView("_Withdrawals", cr.Withdrawals);
+
+            var list = db.Withdrawals.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId).ToList();
+            ViewBag.Causes = db.WithdrawalCauses.ToSelectList();
+            return PartialView("_Withdrawals", list);
         }
 
         [HttpPost]
-        public ActionResult AddWithdrawal(double amount, string comment)
+        public ActionResult AddWithdrawal(double amount, string comment, int causeId)
         {
             var cr = User.Identity.GetCashRegister();
 
-            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now, User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId };
+            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now, User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId, WithdrawalCauseId = causeId };
 
             db.Withdrawals.Add(wd);
             db.SaveChanges();

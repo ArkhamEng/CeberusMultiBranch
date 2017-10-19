@@ -22,11 +22,11 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<Transaction> Transactions { get; set; }
 
-        public ICollection<EmployeeBranch> EmployeeBranches { get; set; }
-
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
         public ICollection<CashRegister> CashRegisters { get; set; }
+
+        public ICollection<UserBranch> UserBranches { get; set; }
 
         [NotMapped]
         public ICollection<Sale> Sales { get { return this.Transactions.OfType<Sale>().ToList(); } }

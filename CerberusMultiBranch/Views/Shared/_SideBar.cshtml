@@ -11,23 +11,15 @@
     </div>
     <ul class="list-unstyled components">
 
-        @if (User.IsInRole("Vendedor") || User.IsInRole("Almacenista"))
-        {
-            <li>
-                <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
-                <ul class="collapse list-unstyled" id="catalogsSm">
-                    @if (User.IsInRole("Vendedor"))
-                    {
-                        <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
-                    }
-                    @if (User.IsInRole("Almacenista"))
-                    {
-                        <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
-                        <li><a href="/Products/">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
-                    }
-                </ul>
-            </li>
-        }
+        <li>
+            <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
+            <ul class="collapse list-unstyled" id="catalogsSm">
+                <li><a href="/Clients/">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
+                <li><a href="/Providers/">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
+                <li><a href="/Products/">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
+                <li><a href="/Employees/">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
+            </ul>
+        </li>
 
         @if (User.IsInRole("Cajero"))
         {
@@ -78,7 +70,6 @@
                     <li><a href="/Configuration/">&nbsp;Sucursales<span class="fa fa-industry" style="float:left" /></a></li>
                     <li><a href="/CarMakes/">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
                     <li><a href="/CarModels/">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
-                    <li><a href="/Employees/">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
                 </ul>
             </li>
         }

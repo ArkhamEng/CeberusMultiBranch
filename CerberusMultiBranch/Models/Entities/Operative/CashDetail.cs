@@ -1,9 +1,11 @@
-﻿using System;
+﻿using CerberusMultiBranch.Models.Entities.Config;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -36,10 +38,34 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         [MaxLength(100)]
         public string Comment { get; set; }
+
+        [ForeignKey("Cause")]
+        public int WithdrawalCauseId { get; set; }
+
+        public virtual WithdrawalCause Cause { get; set; }
     }
 
     public class Income : CashDetail
     {
         public PaymentType Type { get; set; }
+        
+        public string SaleFolio { get; set; }    
+    }
+
+    [Table("WithdrawalCause", Schema = "Operative")]
+    public class WithdrawalCause:ISelectable
+    {
+        public int WithdrawalCauseId { get; set; }
+
+        public string Name { get; set; }
+
+        public string UserAdd { get; set; }
+
+        public DateTime InsDate { get; set; }
+
+        public ICollection<Withdrawal> Withdrawals { get; set; }
+
+        public int Id { get { return this.WithdrawalCauseId; } }
+       
     }
 }

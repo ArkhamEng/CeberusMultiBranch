@@ -216,8 +216,8 @@ namespace CerberusMultiBranch.Support
 
             using (var db = new ApplicationDbContext())
             {
-                var branches = db.EmployeeBranches.Include(eb => eb.Employee).
-                             Where(eb => eb.Employee.UserId == userId).
+                var branches = db.UserBranches.Include(ub => ub.User).
+                             Where(eb => eb.User.Id == userId).
                              Select(eb => eb.Branch).ToList();
 
                 return branches;

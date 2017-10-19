@@ -50,7 +50,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.PictureType  = employee.PictureType;
             this.Picture      = employee.Picture;
             this.UserId       = employee.UserId;
-            this.EmployeeBranches = employee.EmployeeBranches;
             this.States   = new List<State>().ToSelectList();
             this.Cities   = new List<City>().ToSelectList();
             this.Register = new RegisterViewModel();
