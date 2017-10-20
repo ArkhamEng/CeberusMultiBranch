@@ -54,7 +54,7 @@ namespace CerberusMultiBranch.Support
 
         public static double GetPrice(this double buyPrice, int percentage)
         {
-            return buyPrice * (Cons.One + (percentage / Cons.OneHundred));
+            return Math.Round( buyPrice * (Cons.One + (percentage / Cons.OneHundred)),Cons.Two);
         }
 
         public static string Val(this string value)

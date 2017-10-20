@@ -30,16 +30,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, DateTime.Today, null, null, null, null, branches);
+            model.Sales = LookFor(null, DateTime.Today, null, null, null, null,true,null);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee)
+        public ActionResult Search(DateTime? beginDate, DateTime? endDate, string folio, string client, string user)
         {
-            var branches = User.Identity.GetBranches();
-            var model = LookFor(branchId, beginDate, endDate, folio, client, employee, branches);
+            var model = LookFor(beginDate, endDate, folio, client, user,null,true,null );
 
             return PartialView("_SaleList", model);
         }
@@ -48,7 +47,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult MySales()
         {
             TransactionViewModel model = new TransactionViewModel();
-            model.Sales = LookForPerUser(DateTime.Today, null, null, null);
+            model.Sales = LookFor(DateTime.Today, null, null, null,null,null,true,User.Identity.GetUserId());
 
             return View(model);
         }
@@ -57,37 +56,16 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public ActionResult SearchPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
-            var model = LookForPerUser(beginDate, endDate, folio, client);
+            var model = LookFor(beginDate, endDate, folio, client,null,null,true,User.Identity.GetUserId());
 
             return PartialView("_MySaleList", model);
         }
 
 
-        public List<Sale> LookForPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
-        {
-            var branchId = User.Identity.GetBranchId();
-            var userId = User.Identity.GetUserId();
-
-            var model = (from s in db.Sales.Include(s => s.User).Include(s => s.User.Employees).Include(s => s.TransactionDetails)
-                         where (s.BranchId == branchId)
-                         && (s.UserId == userId)
-                         && (beginDate == null || s.TransactionDate >= beginDate)
-                         && (endDate == null || s.TransactionDate <= endDate)
-                         && (folio == null || folio == string.Empty || s.Folio.Contains(folio))
-                         && (client == null || client == string.Empty || s.Client.Name.Contains(client))
-                         && s.Compleated
-                         select s).OrderByDescending(s => s.TransactionId).ToList();
-
-            return model;
-        }
-
-        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string employee, List<Branch> branches)
+        private List<Sale> LookFor(DateTime? beginDate, DateTime? endDate, string folio, string client, 
+            string user, bool? isPayed, bool? compleated, string userId)
         {
             var bId = User.Identity.GetBranchId();
-
-            //busco los userId de los empleados que coincidan con el filtro
-            var uList = (employee == null || employee == string.Empty) ?
-                db.Employees.Where(e => e.Name.Contains(employee)).Select(e => e.UserId).ToList() : null;
 
             var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
                          where (p.BranchId == bId)
@@ -95,9 +73,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                          && (endDate == null || p.TransactionDate <= endDate)
                          && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
                          && (client == null || client == string.Empty || p.Client.Name.Contains(client))
-                         && (employee == null || employee == string.Empty || uList.Contains(p.UserId))
-                         && (p.IsPayed)
-                         select p).ToList();
+                         && (user == null || user == string.Empty || p.User.UserName.Contains(user))
+                         && (userId == null || userId == string.Empty || p.UserId == userId)
+                         && (isPayed == null ||  p.IsPayed == isPayed) 
+                         &&  (compleated == null || p.Compleated == compleated)
+                         select p).OrderByDescending(p=> p.TransactionDate).ToList();
 
             return sales;
         }
@@ -144,6 +124,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "Error Al asignar el cliente", Data = ex.Message });
             }
 
+        }
+
+        [HttpPost]
+        public JsonResult SetNewPrice(int productId, int transactionId, double price)
+        {
+            try
+            {
+                var det = db.TransactionDetails.Include(td => td.Product).Include(td => td.Product.Images)
+             .FirstOrDefault(td => td.TransactionId == transactionId && td.ProductId == productId);
+
+                det.Price = price;
+                det.Amount = det.Price * det.Quantity;
+
+                db.Entry(det).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new { Result = "OK" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al cambiar el costo!", Message = "Ocurrio un error al actualizar el precio detail " + ex.Message });
+            }
         }
 
 
@@ -388,7 +390,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult PaySale(Sale sale, string payment, double? cash, double? card)
+        public ActionResult ShopingCart(Sale sale, string payment, double? cash, double? card)
         {
             var branchId = User.Identity.GetBranchId();
 

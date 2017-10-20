@@ -2,31 +2,27 @@
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 
-
-
-
 <table id="tbDetails" class="table table-striped">
     <thead>
         <tr>
-            <th></th>
+            <th/>
             <th class="text-center">@Html.DisplayName("Descripción")</th>
             <th class="text-center">@Html.DisplayName("Precio")</th>
             <th class="text-center">@Html.DisplayName("Cantidad")</th>
             <th class="text-center">@Html.DisplayName("Disponibles")</th>
             <th class="text-center">@Html.DisplayName("Total")</th>
-            <th hidden> </th>
+            <th hidden></th>
             <th hidden></th>
         </tr>
     </thead>
     <tbody>
         @{int i = 0; }
         @foreach (var item in Model)
-            {
+        {
                 if (item == null)
                 {
                     break;
                 }
-
 
                 var ProductId = "TransactionDetails[" + i + "].ProductId";
                 var TransactionId = "TransactionDetails[" + i + "].TransactionId";
@@ -55,8 +51,10 @@
                 </td>
 
                 <td class="col-md-2 text-center">
-                    <h4 id="txtPrice">
-                        @Html.DisplayFor(modelItem => item.Price)
+                    <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
+                        <u>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </u>
                     </h4>
                 </td>
                 <td class="col-md-1 text-info text-center">
@@ -106,7 +104,8 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="5" />
+            <td colspan="5" >
+            </td>>
             <td>
                 <h4 class="text-danger text-right">
                     <label id="lblTotalAmount">
@@ -118,15 +117,28 @@
     </tfoot>
 </table>
 
-
+@Html.Partial("_PriceSelector")
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function () 
+    {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
 
         SetTotalAmount();
         CompleateProgress();
     });
+
+    function ChangePrice(pId,sPrice,dPrice,wPrice)
+    {
+        $("#txtProductId").val(pId);
+        $("#txtSPrice").val(sPrice);
+        $("#txtDPrice").val(dPrice);
+        $("#txtWPrice").val(wPrice);
+
+        $("#ModalPrice").modal("show");
+
+     
+    }
 
     function QuantityChanged(input) {
         quantity = parseFloat($(input).val());

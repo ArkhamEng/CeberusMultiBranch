@@ -87,9 +87,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.BranchId = User.Identity.GetBranchSession().Id;
             }
 
-            var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
-            model.EmployeeName = employee.Name;
-            model.EmployeeId = employee.EmployeeId;
+            //var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
+            //model.EmployeeName = employee.Name;
+            //model.EmployeeId = employee.EmployeeId;
 
             return View("Create",model);
         }
@@ -151,8 +151,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
 
+                            prod.BuyPrice    = newPrice;
                             prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
+                            prod.StorePrice  = newPrice.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -188,6 +189,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return View(purchase);
         }
+
+  
 
         [HttpPost]
         public ActionResult AddDetail(int productId, int transactionId, double price, double quantity)

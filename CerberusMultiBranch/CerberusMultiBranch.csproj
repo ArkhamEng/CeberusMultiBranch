@@ -217,6 +217,14 @@
     <Compile Include="Migrations\201710190219236_UpdUserProd1.Designer.cs">
       <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710191649502_UpdUserEmp.cs" />
+    <Compile Include="Migrations\201710191649502_UpdUserEmp.Designer.cs">
+      <DependentUpon>201710191649502_UpdUserEmp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710192255154_remDesFromProd.cs" />
+    <Compile Include="Migrations\201710192255154_remDesFromProd.Designer.cs">
+      <DependentUpon>201710192255154_remDesFromProd.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -429,6 +437,8 @@
     <Content Include="Views\Configuration\_WithdrawalCauseList.cshtml" />
     <Content Include="Views\CashRegister\_CashRegisterList.cshtml" />
     <Content Include="Views\CashRegister\History.cshtml" />
+    <Content Include="Views\CashRegister\Detail.cshtml" />
+    <Content Include="Views\Sales\_PriceSelector.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -453,6 +463,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710190219236_UpdUserProd1.resx">
       <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710191649502_UpdUserEmp.resx">
+      <DependentUpon>201710191649502_UpdUserEmp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710192255154_remDesFromProd.resx">
+      <DependentUpon>201710192255154_remDesFromProd.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

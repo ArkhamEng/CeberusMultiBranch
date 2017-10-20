@@ -9,8 +9,8 @@
         HalfProgress();
 </script>
 <h3>
-    <span class="fa fa-shopping-cart" style="float:left"></span>
-    &nbsp;&nbsp;Historial de Ventas
+    <span class="fa fa-history" style="float:left"></span>
+    &nbsp;&nbsp;Historial de caja
 </h3>
 
 <div class="col-md-7">
@@ -24,16 +24,6 @@
         </span>
     </div>
 </div>
-<div class="col-md-3">
-    <h5>
-        <label class="text-danger" id="lblTotalAmount"></label>
-    </h5>
-</div>
-<div class="col-md-2">
-    <h5>
-        <label class="text-danger" id="lblTotalQuantity"></label>
-    </h5>
-</div>
 
 <br /><br /><br />
 
@@ -45,7 +35,7 @@
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("BeginDate", "", new { htmlAttributes = new { @class = "form-control", type = "date" } })
+                        @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
                     </div>
                 </div>
 
@@ -53,7 +43,7 @@
                     @Html.Label("Hasta", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("EndDate", "", new { htmlAttributes = new { @class = "form-control", type = "date" } })
+                        @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
                     </div>
                 </div>
  
@@ -68,10 +58,10 @@
         </div>
         <div class="panel-footer">
             <div class="btn-group">
-                <button class="btn btn-default" type="button" id="btnSearch">
+                <button class="btn btn-default" type="button" onclick="Search()">
                     <span class="glyphicon glyphicon-search" />
                 </button>
-                <button class="btn btn-default" type="button" id="btnClear">
+                <button class="btn btn-default" type="button" onclick="window.location='@Url.Action("History")'">
                     <span class="glyphicon glyphicon-refresh" />
                 </button>
             </div>
@@ -80,6 +70,24 @@
 </div>
 
 
-<div id="divSales">
+<div id="divCashRegisterList">
     @Html.Partial("_CashRegisterList", Model)
 </div>
+
+<script>
+    $(document).ready(function ()
+    {
+        SetFilterControls("#divFilters", "#btnFilter", "#divCashRegisterList");
+
+    });
+
+    function Search()
+    {
+        var param = { beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val(), user: $("#User").val() }
+
+        ExecuteAjax('@Url.Action("Search")', param, function (view)
+        {
+            $("#divCashRegisterList").html(view);
+        });
+    }
+</script>

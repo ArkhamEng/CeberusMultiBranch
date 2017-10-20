@@ -28,14 +28,15 @@
     @Html.HiddenFor(m => m.TransactionId)
     @Html.HiddenFor(m => m.UserId)
     @Html.HiddenFor(m => m.IsPayed)
-    @Html.HiddenFor(m => m.EmployeeId)
+    @Html.HiddenFor(m => m.Compleated)
     @Html.HiddenFor(m => m.ClientId)
     @Html.HiddenFor(m => m.Folio)
 
 
     if (Model.Client != null)
     {   <h4 id="hClientName" class="text-danger">
-        @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RFC:&nbsp;&nbsp;@Model.Client.FTR
+        @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        RFC:&nbsp;&nbsp;@Model.Client.FTR
     </h4>
     }
     else
@@ -76,19 +77,22 @@
                 {
                     if (!Model.Compleated)
                     {
-                        <button class="btn btn-primary" type="button">
-                            <span class="fa fa-exchange"></span>
-                            Cambio de tarifa
-                        </button>
 
                         <button id="btnShowClients" class="btn btn-success" type="button">
                             <span class="fa fa-user-plus"></span>
                             Cargo a cliente
                         </button>
 
-                        <button class="btn btn-danger" type="submit" id="btnCompleate">
+                        <button class="btn btn-primary" type="submit" id="btnCompleate">
                             <span class="fa fa-upload"></span>
-                            Cerrar Venta
+                            Terminar
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger" type="button" onclick="$('#ModalPayment').modal('show')">
+                            <span class="fa fa-dollar"></span>
+                            Seleccionar pago
                         </button>
                     }
                 }
@@ -98,15 +102,17 @@
 
     @Html.Partial("_QuickClient")
 
-    <div id="divModal"></div>
+    @Html.Partial("_ChoosePayment")
 
-    
+
+    <div id="divModal">
+
+    </div>
 }
 
 <input id="ipError" hidden value="0" />
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
         if ('@ViewBag.Message'.length > 0)
             ShowMessage("Error inesperado", '@ViewBag.Message', 'warning');

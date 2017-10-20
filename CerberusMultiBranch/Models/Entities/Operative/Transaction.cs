@@ -62,15 +62,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         #endregion
 
-        #region NotMapped
-        [NotMapped]
-        [Display(Name = "Empleado")]
-        public string EmployeeName { get; set; }
-
-        [NotMapped]
-        public int EmployeeId { get; set; }
-
-        #endregion
 
         public Transaction()
         {

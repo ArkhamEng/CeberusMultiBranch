@@ -87,7 +87,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public DateTime UpdDate { get; set; }
 
         [MaxLength(100)]
-        public string UdpUser { get; set; }
+        public string UpdUser { get; set; }
 
         public byte[] Picture { get; set; }
 

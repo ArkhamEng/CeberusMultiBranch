@@ -46,7 +46,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Code = product.Code;
             this.DealerPercentage = product.DealerPercentage;
             this.DealerPrice = product.DealerPrice;
-            this.Description = product.Description;
             this.Images = product.Images;
             this.MinQuantity = product.MinQuantity;
             this.StorePercentage = product.StorePercentage;
@@ -58,7 +57,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Compatibilities = product.Compatibilities;
             this.BranchProducts = product.BranchProducts;
             this.PartSystemId = product.PartSystemId;
-   
+            this.Row = product.Row;
+            this.Ledge = product.Ledge;
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();

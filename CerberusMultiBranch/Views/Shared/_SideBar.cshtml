@@ -24,6 +24,7 @@
         @if (User.IsInRole("Cajero"))
         {
             <li><a href="/CashRegister/">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
+            <li><a href="/CashRegister/History">&nbsp;Historial de caja<span class="fa fa-history" style="float:left" /></a></li>
         }
 
         @if (User.IsInRole("Vendedor"))

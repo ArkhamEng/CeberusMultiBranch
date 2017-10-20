@@ -61,7 +61,7 @@
                     @Html.DisplayFor(modelItem => item.CloseComment)
                 </td>
                 <td>
-                    <button type="button" class="btn btn-warning btn-xs">
+                    <button type="button" class="btn btn-warning btn-xs" onclick="window.location ='@Url.Action("Detail",new {id=item.CashRegisterId })'" >
                         <span class="glyphicon glyphicon-eye-open"></span>
                     </button>
                 </td>
@@ -73,6 +73,11 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("tbCashRegister",10)
+        Paginate("#tbCashRegister", 10)
+
+        CompleateProgress();
     });
+
+   
+
 </script>

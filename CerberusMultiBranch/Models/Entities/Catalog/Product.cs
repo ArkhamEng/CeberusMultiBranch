@@ -32,10 +32,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
-        [Display(Name = "Descripción")]
-        [MaxLength(200)]
-        [DataType(DataType.MultilineText)]
-        public string Description { get; set; }
+        //[Display(Name = "Descripción")]
+        //[MaxLength(200)]
+        //[DataType(DataType.MultilineText)]
+        //public string Description { get; set; }
 
         [Display(Name="Cantidad Minima")]
         [Required]

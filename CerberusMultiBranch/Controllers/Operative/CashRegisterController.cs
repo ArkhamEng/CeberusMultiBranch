@@ -34,6 +34,28 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(model);
         }
 
+        
+        public ActionResult Detail(int id)
+        {
+            var branchId = User.Identity.GetBranchId();
+            var model    = db.CashRegisters.Include(cr => cr.CashDetails).FirstOrDefault(cr => cr.CashRegisterId == id );
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult Search(DateTime? beginDate, DateTime? endDate, string user)
+        {
+            var branchId = User.Identity.GetBranchId();
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).
+                Where(cr => cr.BranchId == branchId && 
+                (beginDate == null || cr.OpeningDate >= beginDate) &&
+                (endDate == null || cr.OpeningDate <= endDate) &&
+                (user == null || user== string.Empty || cr.UserOpen == user ));
+
+            return PartialView("_CashRegisterList",model);
+        }
+
 
         // GET: CashRegister
         public ActionResult Index()

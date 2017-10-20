@@ -25,10 +25,11 @@
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-    <div class="col-md-11 panel-group">
+    <div class="col-md-12 panel-group">
         <div class="panel panel-default">
             <div class="panel-body">
                 @Html.HiddenFor(model => model.ProductId)
+                @Html.HiddenFor(model => model.IsActive)
                 <div class="row">
                     <div class="form-group col-md-8">
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
@@ -50,7 +51,16 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="form-group col-md-6">
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.PartSystemId, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
+                            @Html.DropDownListFor(model => model.PartSystemId, Model.Systems, "", new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.PartSystemId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-4">
                         @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
@@ -58,32 +68,24 @@
                             @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
                         </div>
                     </div>
+                    <div class="row col-md-3 col-md-offset-1">
+                        <div class="form-group col-md-6">
+                            @Html.Label("Modelos", htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group" id="divModComp">
+                                <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                                @Html.TextBox("Compatibilities", "", htmlAttributes: new { @class = "form-control disabled" })
+                            </div>
+                        </div>
 
-                    <div class="form-group col-md-2">
-                        @Html.Label("Modelos Compatibles", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group" id="divModComp">
-                            <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                            @Html.TextBox("Compatibilities", "", htmlAttributes: new { @class = "form-control disabled" })
+                        <div class="form-group col-md-6">
+                            @Html.Label("Imagenes", htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group" onclick="ShowImages()">
+                                <span class="input-group-addon"><i class="fa fa-camera"></i></span>
+                                @Html.TextBox("Pictures", "", htmlAttributes: new { @class = "form-control disabled" })
+                            </div>
                         </div>
                         <label id="lblMessageModel" class="text-danger" />
-                    </div>
-
-                    <div class="form-group col-md-2 col-md-offset-2">
-                        @Html.Label("Imagenes Adjuntas", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group" onclick="ShowImages()">
-                            <span class="input-group-addon"><i class="fa fa-camera"></i></span>
-                            @Html.TextBox("Pictures", "", htmlAttributes: new { @class = "form-control disabled" })
-                        </div>
                         <label id="lblMessage" class="text-danger" />
-                    </div>
-
-                    <div class="form-group col-md-12">
-                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-comment"></i></span>
-                            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
-                        </div>
                     </div>
 
                     <div class="col-md-4 form-group">
@@ -94,7 +96,8 @@
                             @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
                         </div>
                     </div>
-                    <div class="col-md-2 form-group">
+
+                    <div class="col-md-3 form-group">
                         @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
@@ -103,16 +106,19 @@
                         </div>
                     </div>
 
-                    <div class="form-group col-md-4 col-md-offset-2">
-                        @Html.LabelFor(model => model.PartSystemId, htmlAttributes: new { @class = "control-label" })
+                    @*<div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                            @Html.DropDownListFor(model => model.PartSystemId, Model.Systems, "", new { @class = "form-control" })
-                            @Html.ValidationMessageFor(model => model.PartSystemId, "", new { @class = "text-danger" })
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-comment"></i></span>
+                            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
                         </div>
-                    </div>
+                    </div>*@
                 </div>
-                
+            </div>
+        </div>
+         <div class="panel panel-danger">
+             <div class="panel-body">
                 <div class="row">
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.StorePercentage, htmlAttributes: new { @class = "control-label" })
@@ -165,16 +171,16 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
                             @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
                     </div>
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
                             @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="col-md-2 form-group">
@@ -182,8 +188,8 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
                             @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group col-md-4 col-md-offset-2">
@@ -191,22 +197,54 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-barcode"></i></span>
                             @Html.EditorFor(model => model.BarCode, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
                         </div>
+                        @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
             </div>
-            <div class="panel-footer">
-                <div class="btn-group">
-                    @Html.Partial("_CatalogButtonGroup")
+          
+        </div>
 
-                    <button type="button" class="btn btn-default" id="btnUpload">
-                        <span class="fa fa-cloud-upload" />
-                    </button>
+        <div class="panel panel-danger">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Row, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-bars"></i></span>
+                            @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Row, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        @Html.LabelFor(model => model.Ledge, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-archive"></i></span>
+                            @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="btn-group  col-md-12">
+                        @Html.Partial("_CatalogButtonGroup")
+
+                        <button type="button" class="btn btn-default" id="btnUpload" title="Subir imagenes">
+                            <span class="fa fa-cloud-upload" />
+                        </button>
+                    </div>
                 </div>
-
             </div>
         </div>
+        @*<div class="panel-footer">
+            <div class="btn-group">
+                @Html.Partial("_CatalogButtonGroup")
+
+                <button type="button" class="btn btn-default" id="btnUpload">
+                    <span class="fa fa-cloud-upload" />
+                </button>
+            </div>
+        </div>*@
     </div>
 
 
@@ -244,7 +282,8 @@
     var imgLoaded = 0;
     var count = 0;
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
         $("#Compatibilities").attr("readonly", true);
@@ -275,6 +314,12 @@
         $("#Code").change(CheckCode);
 
         CompleateProgress();
+
+
+        if ('@ViewBag.Message'.length > 0)
+        {
+            ShowMessage('@ViewBag.Header','@ViewBag.Message','warning')
+        }
     });
 
     function CheckCode() {

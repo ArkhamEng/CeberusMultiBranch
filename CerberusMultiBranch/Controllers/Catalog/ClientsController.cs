@@ -19,10 +19,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Clients
         public ActionResult Index()
         {
-
             var model = new SearchClientViewModel();
             model.States = db.States.ToSelectList();
-            model.Clients = db.Clients.Take(200).ToList();
+            model.Clients = db.Clients.Where(c => c.ClientId != Cons.Zero).ToList();
 
             return View(model);
         }
@@ -41,7 +40,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (name      == null || name == string.Empty || arr.Any(n=> (c.Code+" "+ c.Name).Contains(name))) &&
                              (stateId   == null || c.City.StateId == stateId) &&
                              (cityId    == null || c.CityId == cityId) &&
-                             (phone     == null || phone == string.Empty || c.Phone == phone) 
+                             (phone     == null || phone == string.Empty || c.Phone == phone) &&
+                             (c.ClientId != Cons.Zero)
                          select c).ToList();
 
             return PartialView("_List", model);
@@ -56,7 +56,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 arr = name.Trim().Split(' ');
 
             var model = (from p in db.Clients
-                         where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
+                         where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s))) &&
+                               (p.ClientId != Cons.Zero)
                          select p).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickClientList", model);

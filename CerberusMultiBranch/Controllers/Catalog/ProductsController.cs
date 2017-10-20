@@ -184,6 +184,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 var variables = db.Variables;
                 model = new ProductViewModel();
+                model.IsActive = true;
+                model.MinQuantity = Cons.One;
                 model.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
                 model.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
                 model.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -210,62 +212,83 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             if (ModelState.IsValid)
             {
-                if (product.ProductId == Cons.Zero)
-                    db.Products.Add(product);
-                else
-                    db.Entry(product).State = EntityState.Modified;
-
-                db.SaveChanges();
-
-                int i = Cons.Zero;
-
-                foreach (var c in product.NewCompatibilities)
+                try
                 {
-                    var mArr = c.Split('-');
-                    var mId = Convert.ToInt32(mArr[Cons.Zero]);
-                    var yIni = Convert.ToInt32(mArr[Cons.One]);
-                    var yEnd = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
 
-                    for (int j = yIni; j < yEnd; j++)
-                    {
-                        var year = db.CarYears.FirstOrDefault(y => y.Year == j && y.CarModelId == mId);
+                    product.UpdDate = DateTime.Now;
+                    product.UpdUser = User.Identity.Name;
 
-                        if (year == null)
-                        {
-                            year = new CarYear { Year = j, CarModelId = mId };
-                            db.CarYears.Add(year);
-                            db.SaveChanges();
-                        }
+                    if (product.ProductId == Cons.Zero)
+                        db.Products.Add(product);
+                    else
+                        db.Entry(product).State = EntityState.Modified;
 
-                        Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
-                        db.Compatibilites.Add(comp);
-                    }
-                }
-
-                db.SaveChanges();
-
-
-                //Guardado Imagenes
-                foreach (var file in product.Files)
-                {
-                    if (file != null)
-                    {
-                        ProductImage f = new ProductImage();
-
-                        f.Path = FileManager.SaveImage(file, product.ProductId, ImageType.Products);
-                        f.ProductId = product.ProductId;
-                        f.Name = file.FileName;
-                        f.Type = file.ContentType;
-                        f.Size = file.ContentLength;
-
-                        db.ProductImages.Add(f);
-
-                        i++;
-                    }
-                }
-
-                if (i > Cons.Zero)
                     db.SaveChanges();
+
+                    int i = Cons.Zero;
+
+                    foreach (var c in product.NewCompatibilities)
+                    {
+                        var mArr = c.Split('-');
+                        var mId = Convert.ToInt32(mArr[Cons.Zero]);
+                        var yIni = Convert.ToInt32(mArr[Cons.One]);
+                        var yEnd = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
+
+                        for (int j = yIni; j < yEnd; j++)
+                        {
+                            var year = db.CarYears.FirstOrDefault(y => y.Year == j && y.CarModelId == mId);
+
+                            if (year == null)
+                            {
+                                year = new CarYear { Year = j, CarModelId = mId };
+                                db.CarYears.Add(year);
+                                db.SaveChanges();
+                            }
+
+                            Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
+                            db.Compatibilites.Add(comp);
+                        }
+                    }
+
+                    db.SaveChanges();
+
+                    //Guardado Imagenes
+                    foreach (var file in product.Files)
+                    {
+                        if (file != null)
+                        {
+                            ProductImage f = new ProductImage();
+
+                            f.Path = FileManager.SaveImage(file, product.ProductId, ImageType.Products);
+                            f.ProductId = product.ProductId;
+                            f.Name = file.FileName;
+                            f.Type = file.ContentType;
+                            f.Size = file.ContentLength;
+
+                            db.ProductImages.Add(f);
+
+                            i++;
+                        }
+                    }
+
+                    if (i > Cons.Zero)
+                        db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+
+                    ViewBag.Header = "Error al guardar";
+                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detail:" + ex.Message+" inner exception" +ex.InnerException.Message;
+                    var model = new ProductViewModel(product);
+
+                    model.Images = new List<ProductImage>();
+                    model.Compatibilities = new List<Compatibility>();
+                    model.Categories = db.Categories.ToSelectList();
+                    model.CarMakes = db.CarMakes.ToSelectList();
+                    model.Systems = db.Systems.ToSelectList();
+
+                    return View(model);
+                }
             }
 
             return RedirectToAction("Create", new { id = product.ProductId });

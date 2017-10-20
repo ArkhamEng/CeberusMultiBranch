@@ -87,8 +87,14 @@
                                 disponibles
                                 <span class="fa fa-cubes"></span>
                             </h5>
-
-                            @Html.DisplayFor(model => prod.Description)
+                            <h6>
+                                Fila @prod.Row
+                                <span class="fa fa-bars"></span>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                Anaquel @prod.Ledge
+                                <span class="fa fa-archive"></span>
+                            </h6>
                         </div>
                         <div class="col-md-1" style="vertical-align:central">
                             <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">

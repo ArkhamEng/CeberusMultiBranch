@@ -1,7 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
 
 @{
-    ViewBag.Title = "Historial Compras";
+    ViewBag.Title = "Historial Ventas";
 }
 <script>
         HalfProgress();
@@ -43,14 +43,6 @@
         <div class="panel-body">
             <div class="row">
                 <div class="form-group col-md-12">
-                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("BranchId", Model.Branches, "", new { @class = "form-control" })
-                    </div>
-                </div>
-
-                <div class="form-group col-md-12">
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -70,7 +62,7 @@
                     @Html.Label("Cliente", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Client", "", htmlAttributes: new { @class = "form-control" })
 
                     </div>
                 </div>
@@ -84,10 +76,10 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Empleado", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Employee", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
             </div>
@@ -119,11 +111,11 @@
         $("#btnSearch").click(function ()
         {
             var data = {
-                branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
-                bill: $("#Bill").val(),
-                employee: $("#Employee").val()
+                folio: $("#Folio").val(),
+                client: $("#Client").val(),
+                user: $("#User").val()
             };
 
             Search('@Url.Action("Search")', data, "#divSales");

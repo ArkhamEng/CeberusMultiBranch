@@ -52,9 +52,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-        // POST: Employees/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+    
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(Employee employee)
@@ -63,6 +61,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 try
                 {
+                    employee.UpdUser = User.Identity.Name;
+                    employee.UpdDate = DateTime.Now;
+
                     if (employee.EmployeeId == Cons.Zero)
                     {
                         if (employee.PostedFile != null)
@@ -96,15 +97,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     return RedirectToAction("Create", new { id = employee.EmployeeId });
                 }
-                catch (DbEntityValidationException e)
+                
+                catch (Exception ex)
                 {
+                    ViewBag.Header = "Error al guardar los datos";
+                    ViewBag.Message = "Ocurrio un error al guardar los datos del empleador detail:"+ex.Message;
                 }
-                catch (Exception)
-                {
-
-                    throw;
-                }
-
             }
 
             return RedirectToAction("Create", new { id = employee.EmployeeId });

@@ -31,7 +31,6 @@
                     @Html.HiddenFor(m => m.UserId)
                     @Html.HiddenFor(m => m.Inventoried)
                     @Html.HiddenFor(m => m.IsPayed)
-                    @Html.HiddenFor(m => m.EmployeeId)
                     @Html.HiddenFor(m => m.ProviderId)
 
                     <div class="col-md-5">
@@ -65,14 +64,23 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-5">
-                        @Html.LabelFor(model => model.EmployeeName, htmlAttributes: new { @class = "control-label" })
+                    @*<div class="col-md-5">
+                        @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                            @Html.EditorFor(model => model.EmployeeName, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
+                           
+                            @if (Model.User != null)
+                            {
+                                <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                                @Html.EditorFor(model => model.User.UserName, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
+                            }
+                            else
+                            {
+                                <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                                @Html.TextBox("UserName", User.Identity.Name,  htmlAttributes : new { @class = "form-control", @readonly = "true" } )
+                            }
                         </div>
-                    </div>
-                    <div class="col-md-3 col-md-offset-1">
+                    </div>*@
+                    <div class="col-md-5">
                         @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
@@ -80,7 +88,7 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 col-md-offset-4">
                         @Html.LabelFor(model => model.Expiration, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -99,12 +107,12 @@
                         </button>
                     </div>
 
-                    <div class="form-group col-md-3 col-md-offset-3">                            
-                            <div class="input-group col-md-10">
-                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                                @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                            </div>
+                    <div class="form-group col-md-3 col-md-offset-3">
+                        <div class="input-group col-md-10">
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,18 +124,18 @@
     </div>
 
 
-    <div id="divPopCompleate" style="display:none">
-        <div class="text-center">
-            <div class="btn-group">
-                <button class="btn btn-primary btn-sm" onclick="SubmitCompleate()">
-                    Si  <span class="fa fa-check"></span>
-                </button>
-                <button type="button" class="btn btn-danger  btn-sm" onclick="HidePopCompleate()">
-                    No <span class="fa fa-times"></span>
-                </button>
+        <div id="divPopCompleate" style="display:none">
+            <div class="text-center">
+                <div class="btn-group">
+                    <button class="btn btn-primary btn-sm" onclick="SubmitCompleate()">
+                        Si  <span class="fa fa-check"></span>
+                    </button>
+                    <button type="button" class="btn btn-danger  btn-sm" onclick="HidePopCompleate()">
+                        No <span class="fa fa-times"></span>
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
 }
 
 
@@ -139,8 +147,7 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         LoadPopoverCompleate();
 
         if ('@Model.TransactionId' == 0)
@@ -173,8 +180,7 @@
         CompleateProgress();
     });
 
-    function ProviderSelected(id, name)
-    {
+    function ProviderSelected(id, name) {
         $("#ProviderId").val(id);
         $("#Provider_Name").val(name);
 
@@ -195,14 +201,12 @@
         });
     }
 
-    function HidePopCompleate()
-    {
+    function HidePopCompleate() {
         $("#btnCompleate").popover('hide');
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element)
-    {
+    function AddDetail(element) {
         var row = $(element).parent().parent().parent().parent();
         cells = row.find("td");
 
@@ -218,13 +222,11 @@
         });
     }
 
-    function RemoveDetail(tid,pid)
-    {
+    function RemoveDetail(tid, pid) {
         HalfProgress();
-        var param = { transactionId: tid, productId:pid };
+        var param = { transactionId: tid, productId: pid };
 
-        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view)
-        {
+        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view) {
             $("#divDetails").html(view);
             CompleateProgress();
         });

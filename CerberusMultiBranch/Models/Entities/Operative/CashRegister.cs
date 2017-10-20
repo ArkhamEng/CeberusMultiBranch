@@ -16,24 +16,30 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int BranchId { get; set; }
 
+        [Display(Name = "Usuario Apertura")]
         [MaxLength(50)]
         public string UserOpen { get; set; }
 
+        [Display(Name ="Usuario Cierre")]
         [MaxLength(50)]
         public string UserClose { get; set; }
 
+        [Display(Name = "Monto Inicial")]
         [DataType(DataType.Currency)]
         public double InitialAmount { get; set; }
 
         [DataType(DataType.Currency)]
         public double FinalAmount { get; set; }
 
+        [Display(Name = "Comentario de Cierre")]
         [MaxLength(100)]
         public string CloseComment { get; set; }
 
+        [Display(Name = "Fecha Apertura")]
         [DataType(DataType.DateTime)]
         public DateTime OpeningDate { get; set; }
 
+        [Display(Name = "Fecha Cierre")]
         [DataType(DataType.DateTime)]
         public DateTime? ClosingDate { get; set; }
 

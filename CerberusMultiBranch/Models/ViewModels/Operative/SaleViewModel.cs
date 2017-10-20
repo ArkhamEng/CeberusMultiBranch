@@ -36,8 +36,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.BranchId = sale.BranchId;
             this.Client = sale.Client;
             this.ClientId = sale.ClientId;
-            this.EmployeeName = sale.EmployeeName;
-            this.EmployeeId = sale.EmployeeId;
             this.Folio = sale.Folio;
             this.IsPayed = sale.IsPayed;
             this.Compleated = sale.Compleated;

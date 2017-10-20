@@ -11,7 +11,7 @@
             <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Productos")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Pagado")</th>
-            <th class="col-md-1 text-center"/>
+            <th class="col-md-1 text-center" />
         </tr>
     </thead>
     <tbody>
@@ -25,15 +25,24 @@
                 <td align="center">@item.PaymentType.ToString()</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
-                <td align="center">@Html.DisplayFor(m =>quantity )</td>
+                <td align="center">@Html.DisplayFor(m => quantity)</td>
                 <td align="center">@Html.DisplayFor(m => item.IsPayed)</td>
                 <td align="center">
-                    <button class="btn btn-success  btn-xs" onclick="window.location = '@Url.Action("Detail", new {id = item.TransactionId})'">
-                        <span class="fa fa-eye" />
-                    </button>
+                    @if (item.IsPayed)
+                    {
+                        <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("Detail", new { id = item.TransactionId })'">
+                            <span class="fa fa-file-text-o" />
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("ShopingCart", new { id = item.TransactionId })'">
+                            <span class="fa fa-money" />
+                        </button>
+                    }
                 </td>
             </tr>
-        }
+          }
     </tbody>
     @{
         var totalQuantity = Model.Sum(sale => sale.TransactionDetails.Sum(s => s.Quantity));
@@ -43,13 +52,12 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetDataTable("#tbSales", "#Filter");
 
-        var tAmount = "Monto Total: "+ GetCurrency(parseFloat('@totalAmount'));
+        var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
 
-        var tQuantity = "Articulos: " +'@totalQuantity';
+        var tQuantity = "Articulos: " + '@totalQuantity';
 
         $("#lblTotalAmount").text(tAmount);
         $("#lblTotalQuantity").text(tQuantity);
