@@ -121,21 +121,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json("No se ha abierto el modulo de caja");
         }
 
-        public static void AddIncome(double amount, PaymentType type, IIdentity user)
-        {
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                var cr = user.GetCashRegister();
-                var dt = new Income();
-                dt.Amount = amount;
-                dt.InsDate = DateTime.Now;
-                dt.CashRegisterId = cr.CashRegisterId;
-                dt.User = user.Name;
-                dt.Type = type;
-                db.Incomes.Add(dt);
-                db.SaveChanges();
-            }
-        }
+   
 
         [HttpPost]
         public JsonResult OpenCashRegister(double initialAmount)

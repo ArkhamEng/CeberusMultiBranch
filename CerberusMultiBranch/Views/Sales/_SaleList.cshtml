@@ -36,7 +36,7 @@
                     }
                     else
                     {
-                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("ShopingCart", new { id = item.TransactionId })'">
+                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("RegisterPayment", new { id = item.TransactionId })'">
                             <span class="fa fa-money" />
                         </button>
                     }

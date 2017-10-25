@@ -36,7 +36,7 @@
         }
     </tbody>
     @{
-        var totalCom = Model.Sum(sale => sale.ComAmount);
+        var totalCom = Model.Where(s => s.IsPayed).Sum(sale => sale.ComAmount);
         var totalAmount = Model.Sum(sale => sale.TotalAmount);
     }
 </table>

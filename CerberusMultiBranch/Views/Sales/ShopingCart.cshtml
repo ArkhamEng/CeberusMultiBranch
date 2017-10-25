@@ -52,7 +52,7 @@
     {
         <div class="panel panel-danger col-md-12">
             <div id="divDetails" class="row">
-                @Html.Partial("_Details", Model.TransactionDetails)
+            @Html.Partial("_Details", Model.TransactionDetails)
             </div>
         </div>
     }
@@ -85,14 +85,7 @@
 
                         <button class="btn btn-primary" type="submit" id="btnCompleate">
                             <span class="fa fa-upload"></span>
-                            Terminar
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-danger" type="button" onclick="$('#ModalPayment').modal('show')">
-                            <span class="fa fa-dollar"></span>
-                            Seleccionar pago
+                            Terminar venta
                         </button>
                     }
                 }
@@ -102,9 +95,7 @@
 
     @Html.Partial("_QuickClient")
 
-    @Html.Partial("_ChoosePayment")
-
-
+  
     <div id="divModal">
 
     </div>
@@ -112,21 +103,18 @@
 
 <input id="ipError" hidden value="0" />
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
 
         if ('@ViewBag.Message'.length > 0)
             ShowMessage("Error inesperado", '@ViewBag.Message', 'warning');
 
-        SetCascade("#CarMakeId", "#CarModelId", "GetModels");
+        if ('@Model.Compleated' == 'false')
+       {
+             SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 
-        SetCascade("#CarModelId", "#CarYearId", "GetYears");
-
-
-        $('#MessageBox').on('hidden.bs.modal', function () {
-            if ($("#ipError").val() == '0')
-                window.location = '@Url.Action("Index")';
-        });
-
+            SetCascade("#CarModelId", "#CarYearId", "GetYears");
+        }
 
         $("#btnShowClients").click(function () {
             $("#ModalQuickClient").modal('show');
@@ -138,7 +126,8 @@
 
 
 
-    function SearchProduct() {
+    function SearchProduct()
+    {
         HalfProgress();
         var filters = { categortyId: $("#CategoryId").val(), carYear: $("#CarYearId").val(), name: $("#ProductName").val() }
 
@@ -164,19 +153,6 @@
                 $("#hClientName").append(ftr);
             }
         });
-    }
-
-    function Calculate(val) {
-        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
-
-        var result = (total - val);
-
-        return (total - parseFloat(val));
-    }
-
-    function GetChange(val) {
-        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
-        return (parseFloat(val) - total);
     }
 
 </script>

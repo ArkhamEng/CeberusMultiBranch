@@ -30,7 +30,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, DateTime.Today, null, null, null, null,true,null);
+            model.Sales = LookFor(DateTime.Today, null, null, null, null, null,true,null);
 
             return View(model);
         }
@@ -148,23 +148,26 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-
+     
 
         [Authorize(Roles = "Vendedor")]
         public ActionResult ShopingCart(int? id)
         {
             SaleViewModel model;
+            string userId = null;
+            if (id==null)
+                userId = User.Identity.GetUserId();
 
-            var userId = User.Identity.GetUserId();
+
             var branchId = User.Identity.GetBranchId();
 
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                 Include(s => s.TransactionDetails.Select(td => td.Product)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-                FirstOrDefault(s => s.UserId == userId
+                FirstOrDefault(s => (userId ==null || s.UserId == userId)
                                && (id != null || s.Compleated == false)
-                               && (id == null || s.TransactionId == id)
+                               && (id == null || s.TransactionId == id )
                                && s.BranchId == branchId);
 
 
@@ -185,9 +188,6 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return View(model);
         }
-
-
-
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
@@ -215,18 +215,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        [Authorize(Roles = "Cajero")]
-        public ActionResult Detail(int id)
-        {
-
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
-             Include(s => s.TransactionDetails.Select(td => td.Product)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-             FirstOrDefault(s => s.TransactionId == id);
-
-            return View("SaleDetail", sale);
-        }
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
@@ -320,22 +308,37 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     foreach (var detail in sale.TransactionDetails)
                     {
-                        var ex = User.Identity.GetStock(detail.ProductId);
+                        //busco stock en sucursal
+                        var pb = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+
+                        // si no hay producto suficiente la operación concluye
+                        if (pb.Stock < detail.Quantity)
+                            throw new Exception("un producto de esta venta excede la cantidad en stock");
+
+                        //guardo dato del detalle
                         detail.Amount = detail.Price * detail.Quantity;
                         detail.Quantity = detail.Quantity;
-
                         db.Entry(detail).State = EntityState.Modified;
+
+                        //actualizo stock de sucursal
+                        pb.LastStock = pb.Stock;
+                        pb.Stock     = pb.Stock - detail.Quantity;
+
+                        db.Entry(pb).State = EntityState.Modified;
                     }
 
+                    //ajusto el monto total y agrego el folio
                     sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
                     sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
 
-                    //Setting comission values
+                    //coloco el porcentaje de comision del empleado
                     sale.ComPer = User.Identity.GetSalePercentage();
 
+                    //si tiene comision por venta, coloco la cantidad de esta
                     if (sale.ComPer > Cons.Zero)
                         sale.ComAmount = Math.Round(sale.TotalAmount * (1d / sale.ComPer), Cons.Two);
 
+                    //ajuto la hora y fecha de venta a la actual y concluyo
                     sale.TransactionDate = DateTime.Now;
                     sale.Compleated      = true;
 
@@ -351,7 +354,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     var model = GetVM(sale.TransactionId);
                     ViewBag.Header  = "Error al cerrar la venta!";
-                    ViewBag.Message = "Ocurrio un error iniesperado al concretar la venta detalle de la excepcion:"+ex.Message;
+                    ViewBag.Message = ex.Message+" "+ex.InnerException!=null? "Detalle interno: " +ex.InnerException.Message : string.Empty;
                     return View("ShopingCart", model);
                 }
             }
@@ -388,75 +391,119 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
+        #region Cash Methods
+        [Authorize(Roles = "Cajero")]
+        public ActionResult Detail(int id)
+        {
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
+             Include(s => s.TransactionDetails.Select(td => td.Product)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+             FirstOrDefault(s => s.TransactionId == id && s.IsPayed);
+
+            return View("SaleDetail", sale);
+        }
+
+        [Authorize(Roles = "Cajero")]
+        public ActionResult RegisterPayment(int id)
+        {
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
+                       Include(s => s.TransactionDetails.Select(td => td.Product)).
+                       Include(s => s.User).
+                       Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                       FirstOrDefault(s => s.TransactionId == id && !s.IsPayed && s.Compleated);
+
+            if (sale == null)
+                return RedirectToAction("Index");
+
+            return View(sale);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult ShopingCart(Sale sale, string payment, double? cash, double? card)
+        public ActionResult RegisterPayment(int transactionId, string payment, double? cash, double? card)
         {
-            var branchId = User.Identity.GetBranchId();
-
-            var chasR = User.Identity.GetCashRegister();
-
-            //Check for existance before to update
-            foreach (var detail in sale.TransactionDetails)
+            try
             {
-                var ex = User.Identity.GetStock(detail.ProductId);
-                detail.Amount = detail.Price * detail.Quantity;
-                detail.Quantity = detail.Quantity;
+                //busco la venta a pagar
+                var sale = db.Sales.Include(s => s.TransactionDetails).FirstOrDefault(s => s.TransactionId == transactionId);
+                //marco la venta como pagada y coloco el tipo de pago
+                sale.IsPayed = true;
+                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
+                sale.Payments = new List<Payment>();
 
-                db.Entry(detail).State = EntityState.Modified;
-
-                var pb = db.BranchProducts.Find(branchId, detail.ProductId);
-                pb.LastStock = pb.Stock;
-                pb.Stock -= detail.Quantity;
-
-                db.Entry(pb).State = EntityState.Modified;
-            }
-
-            sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
-            sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
-            sale.IsPayed = true;
-            sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
-            sale.Payments = new List<Payment>();
-
-            if (payment != PaymentType.Mixto.ToString())
-            {
-                var p = new Payment
+                #region Registros de pago
+                //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
+                //de la venta
+                if (payment != PaymentType.Mixto.ToString())
                 {
-                    TransactionId = sale.TransactionId,
-                    Amount = sale.TotalAmount,
-                    PaymentDate = DateTime.Now,
+                    var p = new Payment
+                    {
+                        TransactionId = sale.TransactionId,
+                        Amount = sale.TotalAmount,
+                        PaymentDate = DateTime.Now,
+                        PaymentType = sale.PaymentType.Value,
+                    };
+                    sale.Payments.Add(p);
+                }
+                //si el pago es Mixto (Efectivo y Tarjeta) agrego un registro de pago con efectivo
+                //y otro de tarjeta con los parametros de entrada correspondientes
+                else
+                {
+                    var pm = new Payment
+                    { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
 
-                    PaymentType = sale.PaymentType.Value,
-                };
-                sale.Payments.Add(p);
+                    var pc = new Payment
+                    { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
+
+                    sale.Payments.Add(pm);
+                    sale.Payments.Add(pc);
+                }
+                #endregion
+
+                //hago attach a la venta.. esto permite agregar los registros de pago a la base de datos
+                db.Sales.Attach(sale);
+                db.Entry(sale).State = EntityState.Modified;
+
+                #region registro de Ingreso a caja
+                //obtengo el registro de caja activo
+                var cr = User.Identity.GetCashRegister();
+
+                if(cr==null)
+                {
+                    return Json(new
+                    {
+                        Result = "Error al registrar el pago!",
+                        Message = "El modulo de caja no ha sido abierto"
+                    });
+                }
+                //por cada registro de pago agrego una registro de entrada a la caja
+                foreach (var pay in sale.Payments)
+                {
+                    var dt = new Income();
+                    dt.CashRegisterId = cr.CashRegisterId;
+                    dt.Amount = pay.Amount;
+                    dt.InsDate = DateTime.Now;
+                    dt.User = User.Identity.Name;
+                    dt.Type = pay.PaymentType;
+                    dt.SaleFolio = sale.Folio;
+                    db.Incomes.Add(dt);
+                }
+                #endregion
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK" });
             }
-            else
+            catch (Exception ex)
             {
-                var pm = new Payment
-                { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
-
-                var pc = new Payment
-                { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
-
-                db.Payments.Add(pm);
-                db.Payments.Add(pc);
+                return Json(new { Result = "Error al registrar el pago!",
+                    Message ="Detalle de la excepción "+ex.Message +" "+ex.InnerException!=null?ex.InnerException.Message:string.Empty });
             }
-
-
-            db.Sales.Attach(sale);
-            db.Entry(sale).State = EntityState.Modified;
-            db.SaveChanges();
-
-            //Creo el registro en caja
-
-            foreach (var pay in sale.Payments)
-            {
-                CashRegisterController.AddIncome(pay.Amount, pay.PaymentType, User.Identity);
-            }
-
-
-            return RedirectToAction("ShopingCart");
         }
+
+        #endregion
 
         protected override void Dispose(bool disposing)
         {

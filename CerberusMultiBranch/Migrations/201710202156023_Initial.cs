@@ -43,7 +43,6 @@ namespace CerberusMultiBranch.Migrations
                         PartSystemId = c.Int(),
                         Code = c.String(nullable: false, maxLength: 30),
                         Name = c.String(maxLength: 200),
-                        Description = c.String(maxLength: 200),
                         MinQuantity = c.Double(nullable: false),
                         BarCode = c.String(),
                         BuyPrice = c.Double(nullable: false),
@@ -59,7 +58,7 @@ namespace CerberusMultiBranch.Migrations
                         Ledge = c.String(maxLength: 30),
                         IsActive = c.Boolean(nullable: false),
                         UpdDate = c.DateTime(nullable: false),
-                        UdpUser = c.String(maxLength: 100),
+                        UpdUser = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.ProductId)
                 .ForeignKey("Config.Category", t => t.CategoryId, cascadeDelete: true)
@@ -274,7 +273,7 @@ namespace CerberusMultiBranch.Migrations
                         EmergencyPhone = c.String(maxLength: 20),
                         IsActive = c.Boolean(nullable: false),
                         UpdDate = c.DateTime(nullable: false),
-                        UdpUser = c.String(maxLength: 100),
+                        UpdUser = c.String(maxLength: 100),
                         Picture = c.Binary(),
                         PictureType = c.String(maxLength: 20),
                     })
@@ -371,7 +370,7 @@ namespace CerberusMultiBranch.Migrations
                         Phone = c.String(maxLength: 20),
                         IsActive = c.Boolean(nullable: false),
                         UpdDate = c.DateTime(nullable: false),
-                        UdpUser = c.String(maxLength: 100),
+                        UpdUser = c.String(maxLength: 100),
                     })
                 .PrimaryKey(t => t.ClientId)
                 .ForeignKey("Config.City", t => t.CityId, cascadeDelete: true)
@@ -435,14 +434,14 @@ namespace CerberusMultiBranch.Migrations
                         Type = c.Int(),
                         SaleFolio = c.String(),
                         Comment = c.String(maxLength: 100),
+                        WithdrawalCauseId = c.Int(),
                         Discriminator = c.String(nullable: false, maxLength: 128),
-                        Cause_WithdrawalCauseId = c.Int(),
                     })
                 .PrimaryKey(t => t.CashDetailId)
                 .ForeignKey("Operative.CashRegister", t => t.CashRegisterId, cascadeDelete: true)
-                .ForeignKey("Operative.WithdrawalCause", t => t.Cause_WithdrawalCauseId)
+                .ForeignKey("Operative.WithdrawalCause", t => t.WithdrawalCauseId, cascadeDelete: true)
                 .Index(t => t.CashRegisterId)
-                .Index(t => t.Cause_WithdrawalCauseId);
+                .Index(t => t.WithdrawalCauseId);
             
             CreateTable(
                 "Operative.WithdrawalCause",
@@ -482,7 +481,7 @@ namespace CerberusMultiBranch.Migrations
         public override void Down()
         {
             DropForeignKey("Security.AspNetUserRoles", "RoleId", "Security.AspNetRoles");
-            DropForeignKey("Operative.CashDetail", "Cause_WithdrawalCauseId", "Operative.WithdrawalCause");
+            DropForeignKey("Operative.CashDetail", "WithdrawalCauseId", "Operative.WithdrawalCause");
             DropForeignKey("Operative.CashDetail", "CashRegisterId", "Operative.CashRegister");
             DropForeignKey("Operative.CashRegister", "BranchId", "Config.Branch");
             DropForeignKey("Operative.BranchProduct", "ProductId", "Catalog.Product");
@@ -513,7 +512,7 @@ namespace CerberusMultiBranch.Migrations
             DropForeignKey("Catalog.Product", "CategoryId", "Config.Category");
             DropForeignKey("Operative.BranchProduct", "BranchId", "Config.Branch");
             DropIndex("Security.AspNetRoles", "RoleNameIndex");
-            DropIndex("Operative.CashDetail", new[] { "Cause_WithdrawalCauseId" });
+            DropIndex("Operative.CashDetail", new[] { "WithdrawalCauseId" });
             DropIndex("Operative.CashDetail", new[] { "CashRegisterId" });
             DropIndex("Operative.CashRegister", new[] { "BranchId" });
             DropIndex("Catalog.Provider", "IDX_Email");

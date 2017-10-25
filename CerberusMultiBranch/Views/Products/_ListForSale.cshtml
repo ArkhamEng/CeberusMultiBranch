@@ -66,9 +66,10 @@
                                     @Html.DisplayFor(modelItem => item.StorePrice)
                                 </td>
                                 <td  class="col-xs-4 col-md-2">
+                                    @Html.Hidden("Quantity",item.Quantity)
                                     <div class="input-group">
                                         <input class="form-control" type="number" max="@item.Quantity" min="0" id="txQuantity" autocomplete="off" value="0"
-                                              onkeydown="return false" onmouseup="SetQuantity(this)" />
+                                             onkeyup="SetQuantity(this)" onmouseup="SetQuantity(this)" />
                                         <span class="input-group-btn">
                                             <button id="btnAdd" type="button" class="btn btn-warning" onclick="AddToSale(this)" disabled
                                                     title="Agregar al carrito">
@@ -98,10 +99,19 @@
 
     function SetQuantity(element)
     {
-        console.log("Pressed");
         var row = $(element).parent().parent().parent();
-        Quantity = parseInt(row.find("#txQuantity").val());
+        var Quantity = parseInt(row.find("#txQuantity").val());
+
+
         var button = row.find("#btnAdd");
+        var available = row.find("#Quantity").val();
+
+        if (Quantity > available)
+        {
+            row.find("#txQuantity").val(available);
+            Quantity = available;
+        }
+            
 
         if(Quantity > 0)
             button.prop("disabled", false)
@@ -122,11 +132,9 @@
             quantity: row.find("#txQuantity").val()
           
         };
-        console.log(param);
-
+      
         ExecuteAjax('@Url.Action("AddToCart", "Sales")', param, function (data)
         {
-            console.log(data);
             if (data.Result != 'OK')
                 ShowMessage(data.Result, data.Message, 'warning');
             else

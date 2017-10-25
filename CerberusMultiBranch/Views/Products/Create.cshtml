@@ -202,7 +202,6 @@
                     </div>
                 </div>
             </div>
-          
         </div>
 
         <div class="panel panel-danger">
@@ -236,15 +235,6 @@
                 </div>
             </div>
         </div>
-        @*<div class="panel-footer">
-            <div class="btn-group">
-                @Html.Partial("_CatalogButtonGroup")
-
-                <button type="button" class="btn btn-default" id="btnUpload">
-                    <span class="fa fa-cloud-upload" />
-                </button>
-            </div>
-        </div>*@
     </div>
 
 
@@ -268,11 +258,14 @@
 
 }
 
+<div class="divImages">
+
+</div>
 
 <div id="divImagesLoaded" class="modal" role="dialog">
     <div class="modal-dialog">
         <div id="imgPartial" class="modal-content">
-            @Html.Partial("_ImagesLoaded", Model.Images)
+                @Html.Partial("_ImagesLoaded", Model.Images)
         </div>
     </div>
 </div>
@@ -322,66 +315,26 @@
         }
     });
 
-    function CheckCode() {
-        console.log("Checar Codigo");
-        $.ajax({
-            url: '@Url.Action("CheckProductCode", "Json")',
-            type: "POST",
-            data: { code: $("#Code").val() },
-            sucess: function (exist) {
-                console.log("Result " + exist);
-                if (exist)
-                    alert("El Codigo ya existe");
-            },
-            error: function () {
-                console.log("Error al ejecutar " + exist);
-            },
-            statusCode:
-           {
-               200: function (exist) {
-                   console.log("Result " + exist);
-                   if (exist)
-                       alert("El Codigo ya existe");
-               },
-               401: function (exist) {
-                   alert('401: Unauthenticated');
-               }
-           }
+    function CheckCode()
+    {
+        ExecuteAjax('@Url.Action("CheckProductCode", "Json")', { code: $("#Code").val() }, function (exist)
+        {
+            if (exist)
+                ShowMessage("Dato duplicado!","este código de producto ya existe","warning");
         });
     }
 
-    function ShowCompatibilities() {
-
-        console.log("Loading CarModels Ajax..");
-
-        $.ajax({
-            url: '@Url.Action("GetModels", "CarModels")',
-            type: "POST",
-
-            sucess: function (view) {
-                console.log("Success");
-                $("#divComp").html(view);
-                $("#divCompModal").modal();
-            },
-
-            error: function (data) { console.log("Error Executing"); console.log(data); },
-            statusCode:
-            {
-                200: function (view) {
-                    console.log("200: Authenticated ");
-                    $("#divComp").html(view);
-                    $("#divCompModal").modal();
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
-        });
+    function ShowCompatibilities()
+    {
+        ExecuteAjax('@Url.Action("GetModels", "CarModels")', {}, function (view)
+        {
+            $("#divComp").html(view);
+            $("#divCompModal").modal();
+        });    
     }
 
-    function SetPrice() {
-        console.log("KeyPressed");
-
+    function SetPrice()
+    {
         var sp = (1 + $("#StorePercentage").val() / 100);
         var dp = (1 + $("#WholesalerPercentage").val() / 100);
         var wp = (1 + $("#DealerPercentage").val() / 100);
@@ -391,23 +344,19 @@
         $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(2));
     }
 
-
-
-    function EditCode(checkBox) {
-        console.log($(checkBox).is(':checked'));
+    function EditCode(checkBox)
+    {
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
-
 
     function ShowImages() {
         $("#divImagesLoaded").modal();
     }
 
-    function DropImage(index) {
-        console.log("Drop #div" + index);
+    function DropImage(index)
+    {
         $("#div" + index).remove();
 
-        console.log("Drop #upl" + index);
         $("#upl" + index).remove();
 
         count--;
@@ -420,12 +369,14 @@
 
     }
 
-    function ImageLoaded(input) {
+    function ImageLoaded(input)
+    {
         var files = input.files;
 
         var reader = new FileReader();
 
-        reader.onload = function (e) {
+        reader.onload = function (e)
+        {
             $('#divImages').append(" <div id='div" + imgLoaded + "' class='thumbnail col-md-4' ><a class='close'  onclick='DropImage(" + imgLoaded + ")'>×</a><img  src='" + e.target.result + "' class='img-responsive' style='min-height:50px;height:70px;'/>");
             console.log("Imagen Index " + imgLoaded);
 
@@ -438,7 +389,8 @@
         $(input).closest("label").hide();
     }
 
-    function AddUploader() {
+    function AddUploader()
+    {
         console.log("Creating Upload " + imgLoaded);
 
         var ctrl = ' <label id="upl' + imgLoaded + '" class="btn btn-warning btn-file ">' +
@@ -449,11 +401,11 @@
         $('#divUploader').append(ctrl);
 
         count++;
-        console.log(count);
         $("#lblMessage").text("Imagenes a cargar " + count);
     }
 
-    function Preview(input) {
+    function Preview(input)
+    {
         var files = input.files;
 
         if (files && files[0]) {

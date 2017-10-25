@@ -18,7 +18,8 @@
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtUser", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters"
+                    title="Ver / Ocultar filtros">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
         </span>
@@ -58,10 +59,10 @@
         </div>
         <div class="panel-footer">
             <div class="btn-group">
-                <button class="btn btn-default" type="button" onclick="Search()">
+                <button class="btn btn-default" type="button" onclick="Search()" title="Bucar">
                     <span class="glyphicon glyphicon-search" />
                 </button>
-                <button class="btn btn-default" type="button" onclick="window.location='@Url.Action("History")'">
+                <button class="btn btn-default" type="button" onclick="window.location='@Url.Action("History")'" title="Recargar página">
                     <span class="glyphicon glyphicon-refresh" />
                 </button>
             </div>

@@ -1,21 +1,21 @@
 ﻿using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Security.Principal;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using System.Data;
-using System.Data.Entity;
-using CerberusMultiBranch.Models.Entities.Operative;
-using System.Text;
 using System.Web.UI;
 
 namespace CerberusMultiBranch.Support
@@ -172,6 +172,30 @@ namespace CerberusMultiBranch.Support
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                return db.Users.Find(user.GetUserId()).ComissionForSale;
+            }
+        }
+
+        public static FileResult GetPicture(this IIdentity u)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                string userId =  u.GetUserId();
+                var user = db.Users.Find(userId);
+
+                FileContentResult picture = null;
+
+                if (user.PicturePath != null)
+                {
+                    byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath(user.PicturePath));
+                    picture = new FileContentResult(imgdata, "img/jpg");
+                }
+                else
+                {
+                    byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath("/Content/images/sinimagen.jpg"));
+                    picture = new FileContentResult(imgdata, "img/jpg");
+                }
+
+                return picture;
             }
         }
 

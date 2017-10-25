@@ -8,7 +8,9 @@
     <span class="fa fa-address-book" style="float:left"></span>
     &nbsp;&nbsp;Catálogo de Clientes
 </h3>
-
+<script>
+    HalfProgress();
+</script>
 <div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -87,7 +89,7 @@
 
         $("#btnSearch").click(function ()
         {
-            console.log("Searching Clients");
+            BeginProgress();
             var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#Filter").val(), phone: $("#Phone").val() };
             Search("/Clients/Search", data, "#divClients");
         });

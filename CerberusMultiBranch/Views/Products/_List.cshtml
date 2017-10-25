@@ -1,5 +1,4 @@
-﻿@*@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>*@
-@model IEnumerable<List<CerberusMultiBranch.Models.Entities.Catalog.Product>>
+﻿@model IEnumerable<List<CerberusMultiBranch.Models.Entities.Catalog.Product>>
 
 
 @{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
@@ -52,28 +51,28 @@
                                         content += "<h6>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
                                     }
 
-                                <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
-                                      title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
-                                </span>
+                                    <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
+                                          title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                                    </span>
                                 }
                             </h4>
                             @if (prod.TradeMark != null)
                             {
-                            <h6>
-                                Por @prod.TradeMark
-                                <span class="fa fa-registered"></span>
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                <label class="text-danger">
-                                    Código @prod.Code
-                                </label>
-                            </h6>
+                                <h6>
+                                    Por @prod.TradeMark
+                                    <span class="fa fa-registered"></span>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label class="text-danger">
+                                        Código @prod.Code
+                                    </label>
+                                </h6>
                             }
                             else
                             {
-                            <h6>
-                                Código @prod.Code
-                            </h6>
+                                <h6>
+                                    Código @prod.Code
+                                </h6>
                             }
                             <h4>
                                 <label>
@@ -96,8 +95,10 @@
                                 <span class="fa fa-archive"></span>
                             </h6>
                         </div>
+
                         <div class="col-md-1" style="vertical-align:central">
-                            <button class="btn btn-default btn-sm" onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
+                            <button class="btn btn-default btn-sm" title="Editar producto"
+                                    onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                 <span class="glyphicon glyphicon-edit"></span>
                             </button>
                         </div>
@@ -109,13 +110,16 @@
                 }
             </tr>
 
-         }
+                            }
     </tbody>
 </table>
 
 <div id="divImagesModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
             <div id="divImages" class="modal-body panel-body">
             </div>
         </div>
@@ -126,6 +130,7 @@
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger">
             <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">
                     <span class="fa fa-cubes"></span>
                     Existencias en Sucursales

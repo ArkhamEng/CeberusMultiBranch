@@ -172,7 +172,6 @@
 
     function EditCode(checkBox)
     {
-        console.log($(checkBox).is(':checked'));
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
 
@@ -180,7 +179,6 @@
     {
         SetCascade("#StateId", "#CityId", "GetCities");
 
-        console.log("Loading CreateClient");
         $("#Code").attr("readonly", true);
 
         console.log("Create Employee Loaded");

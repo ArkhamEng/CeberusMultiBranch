@@ -69,7 +69,7 @@ namespace CerberusMultiBranch.Controllers
 
             var roleM = new RoleManager<IdentityRole>(new RoleStore<IdentityRole>(new ApplicationDbContext()));
 
-            if (!roleM.RoleExists("Administrador"))
+           /* if (!roleM.RoleExists("Administrador"))
                 roleM.Create(new IdentityRole("Administrador"));
 
             if (!roleM.RoleExists("Cajero"))
@@ -85,7 +85,7 @@ namespace CerberusMultiBranch.Controllers
                 roleM.Create(new IdentityRole("Capturista"));
 
             if (!roleM.RoleExists("Supervisor"))
-                roleM.Create(new IdentityRole("Supervisor"));
+                roleM.Create(new IdentityRole("Supervisor"));*/
 
             ViewBag.ReturnUrl = returnUrl;
             return View();

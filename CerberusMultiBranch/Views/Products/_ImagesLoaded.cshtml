@@ -50,35 +50,13 @@
 
     });
 
-    function DeleteImage(id) {
+    function DeleteImage(id)
+    {
         console.log("Deleting Image Id: " + id);
 
-        $.ajax({
-            url: "/Products/DeleteImage",
-            type: "POST",
-            cache: false,
-            
-            //processData: false,
-            data: { id: id },
-            sucess: function (view) {
-                console.log("Succes");
-                $("#imgPartial").html(view);
-            },
-
-            error: function (data) {
-                console.log("Error");
-            },
-            statusCode:
-            {
-                200: function (view) {
-                    console.log("Success 200: Authenticated ");
-                    $("#imgPartial").html(view);
-                    // $("#divImagesLoaded").modal();
-                },
-                401: function (data) {
-                    console.log("401: Unauthenticated");
-                }
-            }
+        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (view)
+        {
+            $("#imgPartial").html(view);
         });
     }
 </script>

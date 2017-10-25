@@ -201,29 +201,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710190038176_Initial.cs" />
-    <Compile Include="Migrations\201710190038176_Initial.Designer.cs">
-      <DependentUpon>201710190038176_Initial.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710190048001_UpdUserClient.cs" />
-    <Compile Include="Migrations\201710190048001_UpdUserClient.Designer.cs">
-      <DependentUpon>201710190048001_UpdUserClient.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710190052541_UpdUserProd.cs" />
-    <Compile Include="Migrations\201710190052541_UpdUserProd.Designer.cs">
-      <DependentUpon>201710190052541_UpdUserProd.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710190219236_UpdUserProd1.cs" />
-    <Compile Include="Migrations\201710190219236_UpdUserProd1.Designer.cs">
-      <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710191649502_UpdUserEmp.cs" />
-    <Compile Include="Migrations\201710191649502_UpdUserEmp.Designer.cs">
-      <DependentUpon>201710191649502_UpdUserEmp.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710192255154_remDesFromProd.cs" />
-    <Compile Include="Migrations\201710192255154_remDesFromProd.Designer.cs">
-      <DependentUpon>201710192255154_remDesFromProd.cs</DependentUpon>
+    <Compile Include="Migrations\201710202156023_Initial.cs" />
+    <Compile Include="Migrations\201710202156023_Initial.Designer.cs">
+      <DependentUpon>201710202156023_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -414,7 +394,7 @@
     <Content Include="Views\Sales\_Details.cshtml" />
     <Content Include="Views\Sales\Create - Copy.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
-    <Content Include="Views\Shared\_ChoosePayment.cshtml" />
+    <Content Include="Views\Sales\_ChoosePayment.cshtml" />
     <Content Include="Views\Home\_ChartTest.cshtml" />
     <Content Include="Views\Home\Chart.cshtml" />
     <Content Include="Views\Sales\Index.cshtml" />
@@ -439,6 +419,8 @@
     <Content Include="Views\CashRegister\History.cshtml" />
     <Content Include="Views\CashRegister\Detail.cshtml" />
     <Content Include="Views\Sales\_PriceSelector.cshtml" />
+    <Content Include="Views\Manage\AddProfilePicture.cshtml" />
+    <Content Include="Views\Sales\RegisterPayment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -452,23 +434,8 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710190038176_Initial.resx">
-      <DependentUpon>201710190038176_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710190048001_UpdUserClient.resx">
-      <DependentUpon>201710190048001_UpdUserClient.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710190052541_UpdUserProd.resx">
-      <DependentUpon>201710190052541_UpdUserProd.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710190219236_UpdUserProd1.resx">
-      <DependentUpon>201710190219236_UpdUserProd1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710191649502_UpdUserEmp.resx">
-      <DependentUpon>201710191649502_UpdUserEmp.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710192255154_remDesFromProd.resx">
-      <DependentUpon>201710192255154_remDesFromProd.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710202156023_Initial.resx">
+      <DependentUpon>201710202156023_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

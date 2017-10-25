@@ -61,8 +61,9 @@
                     @Html.DisplayFor(modelItem => item.CloseComment)
                 </td>
                 <td>
-                    <button type="button" class="btn btn-warning btn-xs" onclick="window.location ='@Url.Action("Detail",new {id=item.CashRegisterId })'" >
-                        <span class="glyphicon glyphicon-eye-open"></span>
+                    <button type="button" class="btn btn-primary btn-xs" title="Ver detalle de caja"
+                            onclick="window.location ='@Url.Action("Detail",new {id=item.CashRegisterId })'" >
+                        <span class="glyphicon glyphicon-expand"></span>
                     </button>
                 </td>
             </tr>

@@ -11,10 +11,9 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers
 {
-    [Authorize]
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index1()
         {
             var branches = User.Identity.GetBranches();
             var bList = branches.Select(b => b.BranchId);
@@ -65,6 +64,11 @@ namespace CerberusMultiBranch.Controllers
             return View(sources);
         }
 
+
+        public ActionResult Index()
+        {
+            return View();
+        }
         public ActionResult About()
         {
             ViewBag.Message = "Your application description page.";

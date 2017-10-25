@@ -1,0 +1,45 @@
+﻿
+
+@{
+    ViewBag.Title = "AddProfilePicture";
+}
+
+<h3>
+    <span class="fa fa-camera" style="float:left"></span>
+    &nbsp;&nbsp;Foto de perfil
+</h3>
+
+<hr />
+@using (Html.BeginForm("AddProfilePicture", "Manage", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="col-md-5">
+        <div class="btn-group-vertical thumbnail">
+
+            <img id="picture" src='@Url.Action("GetPicture", "Json")' class="btn" />
+
+            <label id="uplPicture" class="btn btn-primary btn-xs">
+                <span class="fa fa-upload"></span>
+                Cambiar foto
+                <input type="file" name="file" onchange="ImageLoaded(this)" style="display: none;">
+            </label>
+        </div>
+    </div>
+    <input type="submit" hidden id="btnSubmit"/>
+}
+
+<script>
+
+    function ImageLoaded(input) {
+        var files = input.files;
+
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            $("#picture").attr("src", e.target.result);
+        }
+        reader.readAsDataURL(files[0]);
+
+        $("#btnSubmit").click();
+    }
+</script>

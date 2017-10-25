@@ -24,8 +24,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = new List<List<Product>>();
-            model.Systems = db.Systems.ToSelectList();
+            model.Products = LookFor(null, null, null, null, null, false);
+            model.Systems  = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
@@ -69,7 +69,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
                             //&& (code == null || code == string.Empty || p.Code == code)
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            select p).Take(1000).ToList();
+                            select p).Take(400).ToList();
 
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
@@ -259,7 +259,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         {
                             ProductImage f = new ProductImage();
 
-                            f.Path = FileManager.SaveImage(file, product.ProductId, ImageType.Products);
+                            f.Path = FileManager.SaveImage(file, product.ProductId.ToString(), ImageType.Products);
                             f.ProductId = product.ProductId;
                             f.Name = file.FileName;
                             f.Type = file.ContentType;

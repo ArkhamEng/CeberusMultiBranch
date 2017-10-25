@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers
 {
@@ -99,12 +100,36 @@ namespace CerberusMultiBranch.Controllers
             return RedirectToAction("ManageLogins", new { Message = message });
         }
 
-        //
-        // GET: /Manage/AddPhoneNumber
-        public ActionResult AddPhoneNumber()
+        public ActionResult AddProfilePicture()
         {
             return View();
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddProfilePicture(HttpPostedFileBase file)
+        {
+
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(User.Identity.GetUserId());
+                user.PicturePath = FileManager.SaveImage(file, user.Id, ImageType.UserProfile);
+
+                db.Entry(user).State = System.Data.Entity.EntityState.Modified;
+                db.SaveChanges();
+               
+
+                return View();
+            }
+              
+        }
+
+        //
+        // GET: /Manage/AddPhoneNumber
+        //public ActionResult AddPhoneNumber()
+        //{
+        //    return View();
+        //}
 
         //
         // POST: /Manage/AddPhoneNumber

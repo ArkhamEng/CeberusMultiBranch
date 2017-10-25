@@ -46,13 +46,14 @@
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
                         <span class="input-group-btn">
-                            <button  type="button" class="btn btn-default" onclick="SearchProduct()">
+                            <button  type="button" class="btn btn-default" title="Buscar Productos" onclick="SearchProduct()">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
 
                             @if(User.IsInRole("Almacenista"))
                             { 
-                            <button type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Products")','blank')">
+                            <button type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Products")','blank')"
+                                    title="Crear nuevo producto">
                                 <span class="glyphicon glyphicon-file"></span>
                             </button>
                             }

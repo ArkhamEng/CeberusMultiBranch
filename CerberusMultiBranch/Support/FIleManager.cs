@@ -13,13 +13,13 @@ namespace CerberusMultiBranch.Support
     }
     public class FileManager
     {
-        public static string SaveImage(HttpPostedFileBase image, int parentId, ImageType type)
+        public static string SaveImage(HttpPostedFileBase image, string parentId, ImageType type)
         {
             try
             {
                 var fileName = Path.GetFileName(image.FileName); //getting only file name(ex-ganesh.jpg)  
                 var extension = Path.GetExtension(image.FileName); //getting the extension(ex-.jpg)
-                
+
                 string serverUrl = string.Empty;
 
                 switch (type)
@@ -37,6 +37,9 @@ namespace CerberusMultiBranch.Support
 
                 var serverPath = HttpContext.Current.Server.MapPath(serverUrl);
 
+                if (type == ImageType.UserProfile && Directory.Exists(serverPath))
+                    Directory.Delete(serverPath,true);
+
                 Directory.CreateDirectory(serverPath);
 
                 var fullRealPath = Path.Combine(serverPath, fileName);
@@ -48,7 +51,7 @@ namespace CerberusMultiBranch.Support
             }
             catch (System.Exception ex)
             {
-                return string.Empty;
+                return null;
             }
         }
     }

@@ -61,7 +61,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" type="submit">
+                <button class="btn btn-primary" type="button" onclick="RegisterPayment()">
                     <span class="glyphicon glyphicon-ok"></span>
                     Aceptar 
                 </button>
@@ -78,6 +78,12 @@
 <script>
     $(document).ready(function ()
     {
+        $('#ModalPayment').on('hidden.bs.modal', function ()
+        {
+            
+        });
+
+
         $("#btnCancel").click(function ()
         {
             $("#txtCard").val("");
@@ -93,37 +99,44 @@
 
         $("#rdCash").change(function ()
         {
-            $("#txtCard").val("");
-            $("#txtCash").val("");
-            $("#divMix").hide();
-            $("#divCash").show();
-            
+            if (this.checked)
+            {
+                $("#txtCard").val("");
+                $("#txtCash").val("");
+                $("#divMix").hide();
+                $("#divCash").show();
+            }
         });
 
         $("#rdCard").change(function ()
         {
-            $("#txtCard").val("");
-            $("#txtCash").val("");
-            $("#divMix").hide();
-            $("#divCash").hide();
-            $("#txtPayment").val("");
-            $("#txtChange").val("");
+            if (this.checked)
+            {
+                $("#txtCard").val("");
+                $("#txtCash").val("");
+                $("#divMix").hide();
+                $("#divCash").hide();
+                $("#txtPayment").val("");
+                $("#txtChange").val("");
+            }
         });
 
         $("#rdMix").change(function ()
         {
-            $("#divMix").show();
-            $("#divCash").hide();
-            $("#txtPayment").val("");
-            $("#txtChange").val("");
-            console.log("selected mix");
+            if (this.checked)
+            {
+                $("#divMix").show();
+                $("#divCash").hide();
+                $("#txtPayment").val("");
+                $("#txtChange").val("");
+            }
         });
 
         $("#txtCash").keyup(function ()
         {
             var val = $("#txtCash").val();
             var result = Calculate(val);
-          
+
             result = parseFloat(result).toFixed(2);
 
             $("#txtCard").val(result);
@@ -149,5 +162,52 @@
             $("#txtChange").val(result);
         });
     });
+
+    function RegisterPayment()
+    {
+        $("#ModalPayment").modal('hide');
+
+        var param;
+
+        if ($("#rdCash").is(":checked"))
+        {
+            param = {
+                transactionId: $("#TransactionId").val(),
+                payment: $("#rdCash").val(),
+                cash: $("#lblTotalAmount").val().replace(/[$,]+/g, "") };
+        }
+
+        else if ($("#rdCard").is(":checked"))
+        {
+            param = {
+                transactionId: $("#TransactionId").val(),
+                payment: $("#rdCard").val(),
+                cash: $("#lblTotalAmount").val().replace(/[$,]+/g, "")
+            };
+        }
+        else
+        {
+            param = {
+                transactionId: $("#TransactionId").val(),
+                payment: $("#rdMix").val(),
+                cash: $("#txtCash").val(),
+                card: $("#txtCard").val()
+            };
+        }
+
+        ExecuteAjax('@Url.Action("RegisterPayment")', param, function (j) { Response(j) });
+    }
+
+    function Response(j)
+    {
+        if (j.Result != 'OK')
+        {
+            ShowMessage(j.Result, j.Message, 'warning');
+        }
+        else
+        {
+            window.location = '@Url.Action("Index")';
+        }
+    }
 
 </script>

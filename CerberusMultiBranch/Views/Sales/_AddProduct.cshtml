@@ -29,10 +29,11 @@
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                             @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
                             <span class="input-group-btn">
-                                <button id="btnQuickProduct" type="button" class="btn btn-default">
+                                <button id="btnQuickProduct" type="button" class="btn btn-default" title="Buscar productos">
                                     <span class="glyphicon glyphicon-search"></span>
                                 </button>
-                                <button id="btnAddProduct" type="button" class="btn btn-warning" onclick="window.open('@Url.Action("Create","Products")','blank')">
+                                <button id="btnAddProduct" type="button" class="btn btn-warning"  title="Agregar producto al catálogo"
+                                        onclick="window.open('@Url.Action("Create","Products")','blank')">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </button>
                             </span>

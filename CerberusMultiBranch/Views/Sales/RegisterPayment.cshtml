@@ -1,0 +1,141 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+
+@{
+    ViewBag.Title = "Registrar pago";
+}
+
+<script>
+    HalfProgress();
+</script>
+
+<h3 col-md-4>
+    <span class="fa fa-money" style="float:left"></span>
+    &nbsp;&nbsp;Registro de pago
+</h3>
+<hr />
+<div class="col-md-12">
+    <div class="panel panel-info">
+        <div class="panel-body">
+            <h4 class="col-md-6">
+                <label>
+                    Cliente
+                </label>
+                @Model.Client.Name
+            </h4>
+            <h4 class="col-md-3">
+                <label>
+                    RFC
+                </label>
+                @Model.Client.FTR
+            </h4>
+            <h4 class="col-md-3 text-right">
+                <label>
+                   Folio
+                </label>
+                @Model.Folio
+            </h4>
+            <hr />
+            <h4 class="col-md-6">
+                <label>
+                    Agente
+                </label>
+                @Model.User.UserName
+            </h4>
+           
+            <h4 class="col-md-3 col-md-offset-3 text-right">
+                <label>
+                    Total
+                </label>
+                <label id="lblTotalAmount" class="text-danger">
+                    @Html.DisplayFor(m => m.TotalAmount)
+                </label>
+            </h4>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <table id="tbDetails" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>
+                            @Html.DisplayName("Código")
+                        </th>
+                        <th>@Html.DisplayName("Descripción")</th>
+                        <th>@Html.DisplayName("Precio de venta")</th>
+                        <th>@Html.DisplayName("Cantidad")</th>
+                        <th>@Html.DisplayName("Total")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TransactionDetails)
+                    {
+                        <tr>
+                            <td class="col-md-1">
+                                @if (item.Product.Images != null && item.Product.Images.Count > 0)
+                                {
+                                    <img class="img-responsive" src="@item.Product.Images.First().Path" />
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Product.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Product.Name)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Price)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Quantity)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Amount)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <button class="btn btn-primary" type="button" onclick="$('#ModalPayment').modal('show')">
+                <span class="fa fa-dollar"></span>
+                Seleccionar forma de pago
+            </button>
+        </div>
+    </div>
+</div>
+  
+
+  
+
+@Html.Partial("_ChoosePayment")
+
+@Html.HiddenFor(m => m.TransactionId)
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbDetails",5)
+        CompleateProgress();
+    });
+
+    function Calculate(val)
+    {
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+
+        var result = (total - val);
+
+        return (total - parseFloat(val));
+    }
+
+
+    function GetChange(val)
+    {
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+        return (parseFloat(val) - total);
+    }
+
+</script>
