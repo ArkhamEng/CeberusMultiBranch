@@ -10,6 +10,9 @@ namespace ExcelUploader
 {
     public static class Ext
     {
+
+
+
         public static DataTable ToDataDateble<T>(this IList<T> data)
         {
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(typeof(T));
@@ -31,7 +34,7 @@ namespace ExcelUploader
         public static string Clear(this string data, int max)
         {
             data = data.Trim().Replace("*", string.Empty).Replace("-", string.Empty).
-                            Replace("_", string.Empty).Replace(" ", string.Empty).Replace("/", string.Empty).Replace("*",string.Empty);
+                            Replace("_", string.Empty).Replace(" ", string.Empty).Replace("/", string.Empty).Replace("*", string.Empty);
 
             if (data.Length > max)
                 return data.Substring(0, max);
@@ -54,8 +57,8 @@ namespace ExcelUploader
             var dt = data.ToString().Trim();
             int d;
 
-            return int.TryParse(dt, out d)? d: 0;
-           
+            return int.TryParse(dt, out d) ? d : 0;
+
         }
 
         public static double ToDouble(this object data)
@@ -63,25 +66,43 @@ namespace ExcelUploader
             var dt = data.ToString().Trim();
             double d;
 
-            return  Math.Round((double.TryParse(dt, out d) ? d : 0),2);
+            return Math.Round((double.TryParse(dt, out d) ? d : 0), 2);
 
         }
     }
     class DataManager
     {
+        public static void Begin()
+        {
+            var prod = Excel.GetProducts();
+            Console.WriteLine("Agregando productos");
+            int i = 0;
+            foreach (var p in prod)
+            {
+                var done = SQLServer.SetExternalProduct(p, 2);
+                if (done)
+                {
+                    i++;
+                   
+                    Console.WriteLine("\r Productos agregados {0}", i);
+                }
+            }
+        }
+
+
         public static void AddCatalogs()
         {
             var providers = AccessServer.GetProviders();
 
-            var clients   = AccessServer.GetClients();
+            var clients = AccessServer.GetClients();
 
             var categories = AccessServer.GetCategories();
 
-            Console.WriteLine("Proveedores {0}  Clientes {1}   Categorias {2}",providers.Count, clients.Count, categories.Count);
+            Console.WriteLine("Proveedores {0}  Clientes {1}   Categorias {2}", providers.Count, clients.Count, categories.Count);
             Console.WriteLine("Comenzando la exportación de proveedores");
 
             int prC = 0;
-            foreach(var provider in providers)
+            foreach (var provider in providers)
             {
                 var done = SQLServer.AddProvider(provider);
                 if (done)
@@ -125,26 +146,26 @@ namespace ExcelUploader
 
             var sCat = SQLServer.GetCategories();
 
-            Console.WriteLine("Categorias Cargadas {0}",sCat.Count);
+            Console.WriteLine("Categorias Cargadas {0}", sCat.Count);
 
             Console.WriteLine("Obteniendo productos a exportar....");
 
             var products = AccessServer.GetProducts(sCat);
 
-            Console.WriteLine("Productos encontrados {0} Presiona una tecla para continuar",products.Count);
+            Console.WriteLine("Productos encontrados {0} Presiona una tecla para continuar", products.Count);
 
             Console.ReadLine();
             Console.WriteLine("Comenzando la exporacion de productos...");
 
             int pC = 0;
-            foreach(var product in products)
+            foreach (var product in products)
             {
                 var done = SQLServer.AddProduct(product);
 
                 if (done)
                 {
                     pC++;
-                    Console.Write("\rProductos Agregados {0}",pC);
+                    Console.Write("\rProductos Agregados {0}", pC);
                 }
             }
         }

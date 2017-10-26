@@ -14,13 +14,10 @@
 <div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
+        @Html.TextBox("txtFilter", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
-            </button>
-            <button id="btnCreate" type="button" class="btn btn-success" >
-                <span class="glyphicon  glyphicon-file"></span>
             </button>
         </span>
     </div>
@@ -85,20 +82,20 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Empleado", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Employee", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Usuario", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
             </div>
         </div>
         <div class="panel-footer">
             <div class="btn-group">
-                <button class="btn btn-default" type="button" id="btnSearch">
+                <button class="btn btn-default" type="button" id="btnSearch" title="Buscar">
                     <span class="glyphicon glyphicon-search" />
                 </button>
-                <button class="btn btn-default" type="button" id="btnClear">
+                <button class="btn btn-default" type="button" id="btnClear" title="Recargar página" onclick="Reload()">
                     <span class="glyphicon glyphicon-refresh" />
                 </button>
             </div>
@@ -113,27 +110,30 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
-
         SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
 
-        $("#btnSearch").click(function () {
+        $("#btnSearch").click(function ()
+        {
+            BeginProgress();
+
             var data = {
                 branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
                 bill: $("#Bill").val(),
-                employee: $("#Employee").val(),
+                user: $("#User").val(),
                 provider: $("#Provider").val(),
             };
 
             Search('@Url.Action("Search")', data, "#divPurchases");
         });
-
-        CompleateProgress();
     });
 
+    function Reload()
+    {
+        BeginProgress();
+        window.location = '@Url.Action("Index")';
+        HalfProgress();
+    }
 
 </script>
-
-@*@Html.Partial("_List", Model.Purchases)*@

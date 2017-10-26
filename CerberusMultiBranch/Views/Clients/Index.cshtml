@@ -8,9 +8,7 @@
     <span class="fa fa-address-book" style="float:left"></span>
     &nbsp;&nbsp;Catálogo de Clientes
 </h3>
-<script>
-    HalfProgress();
-</script>
+
 <div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -37,9 +35,6 @@
 
 <div id="divFilters" class="col-md-4 collapse">
     <div class="panel panel-danger">
-        @*<div class="panel-heading">
-                Filtros de busqueda
-            </div>*@
         <div class="panel-body">
             <div class="row">
                 <div class="form-group col-md-12">
@@ -78,9 +73,17 @@
 
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '/Clients/Create'; });
+        $("#btnCreate").click(function ()
+        {
+            ShowLoading();
+            window.location ='@Url.Action("Create")';
+        });
 
-        $("#btnClear").click(function () { window.location = '@Url.Action("Index",new { })' })
+        $("#btnClear").click(function ()
+        {
+            ShowLoading();
+            window.location = '@Url.Action("Index",new { })'
+        })
 
         SetCascade("#StateId", "#CityId", "GetCities");
 
@@ -89,9 +92,15 @@
 
         $("#btnSearch").click(function ()
         {
-            BeginProgress();
+            ShowLoading();
             var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#Filter").val(), phone: $("#Phone").val() };
-            Search("/Clients/Search", data, "#divClients");
+
+            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            {
+                $("#divClients").html(view);
+                HideLoading();
+            });
+          
         });
     });
 

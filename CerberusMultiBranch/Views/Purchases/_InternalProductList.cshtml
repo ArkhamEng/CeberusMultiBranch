@@ -1,0 +1,88 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+
+
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <table id="tbInternalProducts" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Código")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cateoría")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Descripción")
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TradeMark)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody class="small">
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td  class="col-md-3">
+                            @Html.DisplayFor(modelItem => item.Category.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.TradeMark)
+                        </td>
+
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.Unit)
+                        </td>
+
+                        <td class="col-md-1">
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-xs" onclick="AddRelation('@item.ProductId')" title="Crear relación de producto">
+                                    <span class="fa fa-link"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbInternalProducts", 6);
+    });
+    function AddRelation(intId)
+    {
+        var param = { internalId: intId, externalId: $("#ExternalProductId").val() }
+
+        console.log(param);
+
+        ExecuteAjax('@Url.Action("AddRelation")', param, function (j)
+        {
+            console.log(j);
+            if (j.Result != "OK")
+            {
+                $("#divInternalProductList").html(j.Result);
+                ShowMessage(j.Result, j.Message, 'warning');
+            }
+            else
+            {
+                $("#ModalInternalProduct").modal('hide');
+            }
+        });
+    }
+</script>

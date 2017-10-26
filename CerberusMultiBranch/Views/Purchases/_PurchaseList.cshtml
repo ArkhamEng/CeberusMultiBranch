@@ -28,7 +28,7 @@
                 <td align="center">@Html.DisplayFor(m =>quantity )</td>
                 <td align="center">@Html.DisplayFor(m => item.Inventoried)</td>
                 <td align="center">
-                    <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.TransactionId})'">
+                    <button class="btn btn-warning  btn-xs" onclick="Edit(@item.TransactionId)" title="Ver detalle / editar">
                         <span class="glyphicon glyphicon-pencil" />
                     </button>
                 </td>
@@ -41,8 +41,9 @@
     var totalAmount = Model.Sum(purchase => purchase.TotalAmount);
 }
 <script>
-    $(document).ready(function () {
-        SetDataTable("#tbPurchases", "#Filter");
+    $(document).ready(function ()
+    {
+        SetDataTable("#tbPurchases", "#txtFilter");
 
         var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
 
@@ -50,5 +51,13 @@
 
         $("#lblTotalAmount").text(tAmount);
         $("#lblTotalQuantity").text(tQuantity);
+
+        CompleateProgress();
     });
+
+    function Edit(id)
+    {
+        ShowLoading();
+        window.location = '@Url.Action("Create")' + '/' + id;
+    }
 </script> 

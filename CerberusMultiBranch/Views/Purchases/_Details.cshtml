@@ -87,7 +87,9 @@
 
         $("#btnShowQuick").click(function ()
         {
-            $("#ModalQuickProduct").modal('show');
+            $("#ProductName").val("");
+            $("#divProductList").html("");
+            $("#ModalExternalProduct").modal('show');
         });
 
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');

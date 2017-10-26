@@ -21,20 +21,16 @@ function ShowMessage(title, text, cls)
     $("#MessageBox").modal();
 }
 
-function BeginProgress() {
+function ShowLoading()
+{
     $("#ModalProgress").modal();
-    $("#ProgressValue").width("33%");
 }
 
-function HalfProgress() {
-    $("#ModalProgress").modal();
-    $("#ProgressValue").width("66%");
-}
 
-function CompleateProgress() {
-    $("#ProgressValue").width("100%");
+
+function HideLoading()
+{
     $("#ModalProgress").modal('hide');
-    $("#ProgressValue").width("0%");
 }
 
 
@@ -194,15 +190,20 @@ function SetDataTable(table, filter) {
 }
 
 function SetFilterControls(filters, button, target) {
-    $(filters).on("hide.bs.collapse", function () {
+    $(filters).on("hide.bs.collapse", function ()
+    {
         $(button).attr("class", "btn btn-warning");
         $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');
+
+        
         $(target).attr("class", "col-md-12");
     });
 
-    $(filters).on("show.bs.collapse", function () {
+    $(filters).on("show.bs.collapse", function ()
+    {
         $(button).attr("class", "btn btn-default");
         $(button).html('<span class="glyphicon glyphicon-eye-close"></span>');
+        
         $(target).attr("class", "col-md-8");
     });
 }

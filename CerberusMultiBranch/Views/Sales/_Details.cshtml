@@ -5,7 +5,7 @@
 <table id="tbDetails" class="table table-striped">
     <thead>
         <tr>
-            <th/>
+            <th />
             <th class="text-center">@Html.DisplayName("Descripción")</th>
             <th class="text-center">@Html.DisplayName("Precio")</th>
             <th class="text-center">@Html.DisplayName("Cantidad")</th>
@@ -19,16 +19,16 @@
         @{int i = 0; }
         @foreach (var item in Model)
         {
-                if (item == null)
-                {
-                    break;
-                }
+            if (item == null)
+            {
+                break;
+            }
 
-                var ProductId = "TransactionDetails[" + i + "].ProductId";
-                var TransactionId = "TransactionDetails[" + i + "].TransactionId";
-                var Amount = "TransactionDetails[" + i + "].Amount";
-                var Price = "TransactionDetails[" + i + "].Price";
-                var Quantity = "TransactionDetails[" + i + "].Quantity";
+            var ProductId = "TransactionDetails[" + i + "].ProductId";
+            var TransactionId = "TransactionDetails[" + i + "].TransactionId";
+            var Amount = "TransactionDetails[" + i + "].Amount";
+            var Price = "TransactionDetails[" + i + "].Price";
+            var Quantity = "TransactionDetails[" + i + "].Quantity";
 
             <tr>
                 <td class="col-md-1">
@@ -51,23 +51,30 @@
                 </td>
 
                 <td class="col-md-2 text-center">
-                    <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
-                        <u>
-                            @Html.DisplayFor(modelItem => item.Price)
-                        </u>
-                    </h4>
+                    @if (item.Sale.Compleated)
+                    {
+                        <h4>@Html.DisplayFor(modelItem => item.Price)</h4>
+                    }
+                    else
+                    {
+                        <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
+                            <u>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </u>
+                        </h4>
+                    }
                 </td>
                 <td class="col-md-1 text-info text-center">
-                   @if (!item.Sale.Compleated)
-                   {
-                    <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
-                           type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
-                   }
-                   else
-                   {<h4>
+                    @if (!item.Sale.Compleated)
+                    {
+                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
+                               type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
+                    }
+                    else
+                    {<h4>
                         @Html.DisplayFor(modelItem => item.Quantity)
                     </h4>
-                   }
+                    }
 
                 </td>
                 <td class="text-center">
@@ -104,8 +111,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="5" >
-            </td>
+            <td colspan="5"></td>
             <td>
                 <h4 class="text-danger text-right">
                     <label id="lblTotalAmount">
@@ -120,16 +126,14 @@
 @Html.Partial("_PriceSelector")
 
 <script>
-    $(document).ready(function () 
-    {
+    $(document).ready(function () {
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
 
         SetTotalAmount();
         CompleateProgress();
     });
 
-    function ChangePrice(pId,sPrice,dPrice,wPrice)
-    {
+    function ChangePrice(pId, sPrice, dPrice, wPrice) {
         $("#txtProductId").val(pId);
         $("#txtSPrice").val(sPrice);
         $("#txtDPrice").val(dPrice);
@@ -137,7 +141,7 @@
 
         $("#ModalPrice").modal("show");
 
-     
+
     }
 
     function QuantityChanged(input) {

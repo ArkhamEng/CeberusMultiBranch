@@ -30,15 +30,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(DateTime.Today, null, null, null, null, null,true,null);
+            model.Sales = LookFor(null,DateTime.Today, null, null, null, null, null,true,null);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(DateTime? beginDate, DateTime? endDate, string folio, string client, string user)
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string user)
         {
-            var model = LookFor(beginDate, endDate, folio, client, user,null,true,null );
+            var model = LookFor(branchId,beginDate, endDate, folio, client, user,null,true,null );
 
             return PartialView("_SaleList", model);
         }
@@ -46,8 +46,10 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public ActionResult MySales()
         {
+            var bId = User.Identity.GetBranchId();
+
             TransactionViewModel model = new TransactionViewModel();
-            model.Sales = LookFor(DateTime.Today, null, null, null,null,null,true,User.Identity.GetUserId());
+            model.Sales = LookFor(bId,DateTime.Today, null, null, null,null,null,true,User.Identity.GetUserId());
 
             return View(model);
         }
@@ -56,19 +58,21 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public ActionResult SearchPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
-            var model = LookFor(beginDate, endDate, folio, client,null,null,true,User.Identity.GetUserId());
+            var bId = User.Identity.GetBranchId();
+            var model = LookFor(bId,beginDate, endDate, folio, client,null,null,true,User.Identity.GetUserId());
 
             return PartialView("_MySaleList", model);
         }
 
 
-        private List<Sale> LookFor(DateTime? beginDate, DateTime? endDate, string folio, string client, 
+        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, 
             string user, bool? isPayed, bool? compleated, string userId)
         {
-            var bId = User.Identity.GetBranchId();
+            
 
-            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
-                         where (p.BranchId == bId)
+            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.TransactionDetails)
+                         where 
+                            (branchId == null || p.BranchId == branchId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
                          && (endDate == null || p.TransactionDate <= endDate)
                          && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
@@ -391,119 +395,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-        #region Cash Methods
-        [Authorize(Roles = "Cajero")]
-        public ActionResult Detail(int id)
-        {
-
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
-             Include(s => s.TransactionDetails.Select(td => td.Product)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-             FirstOrDefault(s => s.TransactionId == id && s.IsPayed);
-
-            return View("SaleDetail", sale);
-        }
-
-        [Authorize(Roles = "Cajero")]
-        public ActionResult RegisterPayment(int id)
-        {
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
-                       Include(s => s.TransactionDetails.Select(td => td.Product)).
-                       Include(s => s.User).
-                       Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id && !s.IsPayed && s.Compleated);
-
-            if (sale == null)
-                return RedirectToAction("Index");
-
-            return View(sale);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Cajero")]
-        public ActionResult RegisterPayment(int transactionId, string payment, double? cash, double? card)
-        {
-            try
-            {
-                //busco la venta a pagar
-                var sale = db.Sales.Include(s => s.TransactionDetails).FirstOrDefault(s => s.TransactionId == transactionId);
-                //marco la venta como pagada y coloco el tipo de pago
-                sale.IsPayed = true;
-                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
-                sale.Payments = new List<Payment>();
-
-                #region Registros de pago
-                //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
-                //de la venta
-                if (payment != PaymentType.Mixto.ToString())
-                {
-                    var p = new Payment
-                    {
-                        TransactionId = sale.TransactionId,
-                        Amount = sale.TotalAmount,
-                        PaymentDate = DateTime.Now,
-                        PaymentType = sale.PaymentType.Value,
-                    };
-                    sale.Payments.Add(p);
-                }
-                //si el pago es Mixto (Efectivo y Tarjeta) agrego un registro de pago con efectivo
-                //y otro de tarjeta con los parametros de entrada correspondientes
-                else
-                {
-                    var pm = new Payment
-                    { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
-
-                    var pc = new Payment
-                    { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
-
-                    sale.Payments.Add(pm);
-                    sale.Payments.Add(pc);
-                }
-                #endregion
-
-                //hago attach a la venta.. esto permite agregar los registros de pago a la base de datos
-                db.Sales.Attach(sale);
-                db.Entry(sale).State = EntityState.Modified;
-
-                #region registro de Ingreso a caja
-                //obtengo el registro de caja activo
-                var cr = User.Identity.GetCashRegister();
-
-                if(cr==null)
-                {
-                    return Json(new
-                    {
-                        Result = "Error al registrar el pago!",
-                        Message = "El modulo de caja no ha sido abierto"
-                    });
-                }
-                //por cada registro de pago agrego una registro de entrada a la caja
-                foreach (var pay in sale.Payments)
-                {
-                    var dt = new Income();
-                    dt.CashRegisterId = cr.CashRegisterId;
-                    dt.Amount = pay.Amount;
-                    dt.InsDate = DateTime.Now;
-                    dt.User = User.Identity.Name;
-                    dt.Type = pay.PaymentType;
-                    dt.SaleFolio = sale.Folio;
-                    db.Incomes.Add(dt);
-                }
-                #endregion
-
-                db.SaveChanges();
-
-                return Json(new { Result = "OK" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error al registrar el pago!",
-                    Message ="Detalle de la excepción "+ex.Message +" "+ex.InnerException!=null?ex.InnerException.Message:string.Empty });
-            }
-        }
-
-        #endregion
+   
 
         protected override void Dispose(bool disposing)
         {

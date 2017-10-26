@@ -207,7 +207,7 @@ namespace ExcelUploader
                 com.CommandText = "[Catalog].[LoadProduct]";
                 com.CommandType = CommandType.StoredProcedure;
 
-                com.Parameters.Add(new SqlParameter { Value = product.CategoryId, ParameterName = "@CategoryId" });
+                com.Parameters.Add(new SqlParameter { Value = product.Category, ParameterName = "@CategoryId" });
                 com.Parameters.Add(new SqlParameter { Value = product.Code, ParameterName = "@Code" });
                 com.Parameters.Add(new SqlParameter { Value = product.Name, ParameterName = "@Name" });
                 com.Parameters.Add(new SqlParameter { Value = product.Description, ParameterName = "@Description" });
@@ -221,6 +221,29 @@ namespace ExcelUploader
                 com.Parameters.Add(new SqlParameter { Value = product.StorePrice, ParameterName = "@StorePrice" });
                 com.Parameters.Add(new SqlParameter { Value = product.WholesalerPrice, ParameterName = "@WholesalerPrice" });
                 com.Parameters.Add(new SqlParameter { Value = product.DealerPrice, ParameterName = "@DealerPrice" });
+                com.Parameters.Add(new SqlParameter { Value = product.TradeMark, ParameterName = "@TradeMark" });
+                com.Parameters.Add(new SqlParameter { Value = product.Unit, ParameterName = "@Unit" });
+
+                return com.ExecuteNonQuery() > 0 ? true : false;
+            }
+        }
+
+        public static bool SetExternalProduct(Product product,int providerId)
+        {
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["Sql"].ToString();
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                conn.Open();
+                SqlCommand com = conn.CreateCommand();
+                com.CommandText = "[Catalog].[InsExternalProduct]";
+                com.CommandType = CommandType.StoredProcedure;
+
+                com.Parameters.Add(new SqlParameter { Value = providerId, ParameterName = "@ProviderId" });
+                com.Parameters.Add(new SqlParameter { Value = product.Code, ParameterName = "@Code" });
+                com.Parameters.Add(new SqlParameter { Value = product.Category, ParameterName = "@Category" });
+                com.Parameters.Add(new SqlParameter { Value = product.Description, ParameterName = "@Description" });
+                com.Parameters.Add(new SqlParameter { Value = product.Price, ParameterName = "@Price" });
+
                 com.Parameters.Add(new SqlParameter { Value = product.TradeMark, ParameterName = "@TradeMark" });
                 com.Parameters.Add(new SqlParameter { Value = product.Unit, ParameterName = "@Unit" });
 

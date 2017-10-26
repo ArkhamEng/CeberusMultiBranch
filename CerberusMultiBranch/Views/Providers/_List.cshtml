@@ -58,11 +58,8 @@
               
                 <td align="right">
                     <div class="btn-group">
-                        <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.ProviderId})'">
+                        <button class="btn btn-warning  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ProviderId})'">
                             <span class="glyphicon glyphicon-pencil" />
-                        </button>
-                        <button class="btn btn-danger  btn-xs">
-                            <span class="glyphicon glyphicon-trash" />
                         </button>
                     </div>
                 </td>

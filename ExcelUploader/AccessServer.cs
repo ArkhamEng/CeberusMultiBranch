@@ -120,7 +120,7 @@ namespace ExcelUploader
                         product.StorePrice      = Math.Round(product.BuyPrice * (1 + (product.StorePercentage / 100d)),2);
                         product.DealerPrice     = Math.Round(product.BuyPrice * (1 + (product.DealerPercentage / 100d)),2);
                         product.WholesalerPrice = Math.Round(product.BuyPrice * (1 + (product.WholesalerPercentage / 100d)),2);
-                        product.Reference       = dr["NOMB_GEN"].ToString().Trim();
+                        
                         
                         products.Add(product);
                     }

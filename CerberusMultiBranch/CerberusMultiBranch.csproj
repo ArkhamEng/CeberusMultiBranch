@@ -205,12 +205,25 @@
     <Compile Include="Migrations\201710202156023_Initial.Designer.cs">
       <DependentUpon>201710202156023_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710260210468_ExternalProduct.cs" />
+    <Compile Include="Migrations\201710260210468_ExternalProduct.Designer.cs">
+      <DependentUpon>201710260210468_ExternalProduct.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710261414195_ExternalProductIndex.cs" />
+    <Compile Include="Migrations\201710261414195_ExternalProductIndex.Designer.cs">
+      <DependentUpon>201710261414195_ExternalProductIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710262013224_externalProductId.cs" />
+    <Compile Include="Migrations\201710262013224_externalProductId.Designer.cs">
+      <DependentUpon>201710262013224_externalProductId.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
+    <Compile Include="Models\Entities\Catalog\ExternalProduct.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
     <Compile Include="Models\Entities\Config\City.cs" />
     <Compile Include="Models\Entities\Config\ISelectable.cs" />
@@ -267,6 +280,7 @@
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\Images\header.png" />
+    <Content Include="Content\Images\loading.gif" />
     <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\logo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
@@ -394,7 +408,7 @@
     <Content Include="Views\Sales\_Details.cshtml" />
     <Content Include="Views\Sales\Create - Copy.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
-    <Content Include="Views\Sales\_ChoosePayment.cshtml" />
+    <Content Include="Views\CashRegister\_ChoosePayment.cshtml" />
     <Content Include="Views\Home\_ChartTest.cshtml" />
     <Content Include="Views\Home\Chart.cshtml" />
     <Content Include="Views\Sales\Index.cshtml" />
@@ -408,7 +422,7 @@
     <Content Include="Views\Sales\_AddProduct.cshtml" />
     <Content Include="Views\Products\_ListForSale.cshtml" />
     <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
-    <Content Include="Views\Sales\SaleDetail.cshtml" />
+    <Content Include="Views\CashRegister\PrintNote.cshtml" />
     <Content Include="Views\Account\UserConfig.cshtml" />
     <Content Include="Views\Account\UserList.cshtml" />
     <Content Include="Views\Sales\MySales.cshtml" />
@@ -420,7 +434,15 @@
     <Content Include="Views\CashRegister\Detail.cshtml" />
     <Content Include="Views\Sales\_PriceSelector.cshtml" />
     <Content Include="Views\Manage\AddProfilePicture.cshtml" />
-    <Content Include="Views\Sales\RegisterPayment.cshtml" />
+    <Content Include="Views\CashRegister\RegistPayment.cshtml" />
+    <Content Include="Views\Sales\Payments.cshtml" />
+    <Content Include="Views\CashRegister\_SalesToPayList.cshtml" />
+    <Content Include="Views\CashRegister\PaymentAndNote.cshtml" />
+    <Content Include="Views\Purchases\_SearchExternalProduct.cshtml" />
+    <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
+    <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
+    <Content Include="Views\Purchases\_InternalProductList.cshtml" />
+    <Content Include="Views\Purchases\_CloneProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -436,6 +458,15 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201710202156023_Initial.resx">
       <DependentUpon>201710202156023_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710260210468_ExternalProduct.resx">
+      <DependentUpon>201710260210468_ExternalProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710261414195_ExternalProductIndex.resx">
+      <DependentUpon>201710261414195_ExternalProductIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710262013224_externalProductId.resx">
+      <DependentUpon>201710262013224_externalProductId.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

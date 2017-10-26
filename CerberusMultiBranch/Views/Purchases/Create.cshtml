@@ -5,12 +5,9 @@
 }
 
 @Scripts.Render("~/bundles/jqueryval")
-<script>
-    HalfProgress();
-</script>
 
 <h3>
-    <span class="fa fa-shopping-bag" style="float:left"></span>
+    <span class="fa fa-shopping-basket" style="float:left"></span>
     &nbsp;&nbsp;Registro de compras
 </h3>
 
@@ -37,7 +34,7 @@
                         @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.EditorFor(model => model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                            @Html.EditorFor(model => model.Provider.Name, "", new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
 
                             <span class="input-group-btn">
                                 <button id="btnShowProviders" type="button" class="btn btn-default">
@@ -64,22 +61,6 @@
                     </div>
                 </div>
                 <div class="row">
-                    @*<div class="col-md-5">
-                        @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                           
-                            @if (Model.User != null)
-                            {
-                                <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                                @Html.EditorFor(model => model.User.UserName, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                            }
-                            else
-                            {
-                                <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                                @Html.TextBox("UserName", User.Identity.Name,  htmlAttributes : new { @class = "form-control", @readonly = "true" } )
-                            }
-                        </div>
-                    </div>*@
                     <div class="col-md-5">
                         @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
@@ -124,34 +105,48 @@
     </div>
 
 
-        <div id="divPopCompleate" style="display:none">
-            <div class="text-center">
-                <div class="btn-group">
-                    <button class="btn btn-primary btn-sm" onclick="SubmitCompleate()">
-                        Si  <span class="fa fa-check"></span>
-                    </button>
-                    <button type="button" class="btn btn-danger  btn-sm" onclick="HidePopCompleate()">
-                        No <span class="fa fa-times"></span>
-                    </button>
-                </div>
+    <div id="divPopCompleate" style="display:none">
+        <div class="text-center">
+            <div class="btn-group">
+                <button class="btn btn-primary btn-sm" onclick="SubmitCompleate()">
+                    Si  <span class="fa fa-check"></span>
+                </button>
+                <button type="button" class="btn btn-danger  btn-sm" onclick="HidePopCompleate()">
+                    No <span class="fa fa-times"></span>
+                </button>
             </div>
         </div>
+    </div>
 }
 
 
+<div id="divClone"></div>
+
+@Html.Partial("_SearchExternalProduct")
+
+@Html.Partial("_SearchInternalProduct")
 
 
-@Html.Partial("_QuickProduct")
 
 @Html.Partial("_QuickProvider")
 
+@Html.Hidden("ExternalProductId")
+
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         LoadPopoverCompleate();
 
         if ('@Model.TransactionId' == 0)
+        {
             $("#btnShowQuick").hide();
+        }
+        else
+        {
+            $("#btnShowProviders").prop("disabled", true);
+        }
+          
 
         $("#btnShowProviders").click(function () {
             $("#ModalQuickProvider").modal('show');
@@ -165,7 +160,7 @@
 
 
         $("#spShowQuick").click(function () {
-            $("#ModalQuickProduct").modal('show');
+            $("#ModalExternalProduct").modal('show');
         });
 
         $("#btnCompleate").click(function () {
@@ -176,8 +171,6 @@
             $(".Compleated").hide();
             $("#btnSave").hide();
         }
-
-        CompleateProgress();
     });
 
     function ProviderSelected(id, name) {
@@ -201,12 +194,14 @@
         });
     }
 
-    function HidePopCompleate() {
+    function HidePopCompleate()
+    {
         $("#btnCompleate").popover('hide');
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element) {
+    function AddDetail(element)
+    {
         var row = $(element).parent().parent().parent().parent();
         cells = row.find("td");
 
@@ -223,12 +218,12 @@
     }
 
     function RemoveDetail(tid, pid) {
-        HalfProgress();
+    
         var param = { transactionId: tid, productId: pid };
 
         ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view) {
             $("#divDetails").html(view);
-            CompleateProgress();
+            
         });
     }
 </script>

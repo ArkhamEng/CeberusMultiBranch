@@ -78,10 +78,6 @@ namespace ExcelUploader
         public static List<Product> GetProducts()
         {
 
-            var sis = SQLServer.GetSystems();
-            var cat = SQLServer.GetCategories();
-            var variables = SQLServer.GetVariables();
-
             Console.Write("Buscando productos.. \n");
             List<Product> list = new List<Product>();
             var cs = System.Configuration.ConfigurationManager.ConnectionStrings["Excel"].ToString();
@@ -90,55 +86,52 @@ namespace ExcelUploader
             {
                 con.Open();
                 OleDbCommand command = con.CreateCommand();
-                command.CommandText = "select * from[Precios$]";
+                command.CommandText = "select * from[Catalogo$]";
                 var i = 0;
                 using (OleDbDataReader dr = command.ExecuteReader())
                 {
                     while (dr.Read())
                     {
                         var product = new Product();
-                        product.TradeMark = dr["Marca"].ToString().Trim();
-
-                        product.Unit = "Pieza";
-                        product.Code = dr["Npc"].ToString().Trim().Replace(" ", string.Empty).Replace("-", string.Empty); 
-                        product.Description = dr["Descripcion"].ToString().Trim();
-
-                        var length = dr["Descripcion"].ToString().Trim().Length;
-                        product.Name = dr["Descripcion"].ToString().Trim().Substring(0, length >= 100 ? 99 : length);
-                      product.BuyPrice = Math.Round(Convert.ToDouble(dr["Precio Lista"]) / 1.16, 2);
-
-                       // product.BuyPrice = Math.Round(Convert.ToDouble(dr["Precio Lista"]), 2);
-                        product.Reference = dr["Referencia"].ToString().Trim().Replace(" ",string.Empty);
-
-                        product.StorePercentage = Convert.ToInt32(variables.FirstOrDefault(v=> v.Name == "StorePercentage").Value);
-                        product.DealerPercentage = Convert.ToInt32(variables.FirstOrDefault(v => v.Name == "DealerPercentage").Value);
-                        product.WholesalerPercentage = Convert.ToInt32(variables.FirstOrDefault(v => v.Name == "WholesalerPercentage").Value);
-
-                        var s = 1 + product.StorePercentage / 100d;
-                        var d = 1 + product.DealerPercentage / 100d;
-                        var w = 1 + product.WholesalerPercentage / 100d;
-
-                        product.StorePrice = Math.Round(product.BuyPrice * s, 2);
-                        product.DealerPrice = Math.Round(product.BuyPrice * d, 2);
-                        product.WholesalerPrice = Math.Round(product.BuyPrice * w, 2);
-
-                        var cName = dr["Genero"].ToString().Trim().ToUpper();
-                        var cate = cat.FirstOrDefault(c => c.Name.Contains(cName));
-                        product.CategoryId = cate.Id;
-
-
-                        var sName = dr["Sistema"].ToString().Trim().ToUpper();
-                        var sys = sis.FirstOrDefault(sy => sy.Name.Contains(sName));
-                        product.PartSystemId =sys.Id;
+                        product.Code        = dr["CODIGO"].ToString().Trim();
+                        product.Description = dr["DESCRIPCION"].ToString().Trim();
+                        product.TradeMark   = dr["MARCA"].ToString().Trim();
+                        product.Unit        = dr["UNIDAD"].ToString().Trim();
+                        product.Category    = dr["CATEGORIA"].ToString().Trim();
+                        product.Price       =Convert.ToDouble( dr["PRECIO"].ToString().Trim());
                         i++;
 
                         Console.Write("\r Productos encontrados {0}", i);
                         list.Add(product);
-
                     }
                 }
             }
             return list;
+        }
+
+
+        public static  bool SetProcess(string codigo)
+        {
+            try
+            {
+                Console.Write("Actualizando...");
+                var cs = System.Configuration.ConfigurationManager.ConnectionStrings["Excel"].ToString();
+
+                using (OleDbConnection con = new OleDbConnection(cs))
+                {
+                    con.Open();
+                    OleDbCommand command = con.CreateCommand();
+                    command.CommandText = "Update [Catalogo$] SET Procesado ='SI' where Codigo='" + codigo + "'";
+
+                    return command.ExecuteNonQuery() > 0 ? true : false;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        
         }
     }
 }

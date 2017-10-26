@@ -30,13 +30,13 @@
                 <td align="center">
                     @if (item.IsPayed)
                     {
-                        <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("Detail", new { id = item.TransactionId })'">
+                        <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("PrintNote", new { id = item.TransactionId })'">
                             <span class="fa fa-file-text-o" />
                         </button>
                     }
                     else
                     {
-                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("RegisterPayment", new { id = item.TransactionId })'">
+                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("RegistPayment", new { id = item.TransactionId })'">
                             <span class="fa fa-money" />
                         </button>
                     }

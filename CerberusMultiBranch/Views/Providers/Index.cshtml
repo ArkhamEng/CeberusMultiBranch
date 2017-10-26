@@ -72,9 +72,9 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
+        $("#btnCreate").click(function () { ShowLoading(); window.location = '@Url.Action("Create")'; });
 
-        $("#btnClear").click(function () { window.location = '@Url.Action("Index",new { })' })
+        $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
 
         SetFilterControls("#divFilters", "#btnFilter", "#divProviders");
 
@@ -82,7 +82,7 @@
 
         $("#btnSearch").click(function ()
         {
-            console.log("Searching Clients");
+            ShowLoading();
 
             var data = {
                 stateId: $("#StateId").val(),
@@ -90,8 +90,11 @@
                 name: $("#txtName").val(),
                 phone: $("#Phone").val()
             };
-
-            Search("/Providers/Search", data, "#divProviders");
+            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            {
+                $("#divProviders").html(view);
+                HideLoading();
+            });
         });
     });
 </script>

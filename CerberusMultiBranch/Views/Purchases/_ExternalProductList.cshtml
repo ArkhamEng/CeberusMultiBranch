@@ -1,0 +1,114 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.ExternalProduct>
+
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <table id="tbExternalProducts" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Codigo")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Equiv")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Descripción")
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TradeMark)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Price)
+                    </th>
+                    <th>@Html.DisplayName("Cantidad")</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody class="small">
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td class="col-md-1">
+                            @if (item.Product!=null)
+                            {
+                                @Html.DisplayFor(modelItem => item.Product.Code)
+                            }
+                            else
+                            {
+
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+
+                        <td class="col-md-2">
+                            @Html.DisplayFor(modelItem => item.TradeMark)
+                        </td>
+
+                        <td class="col-md-1">
+                            @Html.Hidden("ProductId", item.ExternalProductId)
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+
+                        <td class="col-md-1">
+                            @Html.TextBox("Quantity", "1", htmlAttributes: new { @class = "form-control", type = "number" })
+                        </td>
+                        <td class="col-md-1">
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-xs" title="Crear / Cambiar asociación con producto interno" 
+                                        onclick="BeginAddRelation('@item.ExternalProductId','@item.Description','@item.Code')">
+                                    <span class="glyphicon glyphicon-link"></span>
+                                </button>
+                                @if (item.Product != null)
+                                {
+                                    <button class="btn btn-success btn-xs" onclick="AddDetail(this)" title="Agregar a la compra">
+                                        <span class="fa fa-shopping-basket"></span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-success btn-xs" onclick="BeginCopy(@item.ExternalProductId)" title="copiar producto a catálogo interno">
+                                        <span class="fa fa-clone"></span>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        Paginate("#tbExternalProducts", 6);
+    });
+
+    function BeginAddRelation(id,description,code)
+    {
+        $("#ModalExternalProduct").modal("hide");
+        $("#ExternalProductId").val(id);
+        $("#lblExternalProduct").text(code + " => " + description)
+        $("#ModalInternalProduct").modal("show");
+    }
+
+    function BeginCopy(id)
+    {
+        $("#ExternalProductId").val(id);
+        $("#ModalExternalProduct").modal("hide");
+        ShowLoading();
+
+        ExecuteAjax('@Url.Action("BeginCopy")', { externalId: id }, function (view)
+        {
+            HideLoading();
+            $("#divClone").html(view);
+        });
+    }
+</script>

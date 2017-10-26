@@ -11,24 +11,21 @@
                 @Html.DisplayNameFor(model => model.OpeningDate)
             </th>
             <th>
+                @Html.DisplayName("Hora Inicio")
+            </th>
+            <th>
+                @Html.DisplayName("Hora Cierre")
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.InitialAmount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserClose)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ClosingDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FinalAmount)
+                @Html.DisplayName("Monto Final")
             </th>
             <th>
                 @Html.DisplayName("Retiros")
             </th>     
-            <th>
-                @Html.DisplayNameFor(model => model.CloseComment)
-            </th>
-
+       
             <th></th>
         </tr>
     </thead>
@@ -40,16 +37,20 @@
                     @Html.DisplayFor(modelItem => item.UserOpen)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.OpeningDate)
+                   @item.OpeningDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @item.OpeningDate.ToString("hh:mm tt")
+                </td>
+                <td>
+                    @if (item.ClosingDate != null)
+                    {
+                        @item.ClosingDate.Value.ToString("hh:mm tt")
+                    }
+                    
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.InitialAmount)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UserClose)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ClosingDate)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FinalAmount)
@@ -57,9 +58,7 @@
                 <td>
                    @item.Withdrawals.Count()
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CloseComment)
-                </td>
+
                 <td>
                     <button type="button" class="btn btn-primary btn-xs" title="Ver detalle de caja"
                             onclick="window.location ='@Url.Action("Detail",new {id=item.CashRegisterId })'" >
@@ -74,7 +73,7 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbCashRegister", 10)
+        SetDataTable("#tbCashRegister", "#txtFilter")
 
         CompleateProgress();
     });

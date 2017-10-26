@@ -99,11 +99,16 @@
                     }
                 </tbody>
             </table>
-
-            <button class="btn btn-primary" type="button" onclick="$('#ModalPayment').modal('show')">
-                <span class="fa fa-dollar"></span>
-                Seleccionar forma de pago
-            </button>
+            <div class="btn-group">
+                <button class="btn btn-primary" type="button" onclick="window.location ='@Url.Action("PaymentAndNote")'" title="volver a buscar">
+                    <span class="fa fa-search-plus"></span>
+                    ir a búsqueda
+                </button>
+                <button class="btn btn-danger" type="button" onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
+                    <span class="fa fa-dollar"></span>
+                    Pagar
+                </button>
+            </div>
         </div>
     </div>
 </div>

@@ -15,7 +15,7 @@ namespace ExcelUploader
 
           //  DataManager.AddCatalogs();
 
-            DataManager.AddProducts();
+            DataManager.Begin();
                
 
             Console.Write("Operación completa.. presiona cualquier tecla para cerrar!");

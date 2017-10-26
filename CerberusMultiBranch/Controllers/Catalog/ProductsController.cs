@@ -214,7 +214,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 try
                 {
-
                     product.UpdDate = DateTime.Now;
                     product.UpdUser = User.Identity.Name;
 

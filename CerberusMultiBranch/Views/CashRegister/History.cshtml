@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.CashRegister>
 
 @{
-    ViewBag.Title = "History";
+    ViewBag.Title = "Mi Historial de caja";
 }
 
 
@@ -10,13 +10,13 @@
 </script>
 <h3>
     <span class="fa fa-history" style="float:left"></span>
-    &nbsp;&nbsp;Historial de caja
+    &nbsp;&nbsp;Mi historial de caja
 </h3>
 
 <div class="col-md-7">
     <div class="input-group ">
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtUser", "", htmlAttributes: new { @class = "form-control" })
+        @Html.TextBox("txtFilter", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters"
                     title="Ver / Ocultar filtros">
@@ -59,12 +59,16 @@
         </div>
         <div class="panel-footer">
             <div class="btn-group">
-                <button class="btn btn-default" type="button" onclick="Search()" title="Bucar">
-                    <span class="glyphicon glyphicon-search" />
-                </button>
-                <button class="btn btn-default" type="button" onclick="window.location='@Url.Action("History")'" title="Recargar página">
-                    <span class="glyphicon glyphicon-refresh" />
-                </button>
+                <div class="btn-group">
+                    <button class="btn btn-primary" type="button"  title="Buscar"  onclick="Search()" >
+                        <span class="glyphicon glyphicon-search"></span>
+                        Buscar
+                    </button>
+                    <button class="btn btn-success" type="button" title="Recargar página" onclick="Reload()">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        Recargar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -84,11 +88,18 @@
 
     function Search()
     {
+        HalfProgress();
         var param = { beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val(), user: $("#User").val() }
 
         ExecuteAjax('@Url.Action("Search")', param, function (view)
         {
             $("#divCashRegisterList").html(view);
         });
+    }
+
+    function Reload()
+    {
+        HalfProgress();
+        window.location = '@Url.Action("History")';
     }
 </script>

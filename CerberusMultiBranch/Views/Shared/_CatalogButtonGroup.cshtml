@@ -38,12 +38,12 @@
 
         $("#btnNewSearch").click(function ()
         {
-            BeginProgress();
+            ShowLoading();
             window.location = '@Url.Action("Index")';
         });
         $("#btnClear").click(function ()
         {
-            BeginProgress();
+            ShowLoading();
             window.location = '@Url.Action("Create",new { id="" })';
         });
     });
@@ -65,10 +65,11 @@
 
     function Submit()
     {
+        ShowLoading();
         Hide();
        
         $("#btnSubmit").click();
-        HalfProgress();
+        
     }
 
     

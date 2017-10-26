@@ -26,10 +26,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             cr.BranchId = User.Identity.GetBranchId();
             return cr;
         }
+
+
         public ActionResult History()
         {
             var branchId = User.Identity.GetBranchId();
-            var model = db.CashRegisters.Include(cr=> cr.CashDetails).Where(cr => cr.BranchId == branchId);
+            var model = LookForCashReg(branchId, DateTime.Today, null, User.Identity.Name);
             
             return View(model);
         }
@@ -37,7 +39,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         
         public ActionResult Detail(int id)
         {
-            var branchId = User.Identity.GetBranchId();
             var model    = db.CashRegisters.Include(cr => cr.CashDetails).FirstOrDefault(cr => cr.CashRegisterId == id );
 
             return View(model);
@@ -47,15 +48,23 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Search(DateTime? beginDate, DateTime? endDate, string user)
         {
             var branchId = User.Identity.GetBranchId();
-            var model = db.CashRegisters.Include(cr => cr.CashDetails).
-                Where(cr => cr.BranchId == branchId && 
-                (beginDate == null || cr.OpeningDate >= beginDate) &&
-                (endDate == null || cr.OpeningDate <= endDate) &&
-                (user == null || user== string.Empty || cr.UserOpen == user ));
+            var model = LookForCashReg(branchId, beginDate, endDate, user);
 
             return PartialView("_CashRegisterList",model);
         }
 
+
+        private List<CashRegister> LookForCashReg(int? branchId, DateTime? beginDate, DateTime? endDate, string user)
+        {
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).
+            Where(cr => (branchId ==null || cr.BranchId == branchId) &&
+                        (beginDate == null || cr.OpeningDate >= beginDate) &&
+                        (endDate == null || cr.OpeningDate <= endDate) &&
+                        (user == null || user == string.Empty || cr.UserOpen == user)).ToList();
+
+            return model;
+
+        }
 
         // GET: CashRegister
         public ActionResult Index()
@@ -67,11 +76,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 cr = GetNewCR();
                 return View(cr);
             }
-
-            //var shift = cr.OpeningDate.GetShift();
-
-            //var range = shift.EndDate - shift.BeginDate;
-            //var xVal = Enumerable.Range(0, (int)range.TotalHours).Select(i => shift.BeginDate.AddHours(i).Hour).ToList();
 
             var incomes = cr.Incomes.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
             var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Efectivo).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
@@ -182,5 +186,149 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return Json("OK");
         }
+
+        [Authorize(Roles = "Cajero")]
+        public ActionResult PaymentAndNote()
+        {
+            var sales = LookForPayment(DateTime.Today,null,null);
+            return View(sales);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult SearchPayment(DateTime? begin, DateTime? end, string folio)
+        {
+            var sales = LookForPayment(begin, end, folio);
+            return PartialView("_SalesToPayList", sales);
+        }
+
+        private List<Sale> LookForPayment(DateTime? begin, DateTime? end,string folio)
+        {
+           var branchId = User.Identity.GetBranchId();
+
+            var sales = db.Sales.Where(s => s.BranchId == branchId &&
+            (begin == null || s.TransactionDate >= begin) &&
+            (end == null || s.TransactionDate <= end) &&
+            (folio == null || folio == string.Empty || s.Folio == folio) &&
+            s.Compleated).Include(s=> s.TransactionDetails).Include(s=> s.User).OrderByDescending(s=> s.TransactionDate).ToList();
+
+            return sales;
+        }
+
+     
+        [Authorize(Roles = "Cajero")]
+        public ActionResult PrintNote(int id)
+        {
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
+             Include(s => s.TransactionDetails.Select(td => td.Product)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+             FirstOrDefault(s => s.TransactionId == id && s.IsPayed);
+
+            return View(sale);
+        }
+
+        [Authorize(Roles = "Cajero")]
+        public ActionResult RegistPayment(int id)
+        {
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
+                       Include(s => s.TransactionDetails.Select(td => td.Product)).
+                       Include(s => s.User).
+                       Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                       FirstOrDefault(s => s.TransactionId == id && !s.IsPayed && s.Compleated);
+
+            if (sale == null)
+                return RedirectToAction("Index");
+
+            return View(sale);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult RegisterPayment(int transactionId, string payment, double? cash, double? card)
+        {
+            try
+            {
+                //busco la venta a pagar
+                var sale = db.Sales.Include(s => s.TransactionDetails).FirstOrDefault(s => s.TransactionId == transactionId);
+                //marco la venta como pagada y coloco el tipo de pago
+                sale.IsPayed = true;
+                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
+                sale.Payments = new List<Payment>();
+
+                #region Registros de pago
+                //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
+                //de la venta
+                if (payment != PaymentType.Mixto.ToString())
+                {
+                    var p = new Payment
+                    {
+                        TransactionId = sale.TransactionId,
+                        Amount = sale.TotalAmount,
+                        PaymentDate = DateTime.Now,
+                        PaymentType = sale.PaymentType.Value,
+                    };
+                    sale.Payments.Add(p);
+                }
+                //si el pago es Mixto (Efectivo y Tarjeta) agrego un registro de pago con efectivo
+                //y otro de tarjeta con los parametros de entrada correspondientes
+                else
+                {
+                    var pm = new Payment
+                    { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
+
+                    var pc = new Payment
+                    { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
+
+                    sale.Payments.Add(pm);
+                    sale.Payments.Add(pc);
+                }
+                #endregion
+
+                //hago attach a la venta.. esto permite agregar los registros de pago a la base de datos
+                db.Sales.Attach(sale);
+                db.Entry(sale).State = EntityState.Modified;
+
+                #region registro de Ingreso a caja
+                //obtengo el registro de caja activo
+                var cr = User.Identity.GetCashRegister();
+
+                if (cr == null)
+                {
+                    return Json(new
+                    {
+                        Result = "Error al registrar el pago!",
+                        Message = "El modulo de caja no ha sido abierto"
+                    });
+                }
+                //por cada registro de pago agrego una registro de entrada a la caja
+                foreach (var pay in sale.Payments)
+                {
+                    var dt = new Income();
+                    dt.CashRegisterId = cr.CashRegisterId;
+                    dt.Amount = pay.Amount;
+                    dt.InsDate = DateTime.Now;
+                    dt.User = User.Identity.Name;
+                    dt.Type = pay.PaymentType;
+                    dt.SaleFolio = sale.Folio;
+                    db.Incomes.Add(dt);
+                }
+                #endregion
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al registrar el pago!",
+                    Message = "Detalle de la excepción " + ex.Message + " " + ex.InnerException != null ? ex.InnerException.Message : string.Empty
+                });
+            }
+        }
+
     }
 }
