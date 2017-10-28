@@ -56,10 +56,13 @@
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
               
-                <td align="right">
+                <td class="col-md-1" align="right">
                     <div class="btn-group">
-                        <button class="btn btn-warning  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ProviderId})'">
+                        <button class="btn btn-warning  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ProviderId})'" title="Editar datos de provedor">
                             <span class="glyphicon glyphicon-pencil" />
+                        </button>
+                        <button class="btn btn-default  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("UpdateCatalog", new {id = item.ProviderId})'" title="subir lista de productos">
+                            <span class="fa fa-upload" />
                         </button>
                     </div>
                 </td>

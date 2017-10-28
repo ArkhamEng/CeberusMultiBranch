@@ -269,7 +269,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 try
                 {
                    
-                    product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
+                    product.Code    = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
                     product.UpdUser = User.Identity.Name;
                     product.UpdDate = DateTime.Now;
                     product.MinQuantity = Cons.One;

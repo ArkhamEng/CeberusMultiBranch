@@ -26,6 +26,7 @@
                 </div>
             </div>
             <div class="panel panel-danger">
+                <img src="~/Content/Images/loading.gif" id="imgQuickProvider"  class="hidden"/>
                 <div class="panel-body row" id="divProviderList">
                 </div>
             </div>
@@ -42,12 +43,12 @@
 
     function QuickSearchProvider()
     {
-        HalfProgress();
+        $("#imgQuickProvider").attr("class", "img-responsive");
         var filter = {  name: $("#FProviderName").val() }
 
         ExecuteAjax('@Url.Action("QuickSearch", "Providers")', filter, function (view)
         {
-            console.log(view);
+            $("#imgQuickProvider").attr("class", "hidden");
             $("#divProviderList").html(view);
         });
     }

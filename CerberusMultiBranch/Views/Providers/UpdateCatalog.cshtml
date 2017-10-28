@@ -1,0 +1,72 @@
+﻿
+@{
+    ViewBag.Title = "Carga de Catálogo";
+}
+
+<h3>
+    <span class="fa fa-cloud-upload" style="float:left"></span>
+    &nbsp;&nbsp;Carga de Catálogo
+</h3>
+
+
+@using (Html.BeginForm("UpdateCatalog","Providers", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="panel panel-danger">
+        <div class="panel-body">
+
+            <h3 class="text-center text-danger">
+                &nbsp;&nbsp;@ViewBag.Name
+            </h3>
+            <hr />
+            <input type="hidden" value='@ViewBag.ProviderId' name="providerId" />
+            <input type="hidden" value='@ViewBag.Name' name="name" />
+
+            <div class="btn-group">
+                <label class="btn btn-primary btn-file ">
+                    <span class="fa fa-file-excel-o"></span>
+                    Seleccionar Archivo
+                    <input type="file" name="file" style="display: none;" accept="text/xml" onchange="FileLoaded(this)">
+                </label>
+                <button id="btnSubmit" type="submit" class="btn btn-danger" disabled onclick="ShowLoading()">
+                    <span class="fa fa-cloud-upload"></span>
+                    Subir Archivo
+                </button>
+            </div>
+
+            <label id="lblFile" class="text-danger"></label>
+        </div>
+    </div>
+}
+
+<script>
+
+    $(document).ready(function ()
+    {
+        console.log('@ViewBag.Result')
+        if('@ViewBag.Result'!='')
+        {
+            if ('@ViewBag.Result' != 'OK')
+            {
+                ShowMessage('@ViewBag.Result', '@ViewBag.Message', 'warning');
+            }
+            else
+            {
+                ShowMessage('@ViewBag.Result', '@ViewBag.Message', 'success');
+            }
+
+        }
+    });
+
+    function FileLoaded(input)
+    {
+        var files = input.files;
+
+        console.log(files[0]);
+
+        var size = (parseFloat(files[0].size) / 1000000).toFixed(2) + " MB";
+        var text = "Archivo: " + files[0].name + "     " + "tamaño:" + size
+        $("#lblFile").text(text);
+
+        $("#btnSubmit").prop("disabled", false);
+    }
+</script>
