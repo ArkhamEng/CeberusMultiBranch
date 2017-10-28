@@ -3751,3 +3751,27 @@ INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'e0219f0a-25e2-4c93-a718-b143a0450c0a')
 
+
+
+--STORED PROCEDURES
+GO
+CREATE PROCEDURE [Catalog].[DelExternalProduct]
+(
+   @ProviderId INT
+)
+AS
+BEGIN
+	DECLARE @Count INT = 0
+
+	SELECT @Count = COUNT(*)
+	FROM [Catalog].[ExternalProduct]
+	WHERE ProviderId = @ProviderId
+
+	IF @Count > 0
+	BEGIN
+		DELETE FROM [Catalog].[ExternalProduct]
+		WHERE ProviderId = @ProviderId
+	END
+
+END
+

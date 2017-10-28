@@ -9,10 +9,6 @@
 }
 
 
-<script>
-    HalfProgress();
-</script>
-
 
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
@@ -117,23 +113,25 @@
             SetCascade("#CarModelId", "#CarYearId", "GetYears");
         }
 
-        $("#btnShowClients").click(function () {
+        $("#btnShowClients").click(function ()
+        {
             $("#ModalQuickClient").modal('show');
         });
 
-        $("#lblTotalAmount").val(' @Html.DisplayFor(model => model.TotalAmount)')
-        CompleateProgress();
+        $("#lblTotalAmount").val(' @Html.DisplayFor(model => model.TotalAmount)');
     });
 
 
 
     function SearchProduct()
     {
-        HalfProgress();
+        ShowLoading();
         var filters = { categortyId: $("#CategoryId").val(), carYear: $("#CarYearId").val(), name: $("#ProductName").val() }
 
-        ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view) {
+        ExecuteAjax('@Url.Action("SearchForSale", "Products")', filters, function (view)
+        {
             $("#divModal").html(view);
+            HideLoading();
         });
     }
 

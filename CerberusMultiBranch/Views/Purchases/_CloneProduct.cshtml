@@ -113,7 +113,7 @@
             StorePercentage: $("#StorePercentage").val(), Unit: $("#Unit").val()
         }
 
-        ExecuteAjax('@Url.Action("Copy")', { product: param, externalId: $("#ExternalProductId").val() }, function (j)
+        ExecuteAjax('@Url.Action("Copy")', { product: param, providerId: $("#ProviderId").val(), code: $("#ExCode").val() }, function (j)
         {
             if (j.Result != "OK")
             {

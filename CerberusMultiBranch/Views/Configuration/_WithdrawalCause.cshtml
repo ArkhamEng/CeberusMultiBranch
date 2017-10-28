@@ -26,12 +26,12 @@
 
     function AddCause()
     {
-        HalfProgress();
+        ShowLoading();
         ExecuteAjax('@Url.Action("SaveCause")', { name: $("#CauseName").val() }, function (view)
         {
             $("#CauseName").val('');
             $("#divCauses").html(view);
-            CompleateProgress();
+            HideLoading();
         })
     }
 

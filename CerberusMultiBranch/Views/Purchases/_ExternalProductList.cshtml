@@ -33,13 +33,9 @@
                             @Html.DisplayFor(modelItem => item.Code)
                         </td>
                         <td class="col-md-1">
-                            @if (item.Product!=null)
+                            @if (item.InternalCode !=null)
                             {
-                                @Html.DisplayFor(modelItem => item.Product.Code)
-                            }
-                            else
-                            {
-
+                                @Html.DisplayFor(modelItem => item.InternalCode)
                             }
                         </td>
                         <td>
@@ -51,20 +47,22 @@
                         </td>
 
                         <td class="col-md-1">
-                            @Html.Hidden("ProductId", item.ExternalProductId)
-                            @Html.DisplayFor(modelItem => item.Price)
+                          
+                                @Html.DisplayFor(modelItem => item.Price)
+                            @Html.Hidden("txtBuyPrice",item.Price)
                         </td>
 
                         <td class="col-md-1">
+                            @Html.Hidden("ProductId", item.ProductId)
                             @Html.TextBox("Quantity", "1", htmlAttributes: new { @class = "form-control", type = "number" })
                         </td>
                         <td class="col-md-1">
                             <div class="btn-group">
                                 <button class="btn btn-primary btn-xs" title="Crear / Cambiar asociación con producto interno" 
-                                        onclick="BeginAddRelation('@item.ExternalProductId','@item.Description','@item.Code')">
+                                        onclick="BeginAddRelation('@item.Description','@item.Code')">
                                     <span class="glyphicon glyphicon-link"></span>
                                 </button>
-                                @if (item.Product != null)
+                                @if (item.InternalCode != null)
                                 {
                                     <button class="btn btn-success btn-xs" onclick="AddDetail(this)" title="Agregar a la compra">
                                         <span class="fa fa-shopping-basket"></span>
@@ -72,7 +70,7 @@
                                 }
                                 else
                                 {
-                                    <button class="btn btn-success btn-xs" onclick="BeginCopy(@item.ExternalProductId)" title="copiar producto a catálogo interno">
+                                    <button class="btn btn-success btn-xs" onclick="BeginCopy('@item.Code')" title="copiar producto a catálogo interno">
                                         <span class="fa fa-clone"></span>
                                     </button>
                                 }
@@ -91,24 +89,51 @@
         Paginate("#tbExternalProducts", 6);
     });
 
-    function BeginAddRelation(id,description,code)
+    function BeginAddRelation(description,code)
     {
         $("#ModalExternalProduct").modal("hide");
-        $("#ExternalProductId").val(id);
+        $("#ExCode").val(code);
         $("#lblExternalProduct").text(code + " => " + description)
         $("#ModalInternalProduct").modal("show");
     }
 
-    function BeginCopy(id)
+    function BeginCopy(code)
     {
-        $("#ExternalProductId").val(id);
+        $("#ExCode").val(code);
         $("#ModalExternalProduct").modal("hide");
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("BeginCopy")', { externalId: id }, function (view)
+        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: $("#ProviderId").val(), code: code }, function (view)
         {
             HideLoading();
             $("#divClone").html(view);
+        });
+    }
+
+    function AddDetail(element)
+    {
+        $("#divProductList").hide();
+        $("#imgLoading").attr("class", "img-responsive");
+
+        var row = $(element).parent().parent().parent();
+        cells = row.find("td");
+
+        var param = {
+            price: row.find("#txtBuyPrice").val(),
+            productId: row.find("#ProductId").val(),
+            quantity: row.find("#Quantity").val(),
+            transactionId: $("#TransactionId").val()
+        };
+
+        console.log(param);
+
+        ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view)
+        {
+            $("#divDetails").html(view);
+
+            $("#imgLoading").attr("class", "hide");
+            $("#divProductList").show();
+            
         });
     }
 </script>

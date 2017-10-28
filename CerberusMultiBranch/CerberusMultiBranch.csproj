@@ -201,21 +201,13 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710202156023_Initial.cs" />
-    <Compile Include="Migrations\201710202156023_Initial.Designer.cs">
-      <DependentUpon>201710202156023_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201710280638006_Initial.cs" />
+    <Compile Include="Migrations\201710280638006_Initial.Designer.cs">
+      <DependentUpon>201710280638006_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201710260210468_ExternalProduct.cs" />
-    <Compile Include="Migrations\201710260210468_ExternalProduct.Designer.cs">
-      <DependentUpon>201710260210468_ExternalProduct.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710261414195_ExternalProductIndex.cs" />
-    <Compile Include="Migrations\201710261414195_ExternalProductIndex.Designer.cs">
-      <DependentUpon>201710261414195_ExternalProductIndex.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201710262013224_externalProductId.cs" />
-    <Compile Include="Migrations\201710262013224_externalProductId.Designer.cs">
-      <DependentUpon>201710262013224_externalProductId.cs</DependentUpon>
+    <Compile Include="Migrations\201710280645479_Equivalence.cs" />
+    <Compile Include="Migrations\201710280645479_Equivalence.Designer.cs">
+      <DependentUpon>201710280645479_Equivalence.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -223,6 +215,7 @@
     <Compile Include="Models\Entities\Catalog\Client.cs" />
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
+    <Compile Include="Models\Entities\Catalog\Equivalence.cs" />
     <Compile Include="Models\Entities\Catalog\ExternalProduct.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
     <Compile Include="Models\Entities\Config\City.cs" />
@@ -460,17 +453,11 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201710202156023_Initial.resx">
-      <DependentUpon>201710202156023_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710280638006_Initial.resx">
+      <DependentUpon>201710280638006_Initial.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710260210468_ExternalProduct.resx">
-      <DependentUpon>201710260210468_ExternalProduct.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710261414195_ExternalProductIndex.resx">
-      <DependentUpon>201710261414195_ExternalProductIndex.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201710262013224_externalProductId.resx">
-      <DependentUpon>201710262013224_externalProductId.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201710280645479_Equivalence.resx">
+      <DependentUpon>201710280645479_Equivalence.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

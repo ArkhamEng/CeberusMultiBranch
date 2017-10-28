@@ -3,9 +3,7 @@
 @{
     ViewBag.Title = "Historial Ventas";
 }
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-credit-card-alt" style="float:left"></span>
     &nbsp;&nbsp;Pagos y notas
@@ -89,6 +87,7 @@
 
         $("#btnSearch").click(function ()
         {
+            ShowLoading();
             var data = {
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
@@ -97,10 +96,13 @@
                 user: $("#User").val()
             };
 
-            Search('@Url.Action("Search")', data, "#divSales");
+            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            {
+                $("#divSales").html(view);
+                HideLoading();
+            });
+            
         });
-
-        CompleateProgress();
     });
 
 

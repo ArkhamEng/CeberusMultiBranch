@@ -3,9 +3,7 @@
 @{
     ViewBag.Title = "Historial Compras";
 }
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-shopping-bag" style="float:left"></span>
     &nbsp;&nbsp;Historial de compras
@@ -114,7 +112,7 @@
 
         $("#btnSearch").click(function ()
         {
-            BeginProgress();
+            ShowLoading();
 
             var data = {
                 branchId: $("#BranchId").val(),
@@ -124,16 +122,19 @@
                 user: $("#User").val(),
                 provider: $("#Provider").val(),
             };
-
-            Search('@Url.Action("Search")', data, "#divPurchases");
+            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            {
+                $("#divPurchases").html(view);
+                HideLoading();
+            });
+            
         });
     });
 
     function Reload()
     {
-        BeginProgress();
+        ShowLoading();
         window.location = '@Url.Action("Index")';
-        HalfProgress();
     }
 
 </script>

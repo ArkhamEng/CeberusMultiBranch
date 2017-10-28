@@ -3,9 +3,7 @@
 @{
     ViewBag.Title = "Historial Ventas";
 }
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-credit-card-alt" style="float:left"></span>
     &nbsp;&nbsp;Pagos y notas
@@ -83,20 +81,23 @@
 
         $("#btnSearch").click(function ()
         {
-            HalfProgress();
+            ShowLoading();
             var data = {
                 begin: $("#BeginDate").val(),
                 end: $("#EndDate").val(),
                 folio: $("#Folio").val()
             };
-
-            Search('@Url.Action("SearchPayment")', data, "#divSalesToPay");
+            ExecuteAjax('@Url.Action("SearchPayment")', data, function (view)
+            {
+                $("#divSalesToPay").html(view);
+            });
+            
         });
     });
 
     function Reload()
     {
-        HalfProgress();
+        ShowLoading();
         window.location = '@Url.Action("PaymentAndNote")';
     }
 

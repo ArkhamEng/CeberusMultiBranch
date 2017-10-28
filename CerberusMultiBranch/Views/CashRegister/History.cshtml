@@ -5,9 +5,7 @@
 }
 
 
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-history" style="float:left"></span>
     &nbsp;&nbsp;Mi historial de caja
@@ -88,18 +86,19 @@
 
     function Search()
     {
-        HalfProgress();
+        ShowLoading();
         var param = { beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val(), user: $("#User").val() }
 
         ExecuteAjax('@Url.Action("Search")', param, function (view)
         {
             $("#divCashRegisterList").html(view);
+            HideLoading();
         });
     }
 
     function Reload()
     {
-        HalfProgress();
+        ShowLoading();
         window.location = '@Url.Action("History")';
     }
 </script>

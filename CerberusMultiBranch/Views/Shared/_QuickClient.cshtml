@@ -47,7 +47,7 @@
 
     function QuickSearchClient()
     {
-        HalfProgress();
+       
         var filter = {  name: $("#FClientName").val() }
 
         ExecuteAjax('@Url.Action("QuickSearch", "Clients")', filter, function (view)

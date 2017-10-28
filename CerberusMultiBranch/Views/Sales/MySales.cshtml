@@ -3,9 +3,7 @@
 @{
     ViewBag.Title = "Historial Compras";
 }
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
     &nbsp;&nbsp;Mis ventas
@@ -92,6 +90,7 @@
 
         $("#btnSearch").click(function ()
         {
+            ShowLoading();
             var data = {
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
@@ -99,10 +98,12 @@
                 client: $("#Client").val()
             };
 
-            Search('@Url.Action("SearchPerUser")', data, "#divMySales");
+            ExecuteAjax('@Url.Action("SearchPerUser")',data,function(view)
+            {
+                $("#divMySales").html(view);
+                HideLoading();
+            });
         });
-
-        CompleateProgress();
     });
 
 

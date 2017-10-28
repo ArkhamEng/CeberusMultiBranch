@@ -5,9 +5,7 @@
 }
 
 @Scripts.Render("~/bundles/jqueryval")
-<script>
-        HalfProgress();
-</script>
+
 <div class="col-md-12">
     <h3>
         <span class="fa fa-shopping-cart" style="float:left"></span>
@@ -144,13 +142,6 @@
             LoadPopoverCompleate();
         });
 
-        if ('@Model.IsCompleated' == 'True')
-        {
-            $(".Compleated").hide();
-            $("#btnSave").hide();
-        }
-
-        CompleateProgress();
     });
 
 

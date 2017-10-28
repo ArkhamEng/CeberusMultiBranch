@@ -45,26 +45,26 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_PurchaseList", model);
         }
 
-     
+
 
         private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user)
         {
-           
+
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
-                             where (branchId == null ||  p.BranchId == branchId)
+                             where (branchId == null || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
-                             && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider) )
-                             && (user == null || user == string.Empty ||p.User.UserName.Contains(user))
+                             && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
+                             && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                              select p).ToList();
 
             return purchases;
         }
 
-   
 
-     
+
+
         public ActionResult Create(int? id)
         {
             Transaction model = null;
@@ -86,7 +86,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             //model.EmployeeName = employee.Name;
             //model.EmployeeId = employee.EmployeeId;
 
-            return View("Create",model);
+            return View("Create", model);
         }
 
         // POST: Purchases/Create
@@ -113,13 +113,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
 
-                    if(purchase.IsPayed)
+                    if (purchase.IsPayed)
                     {
-                        Payment p       = new Payment();
-                        p.Amount        = purchase.TotalAmount;
-                        p.PaymentDate   = purchase.TransactionDate;
+                        Payment p = new Payment();
+                        p.Amount = purchase.TotalAmount;
+                        p.PaymentDate = purchase.TransactionDate;
                         p.TransactionId = purchase.TransactionId;
-                        p.PaymentType   = PaymentType.Contado;
+                        p.PaymentType = PaymentType.Contado;
 
                         db.Payments.Add(p);
                     }
@@ -132,9 +132,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                         //if the new price is biger than the old one, just update it
                         if (det.Price > prod.BuyPrice)
                         {
-                            prod.BuyPrice        = det.Price;
-                            prod.DealerPrice     = det.Price.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice      = det.Price.GetPrice(prod.StorePercentage);
+                            prod.BuyPrice = det.Price;
+                            prod.DealerPrice = det.Price.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice = det.Price.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = det.Price.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -146,9 +146,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
 
-                            prod.BuyPrice    = newPrice;
+                            prod.BuyPrice = newPrice;
                             prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice  = newPrice.GetPrice(prod.StorePercentage);
+                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -159,10 +159,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                             bProd = new BranchProduct
                             {
                                 ProductId = det.ProductId,
-                                BranchId  = purchase.BranchId,
+                                BranchId = purchase.BranchId,
                                 LastStock = Cons.Zero,
-                                Stock     = det.Quantity,
-                                UpdDate   = DateTime.Now
+                                Stock = det.Quantity,
+                                UpdDate = DateTime.Now
                             };
 
                             db.BranchProducts.Add(bProd);
@@ -170,8 +170,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                         else
                         {
                             bProd.LastStock = bProd.Stock;
-                            bProd.Stock     += det.Quantity;
-                            bProd.UpdDate   = DateTime.Now;
+                            bProd.Stock += det.Quantity;
+                            bProd.UpdDate = DateTime.Now;
 
                             db.Entry(bProd).State = EntityState.Modified;
                         }
@@ -193,12 +193,38 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-            var products = (from ep in db.ExternalProducts.Include(ep => ep.Product)
+            var products = (from ep in db.ExternalProducts
+                            join eq in db.Equivalences.Include(e => e.Product)
+                            on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
+                            from x in gj.DefaultIfEmpty()
+
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description).Contains(s)))
                              && (ep.ProviderId == providerId)
-                            select ep).Take((int)Cons.OneHundred).ToList();
+                            select new
+                            {
+                                ProviderId = ep.ProviderId,
+                                Code = ep.Code,
+                                Description = ep.Description,
+                                InternalCode = gj.FirstOrDefault().Product.Code,
+                                Price = ep.Price,
+                                TradeMark = ep.TradeMark,
+                                Unit = ep.Unit,
+                                ProductId = (int?)gj.FirstOrDefault().ProductId ?? Cons.Zero
+                            }).Take((int)Cons.OneHundred).ToList();
 
-            return PartialView("_ExternalProductList", products);
+            var model = products.Select(ep => new ExternalProduct
+            {
+                ProviderId = ep.ProviderId,
+                Code = ep.Code,
+                Description = ep.Description,
+                InternalCode = ep.InternalCode,
+                Price = ep.Price,
+                TradeMark = ep.TradeMark,
+                Unit = ep.Unit,
+                ProductId = ep.ProductId
+            }).ToList();
+
+            return PartialView("_ExternalProductList", model);
         }
 
         [HttpPost]
@@ -209,7 +235,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-            var products = (from ep in db.Products.Include(p=> p.Category).Include(ep => ep.ExternalProducts)
+            var products = (from ep in db.Products.Include(p => p.Category)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Name).Contains(s)))
                             select ep).Take((int)Cons.OneHundred).ToList();
 
@@ -217,14 +243,26 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public JsonResult AddRelation(int internalId, int externalId)
+        public JsonResult AddRelation(int internalId, int providerId, string code)
         {
             try
             {
-                var exProd       = db.ExternalProducts.Find(externalId);
-                exProd.ProductId = internalId;
+                //busco si el producto del provedor ta tiene una relación de equivalencia
+                var eq = db.Equivalences.FirstOrDefault(e => e.ProviderId == providerId && e.Code == code);
 
-                db.Entry(exProd).State = EntityState.Modified;
+                //si ya existe la actualizo con un nuevo productId
+                if (eq != null)
+                {
+                    eq.ProductId = internalId;
+                    db.Entry(eq).State = EntityState.Modified;
+                }
+                else
+                {
+                    //si no existe creo una nueva realacion
+                    eq = new Equivalence { ProductId = internalId, ProviderId = providerId, Code = code };
+                    db.Equivalences.Add(eq);
+                }
+
                 db.SaveChanges();
 
                 return Json(new { Result = "OK" });
@@ -236,19 +274,19 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult BeginCopy(int externalId)
+        public ActionResult BeginCopy(int providerId, string code)
         {
             var variables = db.Variables;
-            var ep = db.ExternalProducts.Find(externalId);
-           
+            var ep = db.ExternalProducts.Find(providerId, code);
+
             ProductViewModel vm = new ProductViewModel();
-            vm.Categories  = db.Categories.ToSelectList();
-            vm.Name        = ep.Description;
-            vm.TradeMark   = ep.TradeMark;
-            vm.Unit        = ep.Unit;
-            vm.BuyPrice    = ep.Price;
+            vm.Categories = db.Categories.ToSelectList();
+            vm.Name = ep.Description;
+            vm.TradeMark = ep.TradeMark;
+            vm.Unit = ep.Unit;
+            vm.BuyPrice = ep.Price;
             vm.MinQuantity = Cons.One;
-            vm.Code        = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
+            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -258,18 +296,17 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public JsonResult Copy(Product product, int externalId)
+        public JsonResult Copy(Product product, int providerId, string code)
         {
-           if(db.Products.FirstOrDefault(p => p.Code == product.Code)!=null)
+            if (db.Products.FirstOrDefault(p => p.Code == product.Code) != null)
             {
-                return Json(new { Result = "Codigo invalido", Message="Ya existe un producto con este código" });
+                return Json(new { Result = "Codigo invalido", Message = "Ya existe un producto con este código" });
             }
-           else
+            else
             {
                 try
                 {
-                   
-                    product.Code    = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
+                    product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
                     product.UpdUser = User.Identity.Name;
                     product.UpdDate = DateTime.Now;
                     product.MinQuantity = Cons.One;
@@ -287,11 +324,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 try
                 {
-
-                    var ex = db.ExternalProducts.Find(externalId);
-                    ex.ProductId = product.ProductId;
-
-                    db.Entry(ex).State = EntityState.Modified;
+                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
+                    db.Equivalences.Add(eq);
                     db.SaveChanges();
                 }
                 catch (Exception ex)

@@ -10,19 +10,17 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     [Table("ExternalProduct", Schema = "Catalog")]
     public class ExternalProduct
     {
-        public int ExternalProductId { get; set; }
-
         [Index("IDX_ProviderId", IsUnique = false)]
+        [Column(Order = 0), Key, ForeignKey("Provider")]
         public int ProviderId { get; set; }
-
-        [Index("IDX_ProductId", IsUnique = false)]
-        public int? ProductId { get; set; }
 
         [Display(Name = "Código")]
         [Required]
         [MaxLength(30)]
         [Index("IDX_Code", IsUnique = false)]
+        [Column(Order = 1), Key]
         public string Code { get; set; }
+
 
         [Display(Name = "Categoría")]
         [Required]
@@ -49,8 +47,16 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual Provider Provider { get; set; }
 
-        public virtual Product Product { get; set; }
+        //public virtual Product Product { get; set; }
+        [NotMapped]
+        public Equivalence Equivalence { get; set; }
 
-       // public ICollection<Equivalence> Equivalences { get; set; }
+        [NotMapped]
+        public string InternalCode { get; set; }
+
+        [NotMapped]
+        public int ProductId { get; set; }
+
+
     }
 }

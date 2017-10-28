@@ -94,4 +94,16 @@
 
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
     });
+
+    function RemoveDetail(tid, pid)
+    {
+        ShowLoading();
+        var param = { transactionId: tid, productId: pid };
+
+        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view)
+        {
+            $("#divDetails").html(view);
+            HideLoading();
+        });
+    }
 </script>

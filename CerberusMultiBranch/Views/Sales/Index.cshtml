@@ -3,9 +3,7 @@
 @{
     ViewBag.Title = "Historial Ventas";
 }
-<script>
-        HalfProgress();
-</script>
+
 <h3>
     <span class="fa fa-shopping-cart" style="float:left"></span>
     &nbsp;&nbsp;Historial de Ventas
@@ -112,7 +110,7 @@
 
         $("#btnSearch").click(function ()
         {
-            HalfProgress();
+            ShowLoading();
             var data = {
                 branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
@@ -121,14 +119,18 @@
                 client: $("#Client").val(),
                 user: $("#User").val()
             };
-
-            Search('@Url.Action("Search")', data, "#divSales");
+            ExecuteAjax('@Url.Action("Search")',data,function(view)
+            {
+                $("#divSales").html(view);
+                HideLoading();
+            });
+            
         });
     });
 
     function Reload()
     {
-        HalfProgress();
+        ShowLoading();
         window.location = '@Url.Action("Index")';
     }
 

@@ -130,7 +130,7 @@
 
 @Html.Partial("_QuickProvider")
 
-@Html.Hidden("ExternalProductId")
+@Html.Hidden("ExCode")
 
 
 <script>
@@ -200,31 +200,5 @@
         $("#btnCompleate").data("bs.popover").inState.click = false;
     }
 
-    function AddDetail(element)
-    {
-        var row = $(element).parent().parent().parent().parent();
-        cells = row.find("td");
-
-        var param = {
-            price: row.find("#txtBuyPrice").val(),
-            productId: row.find("#ProductId").val(),
-            quantity: row.find("#Quantity").val(),
-            transactionId: $("#TransactionId").val()
-        };
-
-        ExecuteAjax('@Url.Action("AddDetail", "Purchases")', param, function (view) {
-            $("#divDetails").html(view);
-        });
-    }
-
-    function RemoveDetail(tid, pid) {
-    
-        var param = { transactionId: tid, productId: pid };
-
-        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view) {
-            $("#divDetails").html(view);
-            
-        });
-    }
 </script>
 

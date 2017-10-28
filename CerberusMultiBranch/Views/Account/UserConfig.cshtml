@@ -180,33 +180,43 @@
     });
 
 
-    function Add(a) {
-        HalfProgress();
+    function Add(a)
+    {
+        ShowLoading();
         var rr = [];
 
-        if (a) {
-            $('#AvIds :selected').each(function (i, selected) {
+        if (a)
+        {
+            $('#AvIds :selected').each(function (i, selected)
+            {
                 rr[i] = $(selected).text();
             });
         }
-        else {
-            $('#SelIds :selected').each(function (i, selected) {
+        else
+        {
+            $('#SelIds :selected').each(function (i, selected)
+            {
                 rr[i] = $(selected).text();
             });
         }
 
         var param = { userId: $("#Id").val(), roles: rr, add: a }
 
-        ExecuteAjax('@Url.Action("AddOrRemove")', param, function (j) {
+        ExecuteAjax('@Url.Action("AddOrRemove")', param, function (j)
+        {
             if (j.Result != 'OK')
+            {
+                HideLoading();
                 ShowMessage(j.Result, j.Data, 'warning');
+            }
             else
                 window.location = window.location;
         });
     }
 
-    function AddBranch(a) {
-        BeginProgress();
+    function AddBranch(a)
+    {
+        ShowLoading();
 
         var param = { userId: $("#Id").val(), branches: $("#avBrn").val(), add: a }
 
@@ -214,15 +224,15 @@
             param.branches = $("#SelBrn").val();
 
         ExecuteAjax('@Url.Action("AddOrRemoveBranches")', param, function (j) {
-            if (j.Result != 'OK') {
-                CompleateProgress();
+            if (j.Result != 'OK')
+            {
+                HideLoading();
                 ShowMessage(j.Result, j.Data, 'warning');
             }
-            else {
-                HalfProgress();
+            else
+            {
                 window.location = window.location;
             }
-
         });
     }
 

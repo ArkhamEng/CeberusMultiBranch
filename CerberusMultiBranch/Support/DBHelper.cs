@@ -12,23 +12,18 @@ namespace CerberusMultiBranch.Support
 {
     public class DBHelper
     {
-        public static bool SetExternalProduct(ExternalProduct product)
+        public static bool DeleteExternal(int providerId)
         {
             var cs = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();
                 SqlCommand com = conn.CreateCommand();
-                com.CommandText = "[Catalog].[UpdExternalProduct]";
+                com.CommandText = "[Catalog].[DelExternalProduct]";
                 com.CommandType = CommandType.StoredProcedure;
 
-                com.Parameters.Add(new SqlParameter { Value = product.ExternalProductId, ParameterName = "@ExternalProductId" });
-                com.Parameters.Add(new SqlParameter { Value = product.Category, ParameterName = "@Category" });
-                com.Parameters.Add(new SqlParameter { Value = product.Description, ParameterName = "@Description" });
-                com.Parameters.Add(new SqlParameter { Value = product.Price, ParameterName = "@Price" });
-                com.Parameters.Add(new SqlParameter { Value = product.TradeMark, ParameterName = "@TradeMark" });
-                com.Parameters.Add(new SqlParameter { Value = product.Unit, ParameterName = "@Unit" });
-
+                com.Parameters.Add(new SqlParameter { Value = providerId, ParameterName = "@ProviderId" });
+              
                 return com.ExecuteNonQuery() > 0 ? true : false;
             }
         }
@@ -53,7 +48,6 @@ namespace CerberusMultiBranch.Support
                     bulkCopy.ColumnMappings.Add("[Price]", "[Price]");
                     bulkCopy.ColumnMappings.Add("[TradeMark]", "[TradeMark]");
                     bulkCopy.ColumnMappings.Add("[Unit]", "[Unit]");
-                    bulkCopy.ColumnMappings.Add("[ProductId]", "[ProductId]");
                     bulkCopy.DestinationTableName = "[Catalog].[ExternalProduct]";
                     bulkCopy.WriteToServer(dt);
                 }

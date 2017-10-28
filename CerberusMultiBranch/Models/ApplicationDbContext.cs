@@ -44,7 +44,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<ExternalProduct> ExternalProducts { get; set; }
 
-        //public DbSet<Equivalence> Equivalences { get; set; }
+        public DbSet<Equivalence> Equivalences { get; set; }
 
         public DbSet<Compatibility> Compatibilites { get; set; }
 
@@ -79,8 +79,8 @@ namespace CerberusMultiBranch.Models
 
 
 
-        public ApplicationDbContext(): base("DefaultConnection", throwIfV1Schema: false)
-        {  }
+        public ApplicationDbContext() : base("DefaultConnection", throwIfV1Schema: false)
+        { }
 
         public static ApplicationDbContext Create()
         {
@@ -91,6 +91,7 @@ namespace CerberusMultiBranch.Models
         {
             modelBuilder.HasDefaultSchema("Security");
 
+          
             base.OnModelCreating(modelBuilder);
 
         }

@@ -125,6 +125,19 @@ namespace CerberusMultiBranch.Migrations
                 .PrimaryKey(t => t.CarMakeId);
             
             CreateTable(
+                "Catalog.Equivalence",
+                c => new
+                    {
+                        EquivalenceId = c.Int(nullable: false, identity: true),
+                        ProviderId = c.Int(nullable: false),
+                        Code = c.String(),
+                        ProductId = c.Int(nullable: false),
+                    })
+                .PrimaryKey(t => t.EquivalenceId)
+                .ForeignKey("Catalog.Product", t => t.ProductId, cascadeDelete: true)
+                .Index(t => t.ProductId);
+            
+            CreateTable(
                 "Catalog.ProductImage",
                 c => new
                     {
@@ -455,6 +468,25 @@ namespace CerberusMultiBranch.Migrations
                 .PrimaryKey(t => t.WithdrawalCauseId);
             
             CreateTable(
+                "Catalog.ExternalProduct",
+                c => new
+                    {
+                        ProviderId = c.Int(nullable: false),
+                        Code = c.String(nullable: false, maxLength: 30),
+                        Category = c.String(nullable: false, maxLength: 60),
+                        Description = c.String(maxLength: 200),
+                        Price = c.Double(nullable: false),
+                        TradeMark = c.String(maxLength: 50),
+                        Unit = c.String(maxLength: 20),
+                    })
+                .PrimaryKey(t => new { t.ProviderId, t.Code })
+                .ForeignKey("Catalog.Provider", t => t.ProviderId, cascadeDelete: true)
+                .Index(t => t.ProviderId, name: "IDX_ProviderId")
+                .Index(t => t.Code, name: "IDX_Code")
+                .Index(t => t.Category, name: "IDX_Category")
+                .Index(t => t.Description, name: "IDX_Descripction");
+            
+            CreateTable(
                 "Security.AspNetRoles",
                 c => new
                     {
@@ -481,6 +513,7 @@ namespace CerberusMultiBranch.Migrations
         public override void Down()
         {
             DropForeignKey("Security.AspNetUserRoles", "RoleId", "Security.AspNetRoles");
+            DropForeignKey("Catalog.ExternalProduct", "ProviderId", "Catalog.Provider");
             DropForeignKey("Operative.CashDetail", "WithdrawalCauseId", "Operative.WithdrawalCause");
             DropForeignKey("Operative.CashDetail", "CashRegisterId", "Operative.CashRegister");
             DropForeignKey("Operative.CashRegister", "BranchId", "Config.Branch");
@@ -505,6 +538,7 @@ namespace CerberusMultiBranch.Migrations
             DropForeignKey("Operative.TransactionDetail", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Product", "PartSystemId", "Config.PartSystem");
             DropForeignKey("Catalog.ProductImage", "ProductId", "Catalog.Product");
+            DropForeignKey("Catalog.Equivalence", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Compatibility", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Compatibility", "CarYearId", "Config.CarYear");
             DropForeignKey("Config.CarYear", "CarModelId", "Config.CarModel");
@@ -512,6 +546,10 @@ namespace CerberusMultiBranch.Migrations
             DropForeignKey("Catalog.Product", "CategoryId", "Config.Category");
             DropForeignKey("Operative.BranchProduct", "BranchId", "Config.Branch");
             DropIndex("Security.AspNetRoles", "RoleNameIndex");
+            DropIndex("Catalog.ExternalProduct", "IDX_Descripction");
+            DropIndex("Catalog.ExternalProduct", "IDX_Category");
+            DropIndex("Catalog.ExternalProduct", "IDX_Code");
+            DropIndex("Catalog.ExternalProduct", "IDX_ProviderId");
             DropIndex("Operative.CashDetail", new[] { "WithdrawalCauseId" });
             DropIndex("Operative.CashDetail", new[] { "CashRegisterId" });
             DropIndex("Operative.CashRegister", new[] { "BranchId" });
@@ -547,6 +585,7 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Operative.TransactionDetail", new[] { "ProductId" });
             DropIndex("Operative.TransactionDetail", new[] { "TransactionId" });
             DropIndex("Catalog.ProductImage", "IDX_ProductId");
+            DropIndex("Catalog.Equivalence", new[] { "ProductId" });
             DropIndex("Config.CarModel", "IDX_CarMakeId");
             DropIndex("Config.CarYear", "IDX_CarModelId");
             DropIndex("Catalog.Compatibility", new[] { "ProductId" });
@@ -560,6 +599,7 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Operative.BranchProduct", new[] { "BranchId" });
             DropTable("Config.Variable");
             DropTable("Security.AspNetRoles");
+            DropTable("Catalog.ExternalProduct");
             DropTable("Operative.WithdrawalCause");
             DropTable("Operative.CashDetail");
             DropTable("Operative.CashRegister");
@@ -578,6 +618,7 @@ namespace CerberusMultiBranch.Migrations
             DropTable("Operative.TransactionDetail");
             DropTable("Config.PartSystem");
             DropTable("Catalog.ProductImage");
+            DropTable("Catalog.Equivalence");
             DropTable("Config.CarMake");
             DropTable("Config.CarModel");
             DropTable("Config.CarYear");

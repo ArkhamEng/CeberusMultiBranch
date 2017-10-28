@@ -85,6 +85,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Purchase> Purchases { get; set; }
 
+        public ICollection<ExternalProduct> ExternalProducts { get; set; }
+
         public Provider()
         {
             this.IsActive = true;

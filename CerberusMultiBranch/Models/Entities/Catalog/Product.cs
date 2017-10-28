@@ -113,8 +113,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
-        public ICollection<ExternalProduct> ExternalProducts { get; set; }
-        // public ICollection<Equivalence> Equivalences { get; set; }
+        public ICollection<Equivalence> Equivalences { get; set; }
 
         #region NotMapped Properties
         [NotMapped]

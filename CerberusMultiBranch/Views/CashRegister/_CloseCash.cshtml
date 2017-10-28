@@ -39,7 +39,11 @@
             ExecuteAjax('@Url.Action("Close","CashRegister")', data, function (data)
             {
                 if (data == "OK")
+                {
+                    $("#ModalCloseCash").modal("hide");
+                    ShowLoading();
                     window.location = '@Url.Action("Index")';
+                }
                 else
                 {
                     $("#ModalCloseCash").modal("hide");
@@ -47,7 +51,5 @@
                 }
             });
         });
-
-        CompleateProgress();
     });
 </script>

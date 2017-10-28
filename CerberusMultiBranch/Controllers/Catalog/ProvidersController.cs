@@ -112,11 +112,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         public ActionResult UpdateCatalog(int id)
         {
-            var p = db.Providers.Find(id);
+            var p = db.Providers.Include(d=> d.ExternalProducts).FirstOrDefault(d=> d.ProviderId == id);
 
             ViewBag.Name = p.Name;
             ViewBag.Code = p.Code;
             ViewBag.ProviderId = id;
+            ViewBag.Products = p.ExternalProducts.Count;
             return View();
         }
 
@@ -139,8 +140,32 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     records = (RecordSet)xml.Deserialize(file.InputStream);
 
                     if (records != null)
-                        loadedProd = records.Records.ToArray();
+                    {
+                        for(int i=0;i<records.Records.Count;i++)
+                        {
+                            if(toInsert.FirstOrDefault(ti=> ti.Code == records.Records[i].Code) ==null)
+                            {
+                                var description = records.Records[i].Description;
 
+                                if (description.Length > 200)
+                                    description = description.Substring(0, 199);
+
+                                ExternalProduct ex = new ExternalProduct
+                                {
+                                    Code = records.Records[i].Code,
+                                    ProviderId = providerId,
+                                    Description = description,
+                                    TradeMark = records.Records[i].TradeMark ?? "N/A",
+                                    Unit = records.Records[i].Unit ?? "N/A",
+                                    Category = records.Records[i].Category ?? "N/A",
+                                    Price = records.Records[i].Price
+                                };
+                                toInsert.Add(ex);
+                            }
+                               
+                        }
+                    }
+                       
                     xml = null;
                 }
                 catch (Exception ex)
@@ -148,75 +173,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     throw new Exception("Error deserializar el archivo", ex.InnerException);
                 }
 
-                try
-                {
-                    //obtengo de base de datos los productos existentes
-                    extProds = db.ExternalProducts.Where(ex => ex.ProviderId == providerId).ToList();
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Error al consultar los datos existentes", ex.InnerException);
-                }
-
-                int j = 0;
-
-                List<ExternalProduct> toUpdate = new List<ExternalProduct>();
-                for (int i = 0; i < loadedProd.Length; i++)
-                {
-                    var up = extProds.FirstOrDefault(p => p.Code == loadedProd[i].Code);
-
-                    if (up != null)
-                    {
-                        if (up.Price != loadedProd[i].Price)
-                        {
-                            up.Price = loadedProd[i].Price;
-                            up.TradeMark = loadedProd[i].TradeMark;
-                            up.Unit = loadedProd[i].Unit;
-
-                            toUpdate.Add(up);
-                        }
-                    }
-
-
-                    else
-                    {
-                        string d = string.Empty;
-                        if (loadedProd[i].Description.Length > 200)
-                            d = loadedProd[i].Description.Substring(0, 199);
-                        else
-                            d = loadedProd[i].Description;
-
-                        toInsert.Add(new ExternalProduct
-                        {
-                            Description = d,
-                            Category = loadedProd[i].Category ?? "N/A",
-                            Code = loadedProd[i].Code,
-                            ProviderId = providerId,
-                            TradeMark = loadedProd[i].TradeMark ?? "N/A",
-                            Unit = loadedProd[i].Unit ?? "N/A",
-                            Price = loadedProd[i].Price
-                        });
-                    }
-                }
 
                 if (toInsert.Count > Cons.Zero)
                 {
                     try
                     {
+                        DBHelper.DeleteExternal(providerId);
                         //agrego el rango de productos nuevos al data context
                         DBHelper.BulkInsertBulkCopy(toInsert);
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error al agregar nuevos registros", ex.InnerException);
+                        throw new Exception("Error al agregar nuevos registros", ex);
                     }
                 }
 
                 var time = (DateTime.Now - begin).TotalMinutes;
                 ViewBag.Result = "OK";
-                ViewBag.Message = string.Format("Operación concluida, se agregaron {0} y se actualizaron {1} tiempo de ejecucion {2}", toInsert.Count, j, time.ToString());
+                ViewBag.Message = string.Format("Operación concluida, se agregaron {0} ", toInsert.Count);
                 ViewBag.ProviderId = providerId;
                 ViewBag.Name = name;
+                ViewBag.Products = toInsert.Count;
                 return View();
 
             }
@@ -224,7 +201,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 var time = (DateTime.Now - begin).TotalMinutes;
                 ViewBag.Result = ex.Message;
-                ViewBag.Message = "Tiempo de ejecucion " + time.ToString("hh:mm:ss") + " Detalle" + ex.InnerException;
+                ViewBag.Message = "Se encontro un error inesperado al insertar los registros";
                 ViewBag.ProviderId = providerId;
                 ViewBag.Name = name;
                 return View();

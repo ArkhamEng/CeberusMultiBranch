@@ -7,13 +7,13 @@ namespace CerberusMultiBranch.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ExternalProduct : IMigrationMetadata
+    public sealed partial class Equivalence : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ExternalProduct));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Equivalence));
         
         string IMigrationMetadata.Id
         {
-            get { return "201710260210468_ExternalProduct"; }
+            get { return "201710280645479_Equivalence"; }
         }
         
         string IMigrationMetadata.Source
