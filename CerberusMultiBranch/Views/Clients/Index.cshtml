@@ -14,18 +14,22 @@
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("Filter", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
-            <button class="btn btn-default" type="button" id="btnSearch">
+            <button class="btn btn-default" type="button" id="btnSearch" title="buscar">
                 <span class="glyphicon glyphicon-search" />
             </button>
-            <button class="btn btn-default" type="button" id="btnClear">
+            <button class="btn btn-default" type="button" id="btnClear" title="regargar">
                 <span class="glyphicon glyphicon-refresh" />
             </button>
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+            <button id="btnFilter" type="button" class="btn btn-warning" title="Mostrar filtros"
+                    data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
-            <button type="button" class="btn btn-success" id="btnCreate">
-                <span class="glyphicon  glyphicon-file"></span>
-            </button>
+            @if (User.IsInRole("Capturista") || User.IsInRole("Vendedor"))
+            {
+                <button type="button" class="btn btn-success" id="btnCreate" title="Crear nuevo registro">
+                    <span class="glyphicon  glyphicon-file"></span>
+                </button>
+            }
         </span>
     </div>
 </div>

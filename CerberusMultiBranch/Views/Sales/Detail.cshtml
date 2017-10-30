@@ -1,0 +1,168 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>
+    <button type="button" class="btn btn-default" title="volver al Historial de caja"
+            onclick="ShowLoading(); window.location='@Url.Action("History")'">
+        <span class="fa fa-arrow-left"></span>
+    </button>
+    Detalle de Venta Sucursal @Model.Branch.Name
+</h3>
+<hr />
+<div class="panel-group">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-5">
+                    <label class="control-label">
+                        Nombre del cliente
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                        <input class="form-control" value="@Model.Client.Name" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="control-label">
+                        Tipo de pago
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                        @if (Model.PaymentType != null)
+                        {
+                            <input class="form-control" value="@Model.PaymentType.Value.ToString()" readonly />
+                        }
+                        else
+                        {
+                            <input class="form-control alert alert-danger" value="Sin Pago" readonly />
+                        }
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2 col-md-offset-1">
+                    <label class="control-label">
+                        Fecha
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <input class="form-control" value="@Model.TransactionDate.ToString("dd/MM/yyyy")" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="control-label">
+                        Folio
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                        <input class="form-control" value="@Model.Folio" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label class="control-label">
+                        Agente
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
+                        <input class="form-control" value="@Model.User.UserName" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2 col-md-offset-1">
+                    <label class="control-label">
+                        Comision
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+
+                        <input class="form-control" value="@Model.ComAmount.ToString("c")" readonly />
+
+                    </div>
+                </div>
+                <div class="form-group col-md-2 col-md-offset-3">
+                    <label class="control-label">
+                        Total
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                        <input class="form-control" value="@Model.TotalAmount.ToString("c")" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <table id="tbDetails" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>
+                            @Html.DisplayName("Código")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Descripción")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Precio")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Cantidad")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Total")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TransactionDetails)
+                    {
+                        <tr>
+                            <td class="col-md-1">
+                                @if (item.Product.Images.Count > 0)
+                                {
+                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" />
+                                }
+                                else
+                                {
+                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                }
+                            </td>
+                            <td class="text-center">
+                                @Html.DisplayFor(m=> item.Product.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Product.Name)
+                            </td>
+                            <td class="text-right">
+                                @Html.DisplayFor(m => item.Price)
+                            </td>
+                            <td class="text-center">
+                                @Html.DisplayFor(m => item.Quantity)
+                            </td>
+                            <td class="text-right">
+                                @Html.DisplayFor(m => item.Amount)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbDetails",5)
+    });
+</script>

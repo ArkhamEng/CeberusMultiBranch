@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewBag.Title = "PageLayout";
+    Layout = "~/Views/Shared/MainLayout.cshtml";
+}
+
+<div class="container">
+    @RenderBody()
+</div>
+@RenderSection("scripts", required: false)
+

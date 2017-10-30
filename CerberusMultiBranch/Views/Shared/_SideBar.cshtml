@@ -11,55 +11,58 @@
         </div>
     </div>
     <ul class="list-unstyled components">
+        <li>
+            <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
+            <ul class="collapse list-unstyled" id="catalogsSm">
+                <li><a href="/Clients/" onclick="ShowLoading()">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
+                <li><a href="/Products/" onclick="ShowLoading()">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
 
-        @if (User.IsInRole("Capturista"))
-        {
-            <li>
-                <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
-                <ul class="collapse list-unstyled" id="catalogsSm">
-                    <li ><a href="/Clients/" onclick="ShowLoading()">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
-                    <li ><a href="/Providers/" onclick="ShowLoading()">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
-                    <li ><a href="/Products/" onclick="ShowLoading()">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
+                @if (User.IsInRole("Supervisor") || User.IsInRole("Capturista"))
+                {
+                    <li><a href="/Providers/" onclick="ShowLoading()">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
                     <li><a href="/Employees/" onclick="ShowLoading()">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
-                </ul>
-            </li>
-        }
+                }
+            </ul>
+        </li>
 
-      
-        @if (User.IsInRole("Cajero"))
+
+
+        @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
         {
             <li><a href="/CashRegister/" onclick="ShowLoading()">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
-            <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Mi Historial de caja<span class="fa fa-history" style="float:left" /></a></li>
-            <li><a href="/CashRegister/PaymentAndNote" onclick="ShowLoading()">&nbsp;Pagos y notas<span class="badge bg-info"></span><span class="fa fa-credit-card-alt" style="float:left" /></a></li>
+            if (User.IsInRole("Cajero"))
+            {
+                <li><a href="/CashRegister/MyHistory" onclick="ShowLoading()">&nbsp;Mi Historial de caja<span class="fa fa-history" style="float:left" /></a></li>
+                <li><a href="/CashRegister/PaymentAndNote" onclick="ShowLoading()">&nbsp;Pagos y notas<span class="badge bg-info"></span><span class="fa fa-credit-card-alt" style="float:left" /></a></li>
+            }
         }
 
         @if (User.IsInRole("Vendedor"))
         {
             <li>
-                <a href="/Sales/ShopingCart" onclick="ShowLoading()">
-                    &nbsp;Carrito de venta<span class="badge bg-info">@Html.Action("CheckCart", "Sales")</span>
-                    <span class="fa fa-cart-plus" style="float:left" />
-                </a>
+                @Html.Partial("_ShopingCartOption")
             </li>
             <li><a href="/Sales/MySales" onclick="ShowLoading()">&nbsp;Mis ventas<span class="fa fa-shopping-bag" style="float:left" /></a></li>
         }
 
-        @if (User.IsInRole("Almacenista"))
+        @if (User.IsInRole("Capturista"))
         {
             <li><a href="/Purchases/Create" onclick="ShowLoading()">&nbsp;Registrar Compra<span class="fa fa-shopping-basket" style="float:left" /></a></li>
         }
 
-        <li>
-            <a href="#reports" data-toggle="collapse" aria-expanded="false">
-                &nbsp;Reportes<span class="glyphicon glyphicon-duplicate" style="float:left" />
-            </a>
-            <ul class="collapse list-unstyled" id="reports">
-                <li><a href="/Purchases/"  onclick="ShowLoading()">&nbsp;Historial compras<span class="fa fa-file-text" style="float:left" /></a></li>
-                <li><a href="/Sales/" onclick="ShowLoading()">&nbsp;Historial ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
-                <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-file-text-o" style="float:left" /></a></li>
-            </ul>
-        </li>
-
+        @if (User.IsInRole("Supervisor"))
+        {
+            <li>
+                <a href="#reports" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Reportes<span class="glyphicon glyphicon-duplicate" style="float:left" />
+                </a>
+                <ul class="collapse list-unstyled" id="reports">
+                    <li><a href="/Purchases/" onclick="ShowLoading()">&nbsp;Historial compras<span class="fa fa-file-text" style="float:left" /></a></li>
+                    <li><a href="/Sales/History" onclick="ShowLoading()">&nbsp;Historial ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
+                    <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-file-text-o" style="float:left" /></a></li>
+                </ul>
+            </li>
+        }
 
         @if (User.IsInRole("Administrador"))
         {

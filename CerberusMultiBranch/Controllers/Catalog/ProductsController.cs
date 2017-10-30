@@ -31,7 +31,105 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-    
+        [HttpPost]
+        [Authorize(Roles ="Supervisor")]
+        public ActionResult BeginTransference(int branchId, int productId)
+        {
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                Include(bp=> bp.Product.Images).Include(bp => bp.Branch).
+                 FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+            return PartialView("_Transference", branchP);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public JsonResult Transfer(int originBranchId, int productId, double quantity)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var bp = db.BranchProducts.Include(br => br.Product).
+                FirstOrDefault(br => br.BranchId == originBranchId && br.ProductId == productId);
+
+            if (bp.Stock < quantity)
+            {
+                return Json(new { Result = "Imposible realizar la transferencia",
+                    Message = "La cantidad solicitada es mayor a la disponible en sucursal" });
+            }
+
+            //agrego el detalle de la transferencia
+            TransactionDetail detail = new TransactionDetail();
+
+            detail.Quantity = quantity;
+            detail.ProductId = productId;
+            detail.Price = bp.Product.BuyPrice;
+            detail.Amount = detail.Quantity * detail.Price;
+            
+
+            //creo la transferencia
+            Transference trans = new Transference();
+            trans.BranchId = branchId;
+            trans.OriginBranchId = originBranchId;
+            trans.TransactionDate = DateTime.Now;
+            trans.TotalAmount = detail.Amount;
+            trans.UpdDate = DateTime.Now;
+            trans.UserId = User.Identity.GetUserId();
+            
+
+            trans.TransactionDetails.Add(detail);
+
+            //Obtengo la relacion producto sucursal destino
+            var myBp = db.BranchProducts.Find(branchId, productId);
+           
+            try
+            {
+                //si no existe la creo de lo contrario la actualizo
+                if (myBp == null)
+                {
+                    myBp = new BranchProduct
+                    {
+                        Stock = quantity,
+                        LastStock = Cons.Zero,
+                        BranchId = branchId,
+                        ProductId = productId,
+                        UpdDate = DateTime.Now
+                    };
+
+                    db.BranchProducts.Add(myBp);
+                }
+                else
+                {
+                    myBp.LastStock = myBp.Stock;
+                    myBp.Stock += quantity;
+                    myBp.UpdDate = DateTime.Now;
+                    db.Entry(myBp).State = EntityState.Modified;
+                }
+
+                //actualizo stock en sucursal de origen
+                bp.LastStock = bp.Stock;
+                bp.Stock -= quantity;
+                db.Entry(bp).State = EntityState.Modified;
+
+                //Guardo cambios en base de datos
+                db.Transferences.Add(trans);
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    Result = "OK",
+                    Message = "Transferencia exitosa!",
+                    Code=bp.Product.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al transferir",
+                    Message = ex.Message
+                });
+            }
+        }
 
         [HttpPost]
         public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, string name, string code, bool isGrid)
@@ -146,6 +244,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ProductList", model);
         }
 
+        [HttpPost]
         public ActionResult Detail(int id)
         {
             var branchId = User.Identity.GetBranchSession().Id;
@@ -174,11 +273,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
 
-            return View(model);
+            return PartialView("Detail",model);
         }
 
 
         // GET: Products/Create
+        [Authorize(Roles = "Capturista")]
         public ActionResult Create(int? id)
         {
             ProductViewModel model;
@@ -209,6 +309,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Capturista")]
         //public ActionResult Create([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product,HttpPostedFileBase file)
         public ActionResult Create([Bind(Exclude = "Compatibilities")]Product product)
         {
@@ -303,6 +404,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
+        [Authorize(Roles = "Capturista")]
         public ActionResult DeleteImage(int? id)
         {
             if (id == null)

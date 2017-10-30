@@ -36,11 +36,13 @@
                             }
                         </div>
                         @{ string txtC = string.Format("col-md-{0}", (11 - i * 2)); }
-                        <div class='@txtC'>
+                        <div class='@txtC' onmouseover="SetPointer(this)" onclick="Detail('@prod.ProductId')">
                             <h4>
-                                <i onmouseover="SetPointer(this)" onclick="Detail('@prod.ProductId')">
-                                    @Html.DisplayFor(model => prod.Name)
-                                </i>
+                                <label>@prod.Code</label>
+                            </h4>
+                            <h4>
+
+                                @Html.DisplayFor(model => prod.Name)
 
                                 @if (prod.ModelCompatibilities.Count > 0)
                                 {
@@ -51,9 +53,9 @@
                                         content += "<h6>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
                                     }
 
-                                    <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
-                                          title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
-                                    </span>
+                                <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
+                                      title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                                </span>
                                 }
                             </h4>
                             @if (prod.TradeMark != null)
@@ -61,11 +63,6 @@
                                 <h6>
                                     Por @prod.TradeMark
                                     <span class="fa fa-registered"></span>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <label class="text-danger">
-                                        Código @prod.Code
-                                    </label>
                                 </h6>
                             }
                             else
@@ -79,12 +76,14 @@
                                     @Html.DisplayFor(model => prod.StorePrice)
                                 </label>
                             </h4>
-                            <h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">
+                            @*<h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">*@
+                            <h5>
                                 <span class="badge bg-info">
                                     @prod.Quantity
                                 </span>
                                 disponibles
                                 <span class="fa fa-cubes"></span>
+                                Unidad: @prod.Unit
                             </h5>
                             <h6>
                                 Fila @prod.Row
@@ -96,12 +95,15 @@
                             </h6>
                         </div>
 
-                        <div class="col-md-1" style="vertical-align:central">
-                            <button class="btn btn-default btn-sm" title="Editar producto"
-                                    onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
-                                <span class="glyphicon glyphicon-edit"></span>
-                            </button>
-                        </div>
+                        @if (User.IsInRole("Capturista"))
+                        {
+                            <div class="col-md-1" style="vertical-align:central">
+                                <button class="btn btn-default btn-sm" title="Editar producto"
+                                        onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </button>
+                            </div>
+                        }
                     </td>
                             }
                 @for (var g = item.Count; g < i; g++)
@@ -150,7 +152,12 @@
     });
 
     function Detail(id) {
-        window.location = '@Url.Action("Detail", "Products")/' + id;
+        ShowLoading();
+
+        ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view) {
+            HideLoading();
+            $("#divProductDetail").html(view);
+        });
     }
 
 
@@ -197,8 +204,7 @@
         });
     }
 
-    function Show(carousel)
-    {
+    function Show(carousel) {
         $(divContent).html($(carousel).clone());
         $(divModal).modal('show');
     }

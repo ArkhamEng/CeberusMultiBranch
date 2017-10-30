@@ -4,25 +4,34 @@
 
 <h4>Categorías de producto</h4>
 
-<div class="col-md-6">
-    <div class="input-group ">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("CategoryName", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button class="btn btn-default" id="btnClearCategory">
-                <span class="fa fa-refresh" />
-            </button>
-            <button class="btn btn-warning" id="btnCategory">
-                <span class="glyphicon glyphicon-plus" id="spCategory" />
-            </button>
-        </span>
+<div class="col-md-12">
+    <div class="col-md-6">
+        @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
+        <div class="input-group ">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+            @Html.TextBox("CategoryName", "", htmlAttributes: new { @class = "form-control" })
+        </div>
+        <label id="lblCategory" class="text-danger" />
     </div>
-    <label id="lblCategory" class="text-danger"/>
+    <div class="col-md-4">
+        @Html.Label("Clave SAT", htmlAttributes: new { @class = "control-label" })
+        <div class="input-group ">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+            @Html.TextBox("SatCode", "", htmlAttributes: new { @class = "form-control" })
+            <span class="input-group-btn">
+                <button class="btn btn-default" id="btnClearCategory">
+                    <span class="fa fa-refresh" />
+                </button>
+                <button class="btn btn-warning" id="btnCategory">
+                    <span class="glyphicon glyphicon-plus" id="spCategory" />
+                </button>
+            </span>
+        </div>
+    </div>
 </div>
-
 <br />
-<div class="col-md-8">
-    <div id="divCategories" ></div>
+<div class="col-md-10">
+    <div id="divCategories"></div>
 </div>
 
 
@@ -35,6 +44,7 @@
 
         $("#btnCategory").click(function ()
         {
+            ShowLoading();
             if ($("#CategoryName").val().length < 5)
             {
                 $("#lblCategory").text("La categoría debe tener una longitud mayor a 5 caracteres");
@@ -42,14 +52,21 @@
             else
             {
                 $("#lblCategory").text("");
-                ExecuteCategoryAjax('@Url.Action("SaveCategory", "Configuration")',
-                    { CategoryId: $("#CategoryId").val(), Name: $("#CategoryName").val() });
-            }
 
-            
+                var param = { categoryId: $("#CategoryId").val(), name: $("#CategoryName").val(), satCode: $("#SatCode").val() };
+
+                ExecuteAjax('@Url.Action("SaveCategory", "Configuration")', param, function (view)
+                {
+                    $("#divCategories").html(view);
+                    HideLoading();
+                });
+            }
         });
 
-        ExecuteCategoryAjax('@Url.Action("GetCategories", "Configuration")', null);
+        ExecuteAjax('@Url.Action("GetCategories", "Configuration")', {}, function (view)
+        {
+            $("#divCategories").html(view);
+        });
     });
 
     function ClearCategory()
@@ -62,30 +79,4 @@
         $("#btnCategory").attr("class", "btn btn-warning");
     }
 
-    function ExecuteCategoryAjax(url, data) {
-        console.log(url);
-        console.log(data);
-
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: data,
-
-            error: function (data)
-            {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (view)
-                {
-                    $("#divCategories").html(view);
-                    ClearCategory();
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
-        });
-    }
 </script>

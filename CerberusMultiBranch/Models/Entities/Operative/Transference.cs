@@ -12,10 +12,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [ForeignKey("OriginBranch")]
         public int OriginBranchId { get; set; }
 
-        public string AuthUser { get; set; }
-
-        public DateTime AuthDate { get; set; }
-
         public virtual Branch OriginBranch { get; set; }
     }
 }

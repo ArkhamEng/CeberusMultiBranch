@@ -67,7 +67,7 @@
                 <td class="col-md-1 text-info text-center">
                     @if (!item.Sale.Compleated)
                     {
-                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.BranchProducts.FirstOrDefault().Stock"
+                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.Quantity"
                                type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
                     }
                     else
@@ -79,7 +79,7 @@
                 </td>
                 <td class="text-center">
                     <label id="lblAvailable" class="badge bg-danger">
-                        @item.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == item.Transaction.BranchId).Stock
+                        @item.Product.Quantity
                     </label>
                 </td>
                 <td class="text-right">

@@ -62,6 +62,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<Purchase> Purchases { get; set; }
 
+        public DbSet<Transference> Transferences { get; set; }
+
         public DbSet<Sale> Sales { get; set; }
 
         public DbSet<CashRegister> CashRegisters { get; set; }

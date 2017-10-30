@@ -9,6 +9,7 @@ using CerberusMultiBranch.Models.Entities.Operative;
 using System.Data.Entity;
 using System.Security.Principal;
 using System.Web.Helpers;
+using Microsoft.AspNet.Identity;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -27,27 +28,63 @@ namespace CerberusMultiBranch.Controllers.Operative
             return cr;
         }
 
-
-        public ActionResult History()
+        [Authorize(Roles ="Cajero")]
+        public ActionResult MyHistory()
         {
             var branchId = User.Identity.GetBranchId();
             var model = LookForCashReg(branchId, DateTime.Today, null, User.Identity.Name);
-            
-            return View(model);
-        }
-
-        
-        public ActionResult Detail(int id)
-        {
-            var model    = db.CashRegisters.Include(cr => cr.CashDetails).FirstOrDefault(cr => cr.CashRegisterId == id );
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(DateTime? beginDate, DateTime? endDate, string user)
+        [Authorize(Roles = "Cajero")]
+        public ActionResult MySearch(DateTime? beginDate, DateTime? endDate)
         {
             var branchId = User.Identity.GetBranchId();
+            var model = LookForCashReg(branchId, beginDate, endDate, User.Identity.Name);
+
+            return PartialView("_MyCashRegisterList", model);
+        }
+
+        [Authorize(Roles ="Cajero")]
+        public ActionResult MyDetail(int id)
+        {
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).
+                FirstOrDefault(cr => cr.CashRegisterId == id && cr.UserOpen == User.Identity.Name);
+
+            if (model == null)
+                return RedirectToAction("MyHistory");
+
+            return View(model);
+        }
+
+        [Authorize(Roles ="Supervisor")]
+        public ActionResult History()
+        {
+            var model = LookForCashReg(null, DateTime.Today, null, null);
+            ViewBag.Branches =  User.Identity.GetBranches().ToSelectList();
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Detail(int id)
+        {
+            var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
+            var model    = db.CashRegisters.Include(cr => cr.CashDetails).
+                FirstOrDefault(cr => cr.CashRegisterId == id && brancheIds.Contains(cr.BranchId));
+
+            if (model == null)
+                return RedirectToAction("History");
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Search(int branchId, DateTime? beginDate, DateTime? endDate, string user)
+        {
             var model = LookForCashReg(branchId, beginDate, endDate, user);
 
             return PartialView("_CashRegisterList",model);
@@ -56,8 +93,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         private List<CashRegister> LookForCashReg(int? branchId, DateTime? beginDate, DateTime? endDate, string user)
         {
-            var model = db.CashRegisters.Include(cr => cr.CashDetails).
-            Where(cr => (branchId ==null || cr.BranchId == branchId) &&
+            var branchIds = User.Identity.GetBranches().Select(b => b.Id);
+
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).Include(cr=> cr.Branch).
+            Where(cr => (branchId ==null && branchIds.Contains(cr.BranchId) || cr.BranchId == branchId) &&
                         (beginDate == null || cr.OpeningDate >= beginDate) &&
                         (endDate == null || cr.OpeningDate <= endDate) &&
                         (user == null || user == string.Empty || cr.UserOpen == user)).ToList();
@@ -67,6 +106,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         // GET: CashRegister
+        [Authorize(Roles = "Supervisor,Cajero")]
         public ActionResult Index()
         {
             var cr = User.Identity.GetCashRegister();
@@ -128,6 +168,7 @@ namespace CerberusMultiBranch.Controllers.Operative
    
 
         [HttpPost]
+        [Authorize(Roles = "Cajero")]
         public JsonResult OpenCashRegister(double initialAmount)
         {
             try
@@ -158,6 +199,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
+        [Authorize(Roles = "Cajero")]
         public ActionResult AddWithdrawal(double amount, string comment, int causeId)
         {
             var cr = User.Identity.GetCashRegister();
@@ -171,6 +213,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
+        [Authorize(Roles = "Cajero,Supervisor")]
         public ActionResult Close(double amount, string comment)
         {
             var cr = User.Identity.GetCashRegister();

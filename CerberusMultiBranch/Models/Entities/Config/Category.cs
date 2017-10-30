@@ -18,6 +18,10 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
+        [MaxLength(30)]
+        [Display(Name = "Clave SAT")]
+        public string SatCode { get; set; }
+
 
         public int Id { get { return CategoryId; } }
     }

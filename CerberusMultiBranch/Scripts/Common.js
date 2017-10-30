@@ -5,6 +5,7 @@
 });
 
 
+
 function GetCurrency(value) {
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
@@ -27,12 +28,10 @@ function ShowLoading()
 }
 
 
-
 function HideLoading()
 {
     $("#ModalProgress").modal('hide');
 }
-
 
 
 function SetPointer(element) {
@@ -62,10 +61,9 @@ function ExecuteAjax(url, parameters, callback) {
     });
 }
 
-function SetCascade(ddlParent, ddlChild, action) {
-    console.log("Setting Cascade Controls State/Cities");
-    console.log("Child Value " + $(ddlChild).val());
-
+function SetCascade(ddlParent, ddlChild, action)
+{
+   
     if ($(ddlChild).val() == null)
         $(ddlChild).attr("readonly", false);
     else
@@ -75,8 +73,7 @@ function SetCascade(ddlParent, ddlChild, action) {
         console.log("Populating Cascade");
         if ($(ddlParent).val() != '') {
             var parentId = $(ddlParent).val();
-            console.log("Searching for " + parentId);
-
+        
             var AObj =
                 {
                     url: "/Json/" + action,
@@ -99,21 +96,17 @@ function SetCascade(ddlParent, ddlChild, action) {
                         console.log("Error on pupulating cascade");
                     }
                 };
-            console.log("executing ajax");
             $.ajax(AObj);
         }
         else {
             $(ddlChild).empty();
             $(ddlChild).attr("readonly", true);
         }
-
-
     });
 }
 
 function Search(url, data, target) {
-    console.log("Executing Ajax..");
-
+ 
     $.ajax({
         url: url,
         type: "POST",
@@ -194,6 +187,7 @@ function SetFilterControls(filters, button, target) {
     {
         $(button).attr("class", "btn btn-warning");
         $(button).html('<span class="glyphicon glyphicon-eye-open"></span>');
+        $(button).prop("title", "Mostrar filtros");
 
         
         $(target).attr("class", "col-md-12");
@@ -203,6 +197,7 @@ function SetFilterControls(filters, button, target) {
     {
         $(button).attr("class", "btn btn-default");
         $(button).html('<span class="glyphicon glyphicon-eye-close"></span>');
+        $(button).prop("title", "Ocultar filtros"); 
         
         $(target).attr("class", "col-md-8");
     });

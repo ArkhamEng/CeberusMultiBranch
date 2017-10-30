@@ -110,7 +110,7 @@
             row.find("#txQuantity").val(available);
             Quantity = available;
         }
-            
+
 
         if(Quantity > 0)
             button.prop("disabled", false)
@@ -120,24 +120,31 @@
 
     function AddToSale(element)
     {
+        ShowLoading();
         $("#ModalProducts").modal("hide");
-        BeginProgress();
         var row = $(element).parent().parent().parent().parent();
-      
+
         var param = {
             transactionId: $("#TransactionId").val(),
             productId: row.find("#ProductId").val(),
             price: row.find("#txtStorePrice").val(),
             quantity: row.find("#txQuantity").val()
-          
+
         };
-      
+
         ExecuteAjax('@Url.Action("AddToCart", "Sales")', param, function (data)
         {
             if (data.Result != 'OK')
+            {
+                HideLoading();
                 ShowMessage(data.Result, data.Message, 'warning');
+            }
+                
             else
+            {
                 window.location = '@Url.Action("ShopingCart", "Sales")'
+            }
+
         });
     }
 </script>

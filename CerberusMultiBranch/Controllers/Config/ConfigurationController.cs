@@ -19,6 +19,13 @@ namespace CerberusMultiBranch.Controllers.Config
 
 
         [HttpPost]
+        public ActionResult GetCauses()
+        {
+            var causes = db.WithdrawalCauses.OrderBy(c => c.WithdrawalCauseId).ToList();
+            return PartialView("_WithdrawalCauseList", causes);
+        }
+
+        [HttpPost]
 
         public ActionResult SaveCause(string name)
         {
@@ -50,19 +57,19 @@ namespace CerberusMultiBranch.Controllers.Config
 
         [HttpPost]
         
-        public ActionResult SaveCategory(int? categoryId, string name)
+        public ActionResult SaveCategory(int? categoryId, string name,string satCode)
         {
             
             if (ModelState.IsValid)
             {
                 if (categoryId == null)
                 {
-                    var category = new Category {  Name = name };
+                    var category = new Category {  Name = name,SatCode = satCode };
                     db.Categories.Add(category);
                 }
                 else
                 {
-                    var category = new Category { CategoryId = categoryId.Value, Name = name };
+                    var category = new Category { CategoryId = categoryId.Value, Name = name, SatCode = satCode };
                     db.Entry(category).State = EntityState.Modified;
                 }
                 db.SaveChanges();
@@ -73,7 +80,6 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         [HttpPost]
-        
         public ActionResult GetCategories()
         {
             var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();

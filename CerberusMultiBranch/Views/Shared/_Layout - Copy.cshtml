@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Sims 1.0 </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/common")
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+    <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+</head>
+<body>
+    @Html.Partial("_Progress")
+
+    @Html.Partial("_MessageBox")
+
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
+            <div class="col-xs-6 col-sm-4 col-md-12">
+                <img src="~/Content/Images/logo1.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+            </div>
+        </div>
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse">
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+
+
+    <div class="wrapper">
+        @if (User.Identity.IsAuthenticated)
+        {
+          @Html.Partial("_SideBar")
+        }
+
+        <div id="content" class="container small">
+            @RenderBody()
+        </div>
+    </div>
+    <hr />
+
+    @RenderSection("scripts", required: false)
+</body>
+
+</html>

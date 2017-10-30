@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Clientes";
- }
+}
 
 <div class="col-md-11">
     <h3>
@@ -111,10 +111,21 @@
             </div>
 
             <div class="panel-footer">
-                <div class="btn-group">
-                    @Html.Partial("_CatalogButtonGroup")
 
-                </div>
+                @if (User.IsInRole("Capturista") || User.IsInRole("Vendedor"))
+                {
+                    <div class="btn-group">
+                        @Html.Partial("_CatalogButtonGroup")
+                    </div>
+                }
+                else
+                {
+                    <button class="btn btn-primary" title="Volver a la búsqueda" type="button"
+                            onclick="ShowLoading(); window.location = '@Url.Action("Index")'">
+                        <span class="fa fa-search-plus"></span>
+                    </button>
+                }
+
             </div>
         </div>
     </div>
@@ -161,7 +172,7 @@
                     </div>
                 </div>
             </div>
-          
+
         </div>
     </div>
 }

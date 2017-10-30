@@ -3,24 +3,18 @@
 @{
     ViewBag.Title = "Detalle de caja";
 }
+
 <h3>
-    <button type="button" class="btn btn-default" title="volver al Historial de caja"
-            onclick="ShowLoading(); window.location='@Url.Action("History")'">
+    <button type="button" class="btn btn-default" title="volver a Mi historial de caja"
+            onclick="ShowLoading(); window.location='@Url.Action("MyHistory")'">
         <span class="fa fa-arrow-left"></span>
     </button>
-    
-    Detalle de caja
+    &nbsp;&nbsp;Mi detalle de caja
 </h3>
 <hr />
 <div class="panel-group">
     <div class="col-md-12">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <span class="fa fa-industry" style="float:left"></span>
-                    &nbsp;&nbsp;Sucursal @Model.Branch.Name
-                </div>
-            </div>
+        <div class="panel panel-danger">
             <div class="panel-body">
                 <div class="col-md-3">
                     @Html.LabelFor(model => model.OpeningDate, htmlAttributes: new { @class = "control-label" })

@@ -8,7 +8,7 @@
 
 <h3>
     <span class="fa fa-history" style="float:left"></span>
-    &nbsp;&nbsp;Historial de Caja
+    &nbsp;&nbsp;Mi historial de caja
 </h3>
 
 <div class="col-md-7">
@@ -19,11 +19,11 @@
             <button class="btn btn-default" type="button" title="buscar" onclick="Search()">
                 <span class="glyphicon glyphicon-search" />
             </button>
-            <button class="btn btn-default" type="button" title="recargar" onclick="Reload()">
+            <button class="btn btn-default" type="button"  title="recargar" onclick="Reload()">
                 <span class="glyphicon glyphicon-refresh" />
             </button>
             <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters"
-                    title="Ver / Ocultar filtros">
+                    title="Ver filtros">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
         </span>
@@ -36,13 +36,6 @@
     <div class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
-                <div class="form-group col-md-12">
-                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("BranchId", (SelectList)ViewBag.Branches, "", new { @class = "form-control" })
-                    </div>
-                </div>
                 <div class="form-group col-md-12">
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
@@ -58,23 +51,16 @@
                         @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
                     </div>
                 </div>
- 
-                <div class="form-group col-md-12">
-                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
+
             </div>
         </div>
-    
+      
     </div>
 </div>
 
 
 <div id="divCashRegisterList">
-    @Html.Partial("_CashRegisterList", Model)
+    @Html.Partial("_MyCashRegisterList", Model)
 </div>
 
 <script>
@@ -87,9 +73,9 @@
     function Search()
     {
         ShowLoading();
-        var param = {branchId:$("#BranchId").val(), beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val(), user: $("#User").val() }
+        var param = { beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val()}
 
-        ExecuteAjax('@Url.Action("Search")', param, function (view)
+        ExecuteAjax('@Url.Action("MySearch")', param, function (view)
         {
             $("#divCashRegisterList").html(view);
             HideLoading();
@@ -99,6 +85,6 @@
     function Reload()
     {
         ShowLoading();
-        window.location = '@Url.Action("History")';
+        window.location = '@Url.Action("MyHistory")';
     }
 </script>

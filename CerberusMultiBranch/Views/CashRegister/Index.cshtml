@@ -45,12 +45,25 @@ else
             </h3>
         </div>
 
-        <div class="text-center col-md-12 alert btn-danger" id="btnWithdrawal" onmouseover="SetPointer(this)" title="Ver y agregar retiros">
-            <h3>
-                Retiros<br />
-                @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
-            </h3>
-        </div>
+        @if (User.IsInRole("Cajero"))
+        {
+            <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
+                 onmouseover="SetPointer(this)" title="Ver y agregar retiros">
+                <h3>
+                    Retiros<br />
+                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                </h3>
+            </div>
+        }
+        else
+        {
+            <div class="text-center col-md-12 alert btn-danger disabled"  >
+                <h3>
+                    Retiros<br />
+                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                </h3>
+            </div>
+        }
 
         <div class="text-center col-md-12  alert  btn-success" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
             @{
@@ -102,18 +115,16 @@ else
         $("#btnTerminate").click(function () {
             $("#ModalCloseCash").modal("show");
         });
-
-        $("#btnWithdrawal").click(function ()
-        {
-          
-            $("#hTitle").text("Detalle de retiros");
-
-            ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view)
-            {
-                $("#divDetails").html(view);
-            });
-        });
     });
+
+    function OpenWithdrawal()
+    {
+        $("#hTitle").text("Detalle de retiros");
+
+        ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view) {
+            $("#divDetails").html(view);
+        });
+    }
 
     function OpenCashRegister() {
         ExecuteAjax('@Url.Action("OpenCashRegister","CashRegister")',

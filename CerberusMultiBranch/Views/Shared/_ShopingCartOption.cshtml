@@ -1,0 +1,22 @@
+﻿
+
+<a href="/Sales/ShopingCart" onclick="ShowLoading()">
+    &nbsp;Carrito de venta<span id="spShopingCart" class="badge bg-info"></span>
+    <span class="fa fa-cart-plus" style="float:left" />
+</a>
+
+<script>
+    $(document).ready()
+    {
+        CheckCart();
+    }
+    function CheckCart()
+    {
+        ExecuteAjax('@Url.Action("CheckCart","Sales")', {}, function (j) {
+            if (j.Result != "OK")
+                ShowMessage(j.Result, j.Message, 'warning');
+            else
+                $("#spShopingCart").text(j.Message);
+        });
+    }
+</script>

@@ -22,8 +22,8 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-
-        public ActionResult Index()
+        [Authorize(Roles ="Supervisor")]
+        public ActionResult History()
         {
             //obtengo las sucursales configuradas para el empleado
             var branches = User.Identity.GetBranches();
@@ -36,6 +36,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
+        [Authorize(Roles ="Supervisor")]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string user)
         {
             var model = LookFor(branchId,beginDate, endDate, folio, client, user,null,true,null );
@@ -43,7 +44,23 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_SaleList", model);
         }
 
-        [Authorize(Roles = "Vendedor")]
+       
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Detail(int id)
+        {
+            var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s=> s.User).
+                Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                FirstOrDefault(s => s.TransactionId == id && brancheIds.Contains(s.BranchId));
+
+            if (sale == null)
+                return RedirectToAction("History");
+
+            return View(sale);
+        }
+
+      [Authorize(Roles = "Vendedor")]
         public ActionResult MySales()
         {
             var bId = User.Identity.GetBranchId();
@@ -68,11 +85,12 @@ namespace CerberusMultiBranch.Controllers.Operative
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, 
             string user, bool? isPayed, bool? compleated, string userId)
         {
-            
+
+            var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.TransactionDetails)
                          where 
-                            (branchId == null || p.BranchId == branchId)
+                            (branchId == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
                          && (endDate == null || p.TransactionDate <= endDate)
                          && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
@@ -86,24 +104,24 @@ namespace CerberusMultiBranch.Controllers.Operative
             return sales;
         }
 
-
-        public ActionResult CheckCart()
+        [HttpPost]
+        public JsonResult CheckCart()
         {
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
 
             var sale = db.Sales.Include(s => s.TransactionDetails).
-                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.Compleated);
+                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && s.Compleated == false);
 
             if (sale != null)
             {
                 var list = sale.TransactionDetails;
-                return Content((list.Sum(td => td.Quantity)).ToString());
+                return Json(new { Result = "OK", Message = (list.Sum(td => td.Quantity)).ToString() });
             }
 
             else
-                return Content(Cons.Zero.ToString());
+                return Json(new { Result = "OK", Message = Cons.Zero.ToString() });
         }
 
         [HttpPost]
@@ -158,25 +176,32 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult ShopingCart(int? id)
         {
             SaleViewModel model;
+            var branchId = User.Identity.GetBranchId();
             string userId = null;
             if (id==null)
                 userId = User.Identity.GetUserId();
 
 
-            var branchId = User.Identity.GetBranchId();
-
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                 Include(s => s.TransactionDetails.Select(td => td.Product)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+                
                 FirstOrDefault(s => (userId ==null || s.UserId == userId)
                                && (id != null || s.Compleated == false)
                                && (id == null || s.TransactionId == id )
                                && s.BranchId == branchId);
 
-
             if (sale != null)
+            {
+                foreach (var detail in sale.TransactionDetails)
+                {
+                    var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
+                    detail.Product.Quantity = brp != null ? brp.Stock : Cons.Zero;
+                }
                 model = new SaleViewModel(sale);
+            }
+                
             else
             {
                 model = new SaleViewModel();
@@ -222,17 +247,30 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
-        public JsonResult AddToCart(int transactionId, int productId, double quantity, double price)
+        public JsonResult AddToCart(int productId, double quantity, double price)
         {
-            Sale sale = null;
-
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
-            var amount = (quantity * price);
 
+            var bp = db.BranchProducts.FirstOrDefault(brp => brp.BranchId == branchId && brp.ProductId == productId);
+            var existance = bp != null ? bp.Stock : Cons.Zero;
+
+            if (existance < quantity)
+            {
+                var j = new
+                {
+                    Result = "Sin producto en almacen",
+                    Message = "Estas intentando vender mas productos de los disponibles, revisa existencia en sucursal"
+                };
+                return Json(j);
+            }
+
+            var sale = db.Sales.FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && !s.Compleated);
+
+            var amount = (quantity * price);
             //if there is no transaction, create a new one
-            if (transactionId == Cons.Zero)
+            if (sale == null)
             {
                 sale = new Sale
                 {
@@ -246,14 +284,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Sales.Add(sale);
                 db.SaveChanges();
             }
-            else
-                sale = db.Sales.Find(transactionId);
-
+          
             if (sale.TransactionId > Cons.Zero)
             {
                 //check if the product is already added to the transaction
-                var detail = db.TransactionDetails.Include(td => td.Product).Include(td => td.Product.BranchProducts)
-                    .FirstOrDefault(td => td.ProductId == productId && td.TransactionId == transactionId);
+                var detail = db.TransactionDetails.
+                    FirstOrDefault(td => td.ProductId == productId && td.TransactionId == sale.TransactionId);
 
                 //if is sum the new quantity
                 if (detail != null)
@@ -261,16 +297,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                     detail.Amount += amount;
                     detail.Quantity += quantity;
 
-                    var brP = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
-                    var existance = brP != null ? brP.Stock : Cons.Zero;
-
                     if (existance < detail.Quantity)
                     {
                         var j = new
                         {
-                            Result = "ERROR",
-                            Message = "Error:La cantidad total del carrito: "
-                            + detail.Quantity + " excede lo disponible en sucursal dispobiles:" + existance
+                            Result = "Cantidad insuficiente",
+                            Message = "Estas intentando vender mas productos de los disponibles, revisa el carrito de venta"
                         };
 
                         return Json(j);
@@ -316,8 +348,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                         var pb = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
 
                         // si no hay producto suficiente la operación concluye
-                        if (pb.Stock < detail.Quantity)
-                            throw new Exception("un producto de esta venta excede la cantidad en stock");
+                        if (pb == null || pb.Stock < detail.Quantity)
+                            throw new Exception("Un producto execede la cantidad en inventario");
 
                         //guardo dato del detalle
                         detail.Amount = detail.Price * detail.Quantity;
@@ -358,7 +390,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     var model = GetVM(sale.TransactionId);
                     ViewBag.Header  = "Error al cerrar la venta!";
-                    ViewBag.Message = ex.Message+" "+ex.InnerException!=null? "Detalle interno: " +ex.InnerException.Message : string.Empty;
+                    ViewBag.Message = ex.Message;
                     return View("ShopingCart", model);
                 }
             }

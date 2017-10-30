@@ -95,6 +95,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Capturista,Vendedor")]
         public ActionResult Create(Client client)
         {
             try
@@ -124,20 +125,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return RedirectToAction("Create", new { id = client.ClientId });
         }
 
-        // GET: Clients/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Client client = db.Clients.Find(id);
-            if (client == null)
-            {
-                return HttpNotFound();
-            }
-            return View(client);
-        }
+      
 
         protected override void Dispose(bool disposing)
         {

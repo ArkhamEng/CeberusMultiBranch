@@ -209,6 +209,14 @@
     <Compile Include="Migrations\201710280645479_Equivalence.Designer.cs">
       <DependentUpon>201710280645479_Equivalence.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710281510347_SatCode.cs" />
+    <Compile Include="Migrations\201710281510347_SatCode.Designer.cs">
+      <DependentUpon>201710281510347_SatCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710300115596_transference.cs" />
+    <Compile Include="Migrations\201710300115596_transference.Designer.cs">
+      <DependentUpon>201710300115596_transference.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -405,9 +413,7 @@
     <Content Include="Views\Sales\Create - Copy.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
     <Content Include="Views\CashRegister\_ChoosePayment.cshtml" />
-    <Content Include="Views\Home\_ChartTest.cshtml" />
-    <Content Include="Views\Home\Chart.cshtml" />
-    <Content Include="Views\Sales\Index.cshtml" />
+    <Content Include="Views\Sales\History.cshtml" />
     <Content Include="Views\Sales\_SaleList.cshtml" />
     <Content Include="Views\Configuration\_VariableList.cshtml" />
     <Content Include="Views\Configuration\_Variables.cshtml" />
@@ -440,6 +446,15 @@
     <Content Include="Views\Purchases\_InternalProductList.cshtml" />
     <Content Include="Views\Purchases\_CloneProduct.cshtml" />
     <Content Include="Views\Providers\UpdateCatalog.cshtml" />
+    <Content Include="Views\Shared\MainLayout.cshtml" />
+    <Content Include="Views\Shared\_Layout - Copy.cshtml" />
+    <Content Include="Views\Shared\PageLayout.cshtml" />
+    <Content Include="Views\Shared\_ShopingCartOption.cshtml" />
+    <Content Include="Views\Products\_Transference.cshtml" />
+    <Content Include="Views\CashRegister\MyHistory.cshtml" />
+    <Content Include="Views\CashRegister\_MyCashRegisterList.cshtml" />
+    <Content Include="Views\CashRegister\MyDetail.cshtml" />
+    <Content Include="Views\Sales\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -458,6 +473,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710280645479_Equivalence.resx">
       <DependentUpon>201710280645479_Equivalence.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710281510347_SatCode.resx">
+      <DependentUpon>201710281510347_SatCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710300115596_transference.resx">
+      <DependentUpon>201710300115596_transference.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

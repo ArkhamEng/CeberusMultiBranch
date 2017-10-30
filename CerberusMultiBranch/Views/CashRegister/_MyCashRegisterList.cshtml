@@ -5,12 +5,6 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayName("Sucursal")
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UserOpen)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.OpeningDate)
             </th>
             <th>
@@ -37,12 +31,6 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Branch.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UserOpen)
-                </td>
-                <td>
                    @item.OpeningDate.ToString("dd/MM/yyyy")
                 </td>
                 <td>
@@ -67,7 +55,7 @@
 
                 <td>
                     <button type="button" class="btn btn-primary btn-xs" title="Ver detalle de caja"
-                            onclick="window.location ='@Url.Action("Detail",new {id=item.CashRegisterId })'" >
+                            onclick="window.location ='@Url.Action("MyDetail",new {id=item.CashRegisterId })'" >
                         <span class="glyphicon glyphicon-expand"></span>
                     </button>
                 </td>
