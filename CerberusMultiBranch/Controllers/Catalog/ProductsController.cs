@@ -72,10 +72,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
             trans.OriginBranchId = originBranchId;
             trans.TransactionDate = DateTime.Now;
             trans.TotalAmount = detail.Amount;
-            trans.UpdDate = DateTime.Now;
-            trans.UserId = User.Identity.GetUserId();
+            trans.UpdDate    = DateTime.Now;
+            trans.UserId     = User.Identity.GetUserId();
+            trans.LastStatus = TranStatus.InProcess;
+            trans.Status     = TranStatus.Compleated;
+            trans.UpdUser    = User.Identity.Name;
             
-
             trans.TransactionDetails.Add(detail);
 
             //Obtengo la relacion producto sucursal destino
@@ -250,12 +252,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchSession().Id;
             var userId = User.Identity.GetUserId();
 
-            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && !s.IsPayed);
+            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId 
+            && s.Status == TranStatus.InProcess);
 
-            var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts).
+            var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
+                        Include(p => p.BranchProducts).
                         FirstOrDefault(p => p.ProductId == id);
 
-            model.TransactionId = trans == null ? Cons.Zero : trans.TransactionId;
+            model.TransactionId = (trans == null) ? Cons.Zero : trans.TransactionId;
 
 
             var bProd = model.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);

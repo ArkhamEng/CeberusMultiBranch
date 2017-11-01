@@ -32,7 +32,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
-        public PaymentType? PaymentType { get; set; }
+        public PaymentType PaymentType { get; set; }
 
         [Required]
         [Display(Name = "Fecha de Operación")]
@@ -41,12 +41,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
 
+
+        [Index("IDX_Status", IsUnique = false)]
+        public TranStatus Status { get; set; }
+
+        public TranStatus LastStatus { get; set; }
+
+        [MaxLength(100)]
+        public string Comment { get; set; }
+
         [Required]
         public DateTime UpdDate { get; set; }
 
-        [Index("IDX_IsPayed", IsUnique = false)]
-        public bool IsPayed { get; set; }
-
+        [Required]
+        public string UpdUser { get; set; }
 
         public ICollection<TransactionDetail> TransactionDetails { get; set; }
 
@@ -62,12 +70,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         #endregion
 
-
         public Transaction()
         {
             this.TransactionDetails = new List<TransactionDetail>();
             this.TransactionDate = DateTime.Now;
             this.UpdDate = DateTime.Now;
         }
+    }
+
+    public enum TranStatus:int
+    {
+        Canceled      = -1,
+        InProcess     = 0,
+        Reserved      = 1,
+        SemiCompleted = 2,
+        Compleated    = 3,
     }
 }

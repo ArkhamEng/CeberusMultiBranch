@@ -1,12 +1,12 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
 
 @{
-    ViewBag.Title = "Historial Ventas";
+    ViewBag.Title = "Historial Compras";
 }
 
 <h3>
-    <span class="fa fa-history" style="float:left"></span>
-    &nbsp;&nbsp;Historial de Ventas
+    <span class="fa fa-shopping-bag" style="float:left"></span>
+    &nbsp;&nbsp;Historial de compras
 </h3>
 
 <div class="col-md-7">
@@ -17,10 +17,11 @@
             <button class="btn btn-default" type="button" id="btnSearch" title="Buscar">
                 <span class="glyphicon glyphicon-search" />
             </button>
-            <button class="btn btn-default" type="button" title="Recargar página" onclick="Reload()">
+            <button class="btn btn-default" type="button" id="btnClear" title="Recargar página" onclick="Reload()">
                 <span class="glyphicon glyphicon-refresh" />
             </button>
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters" title="Mostras / ocultar filtros">
+            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" title="Mostrar filtros"
+                    data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
         </span>
@@ -37,9 +38,10 @@
     </h5>
 </div>
 
+
 <br /><br /><br />
 
-<div id="divFilters" class="col-md-4  collapse">
+<div id="divFilters" class="col-md-4 collapse">
     <div class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
@@ -50,19 +52,7 @@
                         @Html.DropDownList("BranchId", Model.Branches, "", new { @class = "form-control" })
                     </div>
                 </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Estado de venta", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        <select id="Status" class="form-control">
-                            <option value=""></option>
-                            <option value="0">Abierto</option>
-                            <option value="1">Apartado</option>
-                            <option value="3">Pagado</option>
-                            <option value="-1">Cancelado</option>
-                        </select>
-                    </div>
-                </div>
+
                 <div class="form-group col-md-12">
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
@@ -80,19 +70,19 @@
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Cliente", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Client", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control" })
 
                     </div>
                 </div>
 
                 <div class="form-group col-md-12">
-                    @Html.Label("Folio", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Factura", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Folio", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Bill", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
 
@@ -100,48 +90,49 @@
                     @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control" })
+                        @Html.TextBox("Usuario", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
             </div>
         </div>
+      
     </div>
 </div>
 
 
-<div id="divSales">
-    @Html.Partial("_SaleList", Model.Sales)
+<div id="divPurchases">
+    @Html.Partial("_PurchaseList",Model.Purchases)
 </div>
 <script>
-    $(document).ready(function () {
-        SetFilterControls("#divFilters", "#btnFilter", "#divSales");
+    $(document).ready(function ()
+    {
+        SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
 
         $("#btnSearch").click(function ()
         {
             ShowLoading();
+
             var data = {
                 branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
-                folio: $("#Folio").val(),
-                client: $("#Client").val(),
+                bill: $("#Bill").val(),
                 user: $("#User").val(),
-                status: $("#Status").val()
+                provider: $("#Provider").val(),
             };
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
-                $("#divSales").html(view);
+                $("#divPurchases").html(view);
                 HideLoading();
             });
-
+            
         });
     });
 
-    function Reload() {
+    function Reload()
+    {
         ShowLoading();
         window.location = '@Url.Action("History")';
     }
 
-
 </script>
-

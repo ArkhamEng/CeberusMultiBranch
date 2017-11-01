@@ -1,4 +1,4 @@
-﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Purchase
 @using CerberusMultiBranch.Models.Entities.Operative;
 
 @{
@@ -7,7 +7,10 @@
 }
 
 <h3>
-    Detalle de venta sucursal <label class="text-lowercase">@Model.Branch.Name</label>
+    Detalle de compra sucursal
+    <label class="text-lowercase">
+        @Model.Branch.Name
+    </label>
 </h3>
 
 
@@ -18,17 +21,17 @@
             <div class="row">
                 <div class="form-group col-md-5">
                     <label class="control-label">
-                        Nombre del cliente
+                        Nombre del proveedor
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                        <input class="form-control" value="@Model.Client.Name" readonly />
+                        <input class="form-control" value="@Model.Provider.Name" readonly />
                     </div>
                 </div>
 
                 <div class="form-group col-md-2">
                     <label class="control-label">
-                        Tipo de pago
+                        Tipo de compra
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
@@ -38,23 +41,24 @@
 
                 <div class="form-group col-md-2 col-md-offset-1">
                     <label class="control-label">
-                        Fecha
+                        Fecha de compra
                     </label>
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
                         <input class="form-control" value="@Model.TransactionDate.ToString("dd/MM/yyyy")" readonly />
                     </div>
                 </div>
 
                 <div class="form-group col-md-2">
                     <label class="control-label">
-                        Folio
+                        Expira
                     </label>
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                        <input class="form-control" value="@Model.Folio" readonly />
+                        <span class="input-group-addon"><i class="fa fa-calendar-times-o"></i></span>
+                        <input class="form-control" value="@Model.Expiration.ToString("dd/MM/yyyy")" readonly />
                     </div>
                 </div>
+
             </div>
 
             <div class="row">
@@ -80,13 +84,11 @@
                                 <label class="form-control alert alert-danger">Cancelado</label>
                                 break;
                             case TranStatus.InProcess:
-                                <label class="form-control alert alert-warning">En Proceso</label>
+                                <label class="form-control alert alert-info">En Proceso</label>
                                 break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
+
                             case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
+                                <label class="form-control alert alert-success">Inventariado</label>
                                 break;
                         }
 
@@ -95,18 +97,17 @@
 
                 <div class="form-group col-md-2 col-md-offset-1">
                     <label class="control-label">
-                        Comision
+                        Factura
                     </label>
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-
-                        <input class="form-control" value="@Model.ComAmount.ToString("c")" readonly />
-
+                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                        <input class="form-control" value="@Model.Bill" readonly />
                     </div>
                 </div>
+
                 <div class="form-group col-md-2">
                     <label class="control-label">
-                        Total
+                        Monto Total
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
@@ -137,13 +138,11 @@
                                 <label class="form-control alert alert-danger">Cancelado</label>
                                 break;
                             case TranStatus.InProcess:
-                                <label class="form-control alert alert-warning">En Proceso</label>
+                                <label class="form-control alert alert-info">En Proceso</label>
                                 break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
+
                             case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
+                                <label class="form-control alert alert-success">Inventariado</label>
                                 break;
                         }
 
@@ -152,7 +151,7 @@
 
                 <div class="form-group col-md-2 col-md-offset-5">
                     <label class="control-label">
-                      
+
                     </label>
                     <div class="input-group">
                         <div class="input-group-btn">
@@ -161,7 +160,7 @@
                                         onclick="ShowLoading(); window.location='@Url.Action("History")'">
                                     <span class="fa fa-search-plus"></span>
                                 </button>
-                                <button type="button" class="btn btn-danger" title="cancelar venta">
+                                <button type="button" class="btn btn-danger" title="cancelar la compra">
                                     <span class="fa fa-times"></span>
                                     Cancelar
                                 </button>

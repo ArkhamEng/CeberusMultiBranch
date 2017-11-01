@@ -1,5 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Purchase
-
+@using CerberusMultiBranch.Models.Entities.Operative;
 @{
     ViewBag.Title = "Compras";
 }
@@ -26,8 +26,8 @@
                     @Html.HiddenFor(m => m.BranchId)
                     @Html.HiddenFor(m => m.TransactionId)
                     @Html.HiddenFor(m => m.UserId)
-                    @Html.HiddenFor(m => m.Inventoried)
-                    @Html.HiddenFor(m => m.IsPayed)
+                    @Html.HiddenFor(m => m.UpdUser)
+                    @Html.HiddenFor(m => m.Status)
                     @Html.HiddenFor(m => m.ProviderId)
 
                     <div class="col-md-5">
@@ -146,7 +146,7 @@
         {
             $("#btnShowProviders").prop("disabled", true);
         }
-          
+
 
         $("#btnShowProviders").click(function () {
             $("#ModalQuickProvider").modal('show');
@@ -159,34 +159,41 @@
             $("#rdCredit").attr("checked", true);
 
 
-        $("#spShowQuick").click(function () {
+        $("#spShowQuick").click(function ()
+        {
             $("#ModalExternalProduct").modal('show');
         });
 
-        $("#btnCompleate").click(function () {
+        $("#btnCompleate").click(function ()
+        {
             LoadPopoverCompleate();
         });
 
-        if ('@Model.Inventoried' == 'True') {
+        if ('@Model.Status' == '@TranStatus.Compleated')
+        {
             $(".Compleated").hide();
             $("#btnSave").hide();
         }
     });
 
-    function ProviderSelected(id, name) {
+    function ProviderSelected(id, name)
+    {
         $("#ProviderId").val(id);
         $("#Provider_Name").val(name);
 
         $("#ModalQuickProvider").modal('hide');
     }
 
-    function SubmitCompleate() {
+    function SubmitCompleate()
+    {
         HidePopCompleate();
-        $("#Inventoried").val(true);
+        ShowLoading();
+        $("#Status").val('@TranStatus.Compleated');
         $("#btnSubmit").click();
     }
 
-    function LoadPopoverCompleate() {
+    function LoadPopoverCompleate()
+    {
         $("#btnCompleate").popover({
             html: true,
             content: function () { return $("#divPopCompleate").html(); },

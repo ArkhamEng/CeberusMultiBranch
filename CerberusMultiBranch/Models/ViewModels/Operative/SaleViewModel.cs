@@ -37,8 +37,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.Client = sale.Client;
             this.ClientId = sale.ClientId;
             this.Folio = sale.Folio;
-            this.IsPayed = sale.IsPayed;
-            this.Compleated = sale.Compleated;
+            this.LastStatus = sale.LastStatus;
+            this.Status = sale.Status;
             this.Payments = sale.Payments;
             this.PaymentType = sale.PaymentType;
             this.TotalAmount = sale.TotalAmount;
@@ -48,6 +48,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.UpdDate = sale.UpdDate;
             this.User = sale.User;
             this.UserId = sale.UserId;
+            this.UpdUser = sale.UpdUser;
+            this.Comment = sale.Comment;
+            
 
             this.CarMakes = new List<ISelectable>().ToSelectList();
             this.Categories = new List<ISelectable>().ToSelectList();

@@ -3,13 +3,12 @@
 <table id="tbPurchases" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-1">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
             <th class="col-md-3">@Html.DisplayName("Proveedor")</th>
-            <th class="col-md-1">@Html.DisplayName("Usuario")</th>
             <th class="col-md-1">@Html.DisplayName("Tipo")</th>
             <th class="col-md-1">@Html.DisplayName("Fecha")</th>
-            <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+            <th class="col-md-1">@Html.DisplayName("Expira")</th>
+            <th class="col-md-2">@Html.DisplayName("Monto Total")</th>
             <th class="col-md-1">@Html.DisplayName("Productos")</th>
             <th class="col-md-1">@Html.DisplayName("Estado")</th>
             <th class="col-md-1"/>
@@ -19,39 +18,45 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Branch.Name)</td>
                 <td>@Html.DisplayFor(m => item.Bill)</td>
                 <td>@Html.DisplayFor(m => item.Provider.Name)</td>
-                <td>@Html.DisplayFor(m => item.User.UserName)</td>
                 <td align="center">@item.PaymentType.ToString()</td>
-                <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
+                <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy")</td>
+                <td align="center">@item.Expiration.ToString("dd/MM/yyyy")</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
-                
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
                 <td align="center">@Html.DisplayFor(m =>quantity )</td>
-
-                @switch (item.Status)
+               
+                 @switch (item.Status)
                 {
                     case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
                         <td align="center" class="alert alert-danger">
                             Cancelado
                         </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                         break;
+                     case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
                         <td align="center" class="alert alert-success">
                             Inventariado
                         </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                         break;
+                     case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
                         <td align="center" class="alert alert-info">
                             En Proceso
                         </td>
-                        break;
-                }
+                         break;
+                 }
                 <td align="center">
-                    <button class="btn btn-primary  btn-xs" onclick="Detail(@item.TransactionId)" title="Ver detalle de compra">
-                        <span class="glyphicon glyphicon-eye-open" />
-                    </button>
+                    <div class="btn-group">
+                        @if (item.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess)
+                        {
+                            <button class="btn btn-warning  btn-xs" onclick="Edit(@item.TransactionId)" title="Editar compra">
+                                <span class="glyphicon glyphicon-pencil" />
+                            </button>
+                        }
+                        <button class="btn btn-primary  btn-xs" onclick="Detail(@item.TransactionId)" title="Ver detalle de compra">
+                            <span class="glyphicon glyphicon-eye-open" />
+                        </button>
+                    </div>
                 </td>
             </tr>
         }
@@ -65,19 +70,17 @@
     $(document).ready(function ()
     {
         SetDataTable("#tbPurchases", "#txtFilter");
-
-        var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
-
-        var tQuantity = "Articulos: " + '@totalQuantity';
-
-        $("#lblTotalAmount").text(tAmount);
-        $("#lblTotalQuantity").text(tQuantity);
-
     });
 
     function Detail(id)
     {
         ShowLoading();
-        window.location = '@Url.Action("Detail")' + '/' + id;
+        window.location = '@Url.Action("MyDetail")' + '/' + id;
+    }
+
+    function Edit(id)
+    {
+        ShowLoading();
+        window.location = '@Url.Action("Create")' + '/' + id;
     }
 </script> 

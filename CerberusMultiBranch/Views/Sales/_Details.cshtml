@@ -51,31 +51,16 @@
                 </td>
 
                 <td class="col-md-2 text-center">
-                    @if (item.Sale.Compleated)
-                    {
-                        <h4>@Html.DisplayFor(modelItem => item.Price)</h4>
-                    }
-                    else
-                    {
-                        <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
-                            <u>
-                                @Html.DisplayFor(modelItem => item.Price)
-                            </u>
-                        </h4>
-                    }
+                    <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
+                        onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
+                        <u>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </u>
+                    </h4>
                 </td>
                 <td class="col-md-1 text-info text-center">
-                    @if (!item.Sale.Compleated)
-                    {
-                        <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.Quantity"
-                               type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
-                    }
-                    else
-                    {<h4>
-                        @Html.DisplayFor(modelItem => item.Quantity)
-                    </h4>
-                    }
-
+                    <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.Quantity"
+                           type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
                 </td>
                 <td class="text-center">
                     <label id="lblAvailable" class="badge bg-danger">
@@ -88,15 +73,12 @@
                     </h4>
                 </td>
                 <td>
-                    @if (!item.Sale.Compleated)
-                    {
-                        <div class="btn-group">
-                            <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')"
-                                    title="Quitar del carritos">
-                                <span class="glyphicon glyphicon-trash"></span>
-                            </button>
-                        </div>
-                    }
+                    <div class="btn-group">
+                        <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')"
+                                title="Quitar del carritos">
+                            <span class="glyphicon glyphicon-trash"></span>
+                        </button>
+                    </div>
                 </td>
                 <td hidden>
                     <input name="@ProductId" value="@item.ProductId" />

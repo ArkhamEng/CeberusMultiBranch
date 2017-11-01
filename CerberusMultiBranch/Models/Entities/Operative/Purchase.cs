@@ -22,8 +22,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Expiration { get; set; }
 
-        [Index("IDX_Inventoried", IsUnique = false)]
-        public bool Inventoried { get; set; }
 
         public virtual Provider Provider { get; set; }
 

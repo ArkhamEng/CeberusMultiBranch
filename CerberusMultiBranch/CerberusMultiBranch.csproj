@@ -217,6 +217,14 @@
     <Compile Include="Migrations\201710300115596_transference.Designer.cs">
       <DependentUpon>201710300115596_transference.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710311843351_TransactionStatus.cs" />
+    <Compile Include="Migrations\201710311843351_TransactionStatus.Designer.cs">
+      <DependentUpon>201710311843351_TransactionStatus.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710311901166_PurchaseChanges.cs" />
+    <Compile Include="Migrations\201710311901166_PurchaseChanges.Designer.cs">
+      <DependentUpon>201710311901166_PurchaseChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -398,7 +406,7 @@
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
     <Content Include="Views\Shared\_QuickUser.cshtml" />
     <Content Include="Views\Purchases\Create.cshtml" />
-    <Content Include="Views\Purchases\Index.cshtml" />
+    <Content Include="Views\Purchases\History.cshtml" />
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Products\_ProductList.cshtml" />
@@ -455,6 +463,11 @@
     <Content Include="Views\CashRegister\_MyCashRegisterList.cshtml" />
     <Content Include="Views\CashRegister\MyDetail.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
+    <Content Include="Views\Sales\MyDetail.cshtml" />
+    <Content Include="Views\Purchases\MyPurchases.cshtml" />
+    <Content Include="Views\Purchases\_MyPurchaseList.cshtml" />
+    <Content Include="Views\Purchases\MyDetail.cshtml" />
+    <Content Include="Views\Purchases\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -479,6 +492,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710300115596_transference.resx">
       <DependentUpon>201710300115596_transference.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710311843351_TransactionStatus.resx">
+      <DependentUpon>201710311843351_TransactionStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710311901166_PurchaseChanges.resx">
+      <DependentUpon>201710311901166_PurchaseChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

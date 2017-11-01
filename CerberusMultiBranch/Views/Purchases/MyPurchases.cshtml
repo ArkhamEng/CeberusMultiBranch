@@ -6,7 +6,7 @@
 
 <h3>
     <span class="fa fa-shopping-bag" style="float:left"></span>
-    &nbsp;&nbsp;Historial de compras
+    &nbsp;&nbsp;Mis Compras
 </h3>
 
 <div class="col-md-7">
@@ -14,22 +14,20 @@
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtFilter", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
+            <button class="btn btn-default" type="button" id="btnSearch" title="Buscar">
+                <span class="glyphicon glyphicon-search" />
+            </button>
+            <button class="btn btn-default" type="button" id="btnClear" title="Recargar página" onclick="Reload()">
+                <span class="glyphicon glyphicon-refresh" />
+            </button>
+            <button id="btnFilter" type="button" class="btn btn-warning"  title="ver filtros"
+                    data-toggle="collapse" data-target="#divFilters">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
         </span>
     </div>
 </div>
-<div class="col-md-3">
-    <h5>
-        <label class="text-danger" id="lblTotalAmount"></label>
-    </h5>
-</div>
-<div class="col-md-2">
-    <h5>
-        <label class="text-danger" id="lblTotalQuantity"></label>
-    </h5>
-</div>
+
 
 
 <br /><br /><br />
@@ -38,14 +36,6 @@
     <div class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
-                <div class="form-group col-md-12">
-                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("BranchId", Model.Branches, "", new { @class = "form-control" })
-                    </div>
-                </div>
-
                 <div class="form-group col-md-12">
                     @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
@@ -78,24 +68,6 @@
                         @Html.TextBox("Bill", "", htmlAttributes: new { @class = "form-control" })
                     </div>
                 </div>
-
-                <div class="form-group col-md-12">
-                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Usuario", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="panel-footer">
-            <div class="btn-group">
-                <button class="btn btn-default" type="button" id="btnSearch" title="Buscar">
-                    <span class="glyphicon glyphicon-search" />
-                </button>
-                <button class="btn btn-default" type="button" id="btnClear" title="Recargar página" onclick="Reload()">
-                    <span class="glyphicon glyphicon-refresh" />
-                </button>
             </div>
         </div>
     </div>
@@ -103,7 +75,7 @@
 
 
 <div id="divPurchases">
-    @Html.Partial("_PurchaseList",Model.Purchases)
+    @Html.Partial("_MyPurchaseList",Model.Purchases)
 </div>
 <script>
     $(document).ready(function ()
@@ -115,14 +87,12 @@
             ShowLoading();
 
             var data = {
-                branchId: $("#BranchId").val(),
                 beginDate: $("#BeginDate").val(),
                 endDate: $("#EndDate").val(),
                 bill: $("#Bill").val(),
-                user: $("#User").val(),
                 provider: $("#Provider").val(),
             };
-            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            ExecuteAjax('@Url.Action("MySearch")', data, function (view)
             {
                 $("#divPurchases").html(view);
                 HideLoading();
@@ -134,7 +104,7 @@
     function Reload()
     {
         ShowLoading();
-        window.location = '@Url.Action("Index")';
+        window.location = '@Url.Action("MyPurchases")';
     }
 
 </script>

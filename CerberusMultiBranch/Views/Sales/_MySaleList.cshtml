@@ -9,8 +9,7 @@
             <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Productos")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Comisión")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Completa")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Pagado")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
             <th class="col-md-1 text-center"/>
         </tr>
     </thead>
@@ -25,10 +24,34 @@
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
                 <td align="center">@Html.DisplayFor(m =>quantity )</td>
                 <td align="center">@Html.DisplayFor(m => item.ComAmount)</td>
-                <td align="center">@Html.DisplayFor(m => item.Compleated)</td>
-                <td align="center">@Html.DisplayFor(m => item.IsPayed)</td>
+
+
+                @switch (item.Status)
+                {
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
+                        <td align="center" class="alert alert-danger">
+                            Cancelado
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                        <td align="center" class="alert alert-success">
+                            Pagado
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                        <td align="center" class="alert alert-warning">
+                            Abierto
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                        <td align="center" class="alert alert-info">
+                            Rerservado
+                        </td>
+                        break;
+                }
+
                 <td align="center">
-                    <button class="btn btn-success  btn-xs" onclick="window.location = '@Url.Action("ShopingCart", new {id = item.TransactionId})'">
+                    <button class="btn btn-success  btn-xs" onclick="window.location = '@Url.Action("MyDetail", new {id = item.TransactionId})'">
                         <span class="fa fa-eye" />
                     </button>
                 </td>
@@ -36,7 +59,7 @@
         }
     </tbody>
     @{
-        var totalCom = Model.Where(s => s.IsPayed).Sum(sale => sale.ComAmount);
+        var totalCom = Model.Where(s => s.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated).Sum(sale => sale.ComAmount);
         var totalAmount = Model.Sum(sale => sale.TotalAmount);
     }
 </table>

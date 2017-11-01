@@ -87,8 +87,8 @@
     function Search()
     {
         ShowLoading();
-        var param = {branchId:$("#BranchId").val(), beginDate: $("#BeginDate").val(), endBegin: $("#EndDate").val(), user: $("#User").val() }
-
+        var param = { branchId: $("#BranchId").val(), beginDate: $("#BeginDate").val(), endDate: $("#EndDate").val(), user: $("#User").val() }
+        console.log(param);
         ExecuteAjax('@Url.Action("Search")', param, function (view)
         {
             $("#divCashRegisterList").html(view);

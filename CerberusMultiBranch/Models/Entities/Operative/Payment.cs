@@ -8,6 +8,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 {
     public enum PaymentType
     {
+        Ninguno   = 0,
         Tarjeta   = 1, //Tarjeda Credito o débito
         Efectivo  = 2, // Efectivo
         Cheque    = 3, // Con cheque

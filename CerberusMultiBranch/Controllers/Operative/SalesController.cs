@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        [Authorize(Roles ="Supervisor")]
+        [Authorize(Roles = "Supervisor")]
         public ActionResult History()
         {
             //obtengo las sucursales configuradas para el empleado
@@ -30,27 +30,68 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null,DateTime.Today, null, null, null, null, null,true,null);
+            model.Sales = LookFor(null, DateTime.Today, null, null, null, null, null, null);
 
             return View(model);
         }
 
         [HttpPost]
-        [Authorize(Roles ="Supervisor")]
-        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, string user)
+        [Authorize(Roles = "Supervisor")]
+        public JsonResult Cancel(int transactionId, string comment)
         {
-            var model = LookFor(branchId,beginDate, endDate, folio, client, user,null,true,null );
+            try
+            {
+                //busco la venta a cancelar
+                var sale = db.Sales.Include(s => s.TransactionDetails).
+                    FirstOrDefault(s => s.TransactionId == transactionId);
+
+                //regreso los productos al stock
+                foreach (var detail in sale.TransactionDetails)
+                {
+                    var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+                    bp.LastStock = bp.Stock;
+                    bp.Stock += detail.Quantity;
+
+                    db.Entry(bp).State = EntityState.Modified;
+                }
+
+                //desactivo la venta y registo usuario, comentario y fecha de cancelación
+                sale.LastStatus = sale.Status;
+                sale.Status = TranStatus.Canceled;
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now;
+                sale.Comment = comment;
+
+                db.Entry(sale).State = EntityState.Modified;
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK", Message = "Venta Cancelada" });
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
+            string folio, string client, string user, TranStatus? status)
+        {
+            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status, null);
 
             return PartialView("_SaleList", model);
         }
 
-       
+
         [Authorize(Roles = "Supervisor")]
         public ActionResult Detail(int id)
         {
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s=> s.User).
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.User).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 FirstOrDefault(s => s.TransactionId == id && brancheIds.Contains(s.BranchId));
 
@@ -60,13 +101,28 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(sale);
         }
 
-      [Authorize(Roles = "Vendedor")]
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult MyDetail(int id)
+        {
+            var brancheId = User.Identity.GetBranchId();
+
+            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.User).
+                Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
+                FirstOrDefault(s => s.TransactionId == id && s.BranchId == brancheId);
+
+            if (sale == null)
+                return RedirectToAction("MyHistory");
+
+            return View(sale);
+        }
+
+        [Authorize(Roles = "Vendedor")]
         public ActionResult MySales()
         {
             var bId = User.Identity.GetBranchId();
 
             TransactionViewModel model = new TransactionViewModel();
-            model.Sales = LookFor(bId,DateTime.Today, null, null, null,null,null,true,User.Identity.GetUserId());
+            model.Sales = LookFor(bId, DateTime.Today, null, null, null, null, null, User.Identity.GetUserId());
 
             return View(model);
         }
@@ -76,20 +132,20 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult SearchPerUser(DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
             var bId = User.Identity.GetBranchId();
-            var model = LookFor(bId,beginDate, endDate, folio, client,null,null,true,User.Identity.GetUserId());
+            var model = LookFor(bId, beginDate, endDate, folio, client, null, null, User.Identity.GetUserId());
 
             return PartialView("_MySaleList", model);
         }
 
 
-        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client, 
-            string user, bool? isPayed, bool? compleated, string userId)
+        private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client,
+            string user, TranStatus? status, string userId)
         {
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.TransactionDetails)
-                         where 
+                         where
                             (branchId == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
                          && (endDate == null || p.TransactionDate <= endDate)
@@ -97,9 +153,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                          && (client == null || client == string.Empty || p.Client.Name.Contains(client))
                          && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                          && (userId == null || userId == string.Empty || p.UserId == userId)
-                         && (isPayed == null ||  p.IsPayed == isPayed) 
-                         &&  (compleated == null || p.Compleated == compleated)
-                         select p).OrderByDescending(p=> p.TransactionDate).ToList();
+                         && (status == null || p.Status == status)
+                         select p).OrderByDescending(p => p.TransactionDate).ToList();
 
             return sales;
         }
@@ -112,7 +167,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
             var sale = db.Sales.Include(s => s.TransactionDetails).
-                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && s.Compleated == false);
+                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && s.Status == TranStatus.InProcess);
 
             if (sale != null)
             {
@@ -139,16 +194,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.SaveChanges();
 
                 return Json(new { Result = "OK" });
-
             }
             catch (Exception ex)
             {
                 return Json(new { Result = "Error Al asignar el cliente", Data = ex.Message });
             }
-
         }
 
         [HttpPost]
+        [Authorize(Roles = "Vendedor")]
         public JsonResult SetNewPrice(int productId, int transactionId, double price)
         {
             try
@@ -170,26 +224,20 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-     
-
         [Authorize(Roles = "Vendedor")]
-        public ActionResult ShopingCart(int? id)
+        public ActionResult ShopingCart()
         {
             SaleViewModel model;
             var branchId = User.Identity.GetBranchId();
-            string userId = null;
-            if (id==null)
-                userId = User.Identity.GetUserId();
-
+            string userId = User.Identity.GetUserId();
 
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                 Include(s => s.TransactionDetails.Select(td => td.Product)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-                
-                FirstOrDefault(s => (userId ==null || s.UserId == userId)
-                               && (id != null || s.Compleated == false)
-                               && (id == null || s.TransactionId == id )
+
+                FirstOrDefault(s => (userId == null || s.UserId == userId)
+                               && (s.Status == TranStatus.InProcess)
                                && s.BranchId == branchId);
 
             if (sale != null)
@@ -201,20 +249,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 model = new SaleViewModel(sale);
             }
-                
+
             else
             {
-                model = new SaleViewModel();
-                model.UserId = userId;
+                model          = new SaleViewModel();
+                model.UpdDate  = DateTime.Now;
+                model.UserId   = userId;
                 model.BranchId = branchId;
                 model.TransactionDetails = new List<TransactionDetail>();
             }
-            if (id == null)
-            {
-                model.Categories = db.Categories.ToSelectList();
-                model.CarMakes = db.CarMakes.ToSelectList();
-            }
 
+            model.Categories = db.Categories.ToSelectList();
+            model.CarMakes   = db.CarMakes.ToSelectList();
+
+            model.UpdUser = User.Identity.Name;
             return View(model);
         }
 
@@ -266,7 +314,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(j);
             }
 
-            var sale = db.Sales.FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && !s.Compleated);
+            var sale = db.Sales.FirstOrDefault(s => s.UserId == userId && s.BranchId == branchId && s.Status == TranStatus.InProcess);
 
             var amount = (quantity * price);
             //if there is no transaction, create a new one
@@ -278,13 +326,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                     BranchId = branchId,
                     TransactionDate = DateTime.Now,
                     UpdDate = DateTime.Now,
-                    Folio = Cons.CodeMask
+                    UpdUser = User.Identity.Name,
+                    Folio = Cons.CodeMask,
+                    LastStatus = TranStatus.InProcess,
+                    Status = TranStatus.InProcess
                 };
 
                 db.Sales.Add(sale);
                 db.SaveChanges();
             }
-          
+
             if (sale.TransactionId > Cons.Zero)
             {
                 //check if the product is already added to the transaction
@@ -325,8 +376,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 sale.TotalAmount += amount;
 
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
+                try
+                {
+                    db.Entry(sale).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { Result = "Error", Message = ex.Message });
+                }
+
             }
 
             var js = new { Result = "OK" };
@@ -358,7 +417,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                         //actualizo stock de sucursal
                         pb.LastStock = pb.Stock;
-                        pb.Stock     = pb.Stock - detail.Quantity;
+                        pb.Stock -= detail.Quantity;
 
                         db.Entry(pb).State = EntityState.Modified;
                     }
@@ -372,11 +431,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     //si tiene comision por venta, coloco la cantidad de esta
                     if (sale.ComPer > Cons.Zero)
-                        sale.ComAmount = Math.Round(sale.TotalAmount * (1d / sale.ComPer), Cons.Two);
+                        sale.ComAmount = Math.Round(sale.TotalAmount * (sale.ComPer / Cons.OneHundred), Cons.Two);
 
                     //ajuto la hora y fecha de venta a la actual y concluyo
                     sale.TransactionDate = DateTime.Now;
-                    sale.Compleated      = true;
+                    sale.Status = TranStatus.Reserved;
+                    sale.LastStatus = TranStatus.InProcess;
+                    sale.UpdUser = User.Identity.Name;
+                    sale.UpdDate = DateTime.Now;
 
                     db.Entry(sale).State = EntityState.Modified;
                     db.SaveChanges();
@@ -389,7 +451,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db = null;
 
                     var model = GetVM(sale.TransactionId);
-                    ViewBag.Header  = "Error al cerrar la venta!";
+                    ViewBag.Header = "Error al cerrar la venta!";
                     ViewBag.Message = ex.Message;
                     return View("ShopingCart", model);
                 }
@@ -400,7 +462,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db = null;
 
                 var model = GetVM(sale.TransactionId);
-                ViewBag.Header  = "Datos inválidos!";
+                ViewBag.Header = "Datos inválidos!";
                 ViewBag.Message = "No se pudo concretar venta debido un error en los datos de ingreso";
                 return View("ShopingCart", model);
             }
@@ -417,7 +479,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                                      Include(s => s.TransactionDetails.Select(td => td.Product)).
                                      Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                                     Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).FirstOrDefault(s => s.TransactionId == id);
+                                     Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+                                     FirstOrDefault(s => s.TransactionId == id);
 
             SaleViewModel model = new SaleViewModel(sale);
             model.Categories = db.Categories.ToSelectList();
@@ -427,7 +490,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-   
+
 
         protected override void Dispose(bool disposing)
         {

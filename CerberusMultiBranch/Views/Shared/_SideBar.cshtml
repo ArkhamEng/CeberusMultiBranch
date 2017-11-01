@@ -47,7 +47,8 @@
 
         @if (User.IsInRole("Capturista"))
         {
-            <li><a href="/Purchases/Create" onclick="ShowLoading()">&nbsp;Registrar Compra<span class="fa fa-shopping-basket" style="float:left" /></a></li>
+            <li><a href="/Purchases/Create" onclick="ShowLoading()">&nbsp;Registrar Compra<span class="fa fa-cart-plus" style="float:left" /></a></li>
+            <li><a href="/Purchases/MyPurchases" onclick="ShowLoading()">&nbsp;Mis Compras<span class="fa fa-shopping-basket" style="float:left" /></a></li>
         }
 
         @if (User.IsInRole("Supervisor"))
@@ -57,7 +58,7 @@
                     &nbsp;Reportes<span class="glyphicon glyphicon-duplicate" style="float:left" />
                 </a>
                 <ul class="collapse list-unstyled" id="reports">
-                    <li><a href="/Purchases/" onclick="ShowLoading()">&nbsp;Historial compras<span class="fa fa-file-text" style="float:left" /></a></li>
+                    <li><a href="/Purchases/History" onclick="ShowLoading()">&nbsp;Historial compras<span class="fa fa-file-text" style="float:left" /></a></li>
                     <li><a href="/Sales/History" onclick="ShowLoading()">&nbsp;Historial ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
                     <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-file-text-o" style="float:left" /></a></li>
                 </ul>

@@ -3,15 +3,14 @@
 <table id="tbSales" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-1 text-center">@Html.DisplayName("Sucursal")</th>
+            <th class="col-md-2 text-center">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
             <th class="col-md-3 text-center">@Html.DisplayName("Cliente")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Usuario")</th>
             <th class="col-md-2 text-center">@Html.DisplayName("Fecha venta")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Tipo pago")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Tipo pago")</th>
             <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Pagado")</th>
-            <th class="col-md-1 text-center" />
+            <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
+            <th class="col-md-1 text-right" />
         </tr>
     </thead>
     <tbody>
@@ -21,20 +20,43 @@
                 <td>@Html.DisplayFor(m => item.Branch.Name)</td>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
                 <td>@Html.DisplayFor(m => item.Client.Name)</td>
-                <td>@Html.DisplayFor(m => item.User.UserName)</td>
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
                 <td align="center">@item.PaymentType.ToString()</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
-                <td align="center">@Html.DisplayFor(m => item.IsPayed)</td>
-                <td >
-                    <button class="btn btn-primary  btn-xs" title="Ver detalle" 
+
+
+               @switch (item.Status)
+                {
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
+                    <td align="center" class="alert alert-danger">
+                        Cancelado
+                    </td>
+                       break;
+                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                    <td align="center" class="alert alert-success">
+                        Pagado
+                    </td>
+                       break;
+                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                    <td align="center" class="alert alert-warning">
+                        Abierto
+                    </td>
+                       break;
+                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                    <td align="center" class="alert alert-info">
+                        Rerservado
+                    </td>
+                       break;
+               }
+                <td align="center">
+                    <button class="btn btn-primary  btn-xs" title="Ver detalle"
                             onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.TransactionId })'">
                         <span class="fa fa-eye" />
                     </button>
                 </td>
             </tr>
-          }
+        }
     </tbody>
     @{
         var totalQuantity = Model.Sum(sale => sale.TransactionDetails.Sum(s => s.Quantity));
@@ -56,5 +78,5 @@
         $("#lblTotalQuantity").text(tQuantity);
     });
 
-   
+
 </script> 

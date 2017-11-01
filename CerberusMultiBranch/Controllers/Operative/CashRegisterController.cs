@@ -83,7 +83,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Supervisor")]
-        public ActionResult Search(int branchId, DateTime? beginDate, DateTime? endDate, string user)
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string user)
         {
             var model = LookForCashReg(branchId, beginDate, endDate, user);
 
@@ -249,11 +249,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
            var branchId = User.Identity.GetBranchId();
 
+            //busco las ventas de la sucursal que esten reservadas o completadas (ya pagadas)
             var sales = db.Sales.Where(s => s.BranchId == branchId &&
             (begin == null || s.TransactionDate >= begin) &&
             (end == null || s.TransactionDate <= end) &&
             (folio == null || folio == string.Empty || s.Folio == folio) &&
-            s.Compleated).Include(s=> s.TransactionDetails).Include(s=> s.User).OrderByDescending(s=> s.TransactionDate).ToList();
+            (s.Status == TranStatus.Reserved || s.Status == TranStatus.Compleated)).
+            Include(s=> s.TransactionDetails).Include(s=> s.User).OrderByDescending(s=> s.TransactionDate).ToList();
 
             return sales;
         }
@@ -262,12 +264,12 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult PrintNote(int id)
         {
-
+            // busco la venta con el id provisto validando que ya tenga status compleated (pagada)
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
              Include(s => s.TransactionDetails.Select(td => td.Product)).
              Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
              Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-             FirstOrDefault(s => s.TransactionId == id && s.IsPayed);
+             FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated);
 
             return View(sale);
         }
@@ -275,11 +277,12 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult RegistPayment(int id)
         {
+            //obtengo la venta con el id dado verificando que este en status Reserved
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                        Include(s => s.TransactionDetails.Select(td => td.Product)).
                        Include(s => s.User).
                        Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id && !s.IsPayed && s.Compleated);
+                       FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Reserved);
 
             if (sale == null)
                 return RedirectToAction("Index");
@@ -294,11 +297,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a pagar
-                var sale = db.Sales.Include(s => s.TransactionDetails).FirstOrDefault(s => s.TransactionId == transactionId);
+                var sale = db.Sales.Include(s => s.TransactionDetails).
+                    FirstOrDefault(s => s.TransactionId == transactionId);
+
                 //marco la venta como pagada y coloco el tipo de pago
-                sale.IsPayed = true;
-                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
-                sale.Payments = new List<Payment>();
+                sale.Status         = TranStatus.Compleated;
+                sale.UpdDate        = DateTime.Now;
+                sale.UpdUser        = User.Identity.Name;
+                sale.PaymentType    = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
+                sale.Payments       = new List<Payment>();
 
                 #region Registros de pago
                 //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
@@ -310,7 +317,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         TransactionId = sale.TransactionId,
                         Amount = sale.TotalAmount,
                         PaymentDate = DateTime.Now,
-                        PaymentType = sale.PaymentType.Value,
+                        PaymentType = sale.PaymentType,
                     };
                     sale.Payments.Add(p);
                 }
@@ -319,10 +326,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                 {
                     var pm = new Payment
-                    { TransactionId = sale.TransactionId, Amount = cash.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
+                    { TransactionId = sale.TransactionId, Amount = cash.Value,
+                        PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
 
                     var pc = new Payment
-                    { TransactionId = sale.TransactionId, Amount = card.Value, PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
+                    { TransactionId = sale.TransactionId, Amount = card.Value,
+                        PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
 
                     sale.Payments.Add(pm);
                     sale.Payments.Add(pc);
@@ -368,7 +377,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new
                 {
                     Result = "Error al registrar el pago!",
-                    Message = "Detalle de la excepción " + ex.Message + " " + ex.InnerException != null ? ex.InnerException.Message : string.Empty
+                    Message = "Detalle de la excepción " + ex.Message + " " 
+                    + ex.InnerException != null ? ex.InnerException.Message : string.Empty
                 });
             }
         }

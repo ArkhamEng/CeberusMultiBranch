@@ -14,7 +14,7 @@
     <span class="fa fa-shopping-cart" style="float:left"></span>
     &nbsp;&nbsp;Carrito de Venta
 </h3>
-
+<hr />
 
 @using (Html.BeginForm("ShopingCart", "Sales"))
 {
@@ -24,10 +24,11 @@
     @Html.HiddenFor(m => m.BranchId)
     @Html.HiddenFor(m => m.TransactionId)
     @Html.HiddenFor(m => m.UserId)
-    @Html.HiddenFor(m => m.IsPayed)
-    @Html.HiddenFor(m => m.Compleated)
+    @Html.HiddenFor(m => m.Status)
     @Html.HiddenFor(m => m.ClientId)
     @Html.HiddenFor(m => m.Folio)
+    @Html.HiddenFor(m => m.UpdUser)
+    @Html.HiddenFor(m => m.UpdDate)
 
 
     if (Model.Client != null)
@@ -40,7 +41,7 @@
     {
         <h4 id="hClientName" class="text-danger"></h4>
     }
-    if (!Model.Compleated)
+    if (Model.Status ==  CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess )
     {
         @Html.Partial("_ProductSearchFilters", Model)
     }
@@ -72,7 +73,7 @@
             <div class="col-md-6 btn-group">
                 @if (Model.TransactionDetails.Count > 0)
                 {
-                    if (!Model.Compleated)
+                    if (Model.Status== CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess)
                     {
 
                         <button id="btnShowClients" class="btn btn-success" type="button">
@@ -106,7 +107,7 @@
         if ('@ViewBag.Message'.length > 0)
             ShowMessage("Error inesperado", '@ViewBag.Message', 'warning');
 
-        if ('@Model.Compleated' == 'false')
+        if ('@Model.Status' == '@CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess')
        {
              SetCascade("#CarMakeId", "#CarModelId", "GetModels");
 

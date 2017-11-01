@@ -24,38 +24,99 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Purchases
-        public ActionResult Index()
+
+
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult History()
         {
             //obtengo las sucursales configuradas para el empleado
             var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
+            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null,null);
 
-            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null);
+            return View(model);
+        }
+
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Detail(int id)
+        {
+            //obtengo las sucursales configuradas para el empleado
+            var brancheIds = User.Identity.GetBranches().Select(b=> b.BranchId);
+
+            var purchase = db.Purchases.Include(p => p.TransactionDetails).Include(p=> p.User).
+                   Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
+                   FirstOrDefault(p => p.TransactionId == id && brancheIds.Contains(p.BranchId));
+
+            if (purchase == null)
+                return RedirectToAction("History");
+
+            return View(purchase);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
+            string bill, string provider, string user)
+        {
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user,null);
+            return PartialView("_PurchaseList", model);
+        }
+
+        [Authorize(Roles = "Capturista")]
+        public ActionResult MyPurchases()
+        {
+            var branchId = User.Identity.GetBranchId();
+            var userId = User.Identity.GetUserId();
+
+            TransactionViewModel model = new TransactionViewModel();
+            model.Purchases = LookFor(branchId, DateTime.Today, null, null, null, null, userId);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user)
+        [Authorize(Roles = "Capturista")]
+        public ActionResult MySearch(DateTime? beginDate, DateTime? endDate, string bill, string provider)
         {
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user);
-            return PartialView("_PurchaseList", model);
+            var branchId = User.Identity.GetBranchId();
+            var userId = User.Identity.GetUserId();
+
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, null,userId);
+            return PartialView("_MyPurchaseList", model);
+        }
+
+      
+        [Authorize(Roles = "Capturista")]
+        public ActionResult MyDetail(int id)
+        {
+            var userId = User.Identity.GetUserId();
+
+            var model = db.Purchases.Include(p=> p.TransactionDetails).
+                Include(p=> p.TransactionDetails.Select(td=> td.Product.Images)).
+                FirstOrDefault(p => p.TransactionId == id && p.UserId == userId);
+
+            if (model == null)
+                return RedirectToAction("MyPurchases");
+
+            return View(model);
         }
 
 
-
-        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user)
+        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user,string userId)
         {
+            //si el filtro de sucursal viene nulo
+            //Busco las compras hechas en las sucursales asignadas del usuario
+            var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
-                             where (branchId == null || p.BranchId == branchId)
+                             where (branchId == null || branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
                              && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
+                             && (userId == null ||  p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                              select p).ToList();
 
@@ -63,8 +124,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-
-
+        [Authorize(Roles = "Capturista")]
         public ActionResult Create(int? id)
         {
             Transaction model = null;
@@ -77,28 +137,25 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (model == null)
             {
-                model = new Purchase();
-                model.UserId = User.Identity.GetUserId<string>();
+                model          = new Purchase();
+                model.UserId   = User.Identity.GetUserId<string>();
                 model.BranchId = User.Identity.GetBranchSession().Id;
+                model.UpdUser  = User.Identity.Name;
             }
-
-            //var employee = db.Employees.FirstOrDefault(e => e.UserId == model.UserId);
-            //model.EmployeeName = employee.Name;
-            //model.EmployeeId = employee.EmployeeId;
 
             return View("Create", model);
         }
 
-        // POST: Purchases/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Capturista")]
         public ActionResult Create([Bind(Exclude = "User,Provider")] Purchase purchase)
         {
             if (ModelState.IsValid)
             {
-                purchase.IsPayed = (purchase.PaymentType == PaymentType.Contado);
+                purchase.UpdDate = DateTime.Now;
+                purchase.UpdUser = User.Identity.Name;
 
                 if (purchase.TransactionId == Cons.Zero)
                     db.Purchases.Add(purchase);
@@ -109,11 +166,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.Entry(purchase).State = EntityState.Modified;
                 }
 
-                if (purchase.Inventoried)
+                if (purchase.Status == TranStatus.Compleated)
                 {
                     var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
 
-                    if (purchase.IsPayed)
+                    if (purchase.PaymentType == PaymentType.Contado)
                     {
                         Payment p = new Payment();
                         p.Amount = purchase.TotalAmount;
@@ -146,9 +203,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
 
-                            prod.BuyPrice = newPrice;
-                            prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
+                            prod.BuyPrice        = newPrice;
+                            prod.DealerPrice     = newPrice.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice      = newPrice.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -292,7 +349,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
 
             return PartialView("_CloneProduct", vm);
-
         }
 
         [HttpPost]
@@ -342,7 +398,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var detail = db.TransactionDetails.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+                var detail = db.TransactionDetails.
+                    FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
 
                 if (detail != null)
                 {
@@ -397,9 +454,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_Details", model);
         }
 
-        // POST: Purchases/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit([Bind(Include = "PurchaseId,ProviderId,BranchId,TotalAmount,Bill,PurchaseDate,InsDate,UpdDate,EmployeeId")] Transaction purchase)

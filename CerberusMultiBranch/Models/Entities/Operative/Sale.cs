@@ -16,12 +16,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Folio { get; set; }
 
-        public bool Compleated { get; set; }
-
         public int ComPer { get; set; }
 
         public double ComAmount { get; set; }
 
+      
         public virtual Client Client { get; set; }
 
     }
