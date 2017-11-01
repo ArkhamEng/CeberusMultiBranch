@@ -64,6 +64,52 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_PurchaseList", model);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public JsonResult Cancel(int transactionId, string comment)
+        {
+            try
+            {
+                //busco la venta a cancelar
+                var sale = db.Purchases.Include(s => s.TransactionDetails).
+                    FirstOrDefault(s => s.TransactionId == transactionId);
+
+                //regreso los productos al stock
+                foreach (var detail in sale.TransactionDetails)
+                {
+                    var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+
+                    if(bp.Stock < detail.Quantity)
+                    {
+                        return Json(new { Result = "Error al cancelar la compra",
+                            Message = "No hay producto suficiente para realizar la devolución" });
+                    }
+
+                    bp.LastStock = bp.Stock;
+                    bp.Stock -= detail.Quantity;
+
+                    db.Entry(bp).State = EntityState.Modified;
+                }
+
+                //desactivo la venta y registo usuario, comentario y fecha de cancelación
+                sale.LastStatus = sale.Status;
+                sale.Status = TranStatus.Canceled;
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now;
+                sale.Comment = comment;
+
+                db.Entry(sale).State = EntityState.Modified;
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK", Message = "Compra Cancelada, el producto ha sido regreado al stock" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al cancelar la compra", Message = ex.Message });
+            }
+        }
+
         [Authorize(Roles = "Capturista")]
         public ActionResult MyPurchases()
         {

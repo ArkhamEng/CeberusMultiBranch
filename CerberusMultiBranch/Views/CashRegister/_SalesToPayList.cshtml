@@ -10,7 +10,7 @@
             <th class="col-md-2 text-center">@Html.DisplayName("Tipo pago")</th>
             <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Productos")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Pagado")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
             <th class="col-md-1 text-center" />
         </tr>
     </thead>
@@ -26,21 +26,31 @@
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
                 <td align="center">@Html.DisplayFor(m => quantity)</td>
-                <td align="center">@Html.DisplayFor(m => item.IsPayed)</td>
-                <td align="center">
-                    @if (item.IsPayed)
-                    {
-                        <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("PrintNote", new { id = item.TransactionId })'">
-                            <span class="fa fa-file-text-o" />
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("RegistPayment", new { id = item.TransactionId })'">
-                            <span class="fa fa-money" />
-                        </button>
-                    }
-                </td>
+
+                @switch (item.Status)
+                {
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                        <td align="center" class="alert alert-success">
+                            Pagado
+                        </td>
+                        <td align="center">
+                            <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("PrintNote", new { id = item.TransactionId })'">
+                                <span class="fa fa-file-text-o" />
+                            </button>
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                        <td align="center" class="alert alert-info">
+                            Rerservado
+                        </td>
+                        <td align="center">
+                            <button class="btn btn-danger  btn-xs" title="Recibir pago" onclick="window.location = '@Url.Action("RegistPayment", new { id = item.TransactionId })'">
+                                <span class="fa fa-money" />
+                            </button>
+                        </td>
+                        break;
+                }
+
             </tr>
           }
     </tbody>
@@ -52,7 +62,7 @@
 
 
 <script>
-    $(document).ready(function ()
+    $(document).ready(function () 
     {
         SetDataTable("#tbSales", "#txtFilter");
 

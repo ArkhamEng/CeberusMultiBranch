@@ -1,0 +1,30 @@
+﻿
+
+<div id="ModalCancel" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Cancelación de transacción</h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="col-md-12">
+                    @Html.Label("Agrega un comentario de cancelación", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                        <textarea id="txtComment" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+
+              
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" type="button" title="Confirmar cancelación" onclick="Cancel()">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+

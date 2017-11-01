@@ -11,7 +11,7 @@
 </h3>
 
 
-
+@Html.HiddenFor(m=> m.TransactionId)
 <div class="panel-group">
     <div class="panel panel-danger">
         <div class="panel-body">
@@ -161,7 +161,8 @@
                                         onclick="ShowLoading(); window.location='@Url.Action("History")'">
                                     <span class="fa fa-search-plus"></span>
                                 </button>
-                                <button type="button" class="btn btn-danger" title="cancelar venta">
+                                <button type="button" class="btn btn-danger" title="cancelar venta" 
+                                        onclick="BeginCancel()">
                                     <span class="fa fa-times"></span>
                                     Cancelar
                                 </button>
@@ -232,8 +233,33 @@
     </div>
 </div>
 
+@Html.Partial("_Cancelation")
+
 <script>
-    $(document).ready(function () {
-        Paginate("#tbDetails", 5)
+    $(document).ready(function ()
+    {
+        Paginate("#tbDetails", 5);
     });
+
+    function BeginCancel()
+    {
+        $("#ModalCancel").modal("show");
+    }
+
+    function Cancel()
+    {
+        $("#ModalCancel").modal("hide");
+        ShowLoading();
+
+        var param = { transactionId: $("#TransactionId").val(), comment: $("#txtComment").val() }
+
+        ExecuteAjax('@Url.Action("Cancel")', param, function (j)
+        {
+            if (j.Result = 'OK')
+                window.location = window.location;
+            else
+                ShowMessage(j.Result, j.Message, 'warning');
+        });
+    }
+
 </script>

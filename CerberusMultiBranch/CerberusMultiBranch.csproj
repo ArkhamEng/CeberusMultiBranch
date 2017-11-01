@@ -468,6 +468,7 @@
     <Content Include="Views\Purchases\_MyPurchaseList.cshtml" />
     <Content Include="Views\Purchases\MyDetail.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
+    <Content Include="Views\Shared\_Cancelation.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -3,14 +3,14 @@
 <table id="tbPurchases" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-1">@Html.DisplayName("Sucursal")</th>
+            <th class="col-md-2">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
-            <th class="col-md-3">@Html.DisplayName("Proveedor")</th>
-            <th class="col-md-1">@Html.DisplayName("Usuario")</th>
+            <th class="col-md-4">@Html.DisplayName("Proveedor")</th>
+    
             <th class="col-md-1">@Html.DisplayName("Tipo")</th>
             <th class="col-md-1">@Html.DisplayName("Fecha")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="col-md-1">@Html.DisplayName("Productos")</th>
+         
             <th class="col-md-1">@Html.DisplayName("Estado")</th>
             <th class="col-md-1"/>
         </tr>
@@ -22,13 +22,12 @@
                 <td>@Html.DisplayFor(m => item.Branch.Name)</td>
                 <td>@Html.DisplayFor(m => item.Bill)</td>
                 <td>@Html.DisplayFor(m => item.Provider.Name)</td>
-                <td>@Html.DisplayFor(m => item.User.UserName)</td>
+   
                 <td align="center">@item.PaymentType.ToString()</td>
                 <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 
-                @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
-                <td align="center">@Html.DisplayFor(m =>quantity )</td>
+             
 
                 @switch (item.Status)
                 {

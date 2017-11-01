@@ -1,7 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 
 @{
-    ViewBag.Title = "Registrar pago";
+    ViewBag.Title = "Registro de pago";
 }
 
 
@@ -64,7 +64,7 @@
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input class="form-control" value="@Model.TotalAmount.ToString("c")" readonly />
+                        <input class="form-control" id="lblTotalAmount" value="@Model.TotalAmount.ToString("c")" readonly />
                     </div>
                 </div>
             </div>
@@ -150,8 +150,8 @@
 
     function Calculate(val)
     {
-        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
-
+        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
+        console.log("Val "+val+" total "+total);
         var result = (total - val);
 
         return (total - parseFloat(val));
@@ -160,7 +160,7 @@
 
     function GetChange(val)
     {
-        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
         return (parseFloat(val) - total);
     }
 

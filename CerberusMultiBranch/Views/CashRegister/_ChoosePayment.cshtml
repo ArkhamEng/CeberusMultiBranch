@@ -174,7 +174,7 @@
             param = {
                 transactionId: $("#TransactionId").val(),
                 payment: $("#rdCash").val(),
-                cash: $("#lblTotalAmount").val().replace(/[$,]+/g, "") };
+                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "") };
         }
 
         else if ($("#rdCard").is(":checked"))
@@ -182,7 +182,7 @@
             param = {
                 transactionId: $("#TransactionId").val(),
                 payment: $("#rdCard").val(),
-                cash: $("#lblTotalAmount").val().replace(/[$,]+/g, "")
+                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
             };
         }
         else

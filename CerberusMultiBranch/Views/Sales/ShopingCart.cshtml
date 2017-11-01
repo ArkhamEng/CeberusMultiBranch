@@ -32,7 +32,7 @@
 
 
     if (Model.Client != null)
-    {   <h4 id="hClientName" class="text-danger">
+    {   <h4 id="hClientName" class="text-success text-uppercase">
         @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         RFC:&nbsp;&nbsp;@Model.Client.FTR
     </h4>
@@ -81,7 +81,7 @@
                             Cargo a cliente
                         </button>
 
-                        <button class="btn btn-primary" type="submit" id="btnCompleate">
+                        <button class="btn btn-primary" type="submit" id="btnCompleate" onclick="ShowLoading()">
                             <span class="fa fa-upload"></span>
                             Terminar venta
                         </button>
@@ -136,7 +136,8 @@
         });
     }
 
-    function ClientSelected(id, name, ftr) {
+    function ClientSelected(id, name, ftr)
+    {
         $("#ClientId").val(id);
 
         var param = { clientId: id, transactionId: $("#TransactionId").val() }

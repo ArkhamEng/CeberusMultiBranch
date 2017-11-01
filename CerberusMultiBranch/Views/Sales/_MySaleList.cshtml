@@ -51,7 +51,7 @@
                 }
 
                 <td align="center">
-                    <button class="btn btn-success  btn-xs" onclick="window.location = '@Url.Action("MyDetail", new {id = item.TransactionId})'">
+                    <button class="btn btn-success  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("MyDetail", new {id = item.TransactionId})'">
                         <span class="fa fa-eye" />
                     </button>
                 </td>

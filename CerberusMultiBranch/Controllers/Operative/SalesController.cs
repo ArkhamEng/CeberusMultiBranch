@@ -49,6 +49,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 foreach (var detail in sale.TransactionDetails)
                 {
                     var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+
                     bp.LastStock = bp.Stock;
                     bp.Stock += detail.Quantity;
 
@@ -66,12 +67,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = "Venta Cancelada" });
+                return Json(new { Result = "OK", Message = "Venta Cancelada, el producto ha sido regreado al stock" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
-                throw;
+                return Json(new { Result = "Error al cancelar la venta", Message =ex.Message });
             }
         }
 
