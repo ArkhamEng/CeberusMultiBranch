@@ -253,10 +253,14 @@
 
         ExecuteAjax('@Url.Action("Cancel")', param, function (j)
         {
-            if (j.Result = 'OK')
+            if (j.Result == 'OK')
                 window.location = window.location;
             else
+            {
+                HideLoading();
                 ShowMessage(j.Result, j.Message, 'warning');
+            }
+                
         });
     }
 

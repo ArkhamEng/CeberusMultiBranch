@@ -183,6 +183,9 @@
                             @Html.DisplayName("Código")
                         </th>
                         <th>
+                            @Html.DisplayName("SAT")
+                        </th>
+                        <th>
                             @Html.DisplayName("Descripción")
                         </th>
                         <th>
@@ -212,6 +215,9 @@
                             </td>
                             <td class="text-center">
                                 @Html.DisplayFor(m => item.Product.Code)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Product.Category.SatCode)
                             </td>
                             <td>
                                 @Html.DisplayFor(m => item.Product.Name)

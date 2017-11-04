@@ -43,21 +43,22 @@
                             </span>
                         </div>
                     </div>
-                    <div class="col-md-3 col-md-offset-1">
-                        @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
-                        <div class="form-control">
-                            <label class="radio-inline"><input id="rdCredit" type="radio" value="5" name="PaymentType">Crédito</label>
-                            <label class="radio-inline"><input id="rdCash" type="radio" value="6" name="PaymentType">Contado</label>
-                        </div>
-                    </div>
 
-                    <div class="col-md-2">
+                    <div class="col-md-3  col-md-offset-1">
                         @Html.LabelFor(model => model.TransactionDate, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
                             @Html.EditorFor(model => model.TransactionDate, new { htmlAttributes = new { @class = "form-control" } })
                         </div>
                         @Html.ValidationMessageFor(model => model.TransactionDate, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-2">
+                        @Html.LabelFor(model => model.Expiration, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            @Html.EditorFor(model => model.Expiration, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Expiration, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="row">
@@ -69,33 +70,46 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
                     </div>
-                    <div class="col-md-2 col-md-offset-4">
-                        @Html.LabelFor(model => model.Expiration, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                            @Html.EditorFor(model => model.Expiration, new { htmlAttributes = new { @class = "form-control" } })
+
+                    <div class="col-md-3 col-md-offset-1">
+                        @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
+                        <div class="form-control">
+                            <label class="radio-inline"><input id="rdCredit" type="radio" value="5" name="PaymentType">Crédito</label>
+                            <label class="radio-inline"><input id="rdCash" type="radio" value="6" name="PaymentType">Contado</label>
                         </div>
-                        @Html.ValidationMessageFor(model => model.Expiration, "", new { @class = "text-danger" })
+                    </div>
+                 
+                    <div class="form-group col-md-3">
+                        @Html.LabelFor(model => model.TotalAmount, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group col-md-10">
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            
+                            @Html.HiddenFor(m=> m.TotalAmount)
+                            <label id="lblTotalAmount" class="form-control alert alert-warning text-right">
+                                @Model.TotalAmount.ToString("c")
+                            </label>
+                            @*<input name="TotalAmount" readonly class="alert alert-warning" value="@total" />*@
+                            @*@Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })*@
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="panel-footer">
-                <div class="clearfix row">
+
+                <div class="row">
                     <div class="btn-group col-md-6">
+                        <button type="button" class="btn btn-info" title="Nueva búsqueda" onclick="ShowLoading(); window.location='@Url.Action("MyPurchases")'">
+                            <span class="fa fa-search-plus"></span>
+                        </button>
                         @Html.Partial("_CatalogButtonGroup")
                         <button id="btnCompleate" type="button" class="btn btn-warning Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">
                             <span class="fa fa-cubes"></span>
                         </button>
                     </div>
 
-                    <div class="form-group col-md-3 col-md-offset-3">
-                        <div class="input-group col-md-10">
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.TotalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
+              
+            
         </div>
         <div class="panel panel-default">
             <div id="divDetails" class="panel-body">
@@ -122,6 +136,8 @@
 
 <div id="divClone"></div>
 
+
+
 @Html.Partial("_SearchExternalProduct")
 
 @Html.Partial("_SearchInternalProduct")
@@ -137,6 +153,8 @@
     $(document).ready(function ()
     {
         LoadPopoverCompleate();
+
+        $("#btnNewSearch").hide();
 
         if ('@Model.TransactionId' == 0)
         {

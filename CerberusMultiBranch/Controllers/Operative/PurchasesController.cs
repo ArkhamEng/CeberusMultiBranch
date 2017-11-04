@@ -34,7 +34,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null,null);
+            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null, null);
 
             return View(model);
         }
@@ -43,9 +43,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Detail(int id)
         {
             //obtengo las sucursales configuradas para el empleado
-            var brancheIds = User.Identity.GetBranches().Select(b=> b.BranchId);
+            var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var purchase = db.Purchases.Include(p => p.TransactionDetails).Include(p=> p.User).
+            var purchase = db.Purchases.Include(p => p.TransactionDetails).Include(p => p.User).
                    Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
                    FirstOrDefault(p => p.TransactionId == id && brancheIds.Contains(p.BranchId));
 
@@ -60,7 +60,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
             string bill, string provider, string user)
         {
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user,null);
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, null);
             return PartialView("_PurchaseList", model);
         }
 
@@ -71,34 +71,51 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a cancelar
-                var sale = db.Purchases.Include(s => s.TransactionDetails).
+                var purchase = db.Purchases.Include(s => s.TransactionDetails).
                     FirstOrDefault(s => s.TransactionId == transactionId);
 
                 //regreso los productos al stock
-                foreach (var detail in sale.TransactionDetails)
+                foreach (var detail in purchase.TransactionDetails)
                 {
-                    var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+                    var bp = db.BranchProducts.Find(purchase.BranchId, detail.ProductId);
 
-                    if(bp.Stock < detail.Quantity)
+                    if (bp.Stock < detail.Quantity)
                     {
-                        return Json(new { Result = "Error al cancelar la compra",
-                            Message = "No hay producto suficiente para realizar la devolución" });
+                        return Json(new
+                        {
+                            Result = "Error al cancelar la compra",
+                            Message = "No hay producto suficiente para realizar la devolución"
+                        });
                     }
 
                     bp.LastStock = bp.Stock;
                     bp.Stock -= detail.Quantity;
-
                     db.Entry(bp).State = EntityState.Modified;
+
+                    //creo un movimiento de stock
+                    StockMovement movement = new StockMovement
+                    {
+                        BranchId = bp.BranchId,
+                        ProductId = bp.ProductId,
+                        MovementDate = DateTime.Now,
+                        User = User.Identity.Name,
+                        MovementType = MovementType.Exit,
+                        Comment = string.Format("Cancelación de compra {0} comentarios {1}",
+                                                        purchase.Bill, comment),
+                        Quantity = detail.Quantity
+                    };
+
+                    db.StockMovements.Add(movement);
                 }
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
-                sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Canceled;
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now;
-                sale.Comment = comment;
+                purchase.LastStatus = purchase.Status;
+                purchase.Status = TranStatus.Canceled;
+                purchase.UpdUser = User.Identity.Name;
+                purchase.UpdDate = DateTime.Now;
+                purchase.Comment = comment;
 
-                db.Entry(sale).State = EntityState.Modified;
+                db.Entry(purchase).State = EntityState.Modified;
 
                 db.SaveChanges();
 
@@ -129,18 +146,18 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
             var userId = User.Identity.GetUserId();
 
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, null,userId);
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, null, userId);
             return PartialView("_MyPurchaseList", model);
         }
 
-      
+
         [Authorize(Roles = "Capturista")]
         public ActionResult MyDetail(int id)
         {
             var userId = User.Identity.GetUserId();
 
-            var model = db.Purchases.Include(p=> p.TransactionDetails).
-                Include(p=> p.TransactionDetails.Select(td=> td.Product.Images)).
+            var model = db.Purchases.Include(p => p.TransactionDetails).
+                Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
                 FirstOrDefault(p => p.TransactionId == id && p.UserId == userId);
 
             if (model == null)
@@ -150,7 +167,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user,string userId)
+        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, string userId)
         {
             //si el filtro de sucursal viene nulo
             //Busco las compras hechas en las sucursales asignadas del usuario
@@ -162,7 +179,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
                              && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
-                             && (userId == null ||  p.UserId == userId)
+                             && (userId == null || p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                              select p).ToList();
 
@@ -183,10 +200,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (model == null)
             {
-                model          = new Purchase();
-                model.UserId   = User.Identity.GetUserId<string>();
+                model = new Purchase();
+                model.UserId = User.Identity.GetUserId<string>();
                 model.BranchId = User.Identity.GetBranchSession().Id;
-                model.UpdUser  = User.Identity.Name;
+                model.UpdUser = User.Identity.Name;
             }
 
             return View("Create", model);
@@ -209,6 +226,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     purchase.UserId = User.Identity.GetUserId();
                     purchase.BranchId = User.Identity.GetBranchId();
+                    
                     db.Entry(purchase).State = EntityState.Modified;
                 }
 
@@ -229,7 +247,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     foreach (var det in detailes)
                     {
-                        var prod = db.Products.Include(p => p.BranchProducts).FirstOrDefault(p => p.ProductId == det.ProductId);
+                        var prod = db.Products.Include(p => p.BranchProducts).
+                            FirstOrDefault(p => p.ProductId == det.ProductId);
+
                         var bProd = prod.BranchProducts.FirstOrDefault(bp => bp.BranchId == purchase.BranchId);
 
                         //if the new price is biger than the old one, just update it
@@ -249,9 +269,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
 
-                            prod.BuyPrice        = newPrice;
-                            prod.DealerPrice     = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice      = newPrice.GetPrice(prod.StorePercentage);
+                            prod.BuyPrice = newPrice;
+                            prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
+                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
                             prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
                             db.Entry(prod).State = EntityState.Modified;
                         }
@@ -278,6 +298,19 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             db.Entry(bProd).State = EntityState.Modified;
                         }
+
+                        StockMovement sm = new StockMovement
+                        {
+                            ProductId = bProd.ProductId,
+                            BranchId = bProd.BranchId,
+                            User = User.Identity.Name,
+                            MovementDate = DateTime.Now,
+                            Comment = string.Format("Ingreso por compra en factura {0}", purchase.Bill),
+                            MovementType = MovementType.Entry,
+                            Quantity = det.Quantity
+                        };
+
+                        db.StockMovements.Add(sm);
                     }
                 }
 
@@ -412,9 +445,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                     product.UpdUser = User.Identity.Name;
                     product.UpdDate = DateTime.Now;
                     product.MinQuantity = Cons.One;
-                    product.StorePrice = Math.Round(product.BuyPrice * (Cons.One + (product.StorePercentage / Cons.OneHundred)), 2);
-                    product.DealerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.DealerPercentage / Cons.OneHundred)), 2);
-                    product.WholesalerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.WholesalerPercentage / Cons.OneHundred)), 2);
+                    product.StorePrice = Math.Round(product.BuyPrice * (Cons.One + (product.StorePercentage / Cons.OneHundred)), Cons.Zero);
+                    product.DealerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+                    product.WholesalerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+                    product.IsActive = true;
 
                     db.Products.Add(product);
                     db.SaveChanges();

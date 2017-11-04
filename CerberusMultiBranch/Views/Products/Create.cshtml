@@ -1,7 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 @using CerberusMultiBranch.Support;
 @{
-    
+
     ViewBag.Title = "Productos";
 }
 
@@ -103,20 +103,24 @@
                             @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
                         </div>
                     </div>
-
-                    @*<div class="form-group col-md-12">
-                        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-comment"></i></span>
-                            @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
-                            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    <div class="col-md-3 col-md-offset-2">
+                        @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
+                        <div class="form-control">
+                            <label class="radio-inline">
+                                <input type="radio" value="0" name="ProductType"  onchange="ShowSingle()"  id="rbSingle" />
+                                Individual
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio"  value="1" name="ProductType" onchange="ShowPackage()" id="rbPackage"/>
+                                Paquete
+                            </label>
                         </div>
-                    </div>*@
+                    </div>
                 </div>
             </div>
         </div>
-         <div class="panel panel-danger">
-             <div class="panel-body">
+        <div class="panel panel-danger" id="divSingle">
+            <div class="panel-body">
                 <div class="row">
                     <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.StorePercentage, htmlAttributes: new { @class = "control-label" })
@@ -130,7 +134,7 @@
                         @Html.LabelFor(model => model.DealerPercentage, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control"} })
+                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
                             @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
                         </div>
                     </div>
@@ -199,13 +203,14 @@
                         @Html.ValidationMessageFor(model => model.BarCode, "", new { @class = "text-danger" })
                     </div>
                 </div>
+
             </div>
         </div>
 
         <div class="panel panel-danger">
             <div class="panel-body">
                 <div class="row">
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         @Html.LabelFor(model => model.Row, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-bars"></i></span>
@@ -214,7 +219,7 @@
                         @Html.ValidationMessageFor(model => model.Row, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         @Html.LabelFor(model => model.Ledge, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-archive"></i></span>
@@ -223,11 +228,23 @@
                         @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
                     </div>
 
+                    <div class="col-md-2 form-group">
+                        @Html.Label("Precio del paquete", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
+                           @Html.EditorFor(model => model.PackagePrice, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
+                    </div>
+
                     <div class="btn-group  col-md-12">
                         @Html.Partial("_CatalogButtonGroup")
 
                         <button type="button" class="btn btn-default" id="btnUpload" title="Subir imagenes">
                             <span class="fa fa-cloud-upload" />
+                        </button>
+                        <button type="button" class="btn btn-default" id="btnAddProducts" title="Agregar productos al paquete">
+                            <span class="fa fa-plus" />
                         </button>
                     </div>
                 </div>
@@ -245,7 +262,7 @@
                 <div id="divUploader" class="modal-footer panel-footer">
                     <label id="upl0" class="btn btn-warning btn-file ">
                         <span class="glyphicon glyphicon-picture" />
-                        <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;">
+                        <input type="file" name="Files" onchange="ImageLoaded(this)" style="display: none;"/>
                     </label>
                 </div>
             </div>
@@ -263,7 +280,7 @@
 <div id="divImagesLoaded" class="modal" role="dialog">
     <div class="modal-dialog">
         <div id="imgPartial" class="modal-content">
-                @Html.Partial("_ImagesLoaded", Model.Images)
+            @Html.Partial("_ImagesLoaded", Model.Images)
         </div>
     </div>
 </div>
@@ -275,6 +292,7 @@
 
     $(document).ready(function ()
     {
+        SetControls();
         //$("#Code").attr("readonly", true);
         $("#Pictures").attr("readonly", true);
         $("#Compatibilities").attr("readonly", true);
@@ -308,41 +326,64 @@
 
         if ('@ViewBag.Message'.length > 0)
         {
-            ShowMessage('@ViewBag.Header','@ViewBag.Message','warning')
+            ShowMessage('@ViewBag.Header', '@ViewBag.Message', 'warning')
         }
     });
 
+    function SetControls()
+    {
+        console.log('@Model.ProductType');
+        if('@Model.ProductType' == 'Package')
+        {
+            $("#rbPackage").attr("checked",true)
+            ShowPackage();
+        }
+        else
+        {
+            ShowSingle();
+        }
+    }
+
+    function ShowSingle()
+    {
+        $("#btnAddProducts").hide();
+        $("#txtPackagePrice").hide();
+        $("#divSingle").show();
+    }
+
+    function ShowPackage()
+    {
+        $("#divSingle").hide();
+        $("#btnAddProducts").show();
+        $("#btnAddProducts").show();
+    }
+
     function CheckCode()
     {
-        ExecuteAjax('@Url.Action("CheckProductCode", "Json")', { code: $("#Code").val() }, function (exist)
-        {
+        ExecuteAjax('@Url.Action("CheckProductCode", "Json")', { code: $("#Code").val() }, function (exist) {
             if (exist)
-                ShowMessage("Dato duplicado!","este código de producto ya existe","warning");
+                ShowMessage("Dato duplicado!", "este código de producto ya existe", "warning");
         });
     }
 
-    function ShowCompatibilities()
-    {
-        ExecuteAjax('@Url.Action("GetModels", "CarModels")', {}, function (view)
-        {
+    function ShowCompatibilities() {
+        ExecuteAjax('@Url.Action("GetModels", "CarModels")', {}, function (view) {
             $("#divComp").html(view);
             $("#divCompModal").modal();
-        });    
+        });
     }
 
-    function SetPrice()
-    {
+    function SetPrice() {
         var sp = (1 + $("#StorePercentage").val() / 100);
         var dp = (1 + $("#WholesalerPercentage").val() / 100);
         var wp = (1 + $("#DealerPercentage").val() / 100);
 
-        $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(2));
-        $("#WholesalerPrice").val(($("#BuyPrice").val() * dp).toFixed(2));
-        $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(2));
+        $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(0));
+        $("#WholesalerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
+        $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
     }
 
-    function EditCode(checkBox)
-    {
+    function EditCode(checkBox) {
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
 
@@ -350,8 +391,7 @@
         $("#divImagesLoaded").modal();
     }
 
-    function DropImage(index)
-    {
+    function DropImage(index) {
         $("#div" + index).remove();
 
         $("#upl" + index).remove();
@@ -366,14 +406,12 @@
 
     }
 
-    function ImageLoaded(input)
-    {
+    function ImageLoaded(input) {
         var files = input.files;
 
         var reader = new FileReader();
 
-        reader.onload = function (e)
-        {
+        reader.onload = function (e) {
             $('#divImages').append(" <div id='div" + imgLoaded + "' class='thumbnail col-md-4' ><a class='close'  onclick='DropImage(" + imgLoaded + ")'>×</a><img  src='" + e.target.result + "' class='img-responsive' style='min-height:50px;height:70px;'/>");
             console.log("Imagen Index " + imgLoaded);
 
@@ -386,8 +424,7 @@
         $(input).closest("label").hide();
     }
 
-    function AddUploader()
-    {
+    function AddUploader() {
         console.log("Creating Upload " + imgLoaded);
 
         var ctrl = ' <label id="upl' + imgLoaded + '" class="btn btn-warning btn-file ">' +
@@ -401,8 +438,7 @@
         $("#lblMessage").text("Imagenes a cargar " + count);
     }
 
-    function Preview(input)
-    {
+    function Preview(input) {
         var files = input.files;
 
         if (files && files[0]) {

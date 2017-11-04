@@ -27,5 +27,37 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public virtual Branch Branch { get; set; }
 
         public virtual Product Product { get; set; }
+
+        public ICollection<StockMovement> StockMovements { get; set; }
+    }
+
+    [Table("StockMovement", Schema = "Operative")]
+    public class StockMovement
+    {
+        public int StockMovementId { get; set; }
+
+        [Column(Order = 0),ForeignKey("BranchProduct")]
+        public int BranchId { get; set; }
+
+        [Column(Order = 1), ForeignKey("BranchProduct")]
+        public int ProductId { get; set; }
+
+        public double Quantity { get; set; }
+
+        public DateTime MovementDate { get; set; }
+
+        public string User { get; set; }
+
+        public MovementType MovementType { get; set; }
+
+        public string Comment { get; set; }
+
+        public virtual BranchProduct BranchProduct { get; set; }
+    }
+
+    public enum MovementType
+    {
+        Entry=1,
+        Exit=2,
     }
 }

@@ -3654,17 +3654,17 @@ SET IDENTITY_INSERT Catalog.Client OFF
 INSERT INTO [Config].[Variable]
            ([Name],[Value])
      VALUES
-           ('StorePercentage','30')
+           ('StorePercentage','100')
 
 INSERT INTO [Config].[Variable]
            ([Name],[Value])
      VALUES
-           ('DealerPercentage','25')
+           ('DealerPercentage','75')
 
 INSERT INTO [Config].[Variable]
            ([Name],[Value])
      VALUES
-           ('WholesalerPercentage','20')
+           ('WholesalerPercentage','25')
 
 
 
@@ -3680,16 +3680,16 @@ INSERT INTO [Security].[AspNetUsers]
 --====================BRANCHES===============================================================================================================================
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('ZAPOPAN')
+     VALUES('Zapopan')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('COSAMALOAPAN')
+     VALUES('Cosamaloapan')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('CUAHUTEMOC')
+     VALUES('Cuahutemoc')
 
 INSERT INTO [Config].[Branch]([Name])
-     VALUES('MIGUEL ALEMAN')
+     VALUES('Miguel Aleman')
 
 --====================USER BRANCHES==========================================================
 

@@ -16,6 +16,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public int ClientId { get; set; }
 
         [Display(Name = "Ciudad/Municipio")]
+        [Index("IDX_CityId", IsUnique = false)]
         [Required]
         public int CityId { get; set; }
 

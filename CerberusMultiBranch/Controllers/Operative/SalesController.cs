@@ -54,6 +54,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                     bp.Stock += detail.Quantity;
 
                     db.Entry(bp).State = EntityState.Modified;
+
+                    //agrego movimiento al inventario
+                    StockMovement sm = new StockMovement
+                    {
+                        BranchId = bp.BranchId,
+                        ProductId = bp.ProductId,
+                        Comment = "Cancelación de venta con folio:" + sale.Folio +" comentario:"+comment,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now,
+                        MovementType = MovementType.Entry,
+                        Quantity = detail.Quantity
+                    };
+
+                    db.StockMovements.Add(sm);
                 }
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
@@ -92,6 +106,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.User).
+                Include(s=> s.TransactionDetails.Select(td=> td.Product.Category)).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 FirstOrDefault(s => s.TransactionId == id && brancheIds.Contains(s.BranchId));
 
@@ -401,6 +416,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 try
                 {
+                    var lastSale = db.Sales.
+                        Where(s => s.Status != TranStatus.InProcess).
+                        OrderByDescending(s => s.TransactionDate).FirstOrDefault();
+
+                    
+                    var lastFolio = lastSale != null ? Convert.ToInt32(lastSale.Folio) : Cons.Zero;
+
+                    var folio = (lastFolio + Cons.One).ToString(Cons.CodeMask);
+
                     foreach (var detail in sale.TransactionDetails)
                     {
                         //busco stock en sucursal
@@ -420,11 +444,25 @@ namespace CerberusMultiBranch.Controllers.Operative
                         pb.Stock -= detail.Quantity;
 
                         db.Entry(pb).State = EntityState.Modified;
+
+                        //agrego el moviento al inventario
+                        StockMovement sm = new StockMovement
+                        {
+                            BranchId        = pb.BranchId,
+                            ProductId       = pb.ProductId,
+                            MovementType    = MovementType.Exit,
+                            Comment         = "Salida por venta Folio:"+folio,
+                            User            = User.Identity.Name,
+                            MovementDate    = DateTime.Now,
+                            Quantity        = detail.Quantity
+                        };
+
+                        db.StockMovements.Add(sm);
                     }
 
                     //ajusto el monto total y agrego el folio
                     sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
-                    sale.Folio = sale.TransactionId.ToString(Cons.CodeMask);
+                    sale.Folio = folio;
 
                     //coloco el porcentaje de comision del empleado
                     sale.ComPer = User.Identity.GetSalePercentage();

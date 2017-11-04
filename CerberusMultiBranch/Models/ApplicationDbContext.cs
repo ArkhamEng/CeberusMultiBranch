@@ -59,10 +59,9 @@ namespace CerberusMultiBranch.Models
         #endregion
 
         #region Operative
+        public DbSet<StockMovement> StockMovements { get; set; }
 
         public DbSet<Purchase> Purchases { get; set; }
-
-        public DbSet<Transference> Transferences { get; set; }
 
         public DbSet<Sale> Sales { get; set; }
 

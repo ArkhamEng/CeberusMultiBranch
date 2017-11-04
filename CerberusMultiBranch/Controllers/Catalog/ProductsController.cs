@@ -25,21 +25,181 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var model = new SearchProductViewModel();
             model.Products = LookFor(null, null, null, null, null, false);
-            model.Systems  = db.Systems.ToSelectList();
+            model.Systems = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
 
         [HttpPost]
-        [Authorize(Roles ="Supervisor")]
+        [Authorize(Roles = "Supervisor")]
         public ActionResult BeginTransference(int branchId, int productId)
         {
             var branchP = db.BranchProducts.Include(bp => bp.Product).
-                Include(bp=> bp.Product.Images).Include(bp => bp.Branch).
+                Include(bp => bp.Product.Images).Include(bp => bp.Branch).
                  FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
 
             return PartialView("_Transference", branchP);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult BeginMovement(int productId)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+            if (branchP == null)
+            {
+                branchP = new BranchProduct { BranchId = branchId, ProductId = productId, UpdDate = DateTime.Now };
+                db.BranchProducts.Add(branchP);
+                db.SaveChanges();
+
+                branchP = db.BranchProducts.Include(bp => bp.Product).
+                       Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                       FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+            }
+
+
+            return PartialView("_Movement", branchP);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public JsonResult Move(int productId, MovementType type, double quantity)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                         Include(bp => bp.Product.PackageDetails).
+                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+
+           
+            if (type == MovementType.Exit)
+            {
+                if (branchP.Stock < quantity)
+                    return Json(new { Result = "Imposible realizar el movimiento", Message = "La cantidad a retirar supera la disponible" });
+                else
+                {
+                    branchP.LastStock = branchP.Stock;
+                    branchP.Stock -= quantity;
+                    branchP.UpdDate = DateTime.Now;
+                    branchP.StockMovements = branchP.StockMovements ?? new List<StockMovement>();
+
+                   var mSm = new StockMovement
+                    {
+                        BranchId = branchP.BranchId,
+                        ProductId = branchP.ProductId,
+                        Quantity = quantity,
+                        MovementType = MovementType.Exit,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now,
+                        Comment = "Salida manual producto"
+                    };
+
+                    db.StockMovements.Add(mSm);
+
+                    // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
+                    if (branchP.Product.ProductType == ProductType.Package)
+                    {
+                        foreach(var det in branchP.Product.PackageDetails)
+                        {
+                           
+                           var dtBranchP = db.BranchProducts.Find(productId, det.ProductId);
+                            
+                            dtBranchP.LastStock = dtBranchP.Stock;
+                            dtBranchP.Stock += det.Quantity;
+
+                            db.Entry(dtBranchP).State = EntityState.Modified;
+
+                            //creo los reingresos del producto al inventario
+                           var sm = new StockMovement
+                            {
+                                BranchId = dtBranchP.BranchId,
+                                ProductId = dtBranchP.ProductId,
+                                Quantity = det.Quantity,
+                                MovementType = MovementType.Entry,
+                                User = User.Identity.Name,
+                                MovementDate = DateTime.Now,
+                                Comment = "Ingreso por salida de disolución de paquete"
+                            };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                branchP.LastStock = branchP.Stock;
+                branchP.Stock += quantity;
+            
+                var mSm = new StockMovement
+                {
+                    BranchId = branchP.BranchId,
+                    ProductId = branchP.ProductId,
+                    Quantity = quantity,
+                    MovementType = MovementType.Entry,
+                    User = User.Identity.Name,
+                    MovementDate = DateTime.Now,
+                    Comment = "Entrada de manual producto"
+                };
+
+                db.StockMovements.Add(mSm);
+
+                // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
+                if (branchP.Product.ProductType == ProductType.Package)
+                {
+                    foreach (var det in branchP.Product.PackageDetails)
+                    {
+                        var dtBranchP = db.BranchProducts.Find(productId, det.ProductId);
+
+                        //verifico si la cantidad en stock es suficiente para alimentar el paquete, si no lo es, 
+                        //la operación concluye
+                        if(dtBranchP.Stock < det.Quantity)
+                        {
+                            return Json(new { Result = "Imposible realizar el ingreso del paquete!",
+                                Message = "No hay suficiente producto en inventario, revise la configuración del paquete para conocer las cantidades necesarias" });
+                        }
+
+                        dtBranchP.LastStock = dtBranchP.Stock;
+                        dtBranchP.Stock -= det.Quantity;
+
+                        db.Entry(dtBranchP).State = EntityState.Modified;
+
+                        //creo los reingresos del producto al inventario
+                        var sm = new StockMovement
+                        {
+                            BranchId = dtBranchP.BranchId,
+                            ProductId = dtBranchP.ProductId,
+                            Quantity = det.Quantity,
+                            MovementType = MovementType.Exit,
+                            User = User.Identity.Name,
+                            MovementDate = DateTime.Now,
+                            Comment = "Salida para formar paquete"
+                        };
+
+                        db.StockMovements.Add(sm);
+                    }
+                }
+            }
+
+            try
+            {
+                db.Entry(branchP).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new { Result = "OK", Message = "Movimiento exitoso! se ha actualizado la cantidad de producto en inventario" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Ocurrio un error al guardar los datos", Message = ex.Message });
+            }
+
         }
 
         [HttpPost]
@@ -48,41 +208,22 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var branchId = User.Identity.GetBranchId();
 
-            var bp = db.BranchProducts.Include(br => br.Product).
+            var bp = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
                 FirstOrDefault(br => br.BranchId == originBranchId && br.ProductId == productId);
 
             if (bp.Stock < quantity)
             {
-                return Json(new { Result = "Imposible realizar la transferencia",
-                    Message = "La cantidad solicitada es mayor a la disponible en sucursal" });
+                return Json(new
+                {
+                    Result = "Imposible realizar la transferencia",
+                    Message = "La cantidad solicitada es mayor a la disponible en sucursal"
+                });
             }
 
-            //agrego el detalle de la transferencia
-            TransactionDetail detail = new TransactionDetail();
-
-            detail.Quantity = quantity;
-            detail.ProductId = productId;
-            detail.Price = bp.Product.BuyPrice;
-            detail.Amount = detail.Quantity * detail.Price;
-            
-
-            //creo la transferencia
-            Transference trans = new Transference();
-            trans.BranchId = branchId;
-            trans.OriginBranchId = originBranchId;
-            trans.TransactionDate = DateTime.Now;
-            trans.TotalAmount = detail.Amount;
-            trans.UpdDate    = DateTime.Now;
-            trans.UserId     = User.Identity.GetUserId();
-            trans.LastStatus = TranStatus.InProcess;
-            trans.Status     = TranStatus.Compleated;
-            trans.UpdUser    = User.Identity.Name;
-            
-            trans.TransactionDetails.Add(detail);
 
             //Obtengo la relacion producto sucursal destino
             var myBp = db.BranchProducts.Find(branchId, productId);
-           
+
             try
             {
                 //si no existe la creo de lo contrario la actualizo
@@ -107,20 +248,46 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.Entry(myBp).State = EntityState.Modified;
                 }
 
+                //agrego los movimientos de Stock en la sucursal destino
+                StockMovement smD = new StockMovement
+                {
+                    BranchId = myBp.BranchId,
+                    ProductId = myBp.ProductId,
+                    Comment = "Ingreso por transferencia",
+                    MovementType = MovementType.Entry,
+                    MovementDate = DateTime.Now,
+                    User = User.Identity.Name,
+                    Quantity = quantity
+                };
+
+                db.StockMovements.Add(smD);
+
+                //agrego los movimientos de Stock en la sucursal origen
+                StockMovement smO = new StockMovement
+                {
+                    BranchId = bp.BranchId,
+                    ProductId = bp.ProductId,
+                    Comment = "Salida por transferencia",
+                    MovementType = MovementType.Exit,
+                    MovementDate = DateTime.Now,
+                    User = User.Identity.Name,
+                    Quantity = quantity
+                };
+
+                db.StockMovements.Add(smO);
+
+
                 //actualizo stock en sucursal de origen
                 bp.LastStock = bp.Stock;
                 bp.Stock -= quantity;
                 db.Entry(bp).State = EntityState.Modified;
-
-                //Guardo cambios en base de datos
-                db.Transferences.Add(trans);
                 db.SaveChanges();
 
                 return Json(new
                 {
                     Result = "OK",
                     Message = "Transferencia exitosa!",
-                    Code=bp.Product.Code
+                    Code = bp.Product.Code
                 });
             }
             catch (Exception ex)
@@ -252,7 +419,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchSession().Id;
             var userId = User.Identity.GetUserId();
 
-            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId 
+            var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
             && s.Status == TranStatus.InProcess);
 
             var model = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
@@ -277,7 +444,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
 
-            return PartialView("Detail",model);
+            return PartialView("Detail", model);
         }
 
 
@@ -384,7 +551,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
 
                     ViewBag.Header = "Error al guardar";
-                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detail:" + ex.Message+" inner exception" +ex.InnerException.Message;
+                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detail:" + ex.Message + " inner exception" + ex.InnerException.Message;
                     var model = new ProductViewModel(product);
 
                     model.Images = new List<ProductImage>();

@@ -32,11 +32,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("IDX_Name", IsUnique = false)]
         public string Name { get; set; }
 
-        //[Display(Name = "Descripción")]
-        //[MaxLength(200)]
-        //[DataType(DataType.MultilineText)]
-        //public string Description { get; set; }
-
+        
         [Display(Name="Cantidad Minima")]
         [Required]
         public double MinQuantity { get; set; }
@@ -76,7 +72,16 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public double DealerPrice { get; set; }
 
-     
+        [DataType(DataType.Currency)]
+        [Required]
+        public double PackagePrice { get; set; }
+
+
+
+        [Required]
+        public ProductType ProductType { get; set; }
+
+
         [Display(Name = "Fabricante")]
         [MaxLength(50)]
         public string TradeMark { get; set; }
@@ -115,7 +120,14 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Equivalence> Equivalences { get; set; }
 
+        public ICollection<PackageDetail> PackageDetails { get; set; }
+
+        
+
+
         #region NotMapped Properties
+
+     
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 
@@ -139,6 +151,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.NewCompatibilities = new List<string>();
         }
         #endregion
+    }
+
+    public enum ProductType:int
+    {
+        Single=0,
+        Package=1
     }
 
 }

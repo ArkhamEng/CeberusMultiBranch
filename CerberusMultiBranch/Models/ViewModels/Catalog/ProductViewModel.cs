@@ -59,6 +59,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.PartSystemId = product.PartSystemId;
             this.Row = product.Row;
             this.Ledge = product.Ledge;
+            this.PackagePrice = product.PackagePrice;
+            this.ProductType = product.ProductType;
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();

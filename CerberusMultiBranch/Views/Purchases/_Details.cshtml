@@ -93,6 +93,7 @@
         });
 
         $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
+        $("#lblTotalAmount").text('@Model.Sum(d => d.Amount).ToString("c")');
     });
 
     function RemoveDetail(tid, pid)
@@ -106,4 +107,6 @@
             HideLoading();
         });
     }
+
+   
 </script>

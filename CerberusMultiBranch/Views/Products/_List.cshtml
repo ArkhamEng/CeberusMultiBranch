@@ -94,64 +94,50 @@
                                 <span class="fa fa-archive"></span>
                             </h6>
                         </div>
-
-                        @if (User.IsInRole("Capturista"))
+                        
+                        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
                         {
                             <div class="col-md-1" style="vertical-align:central">
-                                <button class="btn btn-default btn-sm" title="Editar producto"
-                                        onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
-                                    <span class="glyphicon glyphicon-edit"></span>
-                                </button>
+                                @if (User.IsInRole("Capturista"))
+                                {
+                                    <button class="btn btn-default btn-sm" title="Editar producto"
+                                            onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </button>
+                                }
+
+                                @if (User.IsInRole("Supervisor"))
+                                {
+                                    <button class="btn btn-default btn-sm" title="Registrar movimiento en inventario"
+                                            onclick="BeginMovement('@prod.ProductId')">
+                                        <span class="fa fa-arrows"></span>
+                                    </button>
+                                }
                             </div>
                         }
                     </td>
-                            }
+                 }
                 @for (var g = item.Count; g < i; g++)
                 {
                     <td class="col-md-6"></td>
                 }
             </tr>
 
-                            }
+        }
     </tbody>
 </table>
 
-<div id="divImagesModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content panel panel-danger">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div id="divImages" class="modal-body panel-body">
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="ModalStock" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content panel panel-danger">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">
-                    <span class="fa fa-cubes"></span>
-                    Existencias en Sucursales
-                </h4>
-            </div>
-            <div id="divModalStock" class="modal-body">
-            </div>
-        </div>
-    </div>
-</div>
 
 
+<div id="divMovement"></div>
 
 <script>
     $(document).ready(function () {
         SetDataTable("#tbProducts", "#txtName");
     });
 
-    function Detail(id) {
+    function Detail(id)
+    {
         ShowLoading();
 
         ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view) {
@@ -161,66 +147,16 @@
     }
 
 
-    function StockInBranches(id) {
-        $.ajax({
-            url: '@Url.Action("GetStockInBranches", "Products")',
-            type: "POST",
-            data: { productId: id },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (view) {
-                    $("#divModalStock").html(view);
-                    $("#ModalStock").modal('show');
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
-        });
-    }
+    function BeginMovement(pid)
+    {
+        ShowLoading();
+        var param = { productId: pid };
 
-    function ShowSlide(id) {
-        $.ajax({
-            url: '@Url.Action("GetImages", "Products")',
-            type: "POST",
-            data: { productId: id },
-            error: function (data) {
-                console.log("Error Executing"); console.log(data);
-            },
-            statusCode:
-            {
-                200: function (view) {
-                    $("#divImages").html(view);
-                    $(".carousel-caption").hide()
-                    $("#divImagesModal").modal('show');
-                },
-                401: function (data) {
-                    alert('401: Unauthenticated');
-                }
-            }
-        });
-    }
-
-    function Show(carousel) {
-        $(divContent).html($(carousel).clone());
-        $(divModal).modal('show');
-    }
-
-    function CompatibilitiesPop(content) {
-        $('body').popover("destroy")
-        var popOverSettings =
+        ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view)
         {
-            placement: 'right',
-            container: 'body',
-            html: true,
-            selector: '[rel="popover"]', //Sepcify the selector here
-            content: content
-        }
-
-        $('body').popover(popOverSettings);
+            HideLoading();
+            $("#divMovement").html(view);
+        });
     }
 
 
