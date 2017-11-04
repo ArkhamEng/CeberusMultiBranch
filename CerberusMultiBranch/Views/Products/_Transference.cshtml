@@ -42,7 +42,8 @@
                     @Html.Label("Cantidad a transferir", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                        <input id="txtQuantityTransfer" class="form-control" type="number" , max='@Model.Stock' min="1" value="0" />
+                        <input id="txtQuantityTransfer" class="form-control" 
+                               type="number"  max='@Model.Stock' min="1" value="0" />
 
                         <span class="input-group-btn">
                             <button class="btn btn-danger" type="button" title="Realizar transferencia"

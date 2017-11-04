@@ -52,6 +52,7 @@ namespace CerberusMultiBranch.Migrations
                         StorePrice = c.Double(nullable: false),
                         WholesalerPrice = c.Double(nullable: false),
                         DealerPrice = c.Double(nullable: false),
+                        PackagePrice = c.Double(nullable: false),
                         ProductType = c.Int(nullable: false),
                         TradeMark = c.String(maxLength: 50),
                         Unit = c.String(maxLength: 20),
@@ -160,15 +161,16 @@ namespace CerberusMultiBranch.Migrations
                 "Catalog.PackageDetail",
                 c => new
                     {
+                        PackageDetailId = c.Int(nullable: false, identity: true),
                         PackageId = c.Int(nullable: false),
-                        ProductId = c.Int(nullable: false),
+                        DetailtId = c.Int(nullable: false),
                         Quantity = c.Double(nullable: false),
                     })
-                .PrimaryKey(t => new { t.PackageId, t.ProductId })
-                .ForeignKey("Catalog.Product", t => t.PackageId, cascadeDelete: true)
-                .ForeignKey("Catalog.Product", t => t.ProductId, cascadeDelete: false)
+                .PrimaryKey(t => t.PackageDetailId)
+                .ForeignKey("Catalog.Product", t => t.DetailtId, cascadeDelete: true)
+                .ForeignKey("Catalog.Product", t => t.PackageId, cascadeDelete: false)
                 .Index(t => t.PackageId)
-                .Index(t => t.ProductId);
+                .Index(t => t.DetailtId);
             
             CreateTable(
                 "Config.PartSystem",
@@ -567,9 +569,8 @@ namespace CerberusMultiBranch.Migrations
             DropForeignKey("Operative.Transaction", "BranchId", "Config.Branch");
             DropForeignKey("Operative.TransactionDetail", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Product", "PartSystemId", "Config.PartSystem");
-            DropForeignKey("Catalog.PackageDetail", "Product_ProductId", "Catalog.Product");
-            DropForeignKey("Catalog.PackageDetail", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.PackageDetail", "PackageId", "Catalog.Product");
+            DropForeignKey("Catalog.PackageDetail", "DetailtId", "Catalog.Product");
             DropForeignKey("Catalog.ProductImage", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Equivalence", "ProductId", "Catalog.Product");
             DropForeignKey("Catalog.Compatibility", "ProductId", "Catalog.Product");
@@ -616,8 +617,7 @@ namespace CerberusMultiBranch.Migrations
             DropIndex("Operative.Transaction", "IDX_BranchId");
             DropIndex("Operative.TransactionDetail", new[] { "ProductId" });
             DropIndex("Operative.TransactionDetail", new[] { "TransactionId" });
-            DropIndex("Catalog.PackageDetail", new[] { "Product_ProductId" });
-            DropIndex("Catalog.PackageDetail", new[] { "ProductId" });
+            DropIndex("Catalog.PackageDetail", new[] { "DetailtId" });
             DropIndex("Catalog.PackageDetail", new[] { "PackageId" });
             DropIndex("Catalog.ProductImage", "IDX_ProductId");
             DropIndex("Catalog.Equivalence", new[] { "ProductId" });

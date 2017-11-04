@@ -1,0 +1,82 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+
+
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <table id="tbInternalProducts" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Código")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Descripción")
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.TradeMark)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Unit)
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cantidad")
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody class="small">
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.Code)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td class="col-md-1">
+                            @Html.DisplayFor(modelItem => item.TradeMark)
+                        </td>
+
+                        <td class="col-md-1">
+                            <input id="txtProductId" value="@item.ProductId" type="hidden" />
+                            @Html.DisplayFor(modelItem => item.Unit)
+                        </td>
+                        <td class="col-md-1">
+                            <input id="txtQuantity" class="form-control" value="1" type="number" min="1" />
+                        </td>
+
+                        <td class="col-md-1 btn-group">
+                            <button class="btn btn-warning btn-xs" onclick="AddToPackage(this)" title="agregar a paquete">
+                                <span class="fa fa-plus"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        Paginate("#tbInternalProducts", 6);
+    });
+    function AddToPackage(input) {
+        var row = $(input).parent().parent();
+
+        productId = row.find("#txtProductId").val();
+        quantity = row.find("#txtQuantity").val();
+
+        var param = { packagedId: $("#ProductId").val(), productId: productId, quantity: quantity }
+
+
+        ExecuteAjax('@Url.Action("AddToPackage")', param, function (view)
+        {
+            $("#ModalInternalProduct").modal("hide");
+
+            $("#divPackageDetails").html(view);
+        });
+    }
+</script>

@@ -120,14 +120,15 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Equivalence> Equivalences { get; set; }
 
-        public ICollection<PackageDetail> PackageDetails { get; set; }
+        [InverseProperty("Package")]
+        public virtual ICollection<PackageDetail> Packages { get; set; }
 
-        
-
+        [InverseProperty("Detail")]
+        public virtual ICollection<PackageDetail> Details { get; set; }
 
         #region NotMapped Properties
 
-     
+
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 
@@ -149,6 +150,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public Product()
         {
             this.NewCompatibilities = new List<string>();
+
         }
         #endregion
     }

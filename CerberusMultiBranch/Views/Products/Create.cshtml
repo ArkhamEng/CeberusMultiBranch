@@ -103,7 +103,7 @@
                             @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
                         </div>
                     </div>
-                    <div class="col-md-3 col-md-offset-2">
+                    <div class="col-md-3 col-md-offset-2" id="divProductType">
                         @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
                         <div class="form-control">
                             <label class="radio-inline">
@@ -228,7 +228,7 @@
                         @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="col-md-2 form-group">
+                    <div class="col-md-2 form-group" id="divPackagePrice">
                         @Html.Label("Precio del paquete", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-usd"></i></span>
@@ -243,14 +243,21 @@
                         <button type="button" class="btn btn-default" id="btnUpload" title="Subir imagenes">
                             <span class="fa fa-cloud-upload" />
                         </button>
-                        <button type="button" class="btn btn-default" id="btnAddProducts" title="Agregar productos al paquete">
+                        <button type="button" class="btn btn-default" id="btnAddProducts" 
+                                title="Agregar productos al paquete" onclick="BeginAdd()">
                             <span class="fa fa-plus" />
                         </button>
                     </div>
                 </div>
             </div>
         </div>
+
+      <div id="divPackageDetails">
+          @Html.Partial("_PackageDetails",Model.Packages)
+      </div>
     </div>
+
+
 
 
     <div id="divImagesModal" class="modal fade" role="dialog">
@@ -285,6 +292,7 @@
     </div>
 </div>
 
+@Html.Partial("_SearchInternalProduct")
 
 <script>
     var imgLoaded = 0;
@@ -330,16 +338,32 @@
         }
     });
 
+    function BeginAdd()
+    {
+        $("#ModalInternalProduct").modal("show");
+    }
+
     function SetControls()
     {
-        console.log('@Model.ProductType');
-        if('@Model.ProductType' == 'Package')
+        if (parseInt('@Model.ProductId') > 0)
         {
-            $("#rbPackage").attr("checked",true)
-            ShowPackage();
+            $("#rbSingle").attr("disabled", "disabled");
+            $("#rbPackage").attr("disabled", "disabled");
+
+            if ('@Model.ProductType' == 'Package')
+            {
+                $("#rbPackage").attr("checked", true)
+                ShowPackage();
+            }
+            else
+            {
+                $("#rbSingle").attr("checked", true)
+                ShowSingle();
+            }
         }
         else
         {
+            $("#rbSingle").attr("checked", true)
             ShowSingle();
         }
     }
@@ -347,15 +371,20 @@
     function ShowSingle()
     {
         $("#btnAddProducts").hide();
-        $("#txtPackagePrice").hide();
+        $("#divPackagePrice").hide();
+        $("#divPackageDetails").hide();
         $("#divSingle").show();
     }
 
     function ShowPackage()
     {
         $("#divSingle").hide();
-        $("#btnAddProducts").show();
-        $("#btnAddProducts").show();
+        $("#divPackagePrice").show();
+        $("#divPackageDetails").show();
+
+
+        if ($("#ProductId").val() > 0)
+            $("#btnAddProducts").show();
     }
 
     function CheckCode()
@@ -373,7 +402,8 @@
         });
     }
 
-    function SetPrice() {
+    function SetPrice()
+    {
         var sp = (1 + $("#StorePercentage").val() / 100);
         var dp = (1 + $("#WholesalerPercentage").val() / 100);
         var wp = (1 + $("#DealerPercentage").val() / 100);
@@ -383,11 +413,13 @@
         $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
     }
 
-    function EditCode(checkBox) {
+    function EditCode(checkBox)
+    {
         $("#Code").attr("readonly", !$(checkBox).is(':checked'));
     }
 
-    function ShowImages() {
+    function ShowImages()
+    {
         $("#divImagesLoaded").modal();
     }
 

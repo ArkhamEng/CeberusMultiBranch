@@ -34,6 +34,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.ModelCompatibilities = new List<CarModel>();
             this.BranchProducts = new List<BranchProduct>();
             this.Systems = new List<PartSystem>().ToSelectList();
+            this.Details = new List<PackageDetail>();
+            this.Packages = new  List<PackageDetail>();
         }
 
         public ProductViewModel(Product product)
@@ -66,6 +68,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.CarModels = new List<CarModel>().ToSelectList();
             this.ModelCompatibilities = new List<CarModel>();
             this.Systems = new List<PartSystem>().ToSelectList();
+            this.Details = product.Details;
+            this.Packages = product.Packages;
 
         }
     }

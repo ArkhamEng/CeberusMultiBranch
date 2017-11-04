@@ -19,11 +19,6 @@
         @{int i = 0; }
         @foreach (var item in Model)
         {
-            if (item == null)
-            {
-                break;
-            }
-
             var ProductId = "TransactionDetails[" + i + "].ProductId";
             var TransactionId = "TransactionDetails[" + i + "].TransactionId";
             var Amount = "TransactionDetails[" + i + "].Amount";
@@ -50,14 +45,25 @@
                     </h5>
                 </td>
 
-                <td class="col-md-2 text-center">
-                    <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
-                        onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
-                        <u>
-                            @Html.DisplayFor(modelItem => item.Price)
-                        </u>
-                    </h4>
-                </td>
+                @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                {
+                    <td class="col-md-2 text-center">
+                        <h4 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
+                            onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice)">
+                            <u>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </u>
+                        </h4>
+                    </td>
+                }
+                else
+                { 
+                    <td class="col-md-2 text-center">
+                        <h4 id="txtPrice" class="text-info">
+                                @Html.DisplayFor(modelItem => item.Price)
+                        </h4>
+                    </td>
+                }
                 <td class="col-md-1 text-info text-center">
                     <input name="@Quantity" class="form-control text-right" value="@item.Quantity" max="@item.Product.Quantity"
                            type="number" min="1" onkeydown="return false" onmouseup="QuantityChanged(this)" />
@@ -87,8 +93,8 @@
                     <input name="@Price" value="@item.Price" />
                 </td>
             </tr>
-
             i++;
+
         }
     </tbody>
     <tfoot>

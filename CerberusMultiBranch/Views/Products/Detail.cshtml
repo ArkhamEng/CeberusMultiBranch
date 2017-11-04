@@ -88,10 +88,21 @@
                             <div class="col-md-8 row input-group">
                                 @Html.TextBox("txtQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
                                 <span class="input-group-btn">
-                                    <button class="btn btn-warning" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.StorePrice')">
-                                        <span class="fa fa-cart-plus"></span>
-                                        Agregar al carrito
-                                    </button>
+                                    @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                                    {
+                                        <button class="btn btn-warning" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.StorePrice')">
+                                            <span class="fa fa-cart-plus"></span>
+                                            Agregar al carrito
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-primary" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.PackagePrice')">
+                                            <span class="fa fa-cart-plus"></span>
+                                            Agregar al carrito
+                                        </button>
+                                    }
+
                                 </span>
                             </div>
                         }
@@ -218,14 +229,15 @@
         });
     }
 
-    function AddToCart(productId, available, storePrice) {
+    function AddToCart(productId, available, price)
+    {
         quantity = parseFloat($("#txtQuantity").val());
 
         var data =
         {
             productId: productId,
             quantity: $("#txtQuantity").val(),
-            price: storePrice
+            price: price
         }
 
         ExecuteAjax('@Url.Action("AddToCart", "Sales")', data, function (data) {

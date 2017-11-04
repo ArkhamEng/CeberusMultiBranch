@@ -10,19 +10,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     [Table("PackageDetail", Schema = "Catalog")]
     public class PackageDetail
     {
-        [Column(Order = 0), Key]
+        public int PackageDetailId { get; set; }
+
+        [ForeignKey("Package")]
         public int PackageId { get; set; }
 
-        [Column(Order = 1), Key]
-        public int ProductId { get; set; }
+        [ForeignKey("Detail")]
+        public int DetailtId { get; set; }
 
         public double Quantity { get; set; }
 
-        [ForeignKey("PackageId")]
-        public Product Package { get; set; }
+        public virtual Product Package { get; set; }
 
-        [ForeignKey("ProductId")]
-        public Product Product { get; set; }
+        public virtual Product Detail { get; set; }
+
     }
 
 }

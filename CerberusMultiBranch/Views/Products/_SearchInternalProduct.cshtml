@@ -1,0 +1,65 @@
+﻿
+
+
+<div id="ModalInternalProduct" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Búsqueda de productos para paquete</h4>
+            </div>
+            <div class="modal-body panel-body panel-group">
+                <div class="panel panel-danger">
+                    <div class="panel-body">
+                        <div class="col-md-8">
+                            @Html.Label("Código / Descripción de producto interno", htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                                @Html.TextBox("IntProdName", "", htmlAttributes: new { @class = "form-control" })
+                                <span class="input-group-btn">
+                                    <button id="btnSearchProduct" type="button" class="btn btn-default" title="Buscar producto para asociar">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-md-offset-3">
+                    <img id="imgIntLoading" src="~/Content/Images/loading.gif" class="img-responsive hide" />
+                </div>
+                <div id="divInternalProductList">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnSearchProduct").click(function ()
+        {
+            SearchIntProduct();
+        });
+    });
+
+
+    function SearchIntProduct()
+    {
+        $("#divInternalProductList").html('');
+        $("#imgIntLoading").attr("class", "img-responsive");
+
+        var param = { filter: $("#IntProdName").val() }
+
+        ExecuteAjax('@Url.Action("SearchForPackage")', param, function (view)
+        {
+            $("#imgIntLoading").attr("class", "img-responsive hide");
+            $("#divInternalProductList").html(view);
+        });
+    }
+</script>

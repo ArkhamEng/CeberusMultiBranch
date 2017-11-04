@@ -3,7 +3,7 @@
 
 <div id="ModalMovement" class="modal fade" role="dialog">
     <div class="modal-dialog">
-        <div class="modal-content panel panel-danger panel-group">
+        <div class="modal-content panel panel-danger">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Moviento de inventario</h4>
@@ -36,22 +36,32 @@
                         <span class="fa fa-cubes"></span>
                         Unidad @Model.Product.Unit
                     </h5>
-                    <div class="col-md-6 col-md-offset-3">
-                        <div class="form-control">
-                            <label class="radio-inline"><input type="radio" value="1" name="type" checked>Entrada</label>
-                            <label class="radio-inline"><input type="radio" value="2" name="type">Salida</label>
-                        </div>
+                </div>
+                <div class="col-md-6 col-md-offset-3">
+                    <div class="form-control">
+                        <label class="radio-inline">
+                            <input type="radio" value="1" name="type" checked>
+                            Entrada
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" value="2" name="type">
+                            Salida
+                        </label>
                     </div>
                 </div>
                 <div class="col-md-6 col-md-offset-3 text-center">
-                    @Html.Label("Cantidad a transferir", htmlAttributes: new { @class = "control-label" })
+                    @Html.Label("Cantidad a mover", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                        <input id="txtQuantityMovement" class="form-control" type="number" , max='@Model.Stock' min="1" value="0" />
+                        <span class="input-group-addon">
+                            <i class="fa fa-cubes"></i>
+                        </span>
+                        <input id="txtQuantityMovement" class="form-control" onmouseup="Check(this)"
+                               type="number"  max='@Model.Stock' min="0" value="0" onkeyup="Check(this)" />
 
                         <span class="input-group-btn">
-                            <button class="btn btn-primary" type="button" title="Confirmar movimiento de inventario"
-                                    onclick="Move('@Model.ProductId')">
+                            <button id="btnMove" class="btn btn-primary" type="button" 
+                                    title="Confirmar movimiento de inventario"
+                                    onclick="Move('@Model.ProductId')" disabled>
                                 <span class="glyphicon glyphicon-ok" />
                                 Confirmar
                             </button>
@@ -64,15 +74,30 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#ModalMovement").modal("show");
     });
+
+    function Check(element)
+    {
+        var quantity = parseFloat($(element).val());
+
+        if (quantity > 0)
+            $("#btnMove").prop("disabled", false);
+        else
+            $("#btnMove").prop("disabled", true);
+    }
 
     function Move(productId)
     {
         $("#ModalMovement").modal("hide");
+
         ShowLoading();
-        var param = { productId: productId, quantity: $("#txtQuantityMovement").val(), type:$("input[name=type]:checked").val() }
+        var param = {
+            productId: productId, quantity: $("#txtQuantityMovement").val(),
+            type: $("input[name=type]:checked").val()
+        }
 
         ExecuteAjax('@Url.Action("Move")', param, function (j)
         {
@@ -81,10 +106,12 @@
             {
                 $("#txtName").val(j.Code);
                 LookFor();
-                ShowMessage(j.Result, j.Message, 'success');
+                //ShowMessage(j.Result, j.Message, 'success');
             }
             else
+            {
                 ShowMessage(j.Result, j.Message, 'warning');
+            }
         });
     }
 </script>

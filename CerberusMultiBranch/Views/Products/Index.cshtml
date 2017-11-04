@@ -165,8 +165,9 @@
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view)
         {
-            $("#divProducts").html(view);
             HideLoading();
+            $("#divProducts").html(view);
         });
     }
+
 </script>

@@ -76,11 +76,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var branchP = db.BranchProducts.Include(bp => bp.Product).
                          Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                         Include(bp => bp.Product.PackageDetails).
+                         Include(bp => bp.Product.Details).
                          FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
 
 
-           
+
             if (type == MovementType.Exit)
             {
                 if (branchP.Stock < quantity)
@@ -92,7 +92,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     branchP.UpdDate = DateTime.Now;
                     branchP.StockMovements = branchP.StockMovements ?? new List<StockMovement>();
 
-                   var mSm = new StockMovement
+                    var mSm = new StockMovement
                     {
                         BranchId = branchP.BranchId,
                         ProductId = branchP.ProductId,
@@ -108,18 +108,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
                     if (branchP.Product.ProductType == ProductType.Package)
                     {
-                        foreach(var det in branchP.Product.PackageDetails)
+                        foreach (var det in branchP.Product.Packages)
                         {
-                           
-                           var dtBranchP = db.BranchProducts.Find(productId, det.ProductId);
-                            
+
+                            var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
+
                             dtBranchP.LastStock = dtBranchP.Stock;
-                            dtBranchP.Stock += det.Quantity;
+                            dtBranchP.Stock += det.Quantity * quantity;
 
                             db.Entry(dtBranchP).State = EntityState.Modified;
 
                             //creo los reingresos del producto al inventario
-                           var sm = new StockMovement
+                            var sm = new StockMovement
                             {
                                 BranchId = dtBranchP.BranchId,
                                 ProductId = dtBranchP.ProductId,
@@ -137,7 +137,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 branchP.LastStock = branchP.Stock;
                 branchP.Stock += quantity;
-            
+
                 var mSm = new StockMovement
                 {
                     BranchId = branchP.BranchId,
@@ -146,7 +146,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     MovementType = MovementType.Entry,
                     User = User.Identity.Name,
                     MovementDate = DateTime.Now,
-                    Comment = "Entrada de manual producto"
+                    Comment = "Entrada manual de producto"
                 };
 
                 db.StockMovements.Add(mSm);
@@ -154,16 +154,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
                 if (branchP.Product.ProductType == ProductType.Package)
                 {
-                    foreach (var det in branchP.Product.PackageDetails)
+                    foreach (var det in branchP.Product.Packages)
                     {
-                        var dtBranchP = db.BranchProducts.Find(productId, det.ProductId);
+                        var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
 
                         //verifico si la cantidad en stock es suficiente para alimentar el paquete, si no lo es, 
                         //la operación concluye
-                        if(dtBranchP.Stock < det.Quantity)
+                        if (dtBranchP == null || dtBranchP.Stock < (det.Quantity * quantity))
                         {
-                            return Json(new { Result = "Imposible realizar el ingreso del paquete!",
-                                Message = "No hay suficiente producto en inventario, revise la configuración del paquete para conocer las cantidades necesarias" });
+                            return Json(new
+                            {
+                                Result = "Imposible realizar el ingreso del paquete!",
+                                Message = "No hay suficiente producto en inventario, revise la configuración del paquete para conocer las cantidades necesarias"
+                            });
                         }
 
                         dtBranchP.LastStock = dtBranchP.Stock;
@@ -193,7 +196,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 db.Entry(branchP).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = "Movimiento exitoso! se ha actualizado la cantidad de producto en inventario" });
+                return Json(new
+                {
+                    Result = "OK",
+                    Message = "Movimiento exitoso! se ha actualizado la cantidad de producto en inventario",
+                    Code = branchP.Product.Code
+                });
             }
             catch (Exception ex)
             {
@@ -465,7 +473,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
             else
             {
-                var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
+                var product = db.Products.Include(p => p.Images).
+                    Include(p => p.Details).
+                    Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
                 model = new ProductViewModel(product);
             }
 
@@ -474,6 +484,34 @@ namespace CerberusMultiBranch.Controllers.Catalog
             model.Systems = db.Systems.ToSelectList();
             return View(model);
         }
+
+        [HttpPost]
+        public ActionResult AddToPackage(int packagedId, int productId, double quantity)
+        {
+
+            var pd = db.PackageDetails.FirstOrDefault(p=> p.PackageId == packagedId && p.DetailtId == productId);
+
+            if(pd == null)
+            {
+                PackageDetail d = new PackageDetail { PackageId = packagedId, DetailtId = productId, Quantity = quantity };
+                db.PackageDetails.Add(d);
+            }
+            else
+            {
+                pd.Quantity += quantity;
+                db.Entry(pd).State = EntityState.Modified;
+            }
+
+           
+            db.SaveChanges();
+
+            var model = db.PackageDetails.Include(pkD => pkD.Detail).
+                Where(pkD => pkD.PackageId == packagedId).ToList();
+
+            return PartialView("_PackageDetails", model);
+
+        }
+
 
         // POST: Products/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
@@ -565,6 +603,23 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
             return RedirectToAction("Create", new { id = product.ProductId });
+        }
+
+
+        [HttpPost]
+        public ActionResult SearchForPackage(string filter)
+        {
+            string[] arr = new List<string>().ToArray();
+
+            if (filter != null && filter != string.Empty)
+                arr = filter.Trim().Split(' ');
+
+            var products = (from ep in db.Products.Include(p => p.Category)
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Name).Contains(s)))
+                            && (ep.ProductType == ProductType.Single)
+                            select ep).Take((int)Cons.OneHundred).ToList();
+
+            return PartialView("_ListForPackage", products);
         }
 
         [HttpPost]

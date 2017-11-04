@@ -42,6 +42,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<Product> Products { get; set; }
 
+        public DbSet<PackageDetail> PackageDetails { get; set; }
+
         public DbSet<ExternalProduct> ExternalProducts { get; set; }
 
         public DbSet<Equivalence> Equivalences { get; set; }
@@ -92,7 +94,18 @@ namespace CerberusMultiBranch.Models
         {
             modelBuilder.HasDefaultSchema("Security");
 
-          
+            //modelBuilder.Entity<PackageDetail>()
+            //       .HasRequired(m => m.Package)
+            //       .WithMany(t => t.Packages)
+            //       .HasForeignKey(m => m.PackageId)
+            //       .WillCascadeOnDelete(false);
+
+            //modelBuilder.Entity<PackageDetail>()
+            //            .HasRequired(m => m.Detail)
+            //            .WithMany(t => t.PackageDetails)
+            //            .HasForeignKey(m => m.PackageDetailId)
+            //            .WillCascadeOnDelete(false);
+
             base.OnModelCreating(modelBuilder);
 
         }

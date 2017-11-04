@@ -1,0 +1,35 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Catalog.PackageDetail>
+
+
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="row">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayName("Codigo")</th>
+                        <th>@Html.DisplayName("Descripcion")</th>
+                        <th>@Html.DisplayName("Cantidad")</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(m => item.Detail.Code)</td>
+                            <td>@Html.DisplayFor(m => item.Detail.Name)</td>
+                            <td>@Html.DisplayFor(m => item.Quantity)</td>
+                            <td>
+                                <button type="button" class="btn btn-xs btn-danger" title="Quitar del paquete">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
