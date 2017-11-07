@@ -205,6 +205,14 @@
     <Compile Include="Migrations\201711040904068_Initial.Designer.cs">
       <DependentUpon>201711040904068_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711051640073_CommissionPerCategory.cs" />
+    <Compile Include="Migrations\201711051640073_CommissionPerCategory.Designer.cs">
+      <DependentUpon>201711051640073_CommissionPerCategory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711051751014_CommissionPerCategory1.cs" />
+    <Compile Include="Migrations\201711051751014_CommissionPerCategory1.Designer.cs">
+      <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -468,6 +476,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201711040904068_Initial.resx">
       <DependentUpon>201711040904068_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711051640073_CommissionPerCategory.resx">
+      <DependentUpon>201711051640073_CommissionPerCategory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711051751014_CommissionPerCategory1.resx">
+      <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

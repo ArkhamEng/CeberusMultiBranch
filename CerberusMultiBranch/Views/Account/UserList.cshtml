@@ -14,7 +14,9 @@
         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
         @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
         <span class="input-group-btn">
-            <button  type="button" class="btn btn-success" onclick="window.location='@Url.Action("Register")'" title="Registrar nuevo usuario">
+            <button  type="button" class="btn btn-success" 
+                    onclick="ShowLoading(); window.location='@Url.Action("Register")'" 
+                    title="Registrar nuevo usuario">
                 <span class="glyphicon  glyphicon-file"></span>
             </button>
         </span>
@@ -93,7 +95,8 @@
                 </td>
 
                 <td class="col-md-1 btn-group text-right">
-                   <button class="btn btn-warning btn-xs" title="Roles de usuario" onclick="window.location='@Url.Action("UserConfig",new {id=item.Id })'">
+                   <button class="btn btn-warning btn-xs" title="Roles de usuario" 
+                           onclick="ShowLoading(); window.location='@Url.Action("UserConfig",new {id=item.Id })'">
                        <span class="fa fa-edit"></span>
                    </button>
                 </td>

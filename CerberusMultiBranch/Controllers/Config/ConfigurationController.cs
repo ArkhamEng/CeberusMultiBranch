@@ -57,19 +57,20 @@ namespace CerberusMultiBranch.Controllers.Config
 
         [HttpPost]
         
-        public ActionResult SaveCategory(int? categoryId, string name,string satCode)
+        public ActionResult SaveCategory(int? categoryId, string name,string satCode, int commission)
         {
             
             if (ModelState.IsValid)
             {
                 if (categoryId == null)
                 {
-                    var category = new Category {  Name = name,SatCode = satCode };
+                    var category = new Category {  Name = name,SatCode = satCode, Commission = commission };
                     db.Categories.Add(category);
                 }
                 else
                 {
-                    var category = new Category { CategoryId = categoryId.Value, Name = name, SatCode = satCode };
+                    var category = new Category
+                    { CategoryId = categoryId.Value, Name = name, SatCode = satCode, Commission = commission };
                     db.Entry(category).State = EntityState.Modified;
                 }
                 db.SaveChanges();

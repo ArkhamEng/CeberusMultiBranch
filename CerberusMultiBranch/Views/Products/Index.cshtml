@@ -18,13 +18,13 @@
             <button class="btn btn-default" type="button" id="btnSearch" title="Buscar">
                 <span class="glyphicon glyphicon-search" />
             </button>
-            <button id="btnSwitch" type="button" class="btn btn-default" title="Ver como tabla" >
+            <button id="btnSwitch" type="button" class="btn btn-default hidden-xs hidden-sm" title="Ver como tabla" >
                 <span id="spSwitch" class="fa fa-th-large"></span>
             </button>
-            <button class="btn btn-default" type="button" id="btnClear" title="Recargar">
+            <button class="btn btn-default  hidden-xs hidden-sm" type="button" id="btnClear" title="Recargar">
                 <span class="glyphicon glyphicon-refresh" />
             </button>
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters" title="Mostrar filtros">
+            <button id="btnFilter" type="button" class="btn btn-warning hidden-xs hidden-sm" data-toggle="collapse" data-target="#divFilters" title="Mostrar filtros">
                 <span class="glyphicon glyphicon-eye-open"></span>
             </button>
             @if (User.IsInRole("Capturista"))
@@ -47,13 +47,13 @@
             </div>*@
         <div class="panel-body">
             <div class="row">
-                <div class="form-group col-md-12">
+                @*<div class="form-group col-md-12">
                     @Html.Label("Sistema", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
                         @Html.DropDownList("PartSystemId", Model.Systems, "", new { @class = "form-control" })
                     </div>
-                </div>
+                </div>*@
                 <div class="form-group col-md-12">
                     @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
@@ -160,8 +160,8 @@
             carModelId: $("#CarModelId").val(),
             carYear: $("#CarYearId").val(),
             name: $("#txtName").val(),
-            isGrid: $("#IsGrid").val(),
-            partSystemId: $("#PartSystemId").val()
+            isGrid: $("#IsGrid").val()
+            //partSystemId: $("#PartSystemId").val()
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view)
         {

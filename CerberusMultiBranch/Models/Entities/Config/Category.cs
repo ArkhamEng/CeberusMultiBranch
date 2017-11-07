@@ -22,6 +22,10 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Clave SAT")]
         public string SatCode { get; set; }
 
+       
+        [Display(Name = "% Comision")]
+        public int Commission { get; set; }
+
 
         public int Id { get { return CategoryId; } }
     }

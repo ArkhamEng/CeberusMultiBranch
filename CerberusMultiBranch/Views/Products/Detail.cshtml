@@ -97,7 +97,7 @@
                                     }
                                     else
                                     {
-                                        <button class="btn btn-primary" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.PackagePrice')">
+                                        <button class="btn btn-primary" onclick="AddToCart('@Model.ProductId','@Model.Quantity')">
                                             <span class="fa fa-cart-plus"></span>
                                             Agregar al carrito
                                         </button>
@@ -229,15 +229,14 @@
         });
     }
 
-    function AddToCart(productId, available, price)
+    function AddToCart(productId, available)
     {
         quantity = parseFloat($("#txtQuantity").val());
 
         var data =
         {
             productId: productId,
-            quantity: $("#txtQuantity").val(),
-            price: price
+            quantity: $("#txtQuantity").val()
         }
 
         ExecuteAjax('@Url.Action("AddToCart", "Sales")', data, function (data) {

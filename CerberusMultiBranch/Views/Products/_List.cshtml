@@ -19,10 +19,10 @@
             <tr>
                 @foreach (var prod in item)
                 {
-                    string c = string.Format("col-md-{0}", (12 / i));
+                    string c = string.Format("col-md-{0}  col-xs-4 col-sm-4", (12 / i));
                     <td class='@c'>
 
-                        @{ string imgC = string.Format("col-md-{0}", (i * 2)); }
+                        @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", (i * 2)); }
 
                         <div class='@imgC' style="vertical-align:central" onmouseover="SetPointer(this)"
                              onclick="Detail('@prod.ProductId')">

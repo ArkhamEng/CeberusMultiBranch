@@ -25,6 +25,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DataType(DataType.Currency)]
         public double Amount { get; set; }
 
+        [DataType(DataType.Currency)]
+        public double Commission { get; set; }
+
         public virtual Product Product { get; set; }
 
         public virtual Transaction Transaction { get; set; }

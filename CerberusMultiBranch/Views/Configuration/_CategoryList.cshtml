@@ -10,17 +10,23 @@
                 <th>
                     @Html.DisplayNameFor(model => model.SatCode)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Commission)
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr onmouseover="$(this).css('cursor', 'pointer')" onclick="SelectCategory('@item.CategoryId','@item.Name','@item.SatCode')">
+                <tr onmouseover="$(this).css('cursor', 'pointer')" onclick="SelectCategory('@item.CategoryId','@item.Name','@item.SatCode','@item.Commission')">
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.SatCode)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Commission)
                     </td>
                 </tr>
             }
@@ -33,12 +39,13 @@
         SetDataTable("#tbCategories", "#CategoryName")
     });
 
-    function SelectCategory(id,name,code) 
+    function SelectCategory(id,name,code,commission) 
     {
         $("#CategoryId").val(id);
         $("#CategoryName").val(name);
 
         $("#SatCode").val(code);
+        $("#Commission").val(commission);
 
         $("#btnClearCategory").show();
         $("#spCategory").attr("class","glyphicon glyphicon-floppy-disk");

@@ -29,6 +29,7 @@
     @Html.HiddenFor(m => m.Folio)
     @Html.HiddenFor(m => m.UpdUser)
     @Html.HiddenFor(m => m.UpdDate)
+    
 
 
     if (Model.Client != null)
@@ -75,7 +76,6 @@
                 {
                     if (Model.Status== CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess)
                     {
-
                         <button id="btnShowClients" class="btn btn-success" type="button">
                             <span class="fa fa-user-plus"></span>
                             Cargo a cliente
@@ -138,20 +138,26 @@
 
     function ClientSelected(id, name, ftr)
     {
-        $("#ClientId").val(id);
+        $("#ModalQuickClient").modal('hide');
+        ShowLoading();
 
         var param = { clientId: id, transactionId: $("#TransactionId").val() }
 
-        ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j) {
-            $("#ModalQuickClient").modal('hide');
+        ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j)
+        {
             if (j.Result != 'OK')
+            {
+                HideLoading();
                 ShowMessage(j.Result, j.Data, 'warning');
-            else {
-                $("#hClientName").text('');
-                $("#hClientName").append(name);
-                $("#hClientName").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
-                $("#hClientName").append("RFC:");
-                $("#hClientName").append(ftr);
+            }
+            else
+            {
+                //$("#hClientName").text('');
+                //$("#hClientName").append(name);
+                //$("#hClientName").append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+                //$("#hClientName").append("RFC:");
+                //$("#hClientName").append(ftr);
+                window.location = '@Url.Action("ShopingCart")';
             }
         });
     }

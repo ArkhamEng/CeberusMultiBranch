@@ -73,6 +73,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(20)]
         public string Phone { get; set; }
 
+        public ClientType Type { get; set; }
+
         public bool IsActive { get; set; }
 
         [Required]
@@ -114,5 +116,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
                 ZipCode = this.ZipCode
             };
         }
+    }
+
+    public enum ClientType
+    {
+        Store  = 0,
+        Dealer = 1,
+        Wholesaler =2
     }
 }

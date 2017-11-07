@@ -56,8 +56,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 arr = name.Trim().Split(' ');
 
             var model = (from p in db.Clients
-                         where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s))) &&
-                               (p.ClientId != Cons.Zero)
+                         where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
                          select p).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickClientList", model);

@@ -5,7 +5,7 @@
 <h4>Categorías de producto</h4>
 
 <div class="col-md-12">
-    <div class="col-md-6">
+    <div class="col-md-5">
         @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
         <div class="input-group ">
             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -13,11 +13,18 @@
         </div>
         <label id="lblCategory" class="text-danger" />
     </div>
-    <div class="col-md-4">
+    <div class="col-md-2">
         @Html.Label("Clave SAT", htmlAttributes: new { @class = "control-label" })
         <div class="input-group ">
             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
             @Html.TextBox("SatCode", "", htmlAttributes: new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="col-md-3">
+        @Html.Label("% Comision", htmlAttributes: new { @class = "control-label" })
+        <div class="input-group ">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+            @Html.TextBox("Commission", "", htmlAttributes: new { @class = "form-control",@type="number",min="0" })
             <span class="input-group-btn">
                 <button class="btn btn-default" id="btnClearCategory">
                     <span class="fa fa-refresh" />
@@ -27,6 +34,7 @@
                 </button>
             </span>
         </div>
+        <label id="lblCategory" class="text-danger" />
     </div>
 </div>
 <br />
@@ -36,35 +44,40 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#btnClearCategory").hide();
 
         $("#btnClearCategory").click(function () { ClearCategory(); });
 
-        $("#btnCategory").click(function ()
-        {
+        $("#btnCategory").click(function () {
             ShowLoading();
             if ($("#CategoryName").val().length < 5)
             {
-                $("#lblCategory").text("La categoría debe tener una longitud mayor a 5 caracteres");
+                ShowMessage("Error en el nombre",
+                    "La categoría debe tener una longitud mayor a 5 caracteres", "warning");
+            }
+            else if (parseInt($("#Commission").val()) < 0 || parseInt($("#Commission").val()) > 100)
+            {
+                ShowMessage("Error en la comisión",
+                    "El porcentade de comisión debe ser un valor entre 0 y 100%", "warning");
             }
             else
             {
-                $("#lblCategory").text("");
+                var param = {
+                    categoryId: $("#CategoryId").val(),
+                    name: $("#CategoryName").val(),
+                    satCode: $("#SatCode").val(),
+                    commission: $("#Commission").val(),
+                };
 
-                var param = { categoryId: $("#CategoryId").val(), name: $("#CategoryName").val(), satCode: $("#SatCode").val() };
-
-                ExecuteAjax('@Url.Action("SaveCategory", "Configuration")', param, function (view)
-                {
+                ExecuteAjax('@Url.Action("SaveCategory", "Configuration")', param, function (view) {
                     $("#divCategories").html(view);
                     HideLoading();
                 });
             }
         });
 
-        ExecuteAjax('@Url.Action("GetCategories", "Configuration")', {}, function (view)
-        {
+        ExecuteAjax('@Url.Action("GetCategories", "Configuration")', {}, function (view) {
             $("#divCategories").html(view);
         });
     });
@@ -73,6 +86,8 @@
     {
         $("#CategoryId").val("");
         $("#CategoryName").val("");
+        $("#SatCode").val("");
+        $("#Commission").val("0");
         $("#btnClearCategory").hide();
 
         $("#spCategory").attr("class", "glyphicon glyphicon-plus");

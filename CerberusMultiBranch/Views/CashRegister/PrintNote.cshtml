@@ -1,4 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+@using CerberusMultiBranch.Support;
+
 @{
     ViewBag.Title = "SaleDetail";
 }
@@ -9,150 +11,208 @@
     <span class="fa fa-ticket" style="float:left"></span>
     &nbsp;&nbsp;Nota de venta
 </h3>
-<h4 class="text-danger">
-   Vendedor: @Model.User.UserName
-</h4>
 
 <hr />
-<div id="divPrint" >
-    <div class="row">
-        <div class="col-xs-6 col-md-5">
-            <div class="col-xs-6  col-md-5">
-                <img src="~/Content/Images/logo2.png" class="img-responsive" >
-            </div>
-            <div class="col-xs-12   col-md-12">
-                <h5 class="media-heading"><label class="control-label">Autopartes Bicentenario S.A. de C.V.</label></h5>
-                <p class="small">  RFC: APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX</p>
-            </div>
-        </div>
 
-        <div class="col-xs-5 col-xs-offset-1 col-md-offset-3 col-md-4">
-            <div class="panel panel-danger">
-                <div class="text-center BkPrint">
-                    Datos de Compra
-                </div>
-                <table class="table table-bordered panel-body">
+<div id="divPrint" style="width:816px">
+    <table>
+        <tr>
+            <td width="300px">
+                <table style="width:100%">
                     <tr>
-                        <td colspan="2"><label class="control-label">Fecha de venta:</label> </td>
-                        <td colspan="2">@Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <img src="~/Content/Images/logo2.png" style="width:200px">
+                        </td>
                     </tr>
                     <tr>
-                        <td><label class="control-label">Folio:</label></td>
-                        <td>@Model.Folio</td>
-                        <td><label class="control-label">Pago:</label></td>
-                        <td>@Model.PaymentType.ToString()</td>
+                        <td>
+                            <label class="control-label">
+                                Autopartes Bicentenario S.A. de C.V.
+                            </label><br />
+                            APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                            LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                        </td>
                     </tr>
                 </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="row ">
-        <div class="col-xs-12">
-            <div class="panel panel-danger">
-                <div class="BkPrint text-center">
-                    Datos del cliente
-                </div>
-                <table class="table table-bordered">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <label class="control-label">
-                                    @Html.DisplayName("Nombre")
-                                </label>
-                            </td>
-                            <td>@Html.DisplayFor(m => Model.Client.Name)</td>
-
-                            <td>
-                                <label class="control-label">
-                                    @Html.DisplayName("RFC")
-                                </label>
-                            </td>
-                            <td>@Html.DisplayFor(m => Model.Client.FTR)</td>
-                        </tr>
-                        <tr></tr>
-                        <tr>
-                            <td>
-                                <label class="control-label">
-                                    @Html.DisplayName("Dirección")
-                                </label>
-                            </td>
-                            <td colspan="3">@Html.DisplayFor(m => Model.Client.TaxAddress)</td>
-                        </tr>
-                    </tbody>
+            </td>
+            <td width="272px"></td>
+            <td width="264px">
+                <table style="width:100%" class="table-bordered">
+                    <tr>
+                        <td colspan="2" class="BkPrint text-center">
+                            <label style="color:white">Datos de venta</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            <label>Folio</label>
+                        </td>
+                        <td class="text-center">
+                            <label>Fecha</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">
+                            @Model.Folio
+                        </td>
+                        <td class="text-center">
+                            @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            <label>Agente</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            @Model.User.UserName
+                        </td>
+                    </tr>
                 </table>
-            </div>
-        </div>
-    </div>
 
-    <div class="row ">
-        <div class="col-xs-12">
-            <div class="panel panel-danger">
-                <div class="col-xs-2 col-md-1  text-center BkPrint">@Html.DisplayName("Clave")</div>
-                <div class="col-xs-1 col-md-1  text-center BkPrint">@Html.DisplayName("Cant")</div>
-                <div class="col-xs-5 col-md-6  text-center BkPrint">@Html.DisplayName("Descripción")</div>
-                <div class="col-xs-2 col-md-2  text-center BkPrint">@Html.DisplayName("Precio")</div>
-                <div class="col-xs-2 col-md-2  text-center BkPrint">@Html.DisplayName("Importe")</div>
-                <table class="table table-bordered">
-                    <tbody class="panel-body">
-                        @foreach (var item in Model.TransactionDetails)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="height:20px"></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table style="width:816px" class="table-bordered">
+                    <tr>
+                        <td colspan="3" class="text-center BkPrint">
+                            <label style="color:white">Datos del cliente</label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:30%" class="text-center">
+                            <label>Nombre del cliente</label>
+                        </td>
+                        <td style="width:50%" class="text-center">
+                            <label>Dirección del cliente</label>
+                        </td>
+                        <td style="width:20%" class="text-center">
+                            <label>R.F.C.</label>
+                        </td>
+                    </tr>
+                    <tr style="height:60px">
+                        <td valign="top">
+                            @Model.Client.Name
+                        </td>
+                        <td valign="top">
+                            @Model.Client.TaxAddress
+                        </td>
+                        <td valign="top" class="text-center">
+                            @Model.Client.FTR
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="height:20px"></td>
+        </tr>
+        <tr>
+            <td class="text-center BkPrint" colspan="3">
+                <label style="color:white">Detalle de compra</label>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table style="width:100%; height:500px; border:1px solid gray;">
+                    <tr style="border-bottom:1px solid gray; height:15px">
+                        <td style="border-right:1px solid gray; width:10%" align="center">
+                            <label>Codigo</label>
+                        </td>
+                        <td style="border-right:1px solid gray; width:10%" align="center">
+                            <label>Cve. Sat</label>
+                        </td>
+                        <td style="border-right:1px solid gray; width:40%" align="center">
+                            <label>Descripción</label>
+                        </td>
+                        <td style="border-right:1px solid gray; width:10%" align="center">
+                            <label>Precio</label>
+                        </td>
+                        <td style="border-right:1px solid gray; width:10%" align="center">
+                            <label>Cantidad</label>
+                        </td>
+                        <td style="width:10%">
+                            <label>Total</label>
+                        </td>
+                    </tr>
+                    @foreach (var item in Model.TransactionDetails)
                     {
-                            <tr>
-                                <td class="col-xs-2 col-md-1 text-center">
-                                    @Html.DisplayFor(mItem => item.Product.Code)
-                                </td>
-                                <td class="col-xs-1 col-md-1 text-center">
-                                    @Html.DisplayFor(mItem => item.Quantity)
-                                </td>
-                                <td class="col-xs-5 col-md-6">
-                                    @Html.DisplayFor(mItem => item.Product.Name)
-                                </td>
-                                <td class="col-xs-2 col-md-2  text-right">
-                                    @Html.DisplayFor(mItem => item.Price)
-                                </td>
-                                <td class="col-xs-2 col-md-2 text-right">
-                                    @Html.DisplayFor(mItem => item.Amount)
-                                </td>
-                            </tr>
-                    }
-                    </tbody>
-                    <tfoot>
                         <tr>
-                            <td colspan="3"></td>
-                            @{
+                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                @Html.DisplayFor(mItem => item.Product.Code)
+                            </td>
+                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                @Html.DisplayFor(mItem => item.Product.Category.SatCode)
+                            </td>
+                            <td style="border-right:1px solid gray; width:40%" valign="top">
+                                @Html.DisplayFor(mItem => item.Product.Name)
+                            </td>
+                            <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
+                                @Html.DisplayFor(mItem => item.Price)
+                            </td>
+                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                @Html.DisplayFor(mItem => item.Quantity)
+                            </td>
+                            <td class="text-right" style="width:10%" valign="top">
+                                @Html.DisplayFor(mItem => item.Amount)
+                            </td>
+                        </tr>
+                    }
+
+                    <tr style="height:23px; border-top:1px solid gray;">
+                        <td colspan="4" rowspan="3">
+                            IMPORTE CON LETRA <br />
+                            @Model.TotalAmount.toText() 
+                            PESOS MEXICANOS 
+                        </td>
+                        @{
                             var bI = Math.Round(Model.TotalAmount / 1.16, 2);
                             var iva = Math.Round(Model.TotalAmount - bI, 2);
-                            }
-                            <td class="text-right alert alert-info">
-                                <label class="control-label">
-                                    @Html.DisplayName("Sub-Total")
-                                </label>
-                            </td>
-                            <td class="text-right">@bI.ToString("c") </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"></td>
-                            <td class="text-right alert alert-danger">
-                                <label class="control-label">
-                                    @Html.DisplayName("IVA")
-                                </label>
-                            </td>
-                            <td class="text-right">@iva.ToString("c") </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"></td>
-                            <td class="text-right alert alert-info">
-                                <label class="control-label">
-                                    @Html.DisplayName("Total")
-                                </label>
-                            </td>
-                            <td class="text-right"><label class="control-label text-danger">@Model.TotalAmount.ToString("c")</label> </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-    </div>
+                        }
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                            <label class="control-label">
+                                @Html.DisplayName("Sub-Total")
+                            </label>
+                        </td>
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                            @bI.ToString("c")
+                        </td>
+                    </tr>
+                    <tr style="height:23px">
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                            <label>
+                                @Html.DisplayName("IVA")
+                            </label>
+                        </td>
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                        @iva.ToString("c") 
+                        </td>
+                    </tr>
+                    <tr style="height:23px">
+                      
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                            <label>
+                                @Html.DisplayName("Total")
+                            </label>
+                        </td>
+                        <td class="text-right" style="border:1px solid gray; width:10%">
+                            <label class="control-label text-danger">
+                                @Model.TotalAmount.ToString("c")
+                        </label>
+                    </td>
+                </tr>
+            </table>
+
+        </td>
+    </tr>
+</table>
+
+
 </div>
 
 
@@ -170,15 +230,13 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
-        $("#btnPrint").click(function () 
-        {
+    $(document).ready(function () {
+        $("#btnPrint").click(function () {
             $("#divPrint").printThis(
-                {
-                    footer:  "<h1>Amazing header</h1>"
+            {
+                footer: "<h1>Amazing header</h1>"
             });
-          
+
         });
     });
 

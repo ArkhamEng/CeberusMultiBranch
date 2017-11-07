@@ -305,7 +305,9 @@ namespace CerberusMultiBranch.Controllers
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                var users = db.Users.Include(u => u.Roles).Include(u=> u.UserBranches).ToList();
+                var users = db.Users.Include(u => u.Roles).
+                    Include(u=> u.UserBranches).
+                    Where(u=> u.UserName!="Administrador").ToList();
                 return View(users);
             }
         }

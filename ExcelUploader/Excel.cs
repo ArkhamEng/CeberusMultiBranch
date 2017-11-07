@@ -93,12 +93,34 @@ namespace ExcelUploader
                     while (dr.Read())
                     {
                         var product = new Product();
-                        product.Code        = dr["CODIGO"].ToString().Trim();
-                        product.Description = dr["DESCRIPCION"].ToString().Trim();
-                        product.TradeMark   = dr["MARCA"].ToString().Trim();
-                        product.Unit        = dr["UNIDAD"].ToString().Trim();
-                        product.Category    = dr["CATEGORIA"].ToString().Trim();
-                        product.Price       =Convert.ToDouble( dr["PRECIO"].ToString().Trim());
+                        product.CategoryId  = 1;
+                        product.Code        = dr["Clave"].ToString().Trim();
+                        product.Name = dr["Descripcion"].ToString().Trim();
+                        product.TradeMark      = dr["Marca"].ToString().Trim();
+                        product.Unit           = dr["Unidad"].ToString().Trim();
+                        product.MinQuantity    =dr["Minimo"].ToInt();
+                        product.BuyPrice       =dr["Precio"].ToDouble();
+                        product.StorePercentage      = dr["Mostrador"].ToInt();
+                        product.DealerPercentage     = dr["Distribuidor"].ToInt();
+                        product.WholesalerPercentage = dr["Mayorista"].ToInt();
+                        
+
+                        if(product.BuyPrice <=0)
+                        {
+                            product.StorePrice = 0;
+                            product.DealerPrice = 0;
+                            product.WholesalerPrice = 0;
+                        }
+                        else
+                        {
+                            product.StorePrice = Math.Round(product.BuyPrice * (1 +(product.StorePercentage / 100.00)),0);
+                            product.DealerPrice =Math.Round(product.BuyPrice * (1 + (product.DealerPercentage / 100.00)),0); 
+                            product.WholesalerPrice = Math.Round(product.BuyPrice * (1 + (product.WholesalerPercentage / 100.00)),0); 
+                        }
+                        product.IsActive = true;
+                        product.UpdUser  = "Automatico";
+                        product.UpdDate  = DateTime.Now;
+
                         i++;
 
                         Console.Write("\r Productos encontrados {0}", i);

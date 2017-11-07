@@ -310,7 +310,7 @@ ul ul a {
  @media print {
 .BkPrint div 
 {
-    color: #fff;
+    color: white !important;
     background-color: #c9302c !important;
     border-color: #c9302c; 
 }

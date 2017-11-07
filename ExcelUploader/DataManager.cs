@@ -77,16 +77,35 @@ namespace ExcelUploader
             var prod = Excel.GetProducts();
             Console.WriteLine("Agregando productos");
             int i = 0;
+            int e = 0;
             foreach (var p in prod)
             {
-                var done = SQLServer.SetExternalProduct(p, 2);
+                Console.WriteLine("Productos agregados 0");
+                var done = false;
+                try
+                {
+                    done = SQLServer.AddProduct(p);
+                }
+                catch (Exception ex)
+                {
+                    Console.Write(ex.Message);
+                    done = false;
+                }
+
                 if (done)
                 {
                     i++;
-                   
-                    Console.WriteLine("\r Productos agregados {0}", i);
+                    Console.Write("\r Productos agregados {0}", i);
                 }
+                else
+                {
+                    e++;
+                }
+                   
             }
+            Console.WriteLine("Resumen de Operación...");
+            Console.WriteLine("Agregador {0}",i);
+            Console.WriteLine("Fallidos  {0}",e);
         }
 
 

@@ -83,18 +83,22 @@
 
 <script>
     var ModelCount = 0;
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetCascade("#CarMakeFilter", "#CarModelFilter", "GetModels");
 
         $("#Ini").attr("readonly", true);
         $("#End").attr("readonly", true);
 
-        $("#CarModelFilter").change(function () {
-            if ($("#CarModelFilter").val() != "") {
+        $("#CarModelFilter").change(function ()
+        {
+            if ($("#CarModelFilter").val() != "")
+            {
                 $("#Ini").attr("readonly", false);
                 $("#End").attr("readonly", false);
             }
-            else {
+            else
+            {
                 $("#Ini").attr("readonly", true);
                 $("#End").attr("readonly", true);
             }
@@ -105,7 +109,7 @@
         {
             if ($("#Ini").val() > 1900 & $("#End").val() > $("#Ini").val())
             {
-                var ip = '<input type="text" name="NewCompatibilities" value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val() + '" />';
+                var ip = '<input type="hidden" name="NewCompatibilities" value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val() + '" />';
                 var op = '<option value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val()
                     + '">' + $("#CarMakeFilter option:selected").text() + ' ' + $("#CarModelFilter option:selected").text() + ' ' + $("#Ini").val() + '-' + $("#End").val() + '</option>';
 

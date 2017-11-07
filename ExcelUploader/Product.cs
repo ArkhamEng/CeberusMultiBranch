@@ -44,6 +44,12 @@ namespace ExcelUploader
         public double DealerPrice { get; set; }
         public double WholesalerPrice { get; set; }
 
+        public bool IsActive { get; set; }
+
+        public DateTime UpdDate { get; set; }
+
+        public string UpdUser { get; set; }
+
 
 
     }

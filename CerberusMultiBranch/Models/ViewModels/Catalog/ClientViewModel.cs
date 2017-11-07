@@ -17,12 +17,26 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList Cities { get; set; }
 
+        public SelectList Types { get; set; }
+
         public int StateId { get; set; }
 
         public ClientViewModel()
         {
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
+            FillTypes();
+        }
+
+        private void FillTypes()
+        {
+            //utilizo una coleccion de ciudades (ISelectable)
+            var types = new List<City>();
+            types.Add(new City { CityId = 0, Name = "Mostrador" });
+            types.Add(new City { CityId = 1, Name = "Distribuidor" });
+            types.Add(new City { CityId = 2, Name = "Mayorista" });
+
+            this.Types = types.ToSelectList();
         }
 
         public ClientViewModel(Client client)
@@ -42,9 +56,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.TaxAddress   = client.TaxAddress;
             this.UpdDate      = client.UpdDate;
             this.ZipCode      = client.ZipCode;
+            this.Type         = client.Type;
 
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
+            FillTypes();
         }
     }
 }

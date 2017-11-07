@@ -83,6 +83,7 @@
             };
             ExecuteAjax('@Url.Action("SearchPayment")', data, function (view)
             {
+                HideLoading();
                 $("#divSalesToPay").html(view);
             });
             

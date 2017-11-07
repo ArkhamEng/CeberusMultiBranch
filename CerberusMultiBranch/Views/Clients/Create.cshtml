@@ -107,6 +107,14 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                     </div>
+                    <div class="form-group  col-md-4">
+                        @Html.Label("Tipo", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
+                            @Html.DropDownListFor(mode => Model.Type, Model.Types, htmlAttributes: new { @class = "form-control" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
                 </div>
             </div>
 

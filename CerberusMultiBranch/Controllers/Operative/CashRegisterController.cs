@@ -301,6 +301,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     FirstOrDefault(s => s.TransactionId == transactionId);
 
                 //marco la venta como pagada y coloco el tipo de pago
+                sale.LastStatus     = sale.Status;
                 sale.Status         = TranStatus.Compleated;
                 sale.UpdDate        = DateTime.Now;
                 sale.UpdUser        = User.Identity.Name;

@@ -3732,22 +3732,29 @@ GO
 INSERT [Security].[AspNetRoles] ([Id], [Name], [Description], [Discriminator]) VALUES (N'e0219f0a-25e2-4c93-a718-b143a0450c0a', N'Capturista', NULL, N'IdentityRole')
 
 --======================USER ROLES================================
-
+GO
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'6a25bb08-f81d-4d7e-8b4b-b1aaa2c73b19')
 
+GO
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'8c30e201-5f65-42ab-95a3-9a673c543de7')
+
+GO
 
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'a2bd31ac-7150-41f2-b875-3a01eb2ff518')
 
+GO
+
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'b0468515-731b-4cce-98ef-caf3e4a86cd9')
 
+GO
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'b7ca23c8-6f3d-4ecb-976a-b8ef33563d9b')
 
+GO
 INSERT INTO [Security].[AspNetUserRoles] ([UserId],[RoleId])
      VALUES(N'384a8104-cbc6-40a5-a27c-2947263e0fcc' ,N'e0219f0a-25e2-4c93-a718-b143a0450c0a')
 
@@ -3775,3 +3782,121 @@ BEGIN
 
 END
 
+
+--=======CATEGORIAS======================--
+GO
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Catalizadores','12161600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Acabados y revestimientos exterior para vehículos','25172600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Accesorios y componentes de motor','26101700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Aisladores y amortiguadores de vibración de vehículos','25174900',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Baterías, pilas y accesorios','26111700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Cable automotriz','26121800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Chasis automotriz','25181600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes de ciclo no motorizado o accesorios','25174700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes de la transmisión','26111800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes de motores o generadores','26101400',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes de sistema de suspensión','25172000',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes eléctricos','25173900',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes y sistemas de seguridad de vehículo','25172100',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Componentes y sistemas de vehículos','25174800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Controles de emisión y de escape','25173700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Cubiertas automotrices','31181800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Depósitos y sistemas de combustible','25172400',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Embalajes y empaquetaduras','31181700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Embragues','26111900',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Equipo de calefacción y piezas y accesorios','40101800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Equipo de medición y prueba de vehículos','25191800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Equipo para el mantenimiento de vehículo','25191700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Filtros','40161500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Generadores de potencia','26111600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Iluminación exterior para vehículos','25172900',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Iluminación interior para vehículos','25173000',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Limpiaparabrisas','25171500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Motores','26101500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Motores eléctricos de corriente alterna AC','26101100',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Motores eléctricos de corriente directa DC','26101200',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Motores no eléctricos','26101300',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Neumáticos y cámaras de neumáticos','25172500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Piezas y accesorios de embragues','26112000',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Preparados lubricantes','15121500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Puertas para vehículos','25172200',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Remolques para productos y materiales','25181700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Ruedas y acabados','25171900',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistema de refrigerar de motor','25174000',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de asientos del vehículo','25174600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de cargado eléctrico de vehículos','25175000',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de control medioambiental','25172700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de control principal','25173300',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de descarchado y antiniebla','25171600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de frenado y componentes','25171700',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas de tren de transmisión','25173800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas del interior de vehículos','25174400',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas y componentes hidráulicos','25172800',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas y equipo de apoyo para transporte aéreo','25191500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Sistemas y equipo de apoyo para transporte espacial','25191600',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Transmisión de energía cinética','26111500',0)
+INSERT INTO [Config].[Category] (Name, SatCode, Commission) VALUES('Ventanas y parabrisas para vehículos','25172300',0)
+GO
+
+
+--===INITIAL LOAD PRODUCT==============
+ALTER PROCEDURE [Catalog].[LoadProduct]
+(
+     @Code nvarchar(30)
+    ,@Name nvarchar(200)
+    ,@MinQuantity float
+    ,@BuyPrice float
+    ,@StorePercentage int
+    ,@DealerPercentage int
+    ,@WholesalerPercentage int
+    ,@StorePrice float
+    ,@WholesalerPrice float
+    ,@DealerPrice float
+    ,@TradeMark nvarchar(50)
+    ,@Unit nvarchar(20)
+    ,@UpdUser nvarchar(100)
+)
+AS
+BEGIN
+
+DECLARE @UpdDate DATETIME = GETDATE()
+
+INSERT INTO [Catalog].[Product]
+           ([CategoryId]
+           ,[Code]
+           ,[Name]
+           ,[MinQuantity]           
+           ,[BuyPrice]
+           ,[StorePercentage]
+           ,[DealerPercentage]
+           ,[WholesalerPercentage]
+           ,[StorePrice]
+           ,[WholesalerPrice]
+           ,[DealerPrice]
+           ,[PackagePrice]
+           ,[ProductType]
+           ,[TradeMark]
+           ,[Unit]
+           ,[IsActive]
+           ,[UpdDate]
+           ,[UpdUser])
+     VALUES
+           (1
+           ,@Code
+           ,@Name
+           ,@MinQuantity
+           ,@BuyPrice
+           ,@StorePercentage
+           ,@DealerPercentage
+           ,@WholesalerPercentage
+           ,@StorePrice
+           ,@WholesalerPrice
+           ,@DealerPrice
+           ,0
+           ,0
+           ,@TradeMark 
+           ,@Unit 
+           ,1 
+           ,@UpdDate
+           ,@UpdUser)
+END

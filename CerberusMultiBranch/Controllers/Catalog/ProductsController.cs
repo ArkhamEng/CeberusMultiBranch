@@ -346,7 +346,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
                             //&& (code == null || code == string.Empty || p.Code == code)
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            select p).Take(400).ToList();
+                            select p).OrderBy(s=> s.Name).Take(400).ToList();
 
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
@@ -479,7 +479,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 model = new ProductViewModel(product);
             }
 
-            model.Categories = db.Categories.ToSelectList();
+            var categories = db.Categories.ToList();
+            categories.ForEach(c => c.Name = c.SatCode + "-" + c.Name);
+
+            model.Categories = categories.ToSelectList();
             model.CarMakes = db.CarMakes.ToSelectList();
             model.Systems = db.Systems.ToSelectList();
             return View(model);
@@ -530,11 +533,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     product.UpdUser = User.Identity.Name;
 
                     if (product.ProductId == Cons.Zero)
+                    {
                         db.Products.Add(product);
+                        db.SaveChanges();
+                    }
                     else
                         db.Entry(product).State = EntityState.Modified;
-
-                    db.SaveChanges();
 
                     int i = Cons.Zero;
 
@@ -553,15 +557,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             {
                                 year = new CarYear { Year = j, CarModelId = mId };
                                 db.CarYears.Add(year);
-                                db.SaveChanges();
+                                //db.SaveChanges();
                             }
 
-                            Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
-                            db.Compatibilites.Add(comp);
+                            //Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
+                            //db.Compatibilites.Add(comp);
                         }
                     }
 
-                    db.SaveChanges();
+                    //db.SaveChanges();
 
                     //Guardado Imagenes
                     foreach (var file in product.Files)
@@ -582,7 +586,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         }
                     }
 
-                    if (i > Cons.Zero)
+                    //if (i > Cons.Zero)
                         db.SaveChanges();
                 }
                 catch (Exception ex)
@@ -597,6 +601,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     model.Categories = db.Categories.ToSelectList();
                     model.CarMakes = db.CarMakes.ToSelectList();
                     model.Systems = db.Systems.ToSelectList();
+                    
 
                     return View(model);
                 }
