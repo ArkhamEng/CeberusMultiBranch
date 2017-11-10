@@ -79,13 +79,13 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>
+                        <th class="text-center">
                             @Html.DisplayName("Código")
                         </th>
                         <th>@Html.DisplayName("Descripción")</th>
-                        <th>@Html.DisplayName("Precio de venta")</th>
-                        <th>@Html.DisplayName("Cantidad")</th>
-                        <th>@Html.DisplayName("Total")</th>
+                        <th class="text-right">@Html.DisplayName("Precio de venta")</th>
+                        <th class="text-center">@Html.DisplayName("Cantidad")</th>
+                        <th class="text-right">@Html.DisplayName("Total")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -93,28 +93,31 @@
                     {
                         <tr>
                             <td class="col-md-1">
-                                @if (item.Product.Images != null && item.Product.Images.Count > 0)
+                                @if (item.ParentId == null)
                                 {
-                                    <img class="img-responsive" src="@item.Product.Images.First().Path" />
-                                }
-                                else
-                                {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    if (item.Product.Images != null && item.Product.Images.Count > 0)
+                                    {
+                                        <img class="img-responsive" src="@item.Product.Images.First().Path" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    }
                                 }
                             </td>
-                            <td>
+                            <td class="text-center">
                                 @Html.DisplayFor(m => item.Product.Code)
                             </td>
-                            <td>
+                            <td >
                                 @Html.DisplayFor(m => item.Product.Name)
                             </td>
-                            <td>
+                            <td class="text-right">
                                 @Html.DisplayFor(m => item.Price)
                             </td>
-                            <td>
+                            <td class="text-center">
                                 @Html.DisplayFor(m => item.Quantity)
                             </td>
-                            <td>
+                            <td class="text-right">
                                 @Html.DisplayFor(m => item.Amount)
                             </td>
                         </tr>
@@ -145,7 +148,7 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbDetails",5)
+        //Paginate("#tbDetails",5)
     });
 
     function Calculate(val)

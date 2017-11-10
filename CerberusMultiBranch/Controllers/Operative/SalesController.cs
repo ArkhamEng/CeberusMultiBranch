@@ -49,26 +49,31 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //regreso los productos al stock
                 foreach (var detail in sale.TransactionDetails)
                 {
-                    var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
-
-                    bp.LastStock = bp.Stock;
-                    bp.Stock += detail.Quantity;
-
-                    db.Entry(bp).State = EntityState.Modified;
-
-                    //agrego movimiento al inventario
-                    StockMovement sm = new StockMovement
+                    //se descuenta regresa al inventario todo producto de la venta
+                    //en el caso de los paquetes solo el producto padre
+                    if(detail.ParentId == null)
                     {
-                        BranchId = bp.BranchId,
-                        ProductId = bp.ProductId,
-                        Comment = "Cancelación de venta con folio:" + sale.Folio + " comentario:" + comment,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now,
-                        MovementType = MovementType.Entry,
-                        Quantity = detail.Quantity
-                    };
+                        var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
 
-                    db.StockMovements.Add(sm);
+                        bp.LastStock = bp.Stock;
+                        bp.Stock += detail.Quantity;
+
+                        db.Entry(bp).State = EntityState.Modified;
+
+                        //agrego movimiento al inventario
+                        StockMovement sm = new StockMovement
+                        {
+                            BranchId = bp.BranchId,
+                            ProductId = bp.ProductId,
+                            Comment = "Cancelación de venta con folio:" + sale.Folio + " comentario:" + comment,
+                            User = User.Identity.Name,
+                            MovementDate = DateTime.Now,
+                            MovementType = MovementType.Entry,
+                            Quantity = detail.Quantity
+                        };
+
+                        db.StockMovements.Add(sm);
+                    }
                 }
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
@@ -114,6 +119,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (sale == null)
                 return RedirectToAction("History");
 
+            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
+
             return View(sale);
         }
 
@@ -122,13 +129,16 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var brancheId = User.Identity.GetBranchId();
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.User).
+            var sale = db.Sales.Include(s => s.TransactionDetails)
+                .Include(s => s.User).
                 Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
                 FirstOrDefault(s => s.TransactionId == id && s.BranchId == brancheId);
 
             if (sale == null)
                 return RedirectToAction("MyHistory");
 
+            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
+            
             return View(sale);
         }
 
@@ -356,6 +366,36 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(j);
             }
 
+            if (bp.Product.StorePrice <= Cons.Zero)
+            {
+                var j = new
+                {
+                    Result = "Error en precio",
+                    Message = "El precio de mostrador debe ser mayor a $0, revisa la configuración"
+                };
+                return Json(j);
+            }
+            else if(bp.Product.DealerPrice <= Cons.Zero)
+            {
+                var j = new
+                {
+                    Result = "Error en precio",
+                    Message = "El precio de distribuidor debe ser mayor a $0, revisa la configuración"
+                };
+                return Json(j);
+            }
+            else if(bp.Product.WholesalerPrice <= Cons.Zero)
+            {
+                var j = new
+                {
+                    Result = "Error en precio",
+                    Message = "El precio de mayorista debe ser mayor a $0, revisa la configuración"
+                };
+                return Json(j);
+            }
+
+          
+
             //consulto si el usuario tiene una venta activa
             var sale = db.Sales.Include(s => s.Client).FirstOrDefault(s => s.UserId == userId &&
                          s.BranchId == branchId && s.Status == TranStatus.InProcess);
@@ -470,11 +510,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     var folio = (lastFolio + Cons.One).ToString(Cons.CodeMask);
 
+                    int sortOrder = Cons.One;
                     foreach (var detail in sale.TransactionDetails)
                     {
                         //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
                         var pb = db.BranchProducts.Include(brp => brp.Product).
                             Include(brp => brp.Product.Category).
+                            Include(brp=> brp.Product.Packages).
                             FirstOrDefault(brp => brp.BranchId == sale.BranchId && brp.ProductId == detail.ProductId);
 
                         // si no hay producto suficiente la operación concluye
@@ -482,8 +524,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                             throw new Exception("Un producto execede la cantidad en inventario");
 
                         //guardo dato del detalle incluyendo la comision de la venta del determinado producto
-                        detail.Amount = detail.Price * detail.Quantity;
-                        detail.Quantity = detail.Quantity;
+                        detail.Amount    = detail.Price * detail.Quantity;
+                        detail.Quantity  = detail.Quantity;
+                        detail.SortOrder = sortOrder;
 
                         if (pb.Product.Category.Commission > Cons.Zero)
                             detail.Commission = Math.Round(detail.Amount * (pb.Product.Category.Commission / Cons.OneHundred),Cons.Two);
@@ -495,6 +538,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                         pb.Stock -= detail.Quantity;
 
                         db.Entry(pb).State = EntityState.Modified;
+
+                        //si el producto que se esta agregando vendiendo es un paquete
+                        //agrego todos los productos q lo complementan a la venta con precio 0
+                        if(pb.Product.ProductType == ProductType.Package)
+                        {
+                            foreach(var pckDet in pb.Product.Packages)
+                            {
+                                sortOrder++;
+                                var tDeatil = new TransactionDetail
+                                {
+                                    TransactionId = detail.TransactionId,
+                                    Quantity = pckDet.Quantity,
+                                    Price = Cons.Zero,
+                                    Commission = Cons.Zero,
+                                    ProductId = pckDet.DetailtId,
+                                    SortOrder = sortOrder,
+                                    ParentId = pckDet.PackageId,
+                                };
+
+                                db.TransactionDetails.Add(tDeatil);
+                            }
+                        }
 
                         //agrego el moviento al inventario
                         StockMovement sm = new StockMovement
@@ -509,6 +574,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                         };
 
                         db.StockMovements.Add(sm);
+
+                        sortOrder++;
                     }
 
                     //ajusto el monto total y agrego el folio

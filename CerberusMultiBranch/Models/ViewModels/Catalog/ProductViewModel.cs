@@ -23,6 +23,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList CarModels { get; set; }
 
+        public SelectList ProductTypes { get; set; }
+
 
         public ProductViewModel()
         {
@@ -36,6 +38,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Systems = new List<PartSystem>().ToSelectList();
             this.Details = new List<PackageDetail>();
             this.Packages = new  List<PackageDetail>();
+            this.FillTypes();
         }
 
         public ProductViewModel(Product product)
@@ -70,7 +73,16 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Systems = new List<PartSystem>().ToSelectList();
             this.Details = product.Details;
             this.Packages = product.Packages;
+            this.FillTypes();
+        }
 
+        void FillTypes()
+        {
+            var t = new List<Selectable>();
+            t.Add(new Selectable { Id = Cons.Zero, Name = "Individual" });
+            t.Add(new Selectable { Id = Cons.One, Name = "Por Paquete" });
+
+            this.ProductTypes = t.ToSelectList();
         }
     }
 } 

@@ -264,12 +264,18 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult PrintNote(int id)
         {
+            var branchId = User.Identity.GetBranchId();
             // busco la venta con el id provisto validando que ya tenga status compleated (pagada)
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
              Include(s => s.TransactionDetails.Select(td => td.Product)).
              Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
              Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-             FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated);
+             FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated && s.BranchId == branchId);
+
+            if(sale == null)
+                return RedirectToAction("Index");
+
+            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
 
             return View(sale);
         }
@@ -277,15 +283,19 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult RegistPayment(int id)
         {
+            var branchId = User.Identity.GetBranchId();
+
             //obtengo la venta con el id dado verificando que este en status Reserved
             var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
                        Include(s => s.TransactionDetails.Select(td => td.Product)).
                        Include(s => s.User).
                        Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Reserved);
+                       FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Reserved && s.BranchId == branchId);
 
             if (sale == null)
                 return RedirectToAction("Index");
+
+            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
 
             return View(sale);
         }

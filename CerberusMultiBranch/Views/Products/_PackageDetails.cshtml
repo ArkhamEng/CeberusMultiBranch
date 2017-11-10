@@ -3,33 +3,66 @@
 
 <div class="panel panel-danger">
     <div class="panel-body">
-        <div class="row">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>@Html.DisplayName("Codigo")</th>
-                        <th>@Html.DisplayName("Descripcion")</th>
-                        <th>@Html.DisplayName("Cantidad")</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayName("Codigo")</th>
+                    <th>@Html.DisplayName("Descripcion")</th>
+                    <th>@Html.DisplayName("Cantidad")</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
                     {
-                        <tr>
-                            <td>@Html.DisplayFor(m => item.Detail.Code)</td>
-                            <td>@Html.DisplayFor(m => item.Detail.Name)</td>
-                            <td>@Html.DisplayFor(m => item.Quantity)</td>
-                            <td>
-                                <button type="button" class="btn btn-xs btn-danger" title="Quitar del paquete">
-                                    <span class="fa fa-trash"></span>
-                                </button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>@Html.DisplayFor(m => item.Detail.Code)</td>
+                        <td>@Html.DisplayFor(m => item.Detail.Name)</td>
+                        <td>@Html.DisplayFor(m => item.Quantity)</td>
+                        <td>
+                            <button type="button" class="btn btn-xs btn-danger" title="Quitar del paquete"
+                                    onclick="RemoveFromPackage(@item.DetailtId)">
+                                <span class="fa fa-trash"></span>
+                            </button>
+                        </td>
+                    </tr>
                     }
-                </tbody>
-            </table>
-        </div>
+            </tbody>
+        </table>
+        <button type="button" class="btn btn-primary" 
+                title="Agregar productos al paquete" onclick="BeginAdd()">
+            Agregar productos
+            <span class="fa fa-plus" />
+        </button>
+
     </div>
 </div>
 
+<script>
+    function BeginAdd()
+    {
+        $("#ModalInternalProduct").modal("show");
+    }
+
+    function RemoveFromPackage(detailId)
+    {
+        ShowLoading();
+        var param = { packageId: $("#ProductId").val(), productId: detailId }
+
+        ExecuteAjax('@Url.Action("RemoveFromPackage")', param, function (response)
+        {
+            HideLoading();
+            if ($.isPlainObject(response))
+            {
+                console.log("Mostrar mensaje");
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+            {
+                $("#divPackageDetails").html(response);
+            }
+
+        });
+    }
+</script>

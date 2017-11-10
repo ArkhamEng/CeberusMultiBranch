@@ -74,9 +74,17 @@
             HideLoading();
             if (j.Result == 'OK')
             {
-                $("#txtName").val(j.Code);
-                LookFor();
-                ShowMessage(j.Result, j.Message, 'success');
+                ShowLoading();
+                var data =
+                {
+                    name: j.Code,
+                };
+                ExecuteAjax('@Url.Action("Search")', data, function (view)
+                {
+                    HideLoading();
+                    $("#divProducts").html(view);
+                    ShowMessage(j.Result, j.Message, 'success');
+                });
             }
             else
                 ShowMessage(j.Result, j.Message, 'warning');

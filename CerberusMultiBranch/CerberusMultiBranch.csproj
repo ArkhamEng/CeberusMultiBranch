@@ -213,6 +213,10 @@
     <Compile Include="Migrations\201711051751014_CommissionPerCategory1.Designer.cs">
       <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711100553391_packageSortOrder.cs" />
+    <Compile Include="Migrations\201711100553391_packageSortOrder.Designer.cs">
+      <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -278,10 +282,13 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
+    <Content Include="Content\Images\autobienlogo.png" />
     <Content Include="Content\Images\header.png" />
     <Content Include="Content\Images\loading.gif" />
     <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\logo2.png" />
+    <Content Include="Content\Images\rebilogo.png" />
+    <Content Include="Content\Images\rebilogo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
@@ -482,6 +489,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711051751014_CommissionPerCategory1.resx">
       <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711100553391_packageSortOrder.resx">
+      <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

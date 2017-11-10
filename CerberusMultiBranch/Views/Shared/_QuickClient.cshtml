@@ -27,6 +27,9 @@
                 </div>
             </div>
             <div class="panel panel-danger">
+                <div class="col-md-8 col-md-offset-2">
+                    <img src="~/Content/Images/loading.gif" id="imgQuickClient" class="hidden" />
+                </div>
                 <div class="panel-body row" id="divClientList">
                 </div>
             </div>
@@ -47,11 +50,13 @@
 
     function QuickSearchClient()
     {
-       
+        $("#divClientList").html("");
+        $("#imgQuickClient").attr("class", "img-responsive");
         var filter = {  name: $("#FClientName").val() }
 
         ExecuteAjax('@Url.Action("QuickSearch", "Clients")', filter, function (view)
         {
+            $("#imgQuickClient").attr("class", "hidden");
             $("#divClientList").html(view);
         });
     }

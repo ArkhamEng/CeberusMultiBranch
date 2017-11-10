@@ -11,7 +11,7 @@
             onclick="ShowLoading(); window.location='@Url.Action("MySales")'">
         <span class="fa fa-arrow-left"></span>
     </button>
-   Detalle de Mi venta
+    Detalle de Mi venta
 </h3>
 <div class="panel-group">
     <div class="panel panel-danger">
@@ -133,7 +133,7 @@
                         {
                             <input class="form-control" value="$0.00" readonly />
                         }
-                        
+
                     </div>
                 </div>
 
@@ -156,19 +156,19 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>
+                        <th class="text-center">
                             @Html.DisplayName("Código")
                         </th>
                         <th>
                             @Html.DisplayName("Descripción")
                         </th>
-                        <th>
+                        <th class="text-right">
                             @Html.DisplayName("Precio")
                         </th>
-                        <th>
+                        <th class="text-center">
                             @Html.DisplayName("Cantidad")
                         </th>
-                        <th>
+                        <th class="text-right">
                             @Html.DisplayName("Total")
                         </th>
                     </tr>
@@ -178,13 +178,16 @@
                     {
                         <tr>
                             <td class="col-md-1">
-                                @if (item.Product.Images.Count > 0)
+                                @if (item.ParentId == null)
                                 {
-                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" />
-                                }
-                                else
-                                {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    if (item.Product.Images.Count > 0)
+                                    {
+                                        <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    }
                                 }
                             </td>
                             <td class="text-center">
@@ -212,6 +215,7 @@
 
 <script>
     $(document).ready(function () {
-        Paginate("#tbDetails", 5)
+        //evito paginación para no mover el order de los productos lo cual afecta si hay un paquete
+        //Paginate("#tbDetails", 5)
     });
 </script>

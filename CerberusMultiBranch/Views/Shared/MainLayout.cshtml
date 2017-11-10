@@ -1,4 +1,4 @@
-﻿
+﻿@using CerberusMultiBranch.Support
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,7 +21,17 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
             <div class="col-xs-6 col-sm-4 col-md-12">
-                <img src="~/Content/Images/logo1.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+                @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
+                {
+                    <img src="~/Content/Images/autobienlogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+                }
+                else
+                {
+                    <div class="col-xs-10">
+                        <img src="~/Content/Images/rebilogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+                    </div>
+                }
+
             </div>
         </div>
         <div class="container">

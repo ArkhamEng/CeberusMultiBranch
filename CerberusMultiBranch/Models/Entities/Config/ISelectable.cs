@@ -12,4 +12,13 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         string Name { get;  }
     }
+
+
+    public class Selectable: ISelectable
+    {
+
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+    }
 }

@@ -491,8 +491,32 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult AddToPackage(int packagedId, int productId, double quantity)
         {
+            // busco el producto padre (paquete)
+            var pck = db.Products.Include(p => p.BranchProducts).
+                Include(p => p.Packages).
+                FirstOrDefault(p => p.ProductId == packagedId);
 
-            var pd = db.PackageDetails.FirstOrDefault(p=> p.PackageId == packagedId && p.DetailtId == productId);
+            //si ya ha sido ingresado en alguna sucursal, verifico que no haya existencia
+            //actualmente.
+            if (pck.BranchProducts != null)
+            {
+                foreach (var bp in pck.BranchProducts)
+                {
+                    //si el hay existencia en alguna sucursal, no se puede modificar la composición
+                    if (bp.Stock > Cons.Zero)
+                    {
+                        return Json(new
+                        {
+                            Result = "Imposible modificar el paquete",
+                            Message = "La composición del paquete no se puede alterar " +
+                            "ya que aun hay existencia de este es una o mas sucursales. " +
+                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
+                        });
+                    }
+                }
+            }
+
+            var pd = pck.Packages.FirstOrDefault(pkd => pkd.DetailtId == productId);
 
             if(pd == null)
             {
@@ -514,6 +538,46 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_PackageDetails", model);
 
         }
+
+
+        [HttpPost]
+        public ActionResult RemoveFromPackage(int packageId, int productId)
+        {
+            // busco el producto padre (paquete)
+            var pck = db.Products.Include(p => p.BranchProducts).
+                Include(p => p.Packages).
+                FirstOrDefault(p => p.ProductId == packageId);
+
+            //reviso si hay existencias de este paquete en alguna sucursal
+            if(pck.BranchProducts != null)
+            {
+                foreach(var bp in pck.BranchProducts)
+                {
+                    if(bp.Stock > Cons.Zero)
+                    {
+                        return Json(new
+                        {
+                            Result = "Imposible modificar el paquete",
+                            Message = "La composición del paquete no se puede alterar "+
+                            "ya que aun hay existencia de este es una o mas sucursales. "+
+                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
+                        });
+                    }
+                }
+            }
+            //obtengo el detalle a eliminar del producto padre (paquete)
+            var pd = pck.Packages.FirstOrDefault(p => p.DetailtId == productId);
+
+            db.PackageDetails.Remove(pd);
+            db.SaveChanges();
+
+            //hago una busqueda de los detalles del paquete actualizado
+            var model = db.PackageDetails.Include(pkD => pkD.Detail).
+                Where(pkD => pkD.PackageId == packageId).ToList();
+
+            return PartialView("_PackageDetails", model);
+        }
+
 
 
         // POST: Products/Create

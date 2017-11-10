@@ -63,7 +63,11 @@
     $(document).ready(function () {
         Paginate("#tbInternalProducts", 6);
     });
-    function AddToPackage(input) {
+    function AddToPackage(input)
+    {
+        $("#ModalInternalProduct").modal("hide");
+        ShowLoading();
+
         var row = $(input).parent().parent();
 
         productId = row.find("#txtProductId").val();
@@ -72,11 +76,19 @@
         var param = { packagedId: $("#ProductId").val(), productId: productId, quantity: quantity }
 
 
-        ExecuteAjax('@Url.Action("AddToPackage")', param, function (view)
+        ExecuteAjax('@Url.Action("AddToPackage")', param, function (response)
         {
-            $("#ModalInternalProduct").modal("hide");
+            HideLoading();
+            if ('json' === response)
+            {
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+            {
+                $("#divPackageDetails").html(response);
+            }
 
-            $("#divPackageDetails").html(view);
+       
         });
     }
 </script>

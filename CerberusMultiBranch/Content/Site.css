@@ -1,7 +1,7 @@
 ﻿body {
     padding-top: 50px;
     padding-bottom: 20px;
-    -webkit-print-color-adjust:exact;
+    -webkit-print-color-adjust: exact;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -177,8 +177,7 @@ table.TablePrimary tbody th {
     min-height: 100vh;
 }
 
-    #sidebar.active 
-    {
+    #sidebar.active {
         margin-left: -200px;
     }
 
@@ -200,19 +199,14 @@ a[aria-expanded="true"]::before {
     content: '\e260';
 }
 
-@media (max-width: 768px) 
-{
-    #sidebar 
-    {
+@media (max-width: 768px) {
+    #sidebar {
         margin-left: -200px;
     }
 
-        #sidebar.active 
-        {
+        #sidebar.active {
             margin-left: 0;
         }
-
-        
 }
 
 
@@ -223,7 +217,7 @@ a[aria-expanded="true"]::before {
 
 body {
     font-family: 'Poppins', sans-serif;
-   background: #fafafa;
+    background: #fafafa;
 }
 
 p {
@@ -242,8 +236,7 @@ a, a:hover, a:focus {
 
 #sidebar {
     /* don't forget to add all the previously mentioned styles here too */
-    background: #424242; 
-  
+    background: #424242;
     color: #fff;
     transition: all 0.3s;
 }
@@ -285,39 +278,40 @@ ul ul a {
     background: #6d7fcc;
 }
 
-.bgSidebar{background: #151515;}
+.bgSidebar {
+    background: #151515;
+}
 
 
 /*******PILLS******/
- 
+
 .nav-pills > .active > a, .nav-pills > .active > a:hover {
-     color: #fff;
+    color: #fff;
     background-color: #c9302c;
     border-color: #c9302c;
 }
 
 .BkPrint {
-    color: #fff !important;
+   
     background-color: #c9302c !important;
-    border-color: #c9302c !important; 
+    border-color: #c9302c !important;
+    color:#FFFFFF !important;
 }
 
-.FtPrint
-{ background-color: #F5A9BC !important;
-    border-color: #c9302c; 
-
-}
- @media print {
-.BkPrint div 
-{
-    color: white !important;
-    background-color: #c9302c !important;
-    border-color: #c9302c; 
+.FontNote {
+    font-size: 10px !important;
 }
 
-.FtPrint td {
+.FtPrint {
     background-color: #F5A9BC !important;
-    border-color: #c9302c; 
+    border-color: #c9302c;
 }
 
- }
+@media print {
+
+     div { font-family:Arial;  }
+
+     td { font-size: 8pt !important;   }
+
+     .BkPrint { color:#FFFFFF !important;   -webkit-print-color-adjust: exact;}
+}

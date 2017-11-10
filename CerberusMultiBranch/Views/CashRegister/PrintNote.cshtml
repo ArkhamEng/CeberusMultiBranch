@@ -14,29 +14,50 @@
 
 <hr />
 
-<div id="divPrint" style="width:816px">
-    <table>
+<div id="divNote" style="width:816px;">
+    <table >
         <tr>
             <td width="300px">
                 <table style="width:100%">
-                    <tr>
-                        <td>
-                            <img src="~/Content/Images/logo2.png" style="width:200px">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label class="control-label">
-                                Autopartes Bicentenario S.A. de C.V.
-                            </label><br />
-                            APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
-                            LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
-                        </td>
-                    </tr>
+                    @if (User.Identity.GetBranchId() != 2)
+                    {
+                        <tr>
+                            <td>
+                                <img src="~/Content/Images/logo2.png" style="width:150px">
+                            </td>
+                        </tr>
+                        <tr><td colspan="2" style="height:10px"></td></tr>
+                        <tr>
+                            <td>
+                                <label class="control-label">
+                                    Autopartes Bicentenario S.A. de C.V.
+                                </label><br />
+                                APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                                LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>
+                                <img src="~/Content/Images/rebilogo2.png" style="width:180px; height:90px">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label class="control-label">
+                                    AUTOPARTES BICENTENARIO
+                                </label><br />
+                               HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
+                                COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
+                            </td>
+                        </tr>
+                    }
                 </table>
             </td>
-            <td width="272px"></td>
-            <td width="264px">
+            <td width="292px"></td>
+            <td width="244px">
                 <table style="width:100%" class="table-bordered">
                     <tr>
                         <td colspan="2" class="BkPrint text-center">
@@ -113,13 +134,13 @@
             <td colspan="3" style="height:20px"></td>
         </tr>
         <tr>
-            <td class="text-center BkPrint" colspan="3">
+            <td class="BkPrint text-center"  colspan="3">
                 <label style="color:white">Detalle de compra</label>
             </td>
         </tr>
         <tr>
             <td colspan="3">
-                <table style="width:100%; height:500px; border:1px solid gray;">
+                <table style="width:100%; height:600px; border:1px solid gray;">
                     <tr style="border-bottom:1px solid gray; height:15px">
                         <td style="border-right:1px solid gray; width:10%" align="center">
                             <label>Codigo</label>
@@ -142,7 +163,13 @@
                     </tr>
                     @foreach (var item in Model.TransactionDetails)
                     {
-                        <tr>
+                        string st = "height:20px";
+                        if (item.ParentId ==null)
+                        {
+                             st = "height:20px; background-color:lightgray";
+                        }
+
+                        <tr style="@st">
                             <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
                                 @Html.DisplayFor(mItem => item.Product.Code)
                             </td>
@@ -162,13 +189,49 @@
                                 @Html.DisplayFor(mItem => item.Amount)
                             </td>
                         </tr>
+                        @*@if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
+                        {
+                            var packItems = item.Product.Packages;
+                            foreach (var pi in packItems)
+                            {
+                                <tr style="height:20px">
+                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                        @Html.DisplayFor(pdItem => pi.Detail.Code)
+                                    </td>
+                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                        @Html.DisplayFor(mItem => pi.Detail.Category.SatCode)
+                                    </td>
+                                    <td style="border-right:1px solid gray; width:40%" valign="top">
+                                        @Html.DisplayFor(mItem => pi.Detail.Name)
+                                    </td>
+                                  
+                                    <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
+                                       ----
+                                    </td>
+                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                        @Html.DisplayFor(mItem => pi.Quantity)
+                                    </td>
+                                    <td class="text-right" style="width:10%" valign="top">
+                                       ----
+                                    </td>
+                                </tr>
+                            }
+                        }*@
                     }
+                    <tr>
+                        <td  style="border-right:1px solid gray;"/>
+                        <td  style="border-right:1px solid gray;"/>
+                        <td  style="border-right:1px solid gray;"/>
+                        <td  style="border-right:1px solid gray;"/>
+                        <td  style="border-right:1px solid gray;"/>
+                        <td />
+                    </tr>
 
                     <tr style="height:23px; border-top:1px solid gray;">
                         <td colspan="4" rowspan="3">
                             IMPORTE CON LETRA <br />
-                            @Model.TotalAmount.toText() 
-                            PESOS MEXICANOS 
+                            @Model.TotalAmount.toText()
+                            PESOS MEXICANOS
                         </td>
                         @{
                             var bI = Math.Round(Model.TotalAmount / 1.16, 2);
@@ -190,11 +253,11 @@
                             </label>
                         </td>
                         <td class="text-right" style="border:1px solid gray; width:10%">
-                        @iva.ToString("c") 
+                            @iva.ToString("c")
                         </td>
                     </tr>
                     <tr style="height:23px">
-                      
+
                         <td class="text-right" style="border:1px solid gray; width:10%">
                             <label>
                                 @Html.DisplayName("Total")
@@ -203,18 +266,38 @@
                         <td class="text-right" style="border:1px solid gray; width:10%">
                             <label class="control-label text-danger">
                                 @Model.TotalAmount.ToString("c")
-                        </label>
-                    </td>
-                </tr>
-            </table>
+                            </label>
+                        </td>
+                    </tr>
+                </table>
 
-        </td>
-    </tr>
-</table>
-
-
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <label>
+                    Solo se acepta mercancía en devolución si cumple con las siguientes políticas:
+                </label> 
+                <br />
+                1. Mercancía sin daño o retrabajo<br />
+                2. Mercancía con empaque original<br />
+                3. Cuenta con un máximo de 30 días fecha factura<br />
+                4. Contar con la autorización de su ejecutivo de venta
+            </td>
+        </tr>
+    </table>
 </div>
 
+<div id="divTicket" style="width:287px">
+    <table style="width:100%">
+        <tr>
+            <td colspan="3" align="center">
+                <img src="~/Content/Images/logo2.png" style="width:200px" />
+            </td>
+        </tr>
+    </table>
+
+</div>
 
 
 <div class="btn-group">
@@ -222,23 +305,30 @@
         <span class="fa fa-search"></span>
         Buscar
     </button>
-    <button class="btn btn-success" type="button" id="btnPrint">
+    <button class="btn btn-success" type="button" onclick="PrintNote()">
         <span class="fa fa-print"></span>
-        Imprimir
+        Imp Nota
+    </button>
+    <button class="btn btn-warning" type="button" onclick="PrintTicket()">
+        <span class="fa fa-ticket"></span>
+        Imp Ticket
     </button>
 </div>
 
 
 <script>
-    $(document).ready(function () {
-        $("#btnPrint").click(function () {
-            $("#divPrint").printThis(
-            {
-                footer: "<h1>Amazing header</h1>"
-            });
-
-        });
+    $(document).ready(function ()
+    {
     });
 
+    function PrintNote()
+    {
+        $("#divNote").printThis();
+    }
+
+    function PrintTicket()
+    {
+        $("#divTicket").printThis();
+    }
 
 </script>

@@ -28,6 +28,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DataType(DataType.Currency)]
         public double Commission { get; set; }
 
+        public int SortOrder { get; set; }
+
+        public int? ParentId { get; set; }
+
         public virtual Product Product { get; set; }
 
         public virtual Transaction Transaction { get; set; }
