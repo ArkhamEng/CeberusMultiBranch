@@ -217,6 +217,18 @@
     <Compile Include="Migrations\201711100553391_packageSortOrder.Designer.cs">
       <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711110013399_correctioPackage.cs" />
+    <Compile Include="Migrations\201711110013399_correctioPackage.Designer.cs">
+      <DependentUpon>201711110013399_correctioPackage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711150438086_Employee-User.cs" />
+    <Compile Include="Migrations\201711150438086_Employee-User.Designer.cs">
+      <DependentUpon>201711150438086_Employee-User.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711150448347_EmployeeEmail.cs" />
+    <Compile Include="Migrations\201711150448347_EmployeeEmail.Designer.cs">
+      <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -492,6 +504,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711100553391_packageSortOrder.resx">
       <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711110013399_correctioPackage.resx">
+      <DependentUpon>201711110013399_correctioPackage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711150438086_Employee-User.resx">
+      <DependentUpon>201711150438086_Employee-User.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711150448347_EmployeeEmail.resx">
+      <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

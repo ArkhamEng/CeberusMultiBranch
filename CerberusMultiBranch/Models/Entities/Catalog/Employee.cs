@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
 
         [MaxLength(128)]
-        [Index("IDX_UserId", IsUnique = true)]
+        [Index("IDX_UserId", IsUnique = false)]
         public string UserId { get; set; }
 
         [Display(Name = "Clave")]
@@ -67,7 +67,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress)]
         [MaxLength(30)]
-        [Index("IDX_Email", IsUnique = true)]
         public string Email { get; set; }
 
         [Display(Name = "Teléfono")]

@@ -270,6 +270,7 @@ namespace CerberusMultiBranch.Controllers.Operative
              Include(s => s.TransactionDetails.Select(td => td.Product)).
              Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
              Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+             Include(s => s.Branch).
              FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated && s.BranchId == branchId);
 
             if(sale == null)
@@ -381,7 +382,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK" });
+                return Json(new { Result = "OK", Message= sale.TransactionId.ToString() });
             }
             catch (Exception ex)
             {

@@ -516,7 +516,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
                         var pb = db.BranchProducts.Include(brp => brp.Product).
                             Include(brp => brp.Product.Category).
-                            Include(brp=> brp.Product.Packages).
+                            Include(brp=> brp.Product.PackageDetails).
                             FirstOrDefault(brp => brp.BranchId == sale.BranchId && brp.ProductId == detail.ProductId);
 
                         // si no hay producto suficiente la operación concluye
@@ -543,7 +543,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         //agrego todos los productos q lo complementan a la venta con precio 0
                         if(pb.Product.ProductType == ProductType.Package)
                         {
-                            foreach(var pckDet in pb.Product.Packages)
+                            foreach(var pckDet in pb.Product.PackageDetails)
                             {
                                 sortOrder++;
                                 var tDeatil = new TransactionDetail

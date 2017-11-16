@@ -20,8 +20,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public double ComAmount { get; set; }
 
-      
+        
+
         public virtual Client Client { get; set; }
 
     }
+
+  
 }

@@ -76,7 +76,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var branchP = db.BranchProducts.Include(bp => bp.Product).
                          Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                         Include(bp => bp.Product.Details).
+                         Include(bp => bp.Product.PackageDetails).
                          FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
 
 
@@ -108,7 +108,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
                     if (branchP.Product.ProductType == ProductType.Package)
                     {
-                        foreach (var det in branchP.Product.Packages)
+                        foreach (var det in branchP.Product.PackageDetails)
                         {
 
                             var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
@@ -154,7 +154,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
                 if (branchP.Product.ProductType == ProductType.Package)
                 {
-                    foreach (var det in branchP.Product.Packages)
+                    foreach (var det in branchP.Product.PackageDetails)
                     {
                         var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
 
@@ -474,7 +474,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             else
             {
                 var product = db.Products.Include(p => p.Images).
-                    Include(p => p.Details).
+                    Include(p => p.PackageDetails).
                     Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
                 model = new ProductViewModel(product);
             }
@@ -493,7 +493,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             // busco el producto padre (paquete)
             var pck = db.Products.Include(p => p.BranchProducts).
-                Include(p => p.Packages).
+                Include(p => p.PackageDetails).
                 FirstOrDefault(p => p.ProductId == packagedId);
 
             //si ya ha sido ingresado en alguna sucursal, verifico que no haya existencia
@@ -516,7 +516,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 }
             }
 
-            var pd = pck.Packages.FirstOrDefault(pkd => pkd.DetailtId == productId);
+            var pd = pck.PackageDetails.FirstOrDefault(pkd => pkd.DetailtId == productId);
 
             if(pd == null)
             {
@@ -545,7 +545,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             // busco el producto padre (paquete)
             var pck = db.Products.Include(p => p.BranchProducts).
-                Include(p => p.Packages).
+                Include(p => p.PackageDetails).
                 FirstOrDefault(p => p.ProductId == packageId);
 
             //reviso si hay existencias de este paquete en alguna sucursal
@@ -566,7 +566,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 }
             }
             //obtengo el detalle a eliminar del producto padre (paquete)
-            var pd = pck.Packages.FirstOrDefault(p => p.DetailtId == productId);
+            var pd = pck.PackageDetails.FirstOrDefault(p => p.DetailtId == productId);
 
             db.PackageDetails.Remove(pd);
             db.SaveChanges();

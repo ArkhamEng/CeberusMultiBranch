@@ -13,12 +13,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Address)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ZipCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
+          
             <th>
                 @Html.DisplayNameFor(model => model.Phone)
             </th>
@@ -38,15 +33,9 @@
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Address)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ZipCode)
+                    @item.Address, @item.City.Name, @item.City.State.Name
                 </td>
               
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
@@ -55,9 +44,9 @@
                         <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.EmployeeId})'">
                             <span class="glyphicon glyphicon-pencil" />
                         </button>
-                        <button class="btn btn-danger  btn-xs">
+                        @*<button class="btn btn-danger  btn-xs">
                             <span class="glyphicon glyphicon-trash" />
-                        </button>
+                        </button>*@
                     </div>
                 </td>
             </tr>

@@ -37,6 +37,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public double MinQuantity { get; set; }
 
+        [Required]
+        public double MaxQuantity { get; set; }
+
+
         [Display(Name = "Código de barras")]
         public string BarCode { get; set; }
 
@@ -71,11 +75,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [DataType(DataType.Currency)]
         [Required]
         public double DealerPrice { get; set; }
-
-        [DataType(DataType.Currency)]
-        [Required]
-        public double PackagePrice { get; set; }
-
 
 
         [Required]
@@ -120,11 +119,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Equivalence> Equivalences { get; set; }
 
-        [InverseProperty("Package")]
-        public virtual ICollection<PackageDetail> Packages { get; set; }
+        //[InverseProperty("Detail")]
+        //public virtual ICollection<PackageDetail> Details { get; set; }
 
-        [InverseProperty("Detail")]
-        public virtual ICollection<PackageDetail> Details { get; set; }
+
+        [InverseProperty("Package")]
+        public virtual ICollection<PackageDetail> PackageDetails { get; set; }
 
         #region NotMapped Properties
 

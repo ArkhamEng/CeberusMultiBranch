@@ -36,8 +36,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.ModelCompatibilities = new List<CarModel>();
             this.BranchProducts = new List<BranchProduct>();
             this.Systems = new List<PartSystem>().ToSelectList();
-            this.Details = new List<PackageDetail>();
-            this.Packages = new  List<PackageDetail>();
+            
+            this.PackageDetails = new  List<PackageDetail>();
             this.FillTypes();
         }
 
@@ -64,15 +64,14 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.PartSystemId = product.PartSystemId;
             this.Row = product.Row;
             this.Ledge = product.Ledge;
-            this.PackagePrice = product.PackagePrice;
+            this.MaxQuantity = product.MaxQuantity;
             this.ProductType = product.ProductType;
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();
             this.ModelCompatibilities = new List<CarModel>();
             this.Systems = new List<PartSystem>().ToSelectList();
-            this.Details = product.Details;
-            this.Packages = product.Packages;
+            this.PackageDetails = product.PackageDetails;
             this.FillTypes();
         }
 

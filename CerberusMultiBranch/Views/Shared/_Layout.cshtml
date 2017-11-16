@@ -3,8 +3,13 @@
 }
 <div class="wrapper">
     @Html.Partial("_SideBar")
-    <div id="content" class="container small">
-        @RenderBody()
-    </div>
+  
+        <div id="content" class="container small">
+
+            @RenderBody()
+        </div>
+   
 </div>
 @RenderSection("scripts", required: false)
+
+

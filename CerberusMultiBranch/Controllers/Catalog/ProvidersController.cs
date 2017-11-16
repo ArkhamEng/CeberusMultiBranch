@@ -143,7 +143,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         for(int i=0;i<records.Records.Count;i++)
                         {
-                            if(toInsert.FirstOrDefault(ti=> ti.Code == records.Records[i].Code) ==null)
+                            if(toInsert.FirstOrDefault(ti=> ti.Code == records.Records[i].Code.Trim()) == null)
                             {
                                 var description = records.Records[i].Description;
 
@@ -152,7 +152,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                                 ExternalProduct ex = new ExternalProduct
                                 {
-                                    Code = records.Records[i].Code,
+                                    Code = records.Records[i].Code.Trim(),
                                     ProviderId = providerId,
                                     Description = description,
                                     TradeMark = records.Records[i].TradeMark ?? "N/A",

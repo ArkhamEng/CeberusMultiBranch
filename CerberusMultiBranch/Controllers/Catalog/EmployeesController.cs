@@ -25,7 +25,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchEmployeeViewModel();
-            model.Employees = db.Employees.Include(e => e.City);
+            model.Employees = db.Employees.Include(e => e.City).Where(e=> e.IsActive);
             model.States = db.States.ToSelectList();
 
             return View(model);

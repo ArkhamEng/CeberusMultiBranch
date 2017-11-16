@@ -309,9 +309,12 @@ ul ul a {
 
 @media print {
 
-     div { font-family:Arial;  }
+   
+     .Note table { font-size: 8pt !important; font-family:Tahoma;  }
 
-     td { font-size: 8pt !important;   }
+     .Ticket table { font-size: 10pt !important; font-family:Arial;   }
+
+     
 
      .BkPrint { color:#FFFFFF !important;   -webkit-print-color-adjust: exact;}
 }

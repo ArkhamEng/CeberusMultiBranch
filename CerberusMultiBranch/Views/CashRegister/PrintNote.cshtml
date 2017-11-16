@@ -15,7 +15,7 @@
 <hr />
 
 <div id="divNote" style="width:816px;">
-    <table >
+    <table class="Note">
         <tr>
             <td width="300px">
                 <table style="width:100%">
@@ -49,19 +49,27 @@
                                 <label class="control-label">
                                     AUTOPARTES BICENTENARIO
                                 </label><br />
-                               HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
+                                HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
                                 COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
                             </td>
                         </tr>
                     }
                 </table>
             </td>
-            <td width="292px"></td>
+            <td width="292px" align="center">
+                @if (User.Identity.GetBranchId() != 2)
+                {
+                    <div style="width:250px">
+                        <label>Expedida en sucursal</label><br />
+                        @Model.Branch.Address
+                    </div>
+                }
+            </td>
             <td width="244px">
                 <table style="width:100%" class="table-bordered">
                     <tr>
-                        <td colspan="2" class="BkPrint text-center">
-                            <label style="color:white">Datos de venta</label>
+                        <td colspan="2" class="text-center">
+                            <label>Datos de venta</label>
                         </td>
                     </tr>
                     <tr>
@@ -101,8 +109,8 @@
             <td colspan="3">
                 <table style="width:816px" class="table-bordered">
                     <tr>
-                        <td colspan="3" class="text-center BkPrint">
-                            <label style="color:white">Datos del cliente</label>
+                        <td colspan="3" class="text-center">
+                            <label>Datos del cliente</label>
                         </td>
                     </tr>
                     <tr>
@@ -134,8 +142,8 @@
             <td colspan="3" style="height:20px"></td>
         </tr>
         <tr>
-            <td class="BkPrint text-center"  colspan="3">
-                <label style="color:white">Detalle de compra</label>
+            <td class="text-center" style="border:1px solid gray;" colspan="3">
+                <label>Detalle de compra</label>
             </td>
         </tr>
         <tr>
@@ -164,9 +172,9 @@
                     @foreach (var item in Model.TransactionDetails)
                     {
                         string st = "height:20px";
-                        if (item.ParentId ==null)
+                        if (item.ParentId == null)
                         {
-                             st = "height:20px; background-color:lightgray";
+                            st = "height:20px;";
                         }
 
                         <tr style="@st">
@@ -177,7 +185,7 @@
                                 @Html.DisplayFor(mItem => item.Product.Category.SatCode)
                             </td>
                             <td style="border-right:1px solid gray; width:40%" valign="top">
-                                @Html.DisplayFor(mItem => item.Product.Name)
+                                @item.Product.Name.Substring(0, item.Product.Name.Length <= 30 ? item.Product.Name.Length : 30)
                             </td>
                             <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
                                 @Html.DisplayFor(mItem => item.Price)
@@ -189,41 +197,13 @@
                                 @Html.DisplayFor(mItem => item.Amount)
                             </td>
                         </tr>
-                        @*@if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
-                        {
-                            var packItems = item.Product.Packages;
-                            foreach (var pi in packItems)
-                            {
-                                <tr style="height:20px">
-                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                        @Html.DisplayFor(pdItem => pi.Detail.Code)
-                                    </td>
-                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                        @Html.DisplayFor(mItem => pi.Detail.Category.SatCode)
-                                    </td>
-                                    <td style="border-right:1px solid gray; width:40%" valign="top">
-                                        @Html.DisplayFor(mItem => pi.Detail.Name)
-                                    </td>
-                                  
-                                    <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
-                                       ----
-                                    </td>
-                                    <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                        @Html.DisplayFor(mItem => pi.Quantity)
-                                    </td>
-                                    <td class="text-right" style="width:10%" valign="top">
-                                       ----
-                                    </td>
-                                </tr>
-                            }
-                        }*@
                     }
                     <tr>
-                        <td  style="border-right:1px solid gray;"/>
-                        <td  style="border-right:1px solid gray;"/>
-                        <td  style="border-right:1px solid gray;"/>
-                        <td  style="border-right:1px solid gray;"/>
-                        <td  style="border-right:1px solid gray;"/>
+                        <td style="border-right:1px solid gray;" />
+                        <td style="border-right:1px solid gray;" />
+                        <td style="border-right:1px solid gray;" />
+                        <td style="border-right:1px solid gray;" />
+                        <td style="border-right:1px solid gray;" />
                         <td />
                     </tr>
 
@@ -277,7 +257,7 @@
             <td colspan="3">
                 <label>
                     Solo se acepta mercancía en devolución si cumple con las siguientes políticas:
-                </label> 
+                </label>
                 <br />
                 1. Mercancía sin daño o retrabajo<br />
                 2. Mercancía con empaque original<br />
@@ -287,18 +267,119 @@
         </tr>
     </table>
 </div>
+<div hidden>
+    <div id="divTicket" style="width:270px;">
+        <table class="Ticket" style="width:100%">
+            <tr>
+                <td align="center" colspan="2">
+                    <div style="width:200px">
+                        <img src="~/Content/Images/logo2.png" class="img-responsive" />
+                    </div>
+                </td>
+            </tr>
 
-<div id="divTicket" style="width:287px">
-    <table style="width:100%">
-        <tr>
-            <td colspan="3" align="center">
-                <img src="~/Content/Images/logo2.png" style="width:200px" />
-            </td>
-        </tr>
-    </table>
+            <tr>
+                <td align="center" colspan="2">
+                    @Model.Branch.Address
+                </td>
+            </tr>
+            <tr>
+                <td style="height:20px" colspan="2"></td>
+            </tr>
+            <tr>
+                <td align="center">
+                    Folio <br/> @Model.Folio
+                </td>
+                <td align="center">
+                    Fecha <br /> @Model.TransactionDate.ToString("dd/mm/yyyy")
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    Agente <br /> @Model.User.UserName
+                </td>
+                <td align="center">
+                    Hora<br />
+                    @Model.TransactionDate.ToString("HH:mm:ss")
+                </td>
+            </tr>
+            <tr>
+                <td style="height:20px" colspan="2"></td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                    <table style="width:100%">
+                        @foreach (var tI in Model.TransactionDetails)
+                        {
+                            var i = tI.Product.Code.Length - 4;
+                            var sCode = tI.Product.Code.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
+                            var sName = tI.Product.Name.Length <= 12 ? tI.Product.Name : tI.Product.Name.Substring(0, 12);
+                            <tr style="border-bottom:solid 1px gray; ">
+                                <td class="text-left">
+                                    @if (tI.ParentId == null)
+                                    {
+                                        @sCode
+                                    }
+                                    
+                                </td>
+                                <td class="text-left">
+                                    @if (tI.ParentId != null)
+                                    {
+                                        sName = (sCode + " " + sName).ToString();
+                                    }
+                                   @sName
+                                </td>
+                                <td class="text-center">
+                                    @tI.Quantity
+                                </td>
+                                <td class="text-right">
+                                    @if (tI.ParentId == null)
+                                    {
+                                        @tI.Amount.ToString("c")
+                                    }
+                                    
+                                </td>
+                            </tr>
+                            if (tI.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
+                            {
+                                <tr style="border-bottom:solid 1px gray;">
+                                    <td colspan="4" class="text-uppercase text-center" style="height:10px">
+                                    ===Contenido del paquete==</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr><td colspan="4" style="height:10px"></td></tr>
+                            }
 
+                        }
+                        <tr>
+                            <td colspan="4" style="height:20px"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" />
+                            <td>Total</td>
+                            <td align="right">
+                                @Model.TotalAmount.ToString("c")
+                            </td>
+                        </tr>
+                        <tr style="height:30px">
+                            <td colspan="4" align="center">
+                                NO VALIDO COMO PROMPRANTE FISCAL
+                            </td>
+                        </tr>
+                        <tr style="height:30px">
+                            <td colspan="4" align="center">
+                                ==GRACIAS POR SU COMPRA==
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+    </div>
 </div>
-
 
 <div class="btn-group">
     <button class="btn btn-primary" type="button" onclick="window.location='@Url.Action("Index")'">
@@ -317,17 +398,14 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
     });
 
-    function PrintNote()
-    {
+    function PrintNote() {
         $("#divNote").printThis();
     }
 
-    function PrintTicket()
-    {
+    function PrintTicket() {
         $("#divTicket").printThis();
     }
 
