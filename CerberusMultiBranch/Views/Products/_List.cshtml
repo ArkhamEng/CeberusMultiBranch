@@ -3,7 +3,7 @@
 
 @{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
 
-<table id="tbProducts" class="table table-condensed">
+<table id="tbProducts" class="table table-condensed text-uppercase">
     <thead class="panel-heading">
         <tr hidden="hidden">
             @for (var j = 0; j < i; j++)
@@ -28,7 +28,7 @@
                              onclick="Detail('@prod.ProductId')">
                             @if (prod.Images.Count > 0)
                             {
-                                <img src="@prod.Images.First().Path" class="img-responsive" />
+                                <img src="@prod.Images.First().Path" class="img-responsive img-rounded"  style="max-height:200px"/>
                             }
                             else
                             {
@@ -97,10 +97,10 @@
                         
                         @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
                         {
-                            <div class="col-md-1" style="vertical-align:central">
+                            <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
                                 @if (User.IsInRole("Capturista"))
                                 {
-                                    <button class="btn btn-default btn-sm" title="Editar producto"
+                                    <button class="btn btn-primary btn-sm" title="Editar producto"
                                             onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                         <span class="glyphicon glyphicon-edit"></span>
                                     </button>
@@ -108,7 +108,7 @@
 
                                 @if (User.IsInRole("Supervisor"))
                                 {
-                                    <button class="btn btn-default btn-sm" title="Registrar movimiento en inventario"
+                                    <button class="btn btn-danger btn-sm" title="Registrar movimiento en inventario"
                                             onclick="BeginMovement('@prod.ProductId')">
                                         <span class="fa fa-arrows"></span>
                                     </button>

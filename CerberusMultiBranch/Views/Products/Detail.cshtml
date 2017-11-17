@@ -26,7 +26,7 @@
                                         var a = imgIndex == Decimal.Zero ? "active" : "";
 
                                         <div id="div+@file.ProductImageId" class="item @a">
-                                            <img src="@imgSrc" />
+                                            <img src="@imgSrc" style="max-height:300px" />
                                         </div>
                                         imgIndex++;
                                     }
@@ -108,8 +108,8 @@
                         }
                     </div>
                 </div>
-
-                <div class="col-md-12">
+                <br />
+                <div class="col-md-12 row">
                     <ul class="nav nav-pills">
                         <li class="active"><a data-toggle="pill" href="#information">Existecias</a></li>
                         <li><a data-toggle="pill" href="#compatibilities">Compatibilidad</a></li>

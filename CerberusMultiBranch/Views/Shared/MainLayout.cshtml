@@ -18,12 +18,12 @@
     @Html.Partial("_Progress")
 
     @Html.Partial("_MessageBox")
-    <div class="navbar btn-danger navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top" >
         <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
             <div class="col-xs-6 col-sm-4 col-md-12">
                 @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
                 {
-                    <img src="~/Content/Images/autobienlogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+                    <img src="~/Content/Images/autobienlogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" style="max-height:50px" />
                 }
                 else
                 {
@@ -36,6 +36,10 @@
         </div>
         <div class="container">
             <div class="navbar-header">
+                <p style="color:lightgray !important; font-size:18pt;">
+                    <span class="@ViewBag.Class"></span>
+                    @ViewBag.Title
+                </p>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>

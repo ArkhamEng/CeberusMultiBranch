@@ -1,16 +1,17 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.EmployeeViewModel
 
 @{
-    ViewBag.Title = "Empleados";
+    ViewBag.Title = "Registro de Empleados";
+    ViewBag.Class = "fa fa-address-card";
 }
 
-<div class="col-md-11">
+@*<div class="col-md-11">
     <h3>
         <span class="fa fa-address-card" style="float:left"></span>
         &nbsp;&nbsp;Registro de Empleados
     </h3>
-</div>
-
+</div>*@
+<hr />
 @Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm("Create", "Employees", FormMethod.Post, new { enctype = "multipart/form-data" }))

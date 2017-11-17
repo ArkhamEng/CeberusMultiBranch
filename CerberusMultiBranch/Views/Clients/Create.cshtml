@@ -1,17 +1,18 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ClientViewModel
 
 @{
-    ViewBag.Title = "Clientes";
+    ViewBag.Title = "Registro de Clientes";
+    ViewBag.Class = "fa fa-address-book";
 }
 
-<div class="col-md-11">
+@*<div class="col-md-11">
     <h3>
         <span class="fa fa-address-book" style="float:left"></span>
         &nbsp;&nbsp;Edición de Clientes
     </h3>
-</div>
+</div>*@
 @Scripts.Render("~/bundles/jqueryval")
-
+<hr />
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()

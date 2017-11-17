@@ -1,138 +1,73 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 
 
-<div id="divCompModal" class="modal" role="dialog">
-    <div class="modal-dialog  modal-lg">
-        <div class="modal-content panel panel-danger ">
-            <div class="panel-body">
-                <div class="row">
-
-                    <div class="col-md-7 ">
-                        <div class="col-md-12">
-                            <h4>Marcas de Autos</h4>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                                @Html.DropDownList("CarMakeFilter", Model.CarMakes, "", htmlAttributes: new { @class = "form-control" })
-                            </div>
-                        </div>
-                        <div class="col-md-12">
-                            <h4>Modelos disponibles</h4>
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                                @Html.DropDownList("CarModelFilter", Model.CarModels, "", htmlAttributes: new { @class = "form-control" })
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 input-group">
-                            <div class="col-md-5 form-group">
-                                @Html.Label("Inicio", htmlAttributes: new { @class = "control-label" })
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
-                                    @Html.TextBox("Ini", "", htmlAttributes: new { @class = "form-control" })
-                                </div>
-                            </div>
-
-                            <div class="col-md-6 col-md-offset-1 form-group">
-                                @Html.Label("Fin", htmlAttributes: new { @class = "control-label" })
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
-                                    @Html.TextBox("End", "", htmlAttributes: new { @class = "form-control" })
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-success" id="btnAdd" type="button">
-                                            <span class="fa fa-angle-double-down"></span>
-                                        </button>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-12 btn-group-vertical">
-                            <h4>
-                                Pendientes de Guardar
-                            </h4>
-                            <button class="btn btn-danger btn-xs" id="btnRemove" type="button">
-                                <span class="glyphicon glyphicon-arrow-up"></span>
-                            </button>
-                            <div id="divValues" >
-
-                            </div>
-                            <select multiple class="form-control" id="tcPending" name="NewCompatibilities"></select>
-                        </div>
-                    </div>
-
-                    <div class="btn-group-vertical col-md-5">
-                        <h4>
-                            Asignados
-                        </h4>
-                        <select multiple class="form-control" id="tcAssigned" ondrop="drop(event)" ondragover="allowDrop(event)" style="height:220px">
-                            @foreach (var com in Model.Compatibilities)
-                            {
-                                var val = com.CarYearId + "-" + @com.ProductId;
-                                <option value="@val">@com.CarYear.CarModel.CarMake.Name - @com.CarYear.CarModel.Name - @com.CarYear.Year</option>
-                            }
-                        </select>
-                        <button class="btn btn-danger btn-xs" type="button">
-                            <span class="glyphicon glyphicon-remove" />
-                        </button>
-                    </div>
+<div class="panel panel-danger ">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4 form-group">
+                <h4>Marcas de Autos</h4>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                    @Html.DropDownList("CarMakeFilter", Model.CarMakes, "", htmlAttributes: new { @class = "form-control  text-uppercase" })
                 </div>
             </div>
+            <div class="form-group col-md-4 col-md-offset-1">
+                <h4>Modelos disponibles</h4>
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                    @Html.DropDownList("CarModelFilter", Model.CarModels, "", htmlAttributes: new { @class = "form-control  text-uppercase" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-3 form-group">
+                @Html.Label("Año Inicial", htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+                    @Html.TextBox("Ini", "", htmlAttributes: new { @class = "form-control", type = "number" })
+                </div>
+            </div>
+
+            <div class="form-group col-md-3 col-md-offset-2 form-group">
+                @Html.Label("Año final", htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+                    @Html.TextBox("End", "", htmlAttributes: new { @class = "form-control", type="number" })
+                    <span class="input-group-btn">
+                        <button class="btn btn-warning"  type="button"  onclick="AddModel('@Model.ProductId')"
+                                title="Agregar compatibilidad">
+                            <span class="fa fa-plus"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div id="divModels">
+            @Html.Partial("_Compatibilities",Model.Compatibilities)
         </div>
     </div>
 </div>
 
 <script>
     var ModelCount = 0;
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetCascade("#CarMakeFilter", "#CarModelFilter", "GetModels");
 
         $("#Ini").attr("readonly", true);
         $("#End").attr("readonly", true);
 
-        $("#CarModelFilter").change(function ()
-        {
-            if ($("#CarModelFilter").val() != "")
-            {
+        $("#CarModelFilter").change(function () {
+            if ($("#CarModelFilter").val() != "") {
                 $("#Ini").attr("readonly", false);
                 $("#End").attr("readonly", false);
             }
-            else
-            {
+            else {
                 $("#Ini").attr("readonly", true);
                 $("#End").attr("readonly", true);
             }
         });
 
-
-        $("#btnAdd").click(function ()
-        {
-            if ($("#Ini").val() > 1900 & $("#End").val() > $("#Ini").val())
-            {
-                var ip = '<input type="hidden" name="NewCompatibilities" value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val() + '" />';
-                var op = '<option value="' + $("#CarModelFilter").val() + '-' + $("#Ini").val() + '-' + $("#End").val()
-                    + '">' + $("#CarMakeFilter option:selected").text() + ' ' + $("#CarModelFilter option:selected").text() + ' ' + $("#Ini").val() + '-' + $("#End").val() + '</option>';
-
-                console.log(op);
-                console.log(ip);
-
-                $("#tcPending").append(op);
-                $("#divValues").append(ip);
-                ModelCount++;
-                SetLabelModels();
-
-                $("#Ini").attr("readonly", true).val("");
-                $("#End").attr("readonly", true).val("");
-                $("#CarModelFilter").attr("readonly", true).val("");
-                $("#CarMakeFilter").val("");
-            }
-            else
-                alert("El año final debe ser mayor que el inicial");
-        });
-
-
-        $("#btnRemove").click(function ()
-        {
+        $("#btnRemove").click(function () {
 
             $("#selectId > option:selected").each(function () {
                 console.log(this.text + ' ' + this.value);
@@ -140,16 +75,40 @@
 
             $("#tcPending option").remove();
             $("#divValues").empty();
-            ModelCount= 0;
+            ModelCount = 0;
             SetLabelModels();
         });
     });
 
-    function SetLabelModels() {
-        if (ModelCount == 0)
-            $("#lblMessageModel").text("");
+
+    function AddModel(productId)
+    {
+      
+        if ($("#Ini").val() > 1900 & $("#End").val() >= $("#Ini").val()) {
+            ShowLoading();
+            var param =
+                {
+                    productId: productId,
+                    modelId: $("#CarModelFilter").val(),
+                    begin: $("#Ini").val(),
+                    end: $("#End").val()
+                }
+
+            ExecuteAjax('@Url.Action("AddCompatibility")', param, function (response) {
+                HideLoading();
+                if ($.isPlainObject(response))
+                {
+                    ShowMessage(response.Result, response.Message, 'warning');
+                }
+                else {
+                    $("#divModels").html(response);
+                }
+            });
+        }
         else
-            $("#lblMessageModel").text("Modelos pendientes de guardar " + ModelCount);
+            ShowMessage("Error de datos!!",
+                "los años no pueden ser menores a 1900 y el año final no puede ser menor que el incial", "warning");
+            
     }
 
 </script>

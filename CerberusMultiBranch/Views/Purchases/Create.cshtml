@@ -1,15 +1,15 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Purchase
 @using CerberusMultiBranch.Models.Entities.Operative;
 @{
-    ViewBag.Title = "Compras";
+    ViewBag.Title = "Registro de compras";
 }
 
 @Scripts.Render("~/bundles/jqueryval")
 
-<h3>
+@*<h3>
     <span class="fa fa-shopping-basket" style="float:left"></span>
     &nbsp;&nbsp;Registro de compras
-</h3>
+</h3>*@
 
 
 
@@ -30,7 +30,7 @@
                     @Html.HiddenFor(m => m.Status)
                     @Html.HiddenFor(m => m.ProviderId)
 
-                    <div class="col-md-5">
+                    <div class="col-md-5 form-group">
                         @Html.Label("Nombre Proveedor", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
 
-                    <div class="col-md-3  col-md-offset-1">
+                    <div class="col-md-3  col-md-offset-1 form-group">
                         @Html.LabelFor(model => model.TransactionDate, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -52,7 +52,7 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.TransactionDate, "", new { @class = "text-danger" })
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-2 form-group">
                         @Html.LabelFor(model => model.Expiration, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -62,7 +62,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-5 form-group">
                         @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
@@ -71,7 +71,7 @@
                         @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
                     </div>
 
-                    <div class="col-md-3 col-md-offset-1">
+                    <div class="col-md-3 col-md-offset-1 form-group">
                         @Html.Label("Tipo de pago", htmlAttributes: new { @class = "control-label" })
                         <div class="form-control">
                             <label class="radio-inline"><input id="rdCredit" type="radio" value="5" name="PaymentType">Crédito</label>

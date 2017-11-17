@@ -299,6 +299,7 @@
     <Content Include="Content\Images\loading.gif" />
     <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\logo2.png" />
+    <Content Include="Content\Images\logoAb.png" />
     <Content Include="Content\Images\rebilogo.png" />
     <Content Include="Content\Images\rebilogo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
@@ -480,6 +481,7 @@
     <Content Include="Views\Products\_SearchInternalProduct.cshtml" />
     <Content Include="Views\Products\_ListForPackage.cshtml" />
     <Content Include="Views\Products\_PackageDetails.cshtml" />
+    <Content Include="Views\Products\_Compatibilities.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

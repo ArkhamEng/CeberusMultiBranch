@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = LookFor(null, null, null, null, null, false);
+            model.Products = LookFor(null, null, null, null,null,null, null, false);
             model.Systems = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
@@ -309,9 +309,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, string name, string code, bool isGrid)
+        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear,int? carModelId, int? carMakeId, string name, string code, bool isGrid)
         {
-            var model = LookFor(categoryId, partSystemId, carYear, name, code, isGrid);
+            var model = LookFor(categoryId, partSystemId, carYear,carModelId,carMakeId, name, code, isGrid);
             return PartialView("_List", model);
         }
 
@@ -330,7 +330,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_StockInBranches", branches);
         }
 
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, string name, string code, bool isGrid)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear,int? carModel, int? carMake, string name, string code, bool isGrid)
         {
             var branchId = User.Identity.GetBranchSession().Id;
 
@@ -341,11 +341,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
             var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
+                            .Include(p=> p.Compatibilities.Select(c=> c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
                             && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
-                            //&& (code == null || code == string.Empty || p.Code == code)
+                            
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                            && (carModel == null || p.Compatibilities.Where(c=> c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
+                            && (carMake  == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
                             select p).OrderBy(s=> s.Name).Take(400).ToList();
 
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
@@ -606,31 +609,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     int i = Cons.Zero;
 
-                    foreach (var c in product.NewCompatibilities)
-                    {
-                        var mArr = c.Split('-');
-                        var mId = Convert.ToInt32(mArr[Cons.Zero]);
-                        var yIni = Convert.ToInt32(mArr[Cons.One]);
-                        var yEnd = Convert.ToInt32(mArr[Cons.Two]) + Cons.One;
-
-                        for (int j = yIni; j < yEnd; j++)
-                        {
-                            var year = db.CarYears.FirstOrDefault(y => y.Year == j && y.CarModelId == mId);
-
-                            if (year == null)
-                            {
-                                year = new CarYear { Year = j, CarModelId = mId };
-                                db.CarYears.Add(year);
-                                //db.SaveChanges();
-                            }
-
-                            //Compatibility comp = new Compatibility { CarYearId = year.CarYearId, ProductId = product.ProductId };
-                            //db.Compatibilites.Add(comp);
-                        }
-                    }
-
-                    //db.SaveChanges();
-
                     //Guardado Imagenes
                     foreach (var file in product.Files)
                     {
@@ -674,6 +652,74 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return RedirectToAction("Create", new { id = product.ProductId });
         }
 
+        [HttpPost]
+        public ActionResult AddCompatibility(int productId, int modelId, int begin, int end)
+        {
+            try
+            {
+                var itEnd = end + Cons.One;
+
+                for (var yr = begin; yr < itEnd; yr++)
+                {
+                    var year = db.CarYears.FirstOrDefault(y => y.Year == yr && y.CarModelId == modelId);
+
+                    if (year == null)
+                    {
+                        year = new CarYear { Year = yr, CarModelId = modelId };
+                        db.CarYears.Add(year);
+                        db.SaveChanges();
+                    }
+
+                    var comp = db.Compatibilites.FirstOrDefault(c => c.CarYearId == year.CarYearId && c.ProductId == productId);
+
+                    if (comp == null)
+                    {
+                        comp = new Compatibility { CarYearId = year.CarYearId, ProductId = productId };
+                        db.Compatibilites.Add(comp);
+                    }
+                }
+
+                db.SaveChanges();
+
+               var compatibilities = db.Compatibilites.Include(c => c.CarYear.CarModel).
+                    Include(c => c.CarYear.CarModel.CarMake).Where(c => c.ProductId == productId).ToList();
+
+                return PartialView("_Compatibilities",compatibilities);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al guardar los datos", Message = "Ocurrio un error al guardar la compatibilidad " + ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult RemoveCompatibility(int productId, int yearId)
+        {
+            try
+            {
+                var comp = db.Compatibilites.Find(yearId, productId);
+
+                if (comp == null)
+                {
+                    return Json(new { Result="No se encontraron datos!", Message="la compatibilidad que se pretende eliminar ya no existe!"});
+                }
+                else
+                {
+                    db.Compatibilites.Remove(comp);
+                    db.SaveChanges();
+
+                    var compatibilities = db.Compatibilites.Include(c => c.CarYear.CarModel).
+                         Include(c => c.CarYear.CarModel.CarMake).Where(c => c.ProductId == productId).ToList();
+
+                    return PartialView("_Compatibilities", compatibilities);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al eliminar", Message = "Ocurrio un error al eliminar la compatibilidad " + ex.Message });
+            }
+        }
 
         [HttpPost]
         public ActionResult SearchForPackage(string filter)

@@ -1,15 +1,16 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProviderViewModel
 
 @{
-    ViewBag.Title = "Proveedores";
+    ViewBag.Title = "Registro de Proveedores";
+    ViewBag.Class = "fa fa-address-book-o";
 }
 
-<div class="col-md-11">
+@*<div class="col-md-11">
     <h3>
         <span class="fa fa-address-book-o" style="float:left"></span>
         &nbsp;&nbsp;Edición de Proveedores
     </h3>
-</div>
+</div>*@
 @Scripts.Render("~/bundles/jqueryval")
 
 @using (Html.BeginForm())
@@ -22,7 +23,7 @@
     @Html.HiddenFor(m => m.UpdDate)
 
     @Html.HiddenFor(m => m.IsActive)
-
+    <hr />
     <div class="col-md-7">
         <div class="panel panel-danger">
             <div class="panel-body">

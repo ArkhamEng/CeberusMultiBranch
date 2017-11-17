@@ -1,17 +1,18 @@
 ﻿
 @{
     ViewBag.Title = "Carga de Catálogo";
+    ViewBag.Class = "fa fa-cloud-upload";
 }
 
-<h3>
+@*<h3>
     <span class="fa fa-cloud-upload" style="float:left"></span>
     &nbsp;&nbsp;Carga de Catálogo
-</h3>
+</h3>*@
 
-
+<hr />
 @using (Html.BeginForm("UpdateCatalog","Providers", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    <div class="panel panel-danger">
+    <div class="panel panel-danger text-uppercase">
         <div class="panel-body">
 
             <h3 class="text-center text-danger">

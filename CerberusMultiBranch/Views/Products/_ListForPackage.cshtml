@@ -79,7 +79,7 @@
         ExecuteAjax('@Url.Action("AddToPackage")', param, function (response)
         {
             HideLoading();
-            if ('json' === response)
+            if ($.isPlainObject(response))
             {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
