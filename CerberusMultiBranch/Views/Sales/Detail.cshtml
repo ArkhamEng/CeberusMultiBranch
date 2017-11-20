@@ -6,12 +6,24 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3>
-    Sucursal <label class="text-lowercase">@Model.Branch.Name</label>
-</h3>
+
 
 
 @Html.HiddenFor(m=> m.TransactionId)
+
+<h3 class="alert alert-success col-md-4">
+    <span class="fa fa-building"></span>
+    Sucursal @Model.Branch.Name
+</h3>
+
+<h3 class="alert alert-danger col-md-3 col-md-offset-1">
+    Comisión @Model.ComAmount.ToString("c")
+</h3>
+
+<h3 class="alert alert-info col-md-3  col-md-offset-1">
+    Total @Model.TotalAmount.ToString("c")
+</h3>
+<hr />
 <div class="panel-group">
     <div class="panel panel-danger">
         <div class="panel-body">
@@ -58,70 +70,13 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-5">
+                <div class="form-group col-md-3">
                     <label class="control-label">
                         Agente
                     </label>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
                         <input class="form-control" value="@Model.User.UserName" readonly />
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Estado Actual
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
-                        @switch (Model.Status)
-                        {
-                            case TranStatus.Canceled:
-                                <label class="form-control alert alert-danger">Cancelado</label>
-                                break;
-                            case TranStatus.InProcess:
-                                <label class="form-control alert alert-warning">En Proceso</label>
-                                break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
-                            case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
-                                break;
-                        }
-
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2 col-md-offset-1">
-                    <label class="control-label">
-                        Comision
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-
-                        <input class="form-control" value="@Model.ComAmount.ToString("c")" readonly />
-
-                    </div>
-                </div>
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Total
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input class="form-control" value="@Model.TotalAmount.ToString("c")" readonly />
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="form-group col-md-3">
-                    <label class="control-label">
-                        Usuario ultima modificación
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
-                        <input class="form-control" value="@Model.UpdUser" readonly />
                     </div>
                 </div>
 
@@ -150,26 +105,46 @@
                     </div>
                 </div>
 
-                <div class="form-group col-md-2 col-md-offset-5">
+                <div class="form-group col-md-2">
                     <label class="control-label">
-                      
+                        Estado Actual
                     </label>
                     <div class="input-group">
-                        <div class="input-group-btn">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-primary" title="volver a la busqueda"
-                                        onclick="ShowLoading(); window.location='@Url.Action("History")'">
-                                    <span class="fa fa-search-plus"></span>
-                                </button>
-                                <button type="button" class="btn btn-danger" title="cancelar venta" 
-                                        onclick="BeginCancel()">
-                                    <span class="fa fa-times"></span>
-                                    Cancelar
-                                </button>
-                            </div>
-                        </div>
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
+                        @switch (Model.Status)
+                        {
+                            case TranStatus.Canceled:
+                                <label class="form-control alert alert-danger">Cancelado</label>
+                                break;
+                            case TranStatus.InProcess:
+                                <label class="form-control alert alert-warning">En Proceso</label>
+                                break;
+                            case TranStatus.Reserved:
+                                <label class="form-control alert alert-info">Reservado</label>
+                                break;
+                            case TranStatus.Compleated:
+                                <label class="form-control alert alert-success">Pagado</label>
+                                break;
+                        }
+
                     </div>
                 </div>
+                <div class="btn-group right col-md-offset-1 col-md-4" style="padding-top:25px !important;">
+                    <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
+                            onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                        <span class="fa fa-search-plus"></span>
+                        <u>B</u>úsqueda
+                    </button>
+                    @if (User.IsInRole("Supervisor"))
+                    {
+                        <button type="button" class="btn btn-danger" title="cancelar venta"
+                                onclick="BeginCancel()" id="btnCancel">
+                            <span class="fa fa-times"></span>
+                            <u>C</u>ancelar Venta
+                        </button>
+                    }
+                </div>
+              
             </div>
         </div>
     </div>
@@ -203,14 +178,14 @@
                     @foreach (var item in Model.TransactionDetails)
                     {
                         <tr>
-                            <td class="col-md-1">
+                            <td class="col-md-1" align="center">
                                 @if (item.Product.Images.Count > 0)
                                 {
-                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" />
+                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:40px" />
                                 }
                                 else
                                 {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:40px"/>
                                 }
                             </td>
                             <td class="text-center">
@@ -267,5 +242,18 @@
                 ShowMessage(j.Result, j.Message, 'warning');
         });
     }
+
+    $(document).keydown(function (e) {
+        if (e.which == 13 || (e.altKey && e.which == 66))
+        {
+            $("#btnSearch").click();
+        }
+
+        if (e.altKey && e.keyCode == 67)
+        {
+            $("#btnCancel").click();
+        }
+    });
+
 
 </script>

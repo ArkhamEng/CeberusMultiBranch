@@ -1,0 +1,50 @@
+﻿
+
+<a  onclick="OpenCart()" class="btn btn-danger" style="color:whitesmoke !important;">
+    <span class="fa fa-shopping-cart" style="float:left">
+    </span>
+    &nbsp;Carrito
+    <span id="spShopingCart" class="badge bg-info">
+</span>
+    
+</a>
+
+
+
+<script>
+    $(document).ready()
+    {
+        CheckCart();
+    }
+    function CheckCart()
+    {
+        ExecuteAjax('@Url.Action("CheckCart","Sales")', {}, function (j)
+        {
+            if (j.Result != "OK")
+                ShowMessage(j.Result, j.Message, 'warning');
+            else
+                $("#spShopingCart").text(j.Message);
+        });
+    }
+
+    function OpenCart()
+    {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("OpenCart", "Sales")', {}, function (response)
+        {
+            HideLoading();
+           
+            if ($.isPlainObject(response))
+            {
+                console.error("Error");
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+            {
+                $("#divModalCart").html(response);
+                $("#ModalCart").modal("show");
+
+            }
+        });
+    }
+</script>

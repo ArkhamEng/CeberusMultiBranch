@@ -3,7 +3,7 @@
 
 @{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
 
-<table id="tbProducts" class="table table-condensed text-uppercase">
+<table id="tbProducts" class="table table-hover text-uppercase">
     <thead class="panel-heading">
         <tr hidden="hidden">
             @for (var j = 0; j < i; j++)
@@ -28,7 +28,7 @@
                              onclick="Detail('@prod.ProductId')">
                             @if (prod.Images.Count > 0)
                             {
-                                <img src="@prod.Images.First().Path" class="img-responsive img-rounded"  style="max-height:200px"/>
+                                <img src="@prod.Images.First().Path" class="img-responsive img-rounded" style="max-height:150px" />
                             }
                             else
                             {
@@ -53,9 +53,9 @@
                                         content += "<h6>" + m.CarMake.Name + " " + m.Name + " " + m.CarYears.Min(y => y.Year) + '-' + m.CarYears.Max(y => y.Year) + "</h5>";
                                     }
 
-                                <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
-                                      title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
-                                </span>
+                                    <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
+                                          title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
+                                    </span>
                                 }
                             </h4>
                             @if (prod.TradeMark != null)
@@ -74,6 +74,14 @@
                             <h4>
                                 <label>
                                     @Html.DisplayFor(model => prod.StorePrice)
+                                </label> 
+                                | 
+                                <label>
+                                    @Html.DisplayFor(model => prod.DealerPrice)
+                                </label>
+                                |
+                                <label>
+                                    @Html.DisplayFor(model => prod.WholesalerPrice)
                                 </label>
                             </h4>
                             @*<h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">*@
@@ -94,15 +102,15 @@
                                 <span class="fa fa-archive"></span>
                             </h6>
                         </div>
-                        
+
                         @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
                         {
                             <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
                                 @if (User.IsInRole("Capturista"))
                                 {
-                                    <button class="btn btn-primary btn-sm" title="Editar producto"
+                                    <button class="btn btn-warning btn-sm" title="Editar producto"
                                             onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
-                                        <span class="glyphicon glyphicon-edit"></span>
+                                        <span class="glyphicon glyphicon-pencil"></span>
                                     </button>
                                 }
 
@@ -116,14 +124,14 @@
                             </div>
                         }
                     </td>
-                 }
+                            }
                 @for (var g = item.Count; g < i; g++)
                 {
                     <td class="col-md-6"></td>
                 }
             </tr>
 
-        }
+                            }
     </tbody>
 </table>
 
@@ -136,8 +144,7 @@
         SetDataTable("#tbProducts", "#txtName");
     });
 
-    function Detail(id)
-    {
+    function Detail(id) {
         ShowLoading();
 
         ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view) {
@@ -147,13 +154,11 @@
     }
 
 
-    function BeginMovement(pid)
-    {
+    function BeginMovement(pid) {
         ShowLoading();
         var param = { productId: pid };
 
-        ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view)
-        {
+        ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view) {
             HideLoading();
             $("#divMovement").html(view);
         });

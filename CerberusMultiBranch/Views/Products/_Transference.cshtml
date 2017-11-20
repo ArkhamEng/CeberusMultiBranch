@@ -13,7 +13,7 @@
                     <div class="col-md-4">
                         @if (Model.Product.Images != null && Model.Product.Images.Count > 0)
                         {
-                            <img class="img-responsive" src="@Model.Product.Images.First().Path" />
+                            <img class="img-responsive" src="@Model.Product.Images.First().Path" style="max-height:130px" />
                         }
                         else
                         {

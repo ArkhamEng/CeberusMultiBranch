@@ -229,6 +229,10 @@
     <Compile Include="Migrations\201711150448347_EmployeeEmail.Designer.cs">
       <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711200425098_saleSending.cs" />
+    <Compile Include="Migrations\201711200425098_saleSending.Designer.cs">
+      <DependentUpon>201711200425098_saleSending.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -305,6 +309,7 @@
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
+    <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -327,6 +332,7 @@
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
+    <Content Include="Scripts\bootstrap-slider.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Common.js" />
@@ -424,9 +430,8 @@
     <Content Include="Views\Shared\_MessageBox.cshtml" />
     <Content Include="Views\Shared\_Progress.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
-    <Content Include="Views\Sales\ShopingCart.cshtml" />
-    <Content Include="Views\Sales\_Details.cshtml" />
-    <Content Include="Views\Sales\Create - Copy.cshtml" />
+    <Content Include="Views\Sales\_Cart.cshtml" />
+    <Content Include="Views\Sales\_CartDetails.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
     <Content Include="Views\CashRegister\_ChoosePayment.cshtml" />
     <Content Include="Views\Sales\History.cshtml" />
@@ -443,8 +448,6 @@
     <Content Include="Views\CashRegister\PrintNote.cshtml" />
     <Content Include="Views\Account\UserConfig.cshtml" />
     <Content Include="Views\Account\UserList.cshtml" />
-    <Content Include="Views\Sales\MySales.cshtml" />
-    <Content Include="Views\Sales\_MySaleList.cshtml" />
     <Content Include="Views\Configuration\_WithdrawalCause.cshtml" />
     <Content Include="Views\Configuration\_WithdrawalCauseList.cshtml" />
     <Content Include="Views\CashRegister\_CashRegisterList.cshtml" />
@@ -465,13 +468,12 @@
     <Content Include="Views\Shared\MainLayout.cshtml" />
     <Content Include="Views\Shared\_Layout - Copy.cshtml" />
     <Content Include="Views\Shared\PageLayout.cshtml" />
-    <Content Include="Views\Shared\_ShopingCartOption.cshtml" />
+    <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
     <Content Include="Views\CashRegister\MyHistory.cshtml" />
     <Content Include="Views\CashRegister\_MyCashRegisterList.cshtml" />
     <Content Include="Views\CashRegister\MyDetail.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
-    <Content Include="Views\Sales\MyDetail.cshtml" />
     <Content Include="Views\Purchases\MyPurchases.cshtml" />
     <Content Include="Views\Purchases\_MyPurchaseList.cshtml" />
     <Content Include="Views\Purchases\MyDetail.cshtml" />
@@ -482,6 +484,7 @@
     <Content Include="Views\Products\_ListForPackage.cshtml" />
     <Content Include="Views\Products\_PackageDetails.cshtml" />
     <Content Include="Views\Products\_Compatibilities.cshtml" />
+    <Content Include="Views\Shared\_BranchOption.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -515,6 +518,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711150448347_EmployeeEmail.resx">
       <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711200425098_saleSending.resx">
+      <DependentUpon>201711200425098_saleSending.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

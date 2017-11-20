@@ -1,39 +1,65 @@
 ﻿
 
-<button type="button" class="btn btn-info" title="Nueva búsqueda" id="btnNewSearch">
-    <span class="fa fa-search-plus"></span>
-</button>
-<button type="button" class="btn btn-primary" title="Guardar los Datos?" id="btnSave">
+    <button type="button" class="btn btn-primary" title="Nueva búsqueda" id="btnNewSearch">
+        <span class="fa fa-search-plus"></span>
+        <u>B</u>úsqueda
+    </button>
+    @*<button type="button" class="btn btn-primary" title="Guardar los Datos?" id="btnSave">
+            <span class="glyphicon glyphicon-floppy-disk"></span>
+            Guardar
+        </button>*@
+
+  
+    <button type="button" class="btn btn-info" title="Limpiar" id="btnClear">
+        <span class="glyphicon glyphicon-refresh"></span>
+        <u>L</u>impiar
+    </button>
+<button type="button" class="btn btn-success" id="btnSave">
     <span class="glyphicon glyphicon-floppy-disk"></span>
+    <u>G</u>uardar
 </button>
 
-<button type="button" class="btn btn-success " title="Limpiar" id="btnClear">
-    <span class="glyphicon glyphicon-file"></span>
-</button>
+    <input type="submit" hidden="hidden" id="btnSubmit" />
 
-<input type="submit" hidden="hidden" id="btnSubmit"/>
 
-<div id="divPopOverSubmit" style="display:none">
-    <div class="text-center">
-        <div class="btn-group">
-            <button type="submit" class="btn btn-primary btn-sm" id="btnAccept" onclick="Submit()">
-                Si  <span class="fa fa-check"></span>
-            </button>
-            <button type="button" class="btn btn-danger  btn-sm" id="btnCancel" onclick="Hide()">
-                No <span class="fa fa-times"></span>
-            </button>
+<div id="divConfirm" class="modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content panel panel-danger ">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                    Guardar cambios?
+                </h4>
+            </div>
+            <div class="panel-body modal-body">
+                <h4>
+                    ¿Estas seguro que deseas guardar los cambios ?
+                </h4>
+            </div>
+            <div class="modal-footer">
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="btnAccept" onclick="Submit()">
+                        <u>A</u>ceptar  <span class="fa fa-check"></span>
+                    </button>
+                    <button type="button" class="btn btn-danger" id="btnCancel" onclick="Hide()">
+                        <u>C</u>ancelar <span class="fa fa-times"></span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+<input type="hidden" value="false" id="IsModalUp"/>
 <script>
 
     $(document).ready(function ()
     {
-        LoadPopover();
+        //LoadPopover();
 
-        $("#btnSave").click(function () {
-            LoadPopover();
+        $("#btnSave").click(function ()
+        {
+            $("#IsModalUp").val(true);
+            $("#divConfirm").modal("show");
         });
 
         $("#btnNewSearch").click(function ()
@@ -41,37 +67,68 @@
             ShowLoading();
             window.location = '@Url.Action("Index")';
         });
-        $("#btnClear").click(function ()
-        {
+        $("#btnClear").click(function () {
             ShowLoading();
             window.location = '@Url.Action("Create",new { id="" })';
         });
+
+        $("#btnCancel").click(function ()
+        {
+            $("#divConfirm").modal("hide");
+        });
     });
 
-    function Hide()
+    $(document).keydown(function (event)
     {
-        $("#btnSave").popover('hide');
-        $("#btnSave").data("bs.popover").inState.click = false;
-    }
+        if (event.keyCode == 13 || event.keyCode == 71)
+        {
+            event.preventDefault();
+            $("#btnSave").click();
+        }
 
-    function LoadPopover()
-    {
-        $("#btnSave").popover({
-            html: true,
-            content: function () { return $("#divPopOverSubmit").html(); },
-            container: 'body'
-        });
-    }
+        if (event.keyCode == '65' &&  $("#IsModalUp").val() == 'true')
+        {
+            Submit();
+        }
+
+        if (event.keyCode == '67' && $("#IsModalUp").val() == 'true')
+        {
+            $("#divConfirm").modal("hide");
+        }
+
+        if (event.keyCode == 76)
+        {
+            ShowLoading();
+            $("#btnClear").click();
+        }
+        if (event.keyCode == 66)
+        {
+            $("#btnNewSearch").click();
+        }
+    });
+    //function Hide() {
+    //    $("#btnSave").popover('hide');
+    //    $("#btnSave").data("bs.popover").inState.click = false;
+    //}
+
+    //function LoadPopover() {
+    //    $("#btnSave").popover({
+    //        html: true,
+    //        content: function () { return $("#divPopOverSubmit").html(); },
+    //        container: 'body'
+    //    });
+    //}
 
     function Submit()
     {
+        $("#divConfirm").modal("hide");
         ShowLoading();
-        Hide();
-       
         $("#btnSubmit").click();
-        
     }
 
-    
+    $('#divConfirm').on('hidden.bs.modal', function ()
+    {
+        $("#IsModalUp").val("false")
+    });
 
 </script>

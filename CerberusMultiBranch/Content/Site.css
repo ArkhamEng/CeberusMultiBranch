@@ -199,12 +199,15 @@ a[aria-expanded="true"]::before {
     content: '\e260';
 }
 
-@media (max-width: 768px) {
-    #sidebar {
+@media (max-width: 768px) 
+{
+    #sidebar 
+    {
         margin-left: -200px;
     }
 
-        #sidebar.active {
+        #sidebar.active 
+        {
             margin-left: 0;
         }
 }
@@ -292,10 +295,9 @@ ul ul a {
 }
 
 .BkPrint {
-   
     background-color: #c9302c !important;
     border-color: #c9302c !important;
-    color:#FFFFFF !important;
+    color: #FFFFFF !important;
 }
 
 .FontNote {
@@ -309,12 +311,21 @@ ul ul a {
 
 @media print {
 
-   
-     .Note table { font-size: 8pt !important; font-family:Tahoma;  }
 
-     .Ticket table { font-size: 10pt !important; font-family:Arial;   }
+    .Note table {
+        font-size: 8pt !important;
+        font-family: Tahoma;
+    }
 
-     
+    .Ticket table {
+        font-size: 10pt !important;
+        font-family: Arial;
+    }
 
-     .BkPrint { color:#FFFFFF !important;   -webkit-print-color-adjust: exact;}
+
+
+    .BkPrint {
+        color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact;
+    }
 }

@@ -1,25 +1,27 @@
 ﻿
 
-<div id="ModalQuickClient" class="modal" role="dialog">
+<div id="ModalQuickClient" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content panel panel-danger panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Búsqueda rápida de clientes</h4>
+                <h4 class="modal-title">Búsqueda de clientes</h4>
             </div>
             <div class="panel panel-danger">
                 <div class="panel-body row">
                     <div class="col-md-8">
-                        @Html.Label("Nombre Cliente / Clave", htmlAttributes: new { @class = "control-label" })
+                        @*@Html.Label("Nombre Cliente / Clave", htmlAttributes: new { @class = "control-label" })*@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("FClientName", "", htmlAttributes: new { @class = "form-control" })
+                            @Html.TextBox("FClientName", "", htmlAttributes: new { @class = "form-control",placeholder="Clave o Nombre de cliente" })
                             <span class="input-group-btn">
-                                <button id="btnQuickSearchClient" type="button" class="btn btn-default">
+                                <button id="btnQuickSearchClient" type="button" class="btn btn-primary">
                                     <span class="glyphicon glyphicon-search"></span>
+                                    Buscar
                                 </button>
-                                <button id="btnAddClient" type="button" class="btn btn-warning" onclick="window.open('@Url.Action("Create","Clients")','blank')">
-                                    <span class="glyphicon glyphicon-plus"></span>
+                                <button id="btnAddClient" type="button" class="btn btn-success" onclick="window.open('@Url.Action("Create","Clients")','blank')">
+                                    <span class="glyphicon glyphicon-file"></span>
+                                    Nuevo
                                 </button>
                             </span>
                         </div>
@@ -40,10 +42,16 @@
 <script>
     $(document).ready(function ()
     {
+       
         $("#btnQuickSearchClient").click(function ()
         {
             $("#divClientList").html();
             QuickSearchClient();
+        });
+
+        $('#ModalQuickClient').on('hidden.bs.modal', function ()
+        {
+            OpenCart();
         });
     });
 

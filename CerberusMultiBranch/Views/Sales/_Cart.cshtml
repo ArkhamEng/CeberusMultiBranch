@@ -1,0 +1,102 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.SaleViewModel
+
+
+<div id="ModalCart" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-primary panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4  class="modal-title text-uppercase">
+                    <span class="fa fa-shopping-cart" style="float:left">
+                    </span>
+                    &nbsp;<a id="ModalCartHeader"></a>
+                </h4>
+            </div>
+
+            <div class="modal-body panel-body">
+
+                @Html.HiddenFor(m => m.TransactionId)
+
+                @Html.HiddenFor(m => m.ClientId)
+
+                @if (Model.Client != null)
+                {
+                    <h4 id="hClientName" class="text-primary text-uppercase">
+                        @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        RFC:&nbsp;&nbsp;@Model.Client.FTR
+                    </h4>
+                }
+                else
+                {
+                    <h4 id="hClientName" class="text-danger"></h4>
+                }
+
+
+                <div class="panel panel-danger col-md-12">
+                    <div id="divCartDetails" class="row">
+                            @Html.Partial("_CartDetails", Model.TransactionDetails)
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary panel-body">
+                <div class="input-group col-md-6 col-md-offset-6">
+                    <select class="form-control"  id="CartSending">
+                        <option value="0">Mostrador</option>
+                        <option value="1">Envío a domicilo</option>
+                    </select>
+                    @*<select class="form-control" style="width:50%"  id="CartPayment">
+                        <option value="2">Efectivo</option>
+                        <option value="1">Tarjeta</option>
+                        <option value="4">Mixto</option>
+                    </select>*@
+                    <div class="input-group-btn">
+                            <button id="btnShowClients" class="btn btn-success" type="button">
+                                <span class="fa fa-user-plus"></span>
+                                Cargo a cliente
+                            </button>
+                            <button class="btn btn-primary" type="button" id="btnCompleate" onclick="CompleateSale('@Model.TransactionId')">
+                                <span class="fa fa-upload"></span>
+                                Terminar venta
+                            </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnShowClients").click(function ()
+        {
+            $("#ModalCart").modal('hide');
+            $("#ModalQuickClient").modal('show');
+        });
+
+        $("#lblTotalAmount").val('@Html.DisplayFor(model => model.TotalAmount)');
+    });
+
+    function CompleateSale(transactionId)
+    {
+        var param =
+        {
+            transactionId: transactionId,
+            sending: $("#CartSending").val()
+        };
+
+        ExecuteAjax('@Url.Action("CompleateSale","Sales")',param, function(response)
+        {
+            $("#ModalCart").modal("hide");
+            CheckCart();
+            if (response.Result == "OK")
+                ShowMessage("Venta concluida", response.Message, 'success');
+            else
+                ShowMessage(response.Result, response.Message, 'warning');
+        });
+    }
+
+</script>
+

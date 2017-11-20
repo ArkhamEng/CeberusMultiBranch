@@ -57,5 +57,22 @@
         Paginate("#tbQuickClient", 8);
     });
 
+    function ClientSelected(id, name, ftr)
+    {
+        var param = { clientId: id, transactionId: $("#TransactionId").val() }
+
+        ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j)
+        {
+            if (j.Result != 'OK')
+            {               
+                ShowMessage(j.Result, j.Data, 'warning');
+            }
+            else
+            {
+                $("#ModalQuickClient").modal("hide");
+            }
+        });
+    }
+
    
 </script>

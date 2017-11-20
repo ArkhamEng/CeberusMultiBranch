@@ -1,15 +1,13 @@
 ﻿
 
 
-<button class="btn btn-danger btn-file btn-xs" onclick="LoadBranches()">
-    <span class="fa fa-exchange" style="float:left"></span>
-    <span id="lblBrachSelector"></span>
-</button>
+
 
 <div id="divModalBranchSelector" class="modal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger ">
             <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Selecciona una sucursal para empezar</h4>
             </div>
             <div class="panel-body">
@@ -37,9 +35,10 @@
         });
     });
 
-       function LoadBranches()
+    function LoadBranches()
     {
-           ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (result)
+        $("#ddBranchSelector").empty();
+         ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (result)
         {
             $.each(result, function (i, item)
             {
@@ -82,7 +81,7 @@
             {
                 $("#divModalBranchSelector").modal('hide');
                 $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
-                window.location = '@Url.Action("Index","Manage")';
+                window.location = '@Url.Action("Index","Products")';
             }
         });
     }

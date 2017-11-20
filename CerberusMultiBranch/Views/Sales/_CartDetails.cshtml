@@ -1,0 +1,194 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
+
+@if (Model.Count > 0)
+{
+    <table id="tbCartDetails" class="table table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="text-center">@Html.DisplayName("Descripción")</th>
+                <th class="text-center">@Html.DisplayName("Precio")</th>
+                <th class="text-center">@Html.DisplayName("Cantidad")</th>
+                @*<th class="text-center">@Html.DisplayName("Disponibles")</th>*@
+                <th class="text-center">@Html.DisplayName("Total")</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="col-md-1" align="center">
+                        @if (item.Product.Images.Count > 0)
+                        {
+                            <img src="@item.Product.Images.First().Path" class="img-responsive" style="max-height:50px" />
+                        }
+                        else
+                        {
+                            <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                        }
+                    </td>
+                    <td>
+                        <label>
+                            @Html.DisplayFor(modelItem => item.Product.Code)
+                        </label>
+                        <br />
+                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    </td>
+
+                    @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                    {
+                        <td class="col-md-2 text-center">
+                            <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
+                                onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice,@item.Price,)">
+                                <u>
+                                    @Html.DisplayFor(modelItem => item.Price)
+                                </u>
+                            </h5>
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="col-md-2 text-center">
+                            <h5 id="txtPrice" class="text-info">
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </h5>
+                        </td>
+                    }
+                    <td class="col-md-1 text-info text-center">
+                        <h5> @item.Quantity</h5>
+                    </td>
+                    <td class="text-right">
+                        <h5 id="txtAmount" class="text-right">
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </h5>
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId','@item.TransactionId')"
+                                    title="Quitar del carritos">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="panel-body">
+        <div class="col-md-offset-2 col-md-8">
+            <p>
+                <h3>
+                    Aun no has agregado ningun producto a la venta, Agregaga productos
+                    desde el Catálogo selecciona la opcion PRODUCTOS en el menú lateral
+                </h3>
+            </p>
+        </div>
+    </div>
+}
+
+
+
+@Html.Partial("_PriceSelector")
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbCartDetails", 4)
+
+        $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.Amount).ToString("c")');
+
+        if (parseFloat('@Model.Count') > 0)
+            $("#btnCompleate").attr("disabled", false);
+        else
+            $("#btnCompleate").attr("disabled", true);
+
+    });
+
+    function ChangePrice(pId, sPrice,dPrice, wPrice,cPrice)
+    {
+        $("#txtProductId").val(pId);
+     
+        $("#txtPriceSelected").text(GetCurrency(cPrice));
+
+        var bound = 1;
+        //if (cPrice < 1000)
+        //    bound=1
+
+
+        $('#txtPriceSelector').slider({
+            value:cPrice,
+            max: sPrice,
+            min: wPrice,
+
+            ticks: [wPrice, dPrice, sPrice],
+            ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
+
+            ticks_snap_bounds: bound
+        });
+        
+        $("#txtPriceSelector").on("slide", function (slideEvt) {
+            $("#txtPriceSelected").text(GetCurrency(slideEvt.value));
+        });
+
+        $("#txtPriceSelector").on("change", function (response)
+        {
+            $("#txtPriceSelected").text(GetCurrency(response.value.newValue));
+        });
+
+
+        $("#ModalPrice").modal("show");
+    }
+
+    function QuantityChanged(input) {
+        quantity = parseFloat($(input).val());
+
+        var row = $(input).parent().parent();
+        cells = row.find("td");
+
+        var price = row.find("#txtPrice").text();
+
+        var available = parseFloat(row.find("#lblAvailable").text());
+
+        if (quantity > available)
+            ShowMessage("Cantidad Invalida", "Estas Tratando de vender mas productos de los diponibles, verifica existencias!", "warning");
+
+        price = price.replace(/[$,]+/g, "");
+
+        //using two decimal, and regex for add comma each thousand
+        var amount = "$" + (quantity * price).toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+
+        row.find("Amount").val(amount.replace(/[$,]+/g, ""));
+        row.find("#txtAmount").text(amount);
+
+        SetTotalAmount();
+    }
+
+
+    function RemoveFromCart(productId, transactionId) {
+        var data = {
+            transactionId: transactionId,
+            productId: productId
+        }
+
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response)
+        {
+            console.log("Ejecución exitosa");
+            if ($.isPlainObject(response))
+            {
+                $("#ModalCart").modal("hide");
+                ShowMessage(response.Result, response.Message, "warning");
+            }
+            else
+            {
+                CheckCart();
+                $("#divCartDetails").html(response);
+            }
+        });
+    }
+
+</script>

@@ -1,21 +1,38 @@
-﻿
+﻿@using Microsoft.AspNet.Identity
 
 <nav id="sidebar">
     <!-- Sidebar Header -->
     <div class="sidebar-header" style="text-align:center">
         <div class="btn-group-vertical  bgSidebar">
             <div class="col-md-8 col-md-offset-2">
-                <img src="@Url.Action("GetPicture", "Json")" class="img-responsive img-circle" />
+                <img src="@Url.Action("GetPicture", "Json")" class="img-responsive img-circle"
+                     onmouseover="SetPointer(this)" title="Cambiar foto de perfil"
+                     onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture","Manage")'" />
             </div>
-            @Html.Partial("_BranchSelector")
+          <div class="btn btn-file btn-xs" style="color:whitesmoke !important; font-weight:200; background-color:#c9302c">              
+             @User.Identity.GetUserName()
+          </div>
         </div>
     </div>
     <ul class="list-unstyled components">
         <li>
+            <a href="/Products/" onclick="ShowLoading()">
+                &nbsp;Productos<span class="fa fa-dropbox" style="float:left" />
+            </a>
+        </li>
+        @if (User.IsInRole("Vendedor"))
+        {
+           
+            <li>
+                <a href="/Sales/History" onclick="ShowLoading()">
+                    &nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" />
+                </a>
+            </li>
+        }
+        <li>
             <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
             <ul class="collapse list-unstyled" id="catalogsSm">
                 <li><a href="/Clients/" onclick="ShowLoading()">&nbsp;Clientes<span class="fa fa-address-book" style="float:left" /></a></li>
-                <li><a href="/Products/" onclick="ShowLoading()">&nbsp;Productos<span class="fa fa-book" style="float:left" /></a></li>
 
                 @if (User.IsInRole("Supervisor") || User.IsInRole("Capturista"))
                 {
@@ -37,13 +54,7 @@
             }
         }
 
-        @if (User.IsInRole("Vendedor"))
-        {
-            <li>
-                @Html.Partial("_ShopingCartOption")
-            </li>
-            <li><a href="/Sales/MySales" onclick="ShowLoading()">&nbsp;Mis ventas<span class="fa fa-shopping-bag" style="float:left" /></a></li>
-        }
+
 
         @if (User.IsInRole("Capturista"))
         {
@@ -59,7 +70,6 @@
                 </a>
                 <ul class="collapse list-unstyled" id="reports">
                     <li><a href="/Purchases/History" onclick="ShowLoading()">&nbsp;Historial compras<span class="fa fa-history" style="float:left" /></a></li>
-                    <li><a href="/Sales/History" onclick="ShowLoading()">&nbsp;Historial ventas<span class="fa fa-history" style="float:left" /></a></li>
                     <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-history" style="float:left" /></a></li>
                 </ul>
             </li>

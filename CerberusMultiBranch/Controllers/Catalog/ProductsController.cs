@@ -24,12 +24,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
-            model.Products = LookFor(null, null, null, null,null,null, null, false);
+            model.Products = new List<List<Product>>(); //LookFor(null, null, null, null,null,null, null, false);
             model.Systems = db.Systems.ToSelectList();
             model.Categories = db.Categories.ToSelectList();
             model.Makes = db.CarMakes.ToSelectList();
             return View(model);
         }
+
+        
 
         [HttpPost]
         [Authorize(Roles = "Supervisor")]

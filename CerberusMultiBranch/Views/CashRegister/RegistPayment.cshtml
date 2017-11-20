@@ -6,11 +6,6 @@
 }
 
 
-
-@*<h3 col-md-4>
-    <span class="fa fa-money" style="float:left"></span>
-    &nbsp;&nbsp;Registro de pago
-</h3>*@
 <hr />
 <div class="col-md-12">
     <div class="panel panel-info">
@@ -93,12 +88,12 @@
                     @foreach (var item in Model.TransactionDetails)
                     {
                         <tr>
-                            <td class="col-md-1">
+                            <td class="col-md-1" align="center">
                                 @if (item.ParentId == null)
                                 {
                                     if (item.Product.Images != null && item.Product.Images.Count > 0)
                                     {
-                                        <img class="img-responsive" src="@item.Product.Images.First().Path" />
+                                        <img class="img-responsive" src="@item.Product.Images.First().Path" style="max-height:50px;" />
                                     }
                                     else
                                     {
@@ -142,7 +137,7 @@
 
   
 
-@Html.Partial("_ChoosePayment")
+@Html.Partial("_ChoosePayment",Model.TotalAmount)
 
 @Html.HiddenFor(m => m.TransactionId)
 

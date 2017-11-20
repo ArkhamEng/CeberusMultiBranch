@@ -233,29 +233,31 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult PaymentAndNote()
         {
-            var sales = LookForPayment(DateTime.Today,null,null);
+            var sales = LookForPayment(DateTime.Today,null,null,null);
             return View(sales);
         }
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult SearchPayment(DateTime? begin, DateTime? end, string folio)
+        public ActionResult SearchPayment(DateTime? begin, DateTime? end, string folio, string client)
         {
-            var sales = LookForPayment(begin, end, folio);
+            var sales = LookForPayment(begin, end, folio,client);
             return PartialView("_SalesToPayList", sales);
         }
 
-        private List<Sale> LookForPayment(DateTime? begin, DateTime? end,string folio)
+        private List<Sale> LookForPayment(DateTime? begin, DateTime? end,string folio, string client)
         {
            var branchId = User.Identity.GetBranchId();
 
             //busco las ventas de la sucursal que esten reservadas o completadas (ya pagadas)
-            var sales = db.Sales.Where(s => s.BranchId == branchId &&
+            var sales = db.Sales.Include(s=> s.Client).Include(s => s.TransactionDetails).
+                Include(s => s.User).Where(s => s.BranchId == branchId &&
             (begin == null || s.TransactionDate >= begin) &&
             (end == null || s.TransactionDate <= end) &&
             (folio == null || folio == string.Empty || s.Folio == folio) &&
+            (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
             (s.Status == TranStatus.Reserved || s.Status == TranStatus.Compleated)).
-            Include(s=> s.TransactionDetails).Include(s=> s.User).OrderByDescending(s=> s.TransactionDate).ToList();
+            OrderByDescending(s=> s.TransactionDate).ToList();
 
             return sales;
         }

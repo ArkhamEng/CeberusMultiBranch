@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Sims 1.0 </title>
+    <title>Refaccionaria AutoBien</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
@@ -15,15 +15,20 @@
     <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 </head>
 <body>
+    @RenderBody()
+
     @Html.Partial("_Progress")
 
     @Html.Partial("_MessageBox")
-    <div class="navbar navbar-inverse navbar-fixed-top" >
+
+    @Html.Partial("_BranchSelector")
+    @*style="background-color:#960202"*@
+    <div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
         <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
             <div class="col-xs-6 col-sm-4 col-md-12">
                 @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
                 {
-                    <img src="~/Content/Images/autobienlogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" style="max-height:50px" />
+                    <img src="~/Content/Images/logoAb.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" style="max-height:60px" />
                 }
                 else
                 {
@@ -36,10 +41,6 @@
         </div>
         <div class="container">
             <div class="navbar-header">
-                <p style="color:lightgray !important; font-size:18pt;">
-                    <span class="@ViewBag.Class"></span>
-                    @ViewBag.Title
-                </p>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
@@ -47,12 +48,18 @@
                 </button>
             </div>
             <div class="navbar-collapse collapse">
+
+                <p style="color:whitesmoke !important; font-size:18pt;" class="nav navbar-nav">
+                    <span class="@ViewBag.Class"></span>
+                    @ViewBag.Title
+                </p>
+
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>
 
-    @RenderBody()
+
 
 
     @RenderSection("scripts", required: false)

@@ -1,40 +1,56 @@
 ﻿
+<script src="~/Scripts/bootstrap-slider.min.js"></script>
+<link href="~/Content/bootstrap-slider.min.css" rel="stylesheet" />
 
 <div id="ModalPrice" class="modal" role="dialog">
     <div class="modal-dialog modal-sm">
-        <div class="modal-content panel panel-danger panel-group">
+        <div class="modal-content panel panel-info panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Ajusta el precio</h4>
+                <h4 class="modal-title">
+                    <span class="fa fa-money" style="float:left">
+                    </span>
+                    &nbsp;
+                    Ajusta el precio
+                </h4>
             </div>
             <div class="modal-body panel-body">
 
                 @Html.Hidden("txtProductId")
-                @Html.Hidden("txtPrice")
-                <div class="col-md-12">
+                @*@Html.Hidden("txtPrice")*@
+
+                <div class="col-xs-12">
+                    <input id="txtPriceSelector" type="text"  class="form-control"  />
+                    <hr />
+                </div>
+                <div class="row">
+                    <h3 id="txtPriceSelected" class="col-xs-6 col-xs-offset-3">
+                    </h3>
+                </div>
+                @*<div class="col-md-12">
                     @Html.Label("Precio Mostrador", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtSPrice", "", htmlAttributes : new { @class = "form-control", @readonly="true" } )
-                        <span class="input-group-addon"><input type="checkbox" id="cbSPrice"  onchange="SetCheck(this,'#txtSPrice')" class="checkbox" ></span>
+                        @Html.TextBox("txtSPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
+                        <span class="input-group-addon"><input type="checkbox" id="cbSPrice" onchange="SetCheck(this,'#txtSPrice')" class="checkbox"></span>
                     </div>
                 </div>
                 <div class="col-md-12">
                     @Html.Label("Precio Distribuidor", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtDPrice", "", htmlAttributes : new { @class = "form-control", @readonly = "true" } )
-                        <span class="input-group-addon"><input type="checkbox" id="cbDPrice"  onchange="SetCheck(this,'#txtDPrice')" class="checkbox"></span>
+                        @Html.TextBox("txtDPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
+                        <span class="input-group-addon"><input type="checkbox" id="cbDPrice" onchange="SetCheck(this,'#txtDPrice')" class="checkbox"></span>
                     </div>
                 </div>
                 <div class="col-md-12">
-                    @Html.Label("Precio Mayorista", htmlAttributes : new { @class = "control-label" })
+                    @Html.Label("Precio Mayorista", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtWPrice", "", htmlAttributes : new { @class = "form-control", @readonly = "true" } )
+                        @Html.TextBox("txtWPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
                         <span class="input-group-addon"><input type="checkbox" id="cbWPrice" onchange="SetCheck(this,'#txtWPrice')" class="checkbox"></span>
                     </div>
-                </div>
+                </div>*@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" type="button" onclick="SetNewPrice()">
@@ -50,23 +66,32 @@
 <script>
     $(document).ready(function ()
     {
-       
+        
     });
 
     function SetNewPrice()
     {
-        var param = { productId: $("#txtProductId").val(), transactionId: $("#TransactionId").val(), price: $("#txtPrice").val() }
-        console.log(param);
-        ExecuteAjax('@Url.Action("SetNewPrice")', param, function (j)
+        $("#ModalPrice").modal("hide");
+
+        var param =
+            {
+                productId: $("#txtProductId").val(),
+                transactionId: $("#TransactionId").val(),
+                price: $("#txtPriceSelected").text().replace(/[$,]+/g, "")
+            }
+        
+        ExecuteAjax('@Url.Action("SetNewPrice","Sales")', param, function (response)
         {
-            if (j.Result != 'OK')
-                ShowMessage(j.Result, j.Message, 'warning');
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning');
             else
-                window.location = window.location;
+            {
+                $("#divCartDetails").html(response);
+            }
         });
     }
 
-    function SetCheck(cb,idPrice)
+    function SetCheck(cb, idPrice)
     {
         $("#txtPrice").val($(idPrice).val());
         $('.checkbox').not(cb).prop('checked', false);

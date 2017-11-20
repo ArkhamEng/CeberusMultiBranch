@@ -1,31 +1,32 @@
 ﻿
-
 @{
-    ViewBag.Title = "AddProfilePicture";
+    ViewBag.Title = "Foto de perfil";
+    ViewBag.Class = "fa fa-camera";
 }
 
-<h3>
-    <span class="fa fa-camera" style="float:left"></span>
-    &nbsp;&nbsp;Foto de perfil
-</h3>
 
 <hr />
 @using (Html.BeginForm("AddProfilePicture", "Manage", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    <div class="col-md-5">
-        <div class="btn-group-vertical thumbnail">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <div class="col-md-5">
+                <div class="btn-group-vertical thumbnail">
 
-            <img id="picture" src='@Url.Action("GetPicture", "Json")' class="btn" />
+                    <img id="picture" src='@Url.Action("GetPicture", "Json")' class="btn" />
 
-            <label id="uplPicture" class="btn btn-primary btn-xs">
-                <span class="fa fa-upload"></span>
-                Cambiar foto
-                <input type="file" name="file" onchange="ImageLoaded(this)" style="display: none;">
-            </label>
+                    <label id="uplPicture" class="btn btn-primary btn-xs">
+                        <span class="fa fa-upload"></span>
+                        Cambiar foto
+                        <input type="file" name="file" onchange="ImageLoaded(this)" style="display: none;">
+                    </label>
+                </div>
+            </div>
+            <input type="submit" hidden id="btnSubmit" />
         </div>
     </div>
-    <input type="submit" hidden id="btnSubmit"/>
+
 }
 
 <script>

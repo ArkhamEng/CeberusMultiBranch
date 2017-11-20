@@ -111,7 +111,7 @@ namespace CerberusMultiBranch.Controllers
             {
                 case SignInStatus.Success:
                     //return RedirectToLocal(returnUrl);
-                    return RedirectToAction("Index", "Manage");
+                    return RedirectToAction("Index", "Products");
                 case SignInStatus.LockedOut:
                     return View("Lockout");
                 case SignInStatus.RequiresVerification:

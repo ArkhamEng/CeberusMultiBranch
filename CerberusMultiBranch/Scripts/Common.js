@@ -1,12 +1,15 @@
-﻿$(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
+﻿$(document).ready(function ()
+{
+    $('#sidebarCollapse').on('click', function ()
+    {
         $('#sidebar').toggleClass('active');
     });
 });
 
 
 
-function GetCurrency(value) {
+function GetCurrency(value)
+{
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
 
@@ -34,7 +37,8 @@ function HideLoading()
 }
 
 
-function SetPointer(element) {
+function SetPointer(element)
+{
     $(element).css('cursor', 'pointer');
 }
 
