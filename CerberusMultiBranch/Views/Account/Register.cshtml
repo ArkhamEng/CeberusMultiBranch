@@ -1,22 +1,14 @@
 ﻿@model CerberusMultiBranch.Models.RegisterViewModel
 @{
     ViewBag.Title = "Registro de usuario";
+    ViewBag.Class = "fa fa-user";
 }
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
 
-
-<div class="col-md-12">
-    <h3 class="text-info">
-        <span class="fa fa-user" style="float:left"></span>
-        &nbsp;&nbsp;
-        Registro de usuario
-    </h3>
-    <hr />
-</div>
-
+<hr />
 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
 {
     @Html.AntiForgeryToken()

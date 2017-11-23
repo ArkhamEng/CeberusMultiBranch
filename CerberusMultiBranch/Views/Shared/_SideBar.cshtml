@@ -9,7 +9,8 @@
                      onmouseover="SetPointer(this)" title="Cambiar foto de perfil"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture","Manage")'" />
             </div>
-          <div class="btn btn-file btn-xs" style="color:whitesmoke !important; font-weight:200; background-color:#c9302c">              
+          <div class="btn btn-file btn-xs" style="color:whitesmoke !important; font-weight:200; background-color:#c9302c"
+               onmouseover="SetPointer(this)" onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword","Manage")'">              
              @User.Identity.GetUserName()
           </div>
         </div>

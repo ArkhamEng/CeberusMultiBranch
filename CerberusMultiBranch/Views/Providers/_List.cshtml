@@ -4,25 +4,23 @@
 <table id="tbProviders" class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
+            <th class="col-md-1">
+                @Html.DisplayName("Clave")
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
+            <th class="col-md-4">
+                @Html.DisplayName("Clave")
             </th>
-      
-            <th>
-                @Html.DisplayNameFor(model => model.WebSite)
+            <th class="col-md-3">
+                @Html.DisplayName("Página")
             </th>
-          
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
+            <th class="col-md-2">
                 @Html.DisplayNameFor(model => model.Phone)
             </th>
+            <th class="col-md-1">
+                @Html.DisplayName("Productos")
+            </th>
   
-            <th></th>
+            <th class="col-md-1"></th>
         </tr>
     </thead>
 
@@ -30,22 +28,20 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
-            
                 <td>
-                    @Html.DisplayFor(modelItem => item.WebSite)
+                    @Html.DisplayFor(modelItem => item.WebSite)                 
                 </td>
-              
-                <td>
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
-                <td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td class="text-center">
+                    @item.ExternalProducts.Count
                 </td>
               
                 <td class="col-md-1" align="right">

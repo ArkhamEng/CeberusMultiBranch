@@ -6,79 +6,54 @@
 }
 
 
-@*<h3>
-    <span class="fa fa-address-card" style="float:left"></span>
-    &nbsp;&nbsp;Catálogo de Empleados
-</h3>*@
 <hr />
 
-<div class="col-md-7">
-    <div class="input-group ">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("Filter", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters">
-                <span class="glyphicon glyphicon-eye-open"></span>
-            </button>
-            <button type="button" class="btn btn-success" id="btnCreate">
-                <span class="glyphicon  glyphicon-file"></span>
-            </button>
-        </span>
-    </div>
-</div>
-
-<br /><br /><br />
-
-<div id="divFilters" class="col-md-4 collapse">
-    <div class="panel panel-danger">
-
-        <div class="panel-body">
-            <div class="row">
-                <div class="form-group col-md-12">
-                    @Html.Label("Estado", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("StateId", Model.States, "", new { @class = "form-control" })
-                    </div>
-                </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Ciudad / Municipio", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("CityId", Model.Cities, "", new { @class = "form-control" })
-                    </div>
-                </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Nombre del Proveedor", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Name", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
-
-                <div class="form-group col-md-7">
-                    @Html.Label("Clave de Proveedor", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Code", "", htmlAttributes: new { @class = "form-control"})
-                    </div>
-                </div>
-                <div class="form-group col-md-7">
-                    @Html.Label("Télefono", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("Phone", "", htmlAttributes: new { @class = "form-control"})
-                    </div>
-                </div>
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-10">
+            <div class="input-group ">
+                @Html.TextBox("Phone", "", htmlAttributes: new
+           {
+               @class = "form-control",
+               placeholder = "Teléfono",
+               style = "width:30%"
+           })
+                @Html.TextBox("txtName", "", htmlAttributes: new
+           {
+               @class = "form-control",
+               placeholder = "Clave o nombre del empleado",
+               style = "width:70%"
+           })
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" id="btnSearch">
+                        <span class="glyphicon glyphicon-search"></span>
+                        <u>B</u>uscar
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnCreate">
+                        <span class="glyphicon  glyphicon-file"></span>
+                        <u>N</u>uevo
+                    </button>
+                </span>
             </div>
         </div>
-        <div class="panel-footer">
-            <button class="btn btn-default" type="button" id="btnSearch">
-                <span class="glyphicon glyphicon-search" />
-            </button>
+        <br /><br /><br />
+        <div class="col-md-9">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                @Html.DropDownList("StateId", Model.States, "Estado / Entidad", new { @class = "form-control" })
+                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
+                @Html.DropDownList("CityId", Model.Cities, "Ciudad / Municipio", new { @class = "form-control" })
+                <span class="input-group-btn">
+                    <button class="btn btn-info" type="button" id="btnClear">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        <u>L</u>impiar
+                    </button>
+                </span>
+            </div>
         </div>
     </div>
 </div>
+
 
 <div id="divEmployees" class="col-md-12">
     @Html.Partial("_List", Model.Employees)
@@ -87,23 +62,46 @@
 <script>
     $(document).ready(function ()
     {
-        $("#btnCreate").click(function () { window.location = '@Url.Action("Create")'; });
 
-        SetFilterControls("#divFilters", "#btnFilter", "#divEmployees");
+        $("#btnCreate").click(function () {
+            ShowLoading();
+            window.location = '@Url.Action("Create")';
+        });
+
+        $("#btnClear").click(function () {
+            ShowLoading();
+            window.location = '@Url.Action("Index",new { })'
+        })
 
         SetCascade("#StateId", "#CityId", "GetCities");
 
         $("#btnSearch").click(function ()
         {
+            ShowLoading();
             var data = {
                 stateId: $("#StateId").val(),
                 cityId: $("#CityId").val(),
-                name: $("#Name").val(),
-                code: $("#Code").val(),
+                name: $("#txtName").val(),
                 phone: $("#Phone").val()
             };
 
+            ExecuteAjax('@Url.Action("Search")', data, function (response)
+            { });
+
             Search('@Url.Action("Search")', data, "#divEmployees");
         });
+    });
+
+    $(document).keydown(function (e) {
+        if (e.which == 13 || (e.altKey && e.which == 66)) {
+            $("#btnSearch").click();
+        }
+
+        if (e.altKey && e.keyCode == 76) {
+            $("#btnClear").click();
+        }
+        if (e.altKey && e.keyCode == 78) {
+            $("#btnCreate").click();
+        }
     });
 </script>

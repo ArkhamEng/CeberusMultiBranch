@@ -1,0 +1,80 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.ExternalProduct>
+
+<div id="ModalProviderProducts" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Productos de proveedores</h4>
+            </div>
+            <div class="modal-body panel-body">
+                <table id="tbProviderProducts" class="table small">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayName("Descripción")
+                            </th>
+
+                            <th>
+                                @Html.DisplayName("Proveedor")
+                            </th>
+                            <th>
+                                @Html.DisplayName("Precio")
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <label>
+                                        <span class="fa fa-tag"></span>
+                                        @item.Code
+                                    </label><br />
+                                    @item.Description<br />
+                                    Por <label>@item.TradeMark <span class="fa fa-registered"></span> </label> | Unidad @item.Unit
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Provider.Name)
+                                </td>
+
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Price)
+                                </td>
+                                <td>
+                                    <div class="btn-group-vertical">
+                                        <button type="button" class="btn btn-primary" title="Relacionar con producto interno">
+                                            <span class="glyphicon glyphicon-link"></span>
+                                        </button>
+                                        <button type="button" class="btn btn-danger " title="Copiar a catálogo">
+                                            <span class="glyphicon glyphicon-copy"></span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        Paginate("#tbProviderProducts", 5);
+
+        $("#ModalProviderProducts").modal("show");
+
+        //cuando cierro la modal quito el remuevo su código html de la página
+        $('#ModalProviderProducts').on('hidden.bs.modal', function () {
+            $("#divProviderProducts").html("");
+        });
+    });
+
+
+</script>

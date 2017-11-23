@@ -8,14 +8,14 @@
             <th class="col-md-1">
                 @Html.DisplayNameFor(model => model.Code)
             </th>
-            <th class="col-md-2">
+            <th class="col-md-3">
                 @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th class="col-md-4">
+            <th class="col-md-3">
                 @Html.DisplayNameFor(model => model.Address)
             </th>
             <th class="col-md-2">
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.FTR)
             </th>
             <th class="col-md-2">
                 @Html.DisplayNameFor(model => model.Phone)
@@ -37,7 +37,7 @@
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Email)
+                    @Html.DisplayFor(modelItem => item.FTR)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Phone)
@@ -47,19 +47,12 @@
 
                         @if (User.IsInRole("Capturista") || User.IsInRole("Vendedor"))
                         {
-                            <button class="btn btn-primary  btn-xs" title="Editar"
+                            <button class="btn btn-warning  btn-xs" title="Editar"
                                     onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ClientId})'">
                                 <span class="glyphicon glyphicon-pencil" />
                             </button>
                         }
-                        else
-                        {
-                            <button class="btn btn-primary  btn-xs" title="Ver detalle"
-                                    onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ClientId})'">
-                                <span class="glyphicon glyphicon-eye-open" />
-                            </button>
-                        }
-
+                     
                     </div>
                 </td>
             </tr>
@@ -71,7 +64,7 @@
 <script>
 
     $(document).ready(function () {
-        SetDataTable("#tbClients", "#Filter");
+        SetDataTable("#tbClients", "#txtName");
         console.log("Client List Loaded");
     });
 

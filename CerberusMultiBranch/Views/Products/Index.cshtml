@@ -9,13 +9,16 @@
 <hr />
 
 
-<div id="pnlFilters" class="panel panel-danger top" >
+<div id="pnlFilters" class="panel panel-danger top">
     <div class="panel-body">
         <div class="col-md-11">
             <div class="input-group">
                 @Html.DropDownList("PartSystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
                 @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
-                <span class="input-group-btn">
+                <div class="input-group-btn">
+                    <button class="btn btn-default btn-lg" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
+                        <span class="fa fa-binoculars"></span>
+                    </button>
                     <button class="btn btn-primary btn-lg" type="button" id="btnSearch" title="Buscar">
                         <span class="glyphicon glyphicon-search"></span>
                         <u>B</u>uscar
@@ -28,7 +31,8 @@
                             <u>N</u>uevo
                         </button>
                     }
-                </span>
+                </div>
+
             </div>
         </div>
 
@@ -45,7 +49,7 @@
 
         <br /><br />
         <br /><br />
-        <div id="divFilters" class="col-md-10">
+        <div  class="col-md-10">
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-registered"></i></span>
                 @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
@@ -69,6 +73,8 @@
     @Html.Partial("_List", Model.Products)
 </div>
 
+<div id="divProviderProducts"></div>
+
 <div id="divProductDetail">
 
 </div>
@@ -78,8 +84,7 @@
 </div>
 <script>
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#CarMakeId").change(function () {
             CascadeMake();
         });
@@ -92,6 +97,23 @@
 
         $("#btnSearch").click(function () {
             LookFor();
+        });
+
+        $("#btnSearchProvider").click(function ()
+        {
+            ShowLoading();
+            ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response)
+            {
+                HideLoading();
+                if($.isPlainObject(response))
+                {
+                    ShowMessage(response.Result, response.Message, "warning");
+                }
+                else
+                {
+                    $("#divProviderProducts").html(response);
+                }
+            });
         });
 
         $("#btnSwitch").click(function () {
@@ -132,15 +154,12 @@
         });
     }
 
-    $(document).keydown(function (e)
-    {
-        if (e.which == 13 || (e.altKey && e.which == 66) )
-        {
+    $(document).keydown(function (e) {
+        if (e.which == 13 || (e.altKey && e.which == 66)) {
             $("#btnSearch").click();
         }
 
-        if (e.altKey && e.keyCode == 76)
-        {
+        if (e.altKey && e.keyCode == 76) {
             $("#btnClear").click();
         }
         if (e.altKey && e.keyCode == 78) {

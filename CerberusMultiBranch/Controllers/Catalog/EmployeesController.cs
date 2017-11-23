@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.Entity.Validation;
@@ -31,6 +32,25 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
+
+        [HttpPost]
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone)
+        {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
+            var model = (from c in db.Employees
+                         where
+                             (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
+                             (stateId == null || c.City.StateId == stateId) &&
+                             (cityId == null || c.CityId == cityId) &&
+                             (phone == null || phone == string.Empty || c.Phone == phone) 
+                         select c).ToList();
+
+            return PartialView("_List", model);
+        }
 
         // GET: Employees/Create
         public ActionResult Create(int? id)

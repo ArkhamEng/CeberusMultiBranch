@@ -38,7 +38,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
 
         [Display(Name = "Página Web")]
-        [DataType(DataType.Url)]
+        [DataType(DataType.Url, ErrorMessage ="error de formato! el sitio debe incluir http:// o https:// ejemplo: http://www.sitio.com")]
         [MaxLength(30)]
         public string WebSite { get; set; }
 

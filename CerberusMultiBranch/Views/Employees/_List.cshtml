@@ -44,9 +44,6 @@
                         <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.EmployeeId})'">
                             <span class="glyphicon glyphicon-pencil" />
                         </button>
-                        @*<button class="btn btn-danger  btn-xs">
-                            <span class="glyphicon glyphicon-trash" />
-                        </button>*@
                     </div>
                 </td>
             </tr>
@@ -57,6 +54,7 @@
 <script>
     $(document).ready(function () 
     {
-        SetDataTable("#tbEmployees","#Filter");
+        HideLoading();
+        SetDataTable("#tbEmployees","#txtName");
     });
 </script>

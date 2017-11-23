@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProviderViewModel();
-            model.Providers = db.Providers.Take(100).ToList();
+            model.Providers = db.Providers.Include(c => c.ExternalProducts).ToList();
             model.States = db.States.ToSelectList();
 
             return View(model);
@@ -38,7 +38,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
 
-            var model = (from c in db.Providers
+            var model = (from c in db.Providers.Include(c=> c.ExternalProducts)
                          where
                              (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
                              (stateId == null || c.City.StateId == stateId) &&
@@ -60,6 +60,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             else
                 model = new ProviderViewModel();
 
+            model.WebSite = model.WebSite ?? "http://";
             model.States = db.States.ToSelectList();
             return View(model);
 

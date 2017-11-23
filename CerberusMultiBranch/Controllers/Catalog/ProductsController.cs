@@ -318,6 +318,20 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
+        public ActionResult ExternalSearch(string filter)
+        {
+            string[] arr = new List<string>().ToArray();
+
+            if (filter != null && filter != string.Empty)
+                arr = filter.Trim().Split(' ');
+
+            var model = db.ExternalProducts.Include(ep=> ep.Provider).
+                Where(ep => (filter == null || filter == string.Empty || 
+                arr.All(s => (ep.Code + "" + ep.Description).Contains(s)))).ToList();
+            return PartialView("_ProviderProducts", model);
+        }
+
+        [HttpPost]
         public ActionResult GetStockInBranches(int productId)
         {
             var branches = db.Branches.Include(b => b.BranchProducts).ToList();
@@ -485,7 +499,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
             var categories = db.Categories.ToList();
-            categories.ForEach(c => c.Name = c.SatCode + "-" + c.Name);
+            categories.ForEach(c => c.Name = c.Name+" - " + c.SatCode);
 
             model.Categories = categories.ToSelectList();
             model.CarMakes = db.CarMakes.ToSelectList();

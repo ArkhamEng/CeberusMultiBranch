@@ -54,7 +54,9 @@
 
     $(document).ready(function ()
     {
-        //LoadPopover();
+        $('#divConfirm').on('hidden.bs.modal', function () {
+            $("#IsModalUp").val(false);
+        });
 
         $("#btnSave").click(function ()
         {
@@ -80,28 +82,49 @@
 
     $(document).keydown(function (event)
     {
-        if (event.keyCode == 13 || event.keyCode == 71)
+        //al presionar enter
+        if (event.keyCode == 13)
+        {
+            event.preventDefault();
+            //si la confirmación no ha sido lanzada
+            if ($("#IsModalUp").val() == 'false')
+            {
+                $("#btnSave").click();
+            }
+            else
+            {
+                //si la confirmación esta arriba se confirma el guardado
+                Submit();
+            }
+        }
+
+        //alt + G realiza una búsqueda
+        if (event.altKey && event.keyCode == 71)
         {
             event.preventDefault();
             $("#btnSave").click();
         }
 
+        //A con la modal arriba realiza el submit
         if (event.keyCode == '65' &&  $("#IsModalUp").val() == 'true')
         {
             Submit();
         }
 
+        //C con la modal arriba cierra la modal
         if (event.keyCode == '67' && $("#IsModalUp").val() == 'true')
         {
             $("#divConfirm").modal("hide");
         }
 
-        if (event.keyCode == 76)
+        //Alt + L limpia el formulario
+        if (event.altKey && event.keyCode == 76)
         {
             ShowLoading();
             $("#btnClear").click();
         }
-        if (event.keyCode == 66)
+        //Alt + B vuelve a la búsqueda
+        if (event.altKey && event.keyCode == 66)
         {
             $("#btnNewSearch").click();
         }
@@ -124,6 +147,7 @@
         $("#divConfirm").modal("hide");
         ShowLoading();
         $("#btnSubmit").click();
+        HideLoading();
     }
 
     $('#divConfirm').on('hidden.bs.modal', function ()
