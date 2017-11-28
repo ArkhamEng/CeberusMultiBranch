@@ -490,6 +490,7 @@
     <Content Include="Views\Products\_Compatibilities.cshtml" />
     <Content Include="Views\Shared\_BranchOption.cshtml" />
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
+    <Content Include="Views\Shared\_QuickAddProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

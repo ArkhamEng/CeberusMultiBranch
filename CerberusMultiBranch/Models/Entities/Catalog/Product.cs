@@ -19,6 +19,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Sistema")]
         [Index("IDX_PartSystemId", IsUnique = false)]
+        
         public int? PartSystemId { get; set; }
 
         [Display(Name = "Código")]

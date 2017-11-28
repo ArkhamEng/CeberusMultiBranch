@@ -1,0 +1,266 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+
+@section Scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<form id="mForm">
+    <div id="ModalQuickAddProduct" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content panel panel-primary panel-group">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Captura rápida de producto</h4>
+                </div>
+                <div class="modal-body panel-body panel-group row">
+
+                    <div class="col-md-5 form-group">
+                        @Html.Label("Codigo", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                            @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-6 col-md-offset-1">
+                        @Html.Label("Sistema", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
+                            @Html.DropDownListFor(m => m.PartSystemId, Model.Systems, "", new { @class = "form-control", required = "true" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.PartSystemId, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-9">
+                        @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
+                            @Html.DropDownListFor(m => m.CategoryId, Model.Categories, "", new { @class = "form-control" })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3 form-group">
+                        @Html.Label("Existencias", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                            <input type="number" name="intialAmount" id="intialAmount" class="form-control" required />
+                        </div>
+                        @Html.ValidationMessage("intialAmount", "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
+                            @Html.TextAreaFor(model => model.Name, 2, 1, htmlAttributes: new { @class = "form-control" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-6 form-group">
+                        @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
+                            @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3 form-group">
+                        @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
+                            @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-3 form-group">
+                        @Html.Label("Precio compra", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(model => model.WholesalerPrice, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.WholesalerPercentage, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <label class="text-danger" id="lblQuickAddError"></label>
+                    @Html.HiddenFor(model => model.ProductId)
+                    @Html.HiddenFor(model => model.BuyPrice)
+
+                </div>
+
+                <div class="modal-footer">
+                    @*
+                        @Html.HiddenFor(model => model.WholesalerPercentage)
+                         @Html.HiddenFor(model => model.DealerPercentage)
+                         @Html.HiddenFor(model => model.StorePercentage)
+                    *@<button class="btn btn-success" id="btnQuickSave" onclick="Send()" type="button">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                        <u>G</u>uardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="hidden" id="exCode" />
+    <input type="hidden" id="ProviderId" />
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#mForm");
+        form.validate();
+
+        $("#StorePercentage").keyup(SetPrice);
+        $("#StorePercentage").click(SetPrice);
+
+        $("#WholesalerPercentage").keyup(SetPrice);
+        $("#WholesalerPercentage").click(SetPrice);
+
+        $("#DealerPercentage").keyup(SetPrice);
+        $("#DealerPercentage").click(SetPrice);
+
+        $("#BuyPrice").keyup(SetPrice);
+        $("#BuyPrice").click(SetPrice);
+
+    });
+
+    function SetPrice()
+    {
+        var sp = (1 + $("#StorePercentage").val() / 100);
+        var dp = (1 + $("#WholesalerPercentage").val() / 100);
+        var wp = (1 + $("#DealerPercentage").val() / 100);
+
+        $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(0));
+        $("#WholesalerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
+        $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
+    }
+
+    function Send(providerId, code)
+    {
+        $("lblQuickAddError").text("");
+        var form = $("#mForm");
+
+        if (!form.valid())
+            return;
+
+        var product =
+        {
+            Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#PartSystemId").val(),
+            WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
+            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val(), DealerPercentange: $("#DealerPercentange").val(),
+            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(), ProductId: $("#ProductId").val()
+        };
+
+        $("#ModalQuickAddProduct").on('hidden.bs.modal', function ()
+        {
+            LookFor();
+        });
+
+        if (product.ProductId == 0) {
+            var param = {
+                product: product, providerId: $("#ProviderId").val(),
+                code: $("#Code").val(), amount: $("#intialAmount").val()
+            };
+
+
+            ExecuteAjax('@Url.Action("Copy","Products")', param, function (response) {
+                if (response.Result != 'OK') {
+                    $("lblQuickAddError").text(response.Message);
+                }
+                else {
+                    $("#ModalQuickAddProduct").modal('hide');
+                    $("#txtName").val(response.Code);
+                }
+            });
+        }
+        else {
+            var param = {
+                product: product,
+                amount: $("#intialAmount").val()
+            };
+
+
+            ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response)
+            {
+                if (response.Result != 'OK')
+                {
+                    $("lblQuickAddError").text(response.Message);
+                }
+                else
+                {
+                    $("#ModalQuickAddProduct").modal('hide');
+                    $("#txtName").val(response.Code);
+                }
+            });
+        }
+
+
+    }
+
+
+    function Copy() {
+        $("#imgProd").attr("class", "img-responsive");
+        $("#divProd").hide();
+
+        var param =
+        {
+            Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#SystemId").val(),
+            WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
+            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val()
+        }
+
+        ExecuteAjax('@Url.Action("Copy")', { product: param, providerId: $("#ProviderId").val(), code: $("#ExCode").val() }, function (j) {
+            if (j.Result != "OK") {
+                $("#imgProd").attr("class", "img-responsive hide");
+                $("#lblMessage").text(j.Result + '==>' + j.Message);
+                $("#divProd").show();
+            }
+            else {
+                $("#ModalCloneProduct").modal("hide");
+            }
+        });
+    }
+</script>

@@ -57,6 +57,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         public int ProductId { get; set; }
 
+        [NotMapped]
+        public string ProviderName { get; set; }
+
 
     }
 }

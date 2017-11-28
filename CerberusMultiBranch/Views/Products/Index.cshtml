@@ -13,7 +13,7 @@
     <div class="panel-body">
         <div class="col-md-11">
             <div class="input-group">
-                @Html.DropDownList("PartSystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
+                @Html.DropDownList("SystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
                 @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
                 <div class="input-group-btn">
                     <button class="btn btn-default btn-lg" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
@@ -72,16 +72,22 @@
 <div id="divProducts" class="col-md-12 container">
     @Html.Partial("_List", Model.Products)
 </div>
+<button type="button" hidden id="btnTest" onclick='$("#ModalQuickAddProduct").modal("show");'></button>
 
-<div id="divProviderProducts"></div>
+<div id="divProviderProducts">
+</div>
+
 
 <div id="divProductDetail">
-
 </div>
 
 <div id="divTransference">
-
 </div>
+
+<div id="divQuickAdd">
+</div>
+
+
 <script>
 
     $(document).ready(function () {
@@ -101,6 +107,16 @@
 
         $("#btnSearchProvider").click(function ()
         {
+
+            var f = $("#txtName").val();
+
+            if (f.length < 3)
+            {
+                ShowMessage("Datos insuficientes!", "Para realizar una busqueda en el catálogo de proveedores"
+                    + "es necesario ingresar por lo menos 3 caracteres en el filtro de descripción / código","warning");
+                return;
+            }
+
             ShowLoading();
             ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response)
             {
@@ -116,7 +132,8 @@
             });
         });
 
-        $("#btnSwitch").click(function () {
+        $("#btnSwitch").click(function ()
+        {
             if ($("#IsGrid").val() != 'false') {
                 $("#IsGrid").val('false');
                 LookFor();
@@ -136,17 +153,18 @@
         $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
     });
 
-    function LookFor() {
+    function LookFor()
+    {
         ShowLoading();
         var data =
         {
-            categoryId: $("#CategoryId").val(),
+            categoryId: $("#FiltCategoryId").val(),
             carMakeId: $("#CarMakeId").val(),
             carModelId: $("#CarModelId").val(),
             carYear: $("#CarYearId").val(),
             name: $("#txtName").val(),
             isGrid: $("#IsGrid").val(),
-            partSystemId: $("#PartSystemId").val()
+            partSystemId: $("#SystemId").val()
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view) {
             HideLoading();
@@ -208,5 +226,4 @@
             $("#CarYearId").append($('<option></option>').val("").html("Año"));
         }
     }
-
 </script>

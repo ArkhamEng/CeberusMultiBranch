@@ -103,9 +103,21 @@
                             </h6>
                         </div>
 
-                        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
+                        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor") || User.IsInRole("Vendedor"))
                         {
                             <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
+                                @if (User.IsInRole("Supervisor"))
+                                {
+                                    <button class="btn btn-success btn-sm" title="Edición rápida"
+                                            onclick="QuickEdit('@prod.ProductId')">
+                                        <span class="fa fa-bolt"></span>
+                                        <span class="glyphicon glyphicon-pencil"></span>
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" title="Registrar movimiento en inventario"
+                                            onclick="BeginMovement('@prod.ProductId')">
+                                        <span class="fa fa-arrows"></span>
+                                    </button>
+                                }
                                 @if (User.IsInRole("Capturista"))
                                 {
                                     <button class="btn btn-warning btn-sm" title="Editar producto"
@@ -114,13 +126,7 @@
                                     </button>
                                 }
 
-                                @if (User.IsInRole("Supervisor"))
-                                {
-                                    <button class="btn btn-danger btn-sm" title="Registrar movimiento en inventario"
-                                            onclick="BeginMovement('@prod.ProductId')">
-                                        <span class="fa fa-arrows"></span>
-                                    </button>
-                                }
+                               
                             </div>
                         }
                     </td>
@@ -131,7 +137,7 @@
                 }
             </tr>
 
-                            }
+  }
     </tbody>
 </table>
 
@@ -153,6 +159,17 @@
         });
     }
 
+    function QuickEdit(id)
+    {
+        ShowLoading();
+
+        ExecuteAjax('@Url.Action("QuickEdit", "Products")', { productId: id }, function (view) {
+            HideLoading();
+            $("#divQuickAdd").html(view);
+
+            $("#ModalQuickAddProduct").modal("show");
+        });
+    }
 
     function BeginMovement(pid) {
         ShowLoading();

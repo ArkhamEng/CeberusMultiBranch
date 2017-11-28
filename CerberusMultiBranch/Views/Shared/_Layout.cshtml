@@ -3,9 +3,11 @@
 }
 <div class="wrapper">
     @Html.Partial("_SideBar")
-    <div id="divModalCart"></div>
+
+    <div id="divModalCart">
+    </div>
     @Html.Partial("_QuickClient")
-        <div id="content" class="container">
+        <div id="content" class="container text-uppercase">
             @RenderBody()
         </div>
    

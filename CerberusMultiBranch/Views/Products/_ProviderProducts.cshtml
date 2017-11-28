@@ -21,7 +21,9 @@
                             <th>
                                 @Html.DisplayName("Precio")
                             </th>
-                            <th></th>
+                            <th>
+                                @Html.DisplayName("Cv AB")
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,21 +39,25 @@
                                     Por <label>@item.TradeMark <span class="fa fa-registered"></span> </label> | Unidad @item.Unit
                                 </td>
                                 <td>
-                                    @Html.DisplayFor(modelItem => item.Provider.Name)
+                                    @Html.DisplayFor(modelItem => item.ProviderName)
                                 </td>
 
 
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Price)
                                 </td>
-                                <td>
+                                <td align="center">
                                     <div class="btn-group-vertical">
-                                        <button type="button" class="btn btn-primary" title="Relacionar con producto interno">
-                                            <span class="glyphicon glyphicon-link"></span>
-                                        </button>
-                                        <button type="button" class="btn btn-danger " title="Copiar a catálogo">
-                                            <span class="glyphicon glyphicon-copy"></span>
-                                        </button>
+                                        @if (item.InternalCode == null || item.InternalCode == string.Empty)
+                                        {
+                                            <button type="button" class="btn btn-danger" onclick="BeginCopy('@item.ProviderId','@item.Code')" title="Copiar a catálogo">
+                                                <span class="fa fa-copy"></span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            @Html.DisplayFor(modelItem => item.InternalCode)
+                                        }
                                     </div>
                                 </td>
                             </tr>
@@ -63,18 +69,33 @@
     </div>
 </div>
 
-<script>
 
-    $(document).ready(function () {
+
+<script>
+    $(document).ready(function ()
+    {
         Paginate("#tbProviderProducts", 5);
 
-        $("#ModalProviderProducts").modal("show");
+        $("#ModalProviderProducts").modal('show');
 
-        //cuando cierro la modal quito el remuevo su código html de la página
-        $('#ModalProviderProducts').on('hidden.bs.modal', function () {
-            $("#divProviderProducts").html("");
-        });
+       
     });
 
+    function BeginCopy(provId, code)
+    {
+        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: provId, code: code }, function (view) 
+        {
+            $("#divQuickAdd").html(view);
+            $("#exCode").val(code);
+            $("#ProviderId").val(provId);
+
+            $("#ModalProviderProducts").on('hidden.bs.modal', function () {
+
+                $("#ModalQuickAddProduct").modal("show");
+            });
+
+            $("#ModalProviderProducts").modal('hide');
+        });
+    }
 
 </script>

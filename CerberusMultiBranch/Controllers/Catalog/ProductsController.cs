@@ -12,6 +12,7 @@ using CerberusMultiBranch.Models;
 using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Models.Entities.Operative;
+using System.Text.RegularExpressions;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -325,9 +326,38 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-            var model = db.ExternalProducts.Include(ep=> ep.Provider).
-                Where(ep => (filter == null || filter == string.Empty || 
-                arr.All(s => (ep.Code + "" + ep.Description).Contains(s)))).ToList();
+            var products = (from ep in db.ExternalProducts.Include(ep=> ep.Provider)
+                            join eq in db.Equivalences.Include(e => e.Product)
+                            on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
+                            from x in gj.DefaultIfEmpty()
+
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description).Contains(s)))
+                            select new
+                            {
+                                ProviderId = ep.ProviderId,
+                                Code = ep.Code,
+                                Description = ep.Description,
+                                InternalCode = gj.FirstOrDefault().Product.Code,
+                                Price = ep.Price,
+                                TradeMark = ep.TradeMark,
+                                Unit = ep.Unit,
+                                ProductId = (int?)gj.FirstOrDefault().ProductId ?? Cons.Zero,
+                                ProviderName = ep.Provider.Name
+                            }).Take((int)Cons.OneHundred).ToList();
+
+            var model = products.Select(ep => new ExternalProduct
+            {
+                ProviderId = ep.ProviderId,
+                Code = ep.Code,
+                Description = ep.Description,
+                InternalCode = ep.InternalCode,
+                Price = ep.Price,
+                TradeMark = ep.TradeMark,
+                Unit = ep.Unit,
+                ProductId = ep.ProductId,
+                ProviderName = ep.ProviderName
+            }).ToList();
+
             return PartialView("_ProviderProducts", model);
         }
 
@@ -556,6 +586,200 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             return PartialView("_PackageDetails", model);
 
+        }
+
+        [HttpPost]
+        public ActionResult QuickEdit(int productId)
+        {
+            var product = db.Products.Find(productId);
+            ProductViewModel vm = new ProductViewModel(product);
+
+            //obtengo categorias
+            var cats = db.Categories.ToList();
+            cats.ForEach(c => c.Name += " - " + c.SatCode);
+
+            vm.Categories = cats.ToSelectList();
+            vm.Systems = db.Systems.ToSelectList();
+
+
+            if(vm.StorePercentage <= Cons.Zero)
+            {
+                var variables = db.Variables;
+
+                vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+            }
+
+            return PartialView("_QuickAddProduct", vm);
+        }
+
+        [HttpPost]
+        public ActionResult BeginCopy(int providerId, string code)
+        {
+            var variables = db.Variables;
+            var ep = db.ExternalProducts.Find(providerId, code);
+
+            ProductViewModel vm = new ProductViewModel();
+
+            var cats = db.Categories.ToList();
+            cats.ForEach(c => c.Name += " - " + c.SatCode);
+
+            vm.Categories   = cats.ToSelectList();
+            vm.Systems      = db.Systems.ToSelectList();
+            vm.Name         = ep.Description;
+            vm.TradeMark    = ep.TradeMark;
+            vm.Unit         = ep.Unit;
+            vm.BuyPrice     = ep.Price;
+            vm.MinQuantity  = Cons.One;
+            vm.Code         = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
+            vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+            vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+            vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+
+            vm.DealerPrice     = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)),Cons.Zero);
+            vm.StorePrice      = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)),Cons.Zero); 
+            vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPrice / Cons.OneHundred)),Cons.Zero); 
+
+            return PartialView("_QuickAddProduct", vm);
+        }
+
+        [HttpPost]
+        public JsonResult QuickSave(Product product, double amount)
+        {
+            product.UpdDate = DateTime.Now;
+            product.UpdUser = User.Identity.GetUserName();
+
+            db.Entry(product).State = EntityState.Modified;
+
+            if (amount > Cons.Zero)
+            {
+                var branchId = User.Identity.GetBranchId();
+                //verifico si hay registro de stock en sucursal
+                var bp = db.BranchProducts.FirstOrDefault(s => s.BranchId == branchId
+                && s.ProductId == product.ProductId);
+
+                if(bp == null)
+                {
+                    bp = new BranchProduct
+                    {
+                        ProductId = product.ProductId,
+                        BranchId = User.Identity.GetBranchId(),
+                        Stock = amount,
+                        LastStock = Cons.Zero,
+                        UpdDate = DateTime.Now
+                    };
+
+                    db.BranchProducts.Add(bp);
+                }
+                else
+                {
+                    bp.LastStock = bp.LastStock;
+                    bp.Stock += amount;
+                    bp.UpdDate         = DateTime.Now;
+                    db.Entry(bp).State = EntityState.Modified;
+                }
+               
+                var sm = new StockMovement
+                {
+                    BranchId = bp.BranchId,
+                    Comment = "Ingreso en Edición rápida",
+                    MovementDate = DateTime.Now,
+                    ProductId = product.ProductId,
+                    MovementType = MovementType.Entry,
+                    User = User.Identity.GetUserName(),
+                    Quantity = amount
+                };
+
+                db.StockMovements.Add(sm);
+            }
+
+            db.SaveChanges();
+            return Json(new { Result = "OK", Code= product.Code });
+        }
+
+        [HttpPost]
+        public JsonResult Copy(Product product, int providerId, string code, int amount)
+        {
+            //Aplico formato al código
+            product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
+
+            //verifico que el código no exista
+            var eP = db.Products.FirstOrDefault(p => p.Code == product.Code);
+
+            if (eP != null)
+            {
+                return Json(new { Result = "Código repetido", Message = "Ya existe un producto con este código Descripción "+eP.Name });
+            }
+            else
+            {
+                try
+                {
+                    //relleno datos adicionales
+                    product.UpdUser     = User.Identity.Name;
+                    product.UpdDate     = DateTime.Now;
+                    product.MinQuantity = Cons.One;
+                    product.StorePrice  = Math.Round(product.StorePrice, Cons.Zero);
+                    product.DealerPrice = Math.Round(product.DealerPrice, Cons.Zero);
+                    product.WholesalerPrice = Math.Round(product.WholesalerPrice, Cons.Zero);
+                    product.MinQuantity = Cons.One;
+                    
+                    product.IsActive = true;
+
+                    //Guardo el producto
+                    db.Products.Add(product);
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { Result = "Error al guardar el producto", Message = ex.Message });
+                }
+
+                try
+                {
+                    //creo la equivalencia
+                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
+                    db.Equivalences.Add(eq);
+
+                    //si viene con cantidad inicial agrego stock a la sucursal y movimiento al inventario
+
+                    
+                    if (amount > Cons.Zero)
+                    {
+
+                        var bp = new BranchProduct
+                        {
+                            ProductId = product.ProductId,
+                            BranchId = User.Identity.GetBranchId(),
+                            Stock = amount,
+                            LastStock = Cons.Zero,
+                            UpdDate = DateTime.Now
+                        };
+
+                        var sm = new StockMovement
+                        {
+                            BranchId = bp.BranchId,
+                            Comment = "Ingreso en copiador rápido",
+                            MovementDate = DateTime.Now,
+                            ProductId = product.ProductId,
+                            MovementType = MovementType.Entry,
+                            User = User.Identity.GetUserName(),
+                            Quantity = amount
+                        };
+
+                        db.BranchProducts.Add(bp);
+                        db.StockMovements.Add(sm);
+                    }
+
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { Result = "Error al asociar el producto", Message = ex.Message });
+                }
+
+                return Json(new { Result = "OK",Code=product.Code });
+            }
         }
 
 
