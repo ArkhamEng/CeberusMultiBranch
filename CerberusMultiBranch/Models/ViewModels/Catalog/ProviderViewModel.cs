@@ -37,6 +37,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.UpdDate = provider.UpdDate;
             this.ZipCode = provider.ZipCode;
             this.WebSite = provider.WebSite;
+            this.Agent = provider.Agent;
+            this.AgentPhone = provider.AgentPhone;
+            this.Line = provider.Line;
 
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();

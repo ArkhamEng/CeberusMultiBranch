@@ -5,7 +5,7 @@
     <div class="sidebar-header" style="text-align:center">
         <div class="btn-group-vertical  bgSidebar">
             <div class="col-md-8 col-md-offset-2">
-                <img src="@Url.Action("GetPicture", "Json")" class="img-responsive img-circle"
+                <img src="@Url.Action("GetPicture", "Json")" class="img-responsive img-circle" style="max-height:100px"
                      onmouseover="SetPointer(this)" title="Cambiar foto de perfil"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture","Manage")'" />
             </div>

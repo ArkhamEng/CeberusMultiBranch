@@ -65,7 +65,7 @@
                             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-star-empty"></i></span>
-                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                         </div>
@@ -74,7 +74,7 @@
                             @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                                @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control text-right" } })
+                                @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control text-right text-uppercase" } })
                                 @*<span class="input-group-addon"><input type="checkbox" id="cbCode" onclick="EditCode(this)"></span>*@
                             </div>
                             @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
@@ -85,7 +85,7 @@
                             @Html.LabelFor(model => model.CategoryId, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                                @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "", new { @class = "form-control" })
+                                @Html.DropDownListFor(model => model.CategoryId, Model.Categories, "", new { @class = "form-control text-uppercase" })
                             </div>
                             @Html.ValidationMessageFor(model => model.CategoryId, "", new { @class = "text-danger" })
                         </div>
@@ -93,7 +93,7 @@
                             @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
                             @*@if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
                             {*@
-                                @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control" })
+                                @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase" })
                                 @Html.HiddenFor(model => model.ProductType)
                             @*}
                             else
@@ -110,7 +110,7 @@
                             @Html.LabelFor(model => model.TradeMark, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-                                @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
                         </div>
@@ -119,7 +119,7 @@
                             @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
-                                @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
                         </div>
@@ -127,7 +127,7 @@
                             @Html.LabelFor(model => model.PartSystemId, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                                @Html.DropDownListFor(model => model.PartSystemId, Model.Systems, "", new { @class = "form-control" })
+                                @Html.DropDownListFor(model => model.PartSystemId, Model.Systems, "", new { @class = "form-control text-uppercase" })
                                 @Html.ValidationMessageFor(model => model.PartSystemId, "", new { @class = "text-danger" })
                             </div>
                         </div>
@@ -231,7 +231,7 @@
                             @Html.LabelFor(model => model.Row, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-bars"></i></span>
-                                @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.Row, "", new { @class = "text-danger" })
                         </div>
@@ -240,7 +240,7 @@
                             @Html.LabelFor(model => model.Ledge, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-archive"></i></span>
-                                @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
                         </div>

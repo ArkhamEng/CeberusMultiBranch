@@ -72,6 +72,19 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(20)]
         public string Phone { get; set; }
 
+        [Display(Name = "Telefono Representante")]
+        [DataType(DataType.PhoneNumber)]
+        [MaxLength(20)]
+        public string AgentPhone { get; set; }
+
+        [Display(Name = "Representante")]
+        [MaxLength(100)]
+        public string Agent { get; set; }
+
+        [Display(Name = "Línea")]
+        [MaxLength(100)]
+        public string Line { get; set; }
+
         public bool IsActive { get; set; }
 
      

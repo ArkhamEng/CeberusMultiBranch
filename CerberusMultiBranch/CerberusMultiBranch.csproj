@@ -237,6 +237,10 @@
     <Compile Include="Migrations\201711230504167_RequiredProdName.Designer.cs">
       <DependentUpon>201711230504167_RequiredProdName.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201711300331160_Providerchanges.cs" />
+    <Compile Include="Migrations\201711300331160_Providerchanges.Designer.cs">
+      <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -490,7 +494,7 @@
     <Content Include="Views\Products\_Compatibilities.cshtml" />
     <Content Include="Views\Shared\_BranchOption.cshtml" />
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
-    <Content Include="Views\Shared\_QuickAddProduct.cshtml" />
+    <Content Include="Views\Products\_QuickAddProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -530,6 +534,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711230504167_RequiredProdName.resx">
       <DependentUpon>201711230504167_RequiredProdName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711300331160_Providerchanges.resx">
+      <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
