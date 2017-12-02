@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             // var cs = DateTime.Now.GetShift();
             var cr = new CashRegister();
-            cr.OpeningDate = DateTime.Now;
+            cr.OpeningDate = DateTime.Now.ToLocal();
             cr.UserOpen = User.Identity.Name;
             cr.BranchId = User.Identity.GetBranchId();
             return cr;
@@ -204,7 +204,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = User.Identity.GetCashRegister();
 
-            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now, User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId, WithdrawalCauseId = causeId };
+            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now.ToLocal(),
+                User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId,
+                WithdrawalCauseId = causeId };
 
             db.Withdrawals.Add(wd);
             db.SaveChanges();
@@ -220,7 +222,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             cr.FinalAmount = Math.Round(amount, Cons.Two);
             cr.UserClose = User.Identity.Name;
-            cr.ClosingDate = DateTime.Now;
+            cr.ClosingDate = DateTime.Now.ToLocal();
             cr.CloseComment = comment;
             cr.IsOpen = false;
 
@@ -316,7 +318,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //marco la venta como pagada y coloco el tipo de pago
                 sale.LastStatus     = sale.Status;
                 sale.Status         = TranStatus.Compleated;
-                sale.UpdDate        = DateTime.Now;
+                sale.UpdDate        = DateTime.Now.ToLocal();
                 sale.UpdUser        = User.Identity.Name;
                 sale.PaymentType    = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
                 sale.Payments       = new List<Payment>();
@@ -330,7 +332,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         TransactionId = sale.TransactionId,
                         Amount = sale.TotalAmount,
-                        PaymentDate = DateTime.Now,
+                        PaymentDate = DateTime.Now.ToLocal(),
                         PaymentType = sale.PaymentType,
                     };
                     sale.Payments.Add(p);
@@ -341,11 +343,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var pm = new Payment
                     { TransactionId = sale.TransactionId, Amount = cash.Value,
-                        PaymentDate = DateTime.Now, PaymentType = PaymentType.Efectivo };
+                        PaymentDate = DateTime.Now.ToLocal(), PaymentType = PaymentType.Efectivo };
 
                     var pc = new Payment
                     { TransactionId = sale.TransactionId, Amount = card.Value,
-                        PaymentDate = DateTime.Now, PaymentType = PaymentType.Tarjeta };
+                        PaymentDate = DateTime.Now.ToLocal(), PaymentType = PaymentType.Tarjeta };
 
                     sale.Payments.Add(pm);
                     sale.Payments.Add(pc);
@@ -374,7 +376,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var dt = new Income();
                     dt.CashRegisterId = cr.CashRegisterId;
                     dt.Amount = pay.Amount;
-                    dt.InsDate = DateTime.Now;
+                    dt.InsDate = DateTime.Now.ToLocal();
                     dt.User = User.Identity.Name;
                     dt.Type = pay.PaymentType;
                     dt.SaleFolio = sale.Folio;

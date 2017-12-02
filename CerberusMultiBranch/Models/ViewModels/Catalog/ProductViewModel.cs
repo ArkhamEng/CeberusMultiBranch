@@ -72,6 +72,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.ModelCompatibilities = new List<CarModel>();
             this.Systems = new List<PartSystem>().ToSelectList();
             this.PackageDetails = product.PackageDetails;
+            this.Quantity = product.Quantity;
             this.FillTypes();
         }
 

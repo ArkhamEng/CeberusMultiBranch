@@ -32,7 +32,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-        
+
 
         [HttpPost]
         [Authorize(Roles = "Supervisor")]
@@ -312,9 +312,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear,int? carModelId, int? carMakeId, string name, string code, bool isGrid)
+        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid)
         {
-            var model = LookFor(categoryId, partSystemId, carYear,carModelId,carMakeId, name, code, isGrid);
+            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid);
             return PartialView("_List", model);
         }
 
@@ -326,7 +326,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-            var products = (from ep in db.ExternalProducts.Include(ep=> ep.Provider)
+            var products = (from ep in db.ExternalProducts.Include(ep => ep.Provider)
                             join eq in db.Equivalences.Include(e => e.Product)
                             on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
                             from x in gj.DefaultIfEmpty()
@@ -376,9 +376,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_StockInBranches", branches);
         }
 
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear,int? carModel, int? carMake, string name, string code, bool isGrid)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid)
         {
-            var branchId = User.Identity.GetBranchSession().Id;
+            var branchId = User.Identity.GetBranchId();
 
             string[] arr = new List<string>().ToArray();
 
@@ -387,21 +387,29 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
             var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
-                            .Include(p=> p.Compatibilities.Select(c=> c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
+                            .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
                             && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
-                            
+
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            && (carModel == null || p.Compatibilities.Where(c=> c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
-                            && (carMake  == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
-                            select p).OrderBy(s=> s.Name).Take(400).ToList();
+                            && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
+                            && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
+                            select p).OrderBy(s => s.Name).Take(400).ToList();
 
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
             {
                 var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                prod.Quantity = bp != null ? bp.Stock : 0;
+                prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                prod.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                prod.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                prod.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+                prod.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                prod.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                prod.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                prod.Row = bp != null ? bp.Row : string.Empty;
+                prod.Row = bp != null ? bp.Ledge : string.Empty;
             }
 
             products.OrderCarModels();
@@ -473,7 +481,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult Detail(int id)
         {
-            var branchId = User.Identity.GetBranchSession().Id;
+            var branchId = User.Identity.GetBranchId();
             var userId = User.Identity.GetUserId();
 
             var trans = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
@@ -488,16 +496,24 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var bProd = model.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
             model.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
-
+            model.StorePercentage = bProd != null ? bProd.StorePercentage : Cons.Zero;
+            model.DealerPercentage = bProd != null ? bProd.DealerPercentage : Cons.Zero;
+            model.WholesalerPercentage = bProd != null ? bProd.WholesalerPercentage : Cons.Zero;
+            model.StorePrice = bProd != null ? bProd.StorePrice : Cons.Zero;
+            model.DealerPrice = bProd != null ? bProd.DealerPrice : Cons.Zero;
+            model.WholesalerPrice = bProd != null ? bProd.WholesalerPrice : Cons.Zero;
+            
             model.OrderCarModels();
 
-            model.Branches = db.Branches.Include(b => b.BranchProducts).ToList();
-            var details = db.Sales.Include(s => s.TransactionDetails).Select(s => s.TransactionDetails.
-             Where(td => td.ProductId == id)).ToList();
+            //Obtengo existencias en otras sucursales
+            model.Branches = db.Branches.ToList();
+
+            //var details = db.Sales.Include(s => s.TransactionDetails).Select(s => s.TransactionDetails.
+            // Where(td => td.ProductId == id)).ToList();
 
             foreach (var branch in model.Branches)
             {
-                var bpr = branch.BranchProducts.FirstOrDefault(bp => bp.ProductId == model.ProductId);
+                var bpr = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == model.ProductId);
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
 
@@ -509,6 +525,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [Authorize(Roles = "Capturista")]
         public ActionResult Create(int? id)
         {
+            var branchId = User.Identity.GetBranchId();
+
             ProductViewModel model;
             if (id == null)
             {
@@ -522,14 +540,30 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
             else
             {
-                var product = db.Products.Include(p => p.Images).
+                var product = db.Products.Include(p => p.Images).Include(p => p.BranchProducts).
                     Include(p => p.PackageDetails).
                     Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
+
+
+                var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                product.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
+                product.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                product.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                product.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+                product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                product.Row = bp != null ? bp.Row : string.Empty;
+                product.Row = bp != null ? bp.Ledge : string.Empty;
+
+
+
                 model = new ProductViewModel(product);
             }
 
             var categories = db.Categories.ToList();
-            categories.ForEach(c => c.Name = c.Name+" - " + c.SatCode);
+            categories.ForEach(c => c.Name = c.Name + " - " + c.SatCode);
 
             model.Categories = categories.ToSelectList();
             model.CarMakes = db.CarMakes.ToSelectList();
@@ -567,7 +601,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var pd = pck.PackageDetails.FirstOrDefault(pkd => pkd.DetailtId == productId);
 
-            if(pd == null)
+            if (pd == null)
             {
                 PackageDetail d = new PackageDetail { PackageId = packagedId, DetailtId = productId, Quantity = quantity };
                 db.PackageDetails.Add(d);
@@ -578,7 +612,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 db.Entry(pd).State = EntityState.Modified;
             }
 
-           
+
             db.SaveChanges();
 
             var model = db.PackageDetails.Include(pkD => pkD.Detail).
@@ -591,7 +625,22 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult QuickEdit(int productId)
         {
-            var product = db.Products.Find(productId);
+            var branchId = User.Identity.GetBranchId();
+            var product = db.Products.Include(p=> p.BranchProducts).FirstOrDefault(p=> p.ProductId == productId);
+
+            var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+
+            product.Quantity = bp != null ? bp.Stock : Cons.Zero;
+            product.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+            product.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+            product.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+
+            product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
+            product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+            product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+            product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+       
+
             ProductViewModel vm = new ProductViewModel(product);
 
             //obtengo categorias
@@ -602,7 +651,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             vm.Systems = db.Systems.ToSelectList();
 
 
-            if(vm.StorePercentage <= Cons.Zero)
+            if (vm.StorePercentage <= Cons.Zero)
             {
                 var variables = db.Variables;
 
@@ -625,81 +674,111 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var cats = db.Categories.ToList();
             cats.ForEach(c => c.Name += " - " + c.SatCode);
 
-            vm.Categories   = cats.ToSelectList();
-            vm.Systems      = db.Systems.ToSelectList();
-            vm.Name         = ep.Description;
-            vm.TradeMark    = ep.TradeMark;
-            vm.Unit         = ep.Unit;
-            vm.BuyPrice     = ep.Price;
-            vm.MinQuantity  = Cons.One;
-            vm.Code         = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
+            vm.Categories = cats.ToSelectList();
+            vm.Systems = db.Systems.ToSelectList();
+            vm.Name = ep.Description;
+            vm.TradeMark = ep.TradeMark;
+            vm.Unit = ep.Unit;
+            vm.BuyPrice = ep.Price;
+            vm.MinQuantity = Cons.One;
+            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
 
-            vm.DealerPrice     = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)),Cons.Zero);
-            vm.StorePrice      = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)),Cons.Zero); 
-            vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPrice / Cons.OneHundred)),Cons.Zero); 
+            vm.DealerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+            vm.StorePrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)), Cons.Zero);
+            vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPrice / Cons.OneHundred)), Cons.Zero);
 
             return PartialView("_QuickAddProduct", vm);
         }
 
         [HttpPost]
-        public JsonResult QuickSave(Product product, double amount)
+        public JsonResult QuickSave(Product product)
         {
             product.UpdDate = DateTime.Now;
             product.UpdUser = User.Identity.GetUserName();
 
             db.Entry(product).State = EntityState.Modified;
 
-            if (amount > Cons.Zero)
+            if (product.Quantity >= Cons.Zero)
             {
                 var branchId = User.Identity.GetBranchId();
                 //verifico si hay registro de stock en sucursal
                 var bp = db.BranchProducts.FirstOrDefault(s => s.BranchId == branchId
                 && s.ProductId == product.ProductId);
 
-                if(bp == null)
+                if (bp == null)
                 {
                     bp = new BranchProduct
                     {
                         ProductId = product.ProductId,
                         BranchId = User.Identity.GetBranchId(),
-                        Stock = amount,
+                        Stock = product.Quantity,
                         LastStock = Cons.Zero,
-                        UpdDate = DateTime.Now
+                        UpdDate = DateTime.Now.ToLocal(),
+                        BuyPrice = product.BuyPrice,
+                        DealerPercentage = product.DealerPercentage,
+                        StorePercentage = product.StorePercentage,
+                        WholesalerPercentage = product.WholesalerPercentage,
+                        StorePrice = product.StorePrice,
+                        DealerPrice = product.DealerPrice,
+                        WholesalerPrice = product.WholesalerPrice
                     };
 
                     db.BranchProducts.Add(bp);
                 }
                 else
                 {
-                    bp.LastStock = bp.LastStock;
-                    bp.Stock += amount;
-                    bp.UpdDate         = DateTime.Now;
+                    //si la cantidad de producto que se esta ingresando es diferente a la que hay es stock
+                    //registro un movimiento de inventario
+                    var sM          = new StockMovement();
+                    sM.ProductId    = product.ProductId;
+                    sM.BranchId     = bp.BranchId;
+                    sM.MovementDate = DateTime.Now.ToLocal();
+                    sM.User         = User.Identity.GetUserName();
+
+                    //si la nueva cantidad es menor, registro una salida
+                    if (bp.Stock > product.Quantity)
+                    {
+                        sM.Quantity = bp.Stock - product.Quantity;
+                        sM.MovementType = MovementType.Exit;
+                        sM.Comment = "Salida por ajuste rápido";
+
+                        db.StockMovements.Add(sM);
+                    }
+                    //si la nueva cantidad es mayor, registro una entrada
+                    else if (bp.Stock < product.Quantity)
+                    {
+                        sM.Quantity =  product.Quantity - bp.Stock;
+                        sM.MovementType = MovementType.Entry;
+                        sM.Comment = "Entrada por ajuste rápido";
+
+                        db.StockMovements.Add(sM);
+                    }
+
+                    bp.LastStock = bp.Stock;
+                    bp.Stock     = product.Quantity;
+                    bp.UpdDate   = DateTime.Now.ToLocal();
+
+                    bp.BuyPrice         = product.BuyPrice;
+                    bp.DealerPercentage = product.DealerPercentage;
+                    bp.StorePercentage  = product.StorePercentage;
+                    bp.WholesalerPercentage = product.WholesalerPercentage;
+                    bp.StorePrice       = product.StorePrice;
+                    bp.DealerPrice      = product.DealerPrice;
+                    bp.WholesalerPrice  = product.WholesalerPrice;
+
                     db.Entry(bp).State = EntityState.Modified;
                 }
-               
-                var sm = new StockMovement
-                {
-                    BranchId = bp.BranchId,
-                    Comment = "Ingreso en Edición rápida",
-                    MovementDate = DateTime.Now,
-                    ProductId = product.ProductId,
-                    MovementType = MovementType.Entry,
-                    User = User.Identity.GetUserName(),
-                    Quantity = amount
-                };
-
-                db.StockMovements.Add(sm);
             }
 
             db.SaveChanges();
-            return Json(new { Result = "OK", Code= product.Code });
+            return Json(new { Result = "OK", Code = product.Code });
         }
 
         [HttpPost]
-        public JsonResult Copy(Product product, int providerId, string code, int amount)
+        public JsonResult Copy(Product product, int providerId, string code)
         {
             //Aplico formato al código
             product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
@@ -709,21 +788,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             if (eP != null)
             {
-                return Json(new { Result = "Código repetido", Message = "Ya existe un producto con este código Descripción "+eP.Name });
+                return Json(new { Result = "Código repetido", Message = "Ya existe un producto con este código Descripción " + eP.Name });
             }
             else
             {
                 try
                 {
                     //relleno datos adicionales
-                    product.UpdUser     = User.Identity.Name;
-                    product.UpdDate     = DateTime.Now;
+                    product.UpdUser = User.Identity.Name;
+                    product.UpdDate = DateTime.Now.ToLocal();
                     product.MinQuantity = Cons.One;
-                    product.StorePrice  = Math.Round(product.StorePrice, Cons.Zero);
-                    product.DealerPrice = Math.Round(product.DealerPrice, Cons.Zero);
-                    product.WholesalerPrice = Math.Round(product.WholesalerPrice, Cons.Zero);
-                    product.MinQuantity = Cons.One;
-                    
+                    product.MaxQuantity = Cons.Zero;
+
                     product.IsActive = true;
 
                     //Guardo el producto
@@ -743,32 +819,42 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     //si viene con cantidad inicial agrego stock a la sucursal y movimiento al inventario
 
-                    
-                    if (amount > Cons.Zero)
+
+                    if (product.Quantity  >= Cons.Zero)
                     {
 
                         var bp = new BranchProduct
                         {
                             ProductId = product.ProductId,
                             BranchId = User.Identity.GetBranchId(),
-                            Stock = amount,
+                            Stock = product.Quantity,
                             LastStock = Cons.Zero,
-                            UpdDate = DateTime.Now
-                        };
-
-                        var sm = new StockMovement
-                        {
-                            BranchId = bp.BranchId,
-                            Comment = "Ingreso en copiador rápido",
-                            MovementDate = DateTime.Now,
-                            ProductId = product.ProductId,
-                            MovementType = MovementType.Entry,
-                            User = User.Identity.GetUserName(),
-                            Quantity = amount
+                            UpdDate = DateTime.Now.ToLocal(),
+                            BuyPrice = product.BuyPrice,
+                            DealerPercentage = product.DealerPercentage,
+                            StorePercentage = product.StorePercentage,
+                            WholesalerPercentage = product.WholesalerPercentage,
+                            StorePrice = product.StorePrice,
+                            DealerPrice = product.DealerPrice,
+                            WholesalerPrice = product.WholesalerPrice
                         };
 
                         db.BranchProducts.Add(bp);
-                        db.StockMovements.Add(sm);
+
+                        if (product.Quantity > Cons.Zero)
+                        {
+                            var sm = new StockMovement
+                            {
+                                BranchId = bp.BranchId,
+                                Comment = "Ingreso en copiado rápido",
+                                MovementDate = DateTime.Now.ToLocal(),
+                                ProductId = product.ProductId,
+                                MovementType = MovementType.Entry,
+                                User = User.Identity.GetUserName(),
+                                Quantity = product.Quantity
+                            };
+                            db.StockMovements.Add(sm);
+                        }
                     }
 
                     db.SaveChanges();
@@ -778,7 +864,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     return Json(new { Result = "Error al asociar el producto", Message = ex.Message });
                 }
 
-                return Json(new { Result = "OK",Code=product.Code });
+                return Json(new { Result = "OK", Code = product.Code });
             }
         }
 
@@ -792,17 +878,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 FirstOrDefault(p => p.ProductId == packageId);
 
             //reviso si hay existencias de este paquete en alguna sucursal
-            if(pck.BranchProducts != null)
+            if (pck.BranchProducts != null)
             {
-                foreach(var bp in pck.BranchProducts)
+                foreach (var bp in pck.BranchProducts)
                 {
-                    if(bp.Stock > Cons.Zero)
+                    if (bp.Stock > Cons.Zero)
                     {
                         return Json(new
                         {
                             Result = "Imposible modificar el paquete",
-                            Message = "La composición del paquete no se puede alterar "+
-                            "ya que aun hay existencia de este es una o mas sucursales. "+
+                            Message = "La composición del paquete no se puede alterar " +
+                            "ya que aun hay existencia de este es una o mas sucursales. " +
                             "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
                         });
                     }
@@ -836,7 +922,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 try
                 {
-                    product.UpdDate = DateTime.Now;
+                    var branchId = User.Identity.GetBranchId();
+
+                    product.UpdDate = DateTime.Now.ToLocal();
                     product.UpdUser = User.Identity.Name;
 
                     if (product.ProductId == Cons.Zero)
@@ -846,6 +934,91 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     }
                     else
                         db.Entry(product).State = EntityState.Modified;
+
+                    var bp = db.BranchProducts.
+                        FirstOrDefault(bProd => bProd.ProductId == product.ProductId && bProd.BranchId == branchId);
+
+                    if(bp ==null)
+                    {
+                        bp = new BranchProduct();
+                        bp.ProductId = product.ProductId;
+                        bp.BranchId = branchId;
+                        bp.Stock = product.Quantity;
+                        bp.LastStock = Cons.Zero;
+                        bp.StorePercentage = product.StorePercentage;
+                        bp.DealerPercentage = product.DealerPercentage;
+                        bp.WholesalerPercentage = product.WholesalerPercentage;
+                        bp.WholesalerPrice = product.WholesalerPrice;
+                        bp.DealerPrice = product.DealerPrice;
+                        bp.StorePrice = product.StorePrice;
+                        bp.Row     = product.Row;
+                        bp.Ledge   = product.Ledge;
+                        bp.UpdDate = DateTime.Now.ToLocal();
+                        db.BranchProducts.Add(bp);
+
+                        //si se ingresa una cantidad de producto mayor a cero al crearlo
+                        //entonces genero movimiento de stock (Entrada)
+                        if(product.Quantity > Cons.Zero)
+                        {
+                            var sm = new StockMovement();
+                            sm.Quantity = product.Quantity;
+                            sm.BranchId = branchId;
+                            sm.ProductId = product.ProductId;
+                            sm.MovementDate = DateTime.Now.ToLocal();
+                            sm.MovementType = MovementType.Entry;
+                            sm.User = User.Identity.Name;
+                            sm.Comment = "Ingreso en creación";
+
+                            db.StockMovements.Add(sm);
+                        }
+                    }
+                    else
+                    {
+                        //si la cantidad de producto que se esta ingresando es diferente a la que hay es stock
+                        //registro un movimiento de inventario
+                        var sM = new StockMovement();
+                        sM.ProductId = product.ProductId;
+                        sM.BranchId = bp.BranchId;
+                        sM.MovementDate = DateTime.Now.ToLocal();
+                        sM.User = User.Identity.GetUserName();
+
+
+                        if (bp.Stock > product.Quantity)
+                        {
+                            sM.Quantity = bp.Stock - product.Quantity;
+                            sM.MovementType = MovementType.Exit;
+                            sM.Comment = "Salida por ajuste rápido";
+
+                            db.StockMovements.Add(sM);
+                        }
+                        //si la nueva cantidad es mayor, registro una entrada
+                        else if (bp.Stock < product.Quantity)
+                        {
+                            sM.Quantity = product.Quantity - bp.Stock;
+                            sM.MovementType = MovementType.Entry;
+                            sM.Comment = "Entrada por ajuste rápido";
+
+                            db.StockMovements.Add(sM);
+                        }
+
+                        //si hay actualización de stock
+                        bp.LastStock = bp.Stock;
+                        bp.Stock     = product.Quantity;
+                        
+                        //actualizo precios y porcentajes 
+                        bp.StorePercentage = product.StorePercentage;
+                        bp.DealerPercentage = product.DealerPercentage;
+                        bp.WholesalerPercentage = product.WholesalerPercentage;
+                        bp.WholesalerPrice = product.WholesalerPrice;
+                        bp.DealerPrice = product.DealerPrice;
+                        bp.StorePrice = product.StorePrice;
+                        bp.Row = product.Row;
+                        bp.Ledge = product.Ledge;
+                        bp.UpdDate = DateTime.Now.ToLocal();
+
+                        db.Entry(bp).State = EntityState.Modified;
+                    }
+
 
                     int i = Cons.Zero;
 
@@ -869,7 +1042,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     }
 
                     //if (i > Cons.Zero)
-                        db.SaveChanges();
+                    db.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -883,7 +1056,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     model.Categories = db.Categories.ToSelectList();
                     model.CarMakes = db.CarMakes.ToSelectList();
                     model.Systems = db.Systems.ToSelectList();
-                    
+
 
                     return View(model);
                 }
@@ -921,10 +1094,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 db.SaveChanges();
 
-               var compatibilities = db.Compatibilites.Include(c => c.CarYear.CarModel).
-                    Include(c => c.CarYear.CarModel.CarMake).Where(c => c.ProductId == productId).ToList();
+                var compatibilities = db.Compatibilites.Include(c => c.CarYear.CarModel).
+                     Include(c => c.CarYear.CarModel.CarMake).Where(c => c.ProductId == productId).ToList();
 
-                return PartialView("_Compatibilities",compatibilities);
+                return PartialView("_Compatibilities", compatibilities);
             }
             catch (Exception ex)
             {
@@ -942,7 +1115,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 if (comp == null)
                 {
-                    return Json(new { Result="No se encontraron datos!", Message="la compatibilidad que se pretende eliminar ya no existe!"});
+                    return Json(new { Result = "No se encontraron datos!", Message = "la compatibilidad que se pretende eliminar ya no existe!" });
                 }
                 else
                 {

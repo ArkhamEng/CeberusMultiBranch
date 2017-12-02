@@ -108,19 +108,19 @@
                             <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
                                 @if (User.IsInRole("Supervisor"))
                                 {
-                                    <button class="btn btn-success btn-sm" title="Edición rápida"
+                                    <button class="btn btn-success" title="Edición rápida"
                                             onclick="QuickEdit('@prod.ProductId')">
                                         <span class="fa fa-bolt"></span>
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </button>
-                                    <button class="btn btn-danger btn-sm" title="Registrar movimiento en inventario"
+                                    @*<button class="btn btn-danger btn-sm" title="Registrar movimiento en inventario"
                                             onclick="BeginMovement('@prod.ProductId')">
                                         <span class="fa fa-arrows"></span>
-                                    </button>
+                                    </button>*@
                                 }
                                 @if (User.IsInRole("Capturista"))
                                 {
-                                    <button class="btn btn-warning btn-sm" title="Editar producto"
+                                    <button class="btn btn-warning" title="Editar producto"
                                             onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </button>

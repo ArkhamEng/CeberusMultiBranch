@@ -46,9 +46,11 @@
                         @Html.Label("Existencias", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                            <input type="number" name="intialAmount" id="intialAmount" class="form-control" required />
+                            @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+                            @*<input type="number" name="intialAmount" id="intialAmount" class="form-control" required />*@
                         </div>
-                        @Html.ValidationMessage("intialAmount", "", new { @class = "text-danger" })
+                        @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
+                        @*@Html.ValidationMessage("intialAmount", "", new { @class = "text-danger" })*@
                     </div>
 
                     <div class="col-md-12 form-group">
@@ -130,11 +132,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    @*
-                        @Html.HiddenFor(model => model.WholesalerPercentage)
-                         @Html.HiddenFor(model => model.DealerPercentage)
-                         @Html.HiddenFor(model => model.StorePercentage)
-                    *@<button class="btn btn-success" id="btnQuickSave" onclick="Send()" type="button">
+                  <button class="btn btn-success" id="btnQuickSave" onclick="Send()" type="button">
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                         <u>G</u>uardar
                     </button>
@@ -191,7 +189,7 @@
             Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#PartSystemId").val(),
             WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
             StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val(), DealerPercentange: $("#DealerPercentange").val(),
-            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(), ProductId: $("#ProductId").val()
+            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(), ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val()
         };
 
         $("#ModalQuickAddProduct").on('hidden.bs.modal', function ()
@@ -199,15 +197,18 @@
             LookFor();
         });
 
-        if (product.ProductId == 0) {
+        if (product.ProductId == 0)
+        {
             var param = {
                 product: product, providerId: $("#ProviderId").val(),
-                code: $("#Code").val(), amount: $("#intialAmount").val()
+                code: $("#Code").val()
             };
 
 
-            ExecuteAjax('@Url.Action("Copy","Products")', param, function (response) {
-                if (response.Result != 'OK') {
+            ExecuteAjax('@Url.Action("Copy","Products")', param, function (response)
+            {
+                if (response.Result != 'OK')
+                {
                     $("lblQuickAddError").text(response.Message);
                 }
                 else {
@@ -218,8 +219,7 @@
         }
         else {
             var param = {
-                product: product,
-                amount: $("#intialAmount").val()
+                product: product
             };
 
 

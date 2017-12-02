@@ -241,6 +241,22 @@
     <Compile Include="Migrations\201711300331160_Providerchanges.Designer.cs">
       <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712020155118_BranchProductChanges.cs" />
+    <Compile Include="Migrations\201712020155118_BranchProductChanges.Designer.cs">
+      <DependentUpon>201712020155118_BranchProductChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712020305555_BranchProductChanges1.cs" />
+    <Compile Include="Migrations\201712020305555_BranchProductChanges1.Designer.cs">
+      <DependentUpon>201712020305555_BranchProductChanges1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712020430151_ProductChanges.cs" />
+    <Compile Include="Migrations\201712020430151_ProductChanges.Designer.cs">
+      <DependentUpon>201712020430151_ProductChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712020509359_ProductChanges1.cs" />
+    <Compile Include="Migrations\201712020509359_ProductChanges1.Designer.cs">
+      <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -537,6 +553,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201711300331160_Providerchanges.resx">
       <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712020155118_BranchProductChanges.resx">
+      <DependentUpon>201712020155118_BranchProductChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712020305555_BranchProductChanges1.resx">
+      <DependentUpon>201712020305555_BranchProductChanges1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712020430151_ProductChanges.resx">
+      <DependentUpon>201712020430151_ProductChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712020509359_ProductChanges1.resx">
+      <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

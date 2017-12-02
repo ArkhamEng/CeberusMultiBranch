@@ -13,10 +13,14 @@ namespace ExcelUploader
         static void Main(string[] args)
         {
 
-          //  DataManager.AddCatalogs();
+            //  DataManager.AddCatalogs();
 
-            DataManager.Begin();
-               
+            foreach (TimeZoneInfo zoneID in TimeZoneInfo.GetSystemTimeZones())
+            {
+                Console.Write(zoneID.Id);
+            }
+            //DataManager.Begin();
+
 
             Console.Write("Operación completa.. presiona cualquier tecla para cerrar!");
             Console.ReadLine();

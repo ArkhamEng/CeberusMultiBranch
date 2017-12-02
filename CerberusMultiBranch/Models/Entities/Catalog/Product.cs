@@ -46,38 +46,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Código de barras")]
         public string BarCode { get; set; }
 
-        [Display(Name = "Precio de Compra")]
-        [DataType(DataType.Currency)]
-        public double BuyPrice { get; set; }
-
-        [Display(Name = "% Mostrador")]
-        [Required]
-        public int StorePercentage { get; set; }
-
-        [Display(Name = "% Distribuidor")]
-        [Required]
-        public int DealerPercentage { get; set; }
-
-        [Display(Name = "% Mayorista")]
-        [Required]
-        public int WholesalerPercentage { get; set; }
-
-        [Display(Name = "Precio Mostrador")]
-        [DataType(DataType.Currency)]
-        [Required]
-        public double StorePrice { get; set; }
-
-        [Display(Name = "Precio Mayorista")]
-        [DataType(DataType.Currency)]
-        [Required]
-        public double WholesalerPrice { get; set; }
-        
-
-        [Display(Name = "Precio Distribuidor")]
-        [DataType(DataType.Currency)]
-        [Required]
-        public double DealerPrice { get; set; }
-
 
         [Required]
         public ProductType ProductType { get; set; }
@@ -91,14 +59,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(20)]
         public string Unit { get; set; }
 
-        [Display(Name = "Fila")]
-        [MaxLength(30)]
-        public string Row { get; set; }
-
-        [Display(Name = "Anaquel")]
-        [MaxLength(30)]
-        public string Ledge { get; set; }
-
+      
         public bool IsActive { get; set; }
 
         [Required]
@@ -129,6 +90,54 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public virtual ICollection<PackageDetail> PackageDetails { get; set; }
 
         #region NotMapped Properties
+
+        [NotMapped]
+        [Display(Name = "Precio de Compra")]
+        [DataType(DataType.Currency)]
+        public double BuyPrice { get; set; }
+
+        [NotMapped]
+        [Display(Name = "% Mostrador")]
+        [Required]
+        public int StorePercentage { get; set; }
+
+        [NotMapped]
+        [Display(Name = "% Distribuidor")]
+        [Required]
+        public int DealerPercentage { get; set; }
+
+        [NotMapped]
+        [Display(Name = "% Mayorista")]
+        [Required]
+        public int WholesalerPercentage { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Precio Mostrador")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double StorePrice { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Precio Mayorista")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double WholesalerPrice { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Precio Distribuidor")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double DealerPrice { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Fila")]
+        [MaxLength(30)]
+        public string Row { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Anaquel")]
+        [MaxLength(30)]
+        public string Ledge { get; set; }
 
 
         [NotMapped]

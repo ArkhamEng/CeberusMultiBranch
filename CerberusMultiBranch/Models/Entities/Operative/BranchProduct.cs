@@ -24,6 +24,46 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime UpdDate { get; set; }
 
+
+        [Display(Name = "Precio de Compra")]
+        [DataType(DataType.Currency)]
+        public double BuyPrice { get; set; }
+
+        [Display(Name = "% Mostrador")]
+        [Required]
+        public int StorePercentage { get; set; }
+
+        [Display(Name = "% Distribuidor")]
+        [Required]
+        public int DealerPercentage { get; set; }
+
+        [Display(Name = "% Mayorista")]
+        [Required]
+        public int WholesalerPercentage { get; set; }
+
+        [Display(Name = "Precio Mostrador")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double StorePrice { get; set; }
+
+        [Display(Name = "Precio Mayorista")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double WholesalerPrice { get; set; }
+
+        [Display(Name = "Precio Distribuidor")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double DealerPrice { get; set; }
+
+        [Display(Name = "Fila")]
+        [MaxLength(30)]
+        public string Row { get; set; }
+
+        [Display(Name = "Anaquel")]
+        [MaxLength(30)]
+        public string Ledge { get; set; }
+
         public virtual Branch Branch { get; set; }
 
         public virtual Product Product { get; set; }
