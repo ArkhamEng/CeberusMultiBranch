@@ -9,7 +9,7 @@
 
 
 
-@Html.HiddenFor(m=> m.TransactionId)
+@Html.HiddenFor(m => m.TransactionId)
 
 <h3 class="alert alert-success col-md-4">
     <span class="fa fa-building"></span>
@@ -88,11 +88,14 @@
                         <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
                         @switch (Model.LastStatus)
                         {
+                            case TranStatus.OnRevision:
+                                <label class="form-control alert alert-warning">Revisión</label>
+                                break;
                             case TranStatus.Canceled:
-                                <label class="form-control alert alert-danger">Cancelado</label>
+                                <label class="form-control alert alert-warning">Cancelado</label>
                                 break;
                             case TranStatus.InProcess:
-                                <label class="form-control alert alert-warning">En Proceso</label>
+                                <label class="form-control alert alert-danger">En Proceso</label>
                                 break;
                             case TranStatus.Reserved:
                                 <label class="form-control alert alert-info">Reservado</label>
@@ -101,7 +104,6 @@
                                 <label class="form-control alert alert-success">Pagado</label>
                                 break;
                         }
-
                     </div>
                 </div>
 
@@ -113,11 +115,14 @@
                         <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
                         @switch (Model.Status)
                         {
+                            case TranStatus.OnRevision:
+                                <label class="form-control alert alert-warning">Revisión</label>
+                                break;
                             case TranStatus.Canceled:
-                                <label class="form-control alert alert-danger">Cancelado</label>
+                                <label class="form-control alert alert-warning">Cancelado</label>
                                 break;
                             case TranStatus.InProcess:
-                                <label class="form-control alert alert-warning">En Proceso</label>
+                                <label class="form-control alert alert-danger">En Proceso</label>
                                 break;
                             case TranStatus.Reserved:
                                 <label class="form-control alert alert-info">Reservado</label>
@@ -126,7 +131,6 @@
                                 <label class="form-control alert alert-success">Pagado</label>
                                 break;
                         }
-
                     </div>
                 </div>
                 <div class="btn-group right col-md-offset-1 col-md-4" style="padding-top:25px !important;">
@@ -135,16 +139,18 @@
                         <span class="fa fa-search-plus"></span>
                         <u>B</u>úsqueda
                     </button>
-                    @if (User.IsInRole("Supervisor"))
+
+                    @if (Model.Status != TranStatus.Canceled)
                     {
                         <button type="button" class="btn btn-danger" title="cancelar venta"
-                                onclick="BeginCancel()" id="btnCancel">
+                                onclick="$('#ModalCancel').modal('show');" id="btnCancel">
                             <span class="fa fa-times"></span>
-                            <u>C</u>ancelar Venta
+                            <u>C</u>ancelar
                         </button>
+
+                        @Html.Partial("_Cancelation")
                     }
                 </div>
-              
             </div>
         </div>
     </div>
@@ -185,7 +191,7 @@
                                 }
                                 else
                                 {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:40px"/>
+                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:40px" />
                                 }
                             </td>
                             <td class="text-center">
@@ -214,28 +220,24 @@
     </div>
 </div>
 
-@Html.Partial("_Cancelation")
+
 
 <script>
+    var modalOpen = false;
+
     $(document).ready(function ()
     {
         Paginate("#tbDetails", 5);
     });
 
-    function BeginCancel()
-    {
-        $("#ModalCancel").modal("show");
-    }
-
-    function Cancel()
-    {
+   
+    function Cancel() {
         $("#ModalCancel").modal("hide");
         ShowLoading();
 
         var param = { transactionId: $("#TransactionId").val(), comment: $("#txtComment").val() }
 
-        ExecuteAjax('@Url.Action("Cancel")', param, function (j)
-        {
+        ExecuteAjax('@Url.Action("Cancel")', param, function (j) {
             if (j.Result = 'OK')
                 window.location = window.location;
             else
@@ -243,14 +245,14 @@
         });
     }
 
-    $(document).keydown(function (e) {
+    $(document).keydown(function (e)
+    {
         if (e.which == 13 || (e.altKey && e.which == 66))
         {
             $("#btnSearch").click();
         }
 
-        if (e.altKey && e.keyCode == 67)
-        {
+        if (e.altKey && e.keyCode == 67) {
             $("#btnCancel").click();
         }
     });

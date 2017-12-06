@@ -513,7 +513,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             foreach (var branch in model.Branches)
             {
-                var bpr = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == model.ProductId);
+                var bpr = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == model.ProductId 
+                && bp.BranchId == branch.BranchId);
+
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
 
@@ -1214,6 +1216,26 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ListForSale", products);
         }
 
+
+        [HttpPost]
+        [Authorize(Roles = "Capturista")]
+        public ActionResult Delete(int id)
+        {
+            var product = db.Products.Include(p => p.Images).FirstOrDefault(p => p.ProductId == id);
+
+            if(product!=null)
+            {
+                var detail = db.TransactionDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
+
+                //si el producto ya se encuentra en alguna transacción, solo se desactiva
+                if(detail!=null)
+                {
+
+                }
+            }
+
+            return Json(new { Result = "OK" });
+        }
 
         protected override void Dispose(bool disposing)
         {

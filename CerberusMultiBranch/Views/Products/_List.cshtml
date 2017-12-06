@@ -108,7 +108,7 @@
                             <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
                                 @if (User.IsInRole("Supervisor"))
                                 {
-                                    <button class="btn btn-success" title="Edición rápida"
+                                    <button class="btn btn-success btn-lg" title="Edición rápida"
                                             onclick="QuickEdit('@prod.ProductId')">
                                         <span class="fa fa-bolt"></span>
                                         <span class="glyphicon glyphicon-pencil"></span>
@@ -120,7 +120,7 @@
                                 }
                                 @if (User.IsInRole("Capturista"))
                                 {
-                                    <button class="btn btn-warning" title="Editar producto"
+                                    <button class="btn btn-warning  btn-lg" title="Editar producto"
                                             onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </button>

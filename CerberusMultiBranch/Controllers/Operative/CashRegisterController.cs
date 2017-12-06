@@ -295,7 +295,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                        Include(s => s.TransactionDetails.Select(td => td.Product)).
                        Include(s => s.User).
                        Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Reserved && s.BranchId == branchId);
+                       FirstOrDefault(s => s.TransactionId == id && 
+                       s.Status == TranStatus.Reserved && s.BranchId == branchId);
 
             if (sale == null)
                 return RedirectToAction("Index");

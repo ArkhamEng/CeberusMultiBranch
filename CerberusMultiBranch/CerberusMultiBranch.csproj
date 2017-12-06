@@ -511,6 +511,7 @@
     <Content Include="Views\Shared\_BranchOption.cshtml" />
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
     <Content Include="Views\Products\_QuickAddProduct.cshtml" />
+    <Content Include="Views\CashRegister\RegistPayment - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

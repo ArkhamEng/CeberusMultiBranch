@@ -1,30 +1,65 @@
 ﻿
+@section Scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}
 
-<div id="ModalCancel" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content panel panel-danger panel-group">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Cancelación de transacción</h4>
-            </div>
-            <div class="modal-body panel-body">
-                <div class="col-md-12">
-                    @Html.Label("Agrega un comentario de cancelación", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-comments"></i></span>
-                        <textarea id="txtComment" class="form-control" rows="2"></textarea>
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<form id="cForm">
+    <div id="ModalCancel" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel panel-danger panel-group">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Cancelación de transacción</h4>
+                </div>
+                <div class="modal-body panel-body">
+                    <div class="col-md-12">
+                        @Html.Label("Agrega un comentario de cancelación", htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                            @Html.TextArea("txtComment", new { @class = "form-control valid", rows = "2", @data_val = "true",
+                           @data_val_required = "Se requiere un comentario de cancelación" }  )
+                        </div>
+                        @Html.ValidationMessage("txtComment", "", new { @class = "text-danger" })
                     </div>
                 </div>
-
-              
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger" type="button" title="Confirmar cancelación" onclick="Cancel()">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Aceptar
-                </button>
+                <div class="modal-footer">
+                    <button class="btn btn-danger" type="button" id="btnConfirmCancel" title="Confirmar cancelación" onclick="BeginCancel()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        Aceptar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#cForm");
+        form.validate();
+    });
+
+    $(document).keydown(function (e)
+    {
+        if ($("#ModalCancel").hasClass('in') && e.keyCode == 13)
+        {
+            $("#btnConfirmCancel").click();
+            e.preventPropagation();
+        }  
+    });
+
+    function BeginCancel()
+    {
+        var form = $("#cForm");
+
+        if (!form.valid())
+            return;
+
+        Cancel();
+    }
+</script>

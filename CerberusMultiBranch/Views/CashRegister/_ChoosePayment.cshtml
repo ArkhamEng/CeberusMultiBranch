@@ -13,7 +13,7 @@
                         <span class="fa fa-credit-card"></span>
                         &nbsp;
                         <label>
-                            <input type="radio" id="rdCard"  name="payment" value="Tarjeta">
+                            <input type="radio" id="rdCard" name="payment" value="Tarjeta">
                             Crédito / Débito
                         </label>
 
@@ -31,10 +31,10 @@
                     </h4>
                 </div>
 
-                <div id="divCash" >
+                <div id="divCash">
                     <div class="input-group col-md-10">
                         <span class="input-group-addon">Recibido</span>
-                        <input type="number" hidden id="txtPayment" class="form-control"  value="0" />
+                        <input type="number" hidden id="txtPayment" class="form-control" value="0" />
                         <span class="input-group-addon">Cambio</span>
                         <input type="number" hidden id="txtChange" class="form-control" value="0" readonly="readonly" />
                     </div>
@@ -54,38 +54,37 @@
                 <div id="divMix" hidden>
                     <div class="input-group col-md-12">
                         <span class="input-group-addon">Efectivo</span>
-                        <input type="number" hidden id="txtCash" class="form-control" name="Cash" value="0"  />
+                        <input type="number" hidden id="txtCash" class="form-control" name="Cash" value="0" />
                         <span class="input-group-addon">Tarjeta</span>
                         <input type="number" hidden id="txtCard" class="form-control" name="Card" value="0" />
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" type="button" onclick="RegisterPayment()">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Aceptar 
-                </button>
+                <div class="btn-group">
+                    <button class="btn btn-primary" type="button" onclick="RegisterPayment()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        Aceptar
+                    </button>
 
-                <button class="btn btn-danger" type="button" id="btnCancel">
-                    <span class="fa fa-times"></span>
-                    Cancelar
-                </button>
+                    <button class="btn btn-danger" type="button" id="btnCancel">
+                        <span class="fa fa-times"></span>
+                        Cancelar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
-        $('#ModalPayment').on('hidden.bs.modal', function ()
-        {
-            
+    $(document).ready(function () {
+        $('#ModalPayment').on('hidden.bs.modal', function () {
+
         });
 
 
-        $("#btnCancel").click(function ()
-        {
+        $("#btnCancel").click(function () {
             $("#txtCard").val("");
             $("#txtCash").val("");
             $("#divMix").hide();
@@ -97,10 +96,8 @@
             $("#ModalPayment").modal("hide");
         });
 
-        $("#rdCash").change(function ()
-        {
-            if (this.checked)
-            {
+        $("#rdCash").change(function () {
+            if (this.checked) {
                 $("#txtCard").val("");
                 $("#txtCash").val("");
                 $("#divMix").hide();
@@ -108,10 +105,8 @@
             }
         });
 
-        $("#rdCard").change(function ()
-        {
-            if (this.checked)
-            {
+        $("#rdCard").change(function () {
+            if (this.checked) {
                 $("#txtCard").val("");
                 $("#txtCash").val("");
                 $("#divMix").hide();
@@ -121,10 +116,8 @@
             }
         });
 
-        $("#rdMix").change(function ()
-        {
-            if (this.checked)
-            {
+        $("#rdMix").change(function () {
+            if (this.checked) {
                 $("#divMix").show();
                 $("#divCash").hide();
                 $("#txtPayment").val("");
@@ -132,8 +125,7 @@
             }
         });
 
-        $("#txtCash").keyup(function ()
-        {
+        $("#txtCash").keyup(function () {
             var val = $("#txtCash").val();
             var result = Calculate(val);
 
@@ -142,8 +134,7 @@
             $("#txtCard").val(result);
         });
 
-        $("#txtCard").keyup(function ()
-        {
+        $("#txtCard").keyup(function () {
             var val = $("#txtCard").val();
             var result = Calculate(val);
 
@@ -152,8 +143,7 @@
             $("#txtCash").val(result);
         });
 
-        $("#txtPayment").keyup(function ()
-        {
+        $("#txtPayment").keyup(function () {
             var val = $("#txtPayment").val();
             var result = GetChange(val);
 
@@ -163,30 +153,27 @@
         });
     });
 
-    function RegisterPayment()
-    {
+    function RegisterPayment() {
         $("#ModalPayment").modal('hide');
 
         var param;
 
-        if ($("#rdCash").is(":checked"))
-        {
+        if ($("#rdCash").is(":checked")) {
             param = {
                 transactionId: $("#TransactionId").val(),
                 payment: $("#rdCash").val(),
-                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "") };
+                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
+            };
         }
 
-        else if ($("#rdCard").is(":checked"))
-        {
+        else if ($("#rdCard").is(":checked")) {
             param = {
                 transactionId: $("#TransactionId").val(),
                 payment: $("#rdCard").val(),
                 cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
             };
         }
-        else
-        {
+        else {
             param = {
                 transactionId: $("#TransactionId").val(),
                 payment: $("#rdMix").val(),
@@ -198,15 +185,12 @@
         ExecuteAjax('@Url.Action("RegisterPayment")', param, function (j) { Response(j) });
     }
 
-    function Response(j)
-    {
-        if (j.Result != 'OK')
-        {
+    function Response(j) {
+        if (j.Result != 'OK') {
             ShowMessage(j.Result, j.Message, 'warning');
         }
-        else
-        {
-            window.location = '@Url.Action("PrintNote")'+"/"+j.Message;
+        else {
+            window.location = '@Url.Action("PrintNote")' + "/" + j.Message;
         }
     }
 

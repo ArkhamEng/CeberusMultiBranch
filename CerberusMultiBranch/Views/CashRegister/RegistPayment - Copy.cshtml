@@ -1,0 +1,204 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+
+@{
+    ViewBag.Title = "Registro de pago";
+    ViewBag.Class = "fa fa-money";
+}
+
+
+<hr />
+<div class="col-md-12">
+    <div class="panel panel-info">
+        <div class="panel-body">
+            <div class="row">
+                <div class="form-group col-md-5">
+                    <label class="control-label">
+                        Nombre del cliente
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                        <input class="form-control" value="@Model.Client.Name" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2 col-md-offset-3">
+                    <label class="control-label">
+                        Fecha
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <input class="form-control" value="@Model.TransactionDate.ToString("dd/MM/yyyy")" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="control-label">
+                        Folio
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                        <input class="form-control" value="@Model.Folio" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group col-md-4">
+                    <label class="control-label">
+                        Agente
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
+                        <input class="form-control" value="@Model.User.UserName" readonly />
+                    </div>
+                </div>
+
+             
+                <div class="form-group col-md-2 col-md-offset-6">
+                    <label class="control-label">
+                        Total
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                        <input class="form-control" id="lblTotalAmount" value="@Model.TotalAmount.ToString("c")" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="panel panel-danger">
+        <div class="panel-body">
+            <table id="tbDetails" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th class="text-center">
+                            @Html.DisplayName("Código")
+                        </th>
+                        <th>@Html.DisplayName("Descripción")</th>
+                        <th class="text-right">@Html.DisplayName("Precio de venta")</th>
+                        <th class="text-center">@Html.DisplayName("Cantidad")</th>
+                        <th class="text-right">@Html.DisplayName("Total")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.TransactionDetails)
+                    {
+                        <tr>
+                            <td class="col-md-1" align="center">
+                                @if (item.ParentId == null)
+                                {
+                                    if (item.Product.Images != null && item.Product.Images.Count > 0)
+                                    {
+                                        <img class="img-responsive" src="@item.Product.Images.First().Path" style="max-height:50px;" />
+                                    }
+                                    else
+                                    {
+                                        <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
+                                    }
+                                }
+                            </td>
+                            <td class="text-center">
+                                @Html.DisplayFor(m => item.Product.Code)
+                            </td>
+                            <td >
+                                @Html.DisplayFor(m => item.Product.Name)
+                            </td>
+                            <td class="text-right">
+                                @Html.DisplayFor(m => item.Price)
+                            </td>
+                            <td class="text-center">
+                                @Html.DisplayFor(m => item.Quantity)
+                            </td>
+                            <td class="text-right">
+                                @Html.DisplayFor(m => item.Amount)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="btn-group">
+                <button class="btn btn-primary" type="button" id="btnSearch"
+                        onclick="ShowLoading(); window.location ='@Url.Action("PaymentAndNote")'" title="volver a buscar">
+                    <span class="fa fa-search-plus"></span>
+                    <u>B</u>úsqueda
+                </button>
+                <button class="btn btn-success" type="button"  id="btnPayment"
+                        onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
+                    <span class="fa fa-dollar"></span>
+                    <u>P</u>agar
+                </button>
+                <button class="btn btn-danger" type="button" onclick="$('#ModalCancel').modal('show');" title="Cancelación de venta">
+                    <span class="glyphicon glyphicon-remove"></span>
+                    <u>C</u>ancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+  
+
+ @Html.Partial("_Cancelation")
+
+@Html.Partial("_ChoosePayment",Model.TotalAmount)
+
+@Html.HiddenFor(m => m.TransactionId)
+
+<script>
+    $(document).ready(function ()
+    {
+        //Paginate("#tbDetails",5)
+    });
+
+    function Cancel(transactionId)
+    {
+        ExecuteAjax('@Url.Action("SendToRevision","Sales")', param, function (response)
+        {
+            if(response.Result ="OK")
+            {
+
+            }
+            else
+            {
+
+            }
+        });
+    }
+
+    function Calculate(val)
+    {
+        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
+        console.log("Val "+val+" total "+total);
+        var result = (total - val);
+
+        return (total - parseFloat(val));
+    }
+
+    $(document).keydown(function (e)
+    {
+        if (e.which == 13 || e.altKey && e.keyCode == 80)
+        {
+            $("#btnPayment").click();
+        }
+
+        if (e.altKey && e.keyCode == 67)
+        {
+            $("#btnCancel").click();
+        }
+
+        if (e.altKey && e.keyCode == 66)
+        {
+            $("#btnSearch").click();
+        }
+    });
+
+    function GetChange(val)
+    {
+        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
+        return (parseFloat(val) - total);
+    }
+
+</script>

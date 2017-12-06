@@ -67,13 +67,13 @@ function ExecuteAjax(url, parameters, callback) {
 
 function SetCascade(ddlParent, ddlChild, action)
 {
-   
     if ($(ddlChild).val() == null)
         $(ddlChild).attr("readonly", false);
     else
         $(ddlChild).attr("readonly", true);
 
-    $(ddlParent).change(function () {
+    $(ddlParent).change(function ()
+    {
         console.log("Populating Cascade");
         if ($(ddlParent).val() != '') {
             var parentId = $(ddlParent).val();
@@ -109,7 +109,8 @@ function SetCascade(ddlParent, ddlChild, action)
     });
 }
 
-function Search(url, data, target) {
+function Search(url, data, target)
+{
  
     $.ajax({
         url: url,

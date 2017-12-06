@@ -37,19 +37,25 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [Authorize(Roles = "Supervisor,Cajero")]
         public JsonResult Cancel(int transactionId, string comment)
+        {
+           return ChangeStatus(transactionId, comment, TranStatus.Canceled);
+        }
+
+       
+        public JsonResult ChangeStatus(int transactionId, string comment, TranStatus status)
         {
             try
             {
-                //busco la venta a cancelar
+                //busco la venta a la que se le cambiara el status
                 var sale = db.Sales.Include(s => s.TransactionDetails).
                     FirstOrDefault(s => s.TransactionId == transactionId);
 
                 //regreso los productos al stock
                 foreach (var detail in sale.TransactionDetails)
                 {
-                    //se descuenta regresa al inventario todo producto de la venta
+                    //se  regresa al inventario todo producto de la venta
                     //en el caso de los paquetes solo el producto padre
                     if (detail.ParentId == null)
                     {
@@ -65,7 +71,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         {
                             BranchId = bp.BranchId,
                             ProductId = bp.ProductId,
-                            Comment = "Cancelación de venta con folio:" + sale.Folio + " comentario:" + comment,
+                            Comment = "Entrada por Cancelacion de venta con folio:" + sale.Folio + " comentario:" + comment,
                             User = User.Identity.Name,
                             MovementDate = DateTime.Now.ToLocal(),
                             MovementType = MovementType.Entry,
@@ -78,10 +84,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
                 sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Canceled;
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now.ToLocal();
-                sale.Comment = comment;
+                sale.Status     = status;
+                sale.UpdUser    = User.Identity.Name;
+                sale.UpdDate    = DateTime.Now.ToLocal();
+                sale.Comment    = comment;
 
                 db.Entry(sale).State = EntityState.Modified;
 

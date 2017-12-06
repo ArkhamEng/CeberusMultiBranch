@@ -1,14 +1,27 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+@using CerberusMultiBranch.Models.Entities.Operative;
 
 @{
     ViewBag.Title = "Registro de pago";
     ViewBag.Class = "fa fa-money";
 }
 
+@*<h3 class="alert alert-success col-md-4">
+    <span class="fa fa-building"></span>
+    Sucursal @Model.Branch.Name
+</h3>
 
+<h3 class="alert alert-danger col-md-3 col-md-offset-1">
+    Comisión @Model.ComAmount.ToString("c")
+</h3>*@
+
+<h3 class="alert alert-info col-md-3  col-md-offset-9" >
+    Total <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label> 
+</h3>
 <hr />
-<div class="col-md-12">
-    <div class="panel panel-info">
+
+<div class="panel-group">
+    <div class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
                 <div class="form-group col-md-5">
@@ -21,7 +34,17 @@
                     </div>
                 </div>
 
-                <div class="form-group col-md-2 col-md-offset-3">
+                <div class="form-group col-md-2">
+                    <label class="control-label">
+                        Tipo de pago
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
+                        <input class="form-control" value="@Model.PaymentType.ToString()" readonly />
+                    </div>
+                </div>
+
+                <div class="form-group col-md-2 col-md-offset-1">
                     <label class="control-label">
                         Fecha
                     </label>
@@ -43,7 +66,7 @@
             </div>
 
             <div class="row">
-                <div class="form-group col-md-4">
+                <div class="form-group col-md-3">
                     <label class="control-label">
                         Agente
                     </label>
@@ -53,35 +76,106 @@
                     </div>
                 </div>
 
-             
-                <div class="form-group col-md-2 col-md-offset-6">
+                <div class="form-group col-md-2">
                     <label class="control-label">
-                        Total
+                        Estado Anterior
                     </label>
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input class="form-control" id="lblTotalAmount" value="@Model.TotalAmount.ToString("c")" readonly />
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
+                        @switch (Model.LastStatus)
+                        {
+                            case TranStatus.OnRevision:
+                                <label class="form-control alert alert-warning">Revisión</label>
+                                break;
+                            case TranStatus.Canceled:
+                                <label class="form-control alert alert-warning">Cancelado</label>
+                                break;
+                            case TranStatus.InProcess:
+                                <label class="form-control alert alert-danger">En Proceso</label>
+                                break;
+                            case TranStatus.Reserved:
+                                <label class="form-control alert alert-info">Reservado</label>
+                                break;
+                            case TranStatus.Compleated:
+                                <label class="form-control alert alert-success">Pagado</label>
+                                break;
+                        }
                     </div>
+                </div>
+
+                <div class="form-group col-md-2">
+                    <label class="control-label">
+                        Estado Actual
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
+                        @switch (Model.Status)
+                        {
+                            case TranStatus.OnRevision:
+                                <label class="form-control alert alert-warning">Revisión</label>
+                                break;
+                            case TranStatus.Canceled:
+                                <label class="form-control alert alert-warning">Cancelado</label>
+                                break;
+                            case TranStatus.InProcess:
+                                <label class="form-control alert alert-danger">En Proceso</label>
+                                break;
+                            case TranStatus.Reserved:
+                                <label class="form-control alert alert-info">Reservado</label>
+                                break;
+                            case TranStatus.Compleated:
+                                <label class="form-control alert alert-success">Pagado</label>
+                                break;
+                        }
+                    </div>
+                </div>
+                <div class="btn-group right col-md-offset-1 col-md-4" style="padding-top:25px !important;">
+                    <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
+                            onclick="ShowLoading(); window.location='@Url.Action("PaymentAndNote")'">
+                        <span class="fa fa-search-plus"></span>
+                        <u>B</u>úsqueda
+                    </button>
+                    @if (User.IsInRole("Supervisor"))
+                    {
+                        <button type="button" class="btn btn-danger" title="cancelar venta"
+                                onclick="$('#ModalCancel').modal('show');" id="btnCancel">
+                            <span class="fa fa-times"></span>
+                            <u>C</u>ancelar
+                        </button>
+                    }
+                    <button class="btn btn-success" type="button" id="btnPayment"
+                            onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
+                        <span class="fa fa-dollar"></span>
+                        <u>P</u>agar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="col-md-12">
     <div class="panel panel-danger">
         <div class="panel-body">
             <table id="tbDetails" class="table table-striped">
                 <thead>
                     <tr>
                         <th></th>
-                        <th class="text-center">
+                        <th>
                             @Html.DisplayName("Código")
                         </th>
-                        <th>@Html.DisplayName("Descripción")</th>
-                        <th class="text-right">@Html.DisplayName("Precio de venta")</th>
-                        <th class="text-center">@Html.DisplayName("Cantidad")</th>
-                        <th class="text-right">@Html.DisplayName("Total")</th>
+                        <th>
+                            @Html.DisplayName("SAT")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Descripción")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Precio")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Cantidad")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Total")
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -89,22 +183,22 @@
                     {
                         <tr>
                             <td class="col-md-1" align="center">
-                                @if (item.ParentId == null)
+                                @if (item.Product.Images.Count > 0)
                                 {
-                                    if (item.Product.Images != null && item.Product.Images.Count > 0)
-                                    {
-                                        <img class="img-responsive" src="@item.Product.Images.First().Path" style="max-height:50px;" />
-                                    }
-                                    else
-                                    {
-                                        <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
-                                    }
+                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:40px" />
+                                }
+                                else
+                                {
+                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:40px" />
                                 }
                             </td>
                             <td class="text-center">
                                 @Html.DisplayFor(m => item.Product.Code)
                             </td>
-                            <td >
+                            <td>
+                                @Html.DisplayFor(m => item.Product.Category.SatCode)
+                            </td>
+                            <td>
                                 @Html.DisplayFor(m => item.Product.Name)
                             </td>
                             <td class="text-right">
@@ -120,22 +214,11 @@
                     }
                 </tbody>
             </table>
-            <div class="btn-group">
-                <button class="btn btn-primary" type="button" onclick="window.location ='@Url.Action("PaymentAndNote")'" title="volver a buscar">
-                    <span class="fa fa-search-plus"></span>
-                    ir a búsqueda
-                </button>
-                <button class="btn btn-danger" type="button" onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
-                    <span class="fa fa-dollar"></span>
-                    Pagar
-                </button>
-            </div>
         </div>
     </div>
 </div>
-  
 
-  
+@Html.Partial("_Cancelation")
 
 @Html.Partial("_ChoosePayment",Model.TotalAmount)
 
@@ -147,19 +230,54 @@
         //Paginate("#tbDetails",5)
     });
 
-    function Calculate(val)
+    function Cancel()
     {
-        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
-        console.log("Val "+val+" total "+total);
-        var result = (total - val);
+        $("#ModalCancel").modal("hide");
+        ShowLoading();
 
-        return (total - parseFloat(val));
+        var param = { transactionId: $("#TransactionId").val(), comment: $("#txtComment").val() }
+
+        ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
+        {
+            if (j.Result = 'OK')
+                window.location = '@Url.Action("PaymentAndNote")';
+            else
+                ShowMessage(j.Result, j.Message, 'warning');
+        });
     }
 
+    function Calculate(val)
+    {
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
+
+        var result = (total - parseFloat(val));
+
+        console.log(result);
+
+        return result;
+    }
+
+    $(document).keydown(function (e)
+    {
+        if (e.which == 13 || e.altKey && e.keyCode == 80)
+        {
+            $("#btnPayment").click();
+        }
+
+        if (e.altKey && e.keyCode == 67)
+        {
+            $("#btnCancel").click();
+        }
+
+        if (e.altKey && e.keyCode == 66)
+        {
+            $("#btnSearch").click();
+        }
+    });
 
     function GetChange(val)
     {
-        var total = $("#lblTotalAmount").val().replace(/[$,]+/g, "");
+        var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
         return (parseFloat(val) - total);
     }
 
