@@ -82,28 +82,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
                          Include(bp => bp.Product.PackageDetails).
                          FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
 
-
-
             if (type == MovementType.Exit)
             {
                 if (branchP.Stock < quantity)
-                    return Json(new { Result = "Imposible realizar el movimiento", Message = "La cantidad a retirar supera la disponible" });
+                    return Json(new { Result = "Imposible realizar el movimiento",
+                        Message = "La cantidad a retirar supera la disponible" });
                 else
                 {
-                    branchP.LastStock = branchP.Stock;
-                    branchP.Stock -= quantity;
-                    branchP.UpdDate = DateTime.Now;
+                    branchP.LastStock   = branchP.Stock;
+                    branchP.Stock       -= quantity;
+                    branchP.UpdDate     = DateTime.Now;
                     branchP.StockMovements = branchP.StockMovements ?? new List<StockMovement>();
 
                     var mSm = new StockMovement
                     {
-                        BranchId = branchP.BranchId,
-                        ProductId = branchP.ProductId,
-                        Quantity = quantity,
+                        BranchId     = branchP.BranchId,
+                        ProductId    = branchP.ProductId,
+                        Quantity     = quantity,
                         MovementType = MovementType.Exit,
-                        User = User.Identity.Name,
+                        User         = User.Identity.Name,
                         MovementDate = DateTime.Now,
-                        Comment = "Salida manual producto"
+                        Comment      = "Salida manual producto"
                     };
 
                     db.StockMovements.Add(mSm);
@@ -395,6 +394,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
                             && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
+                            && (p.IsActive)
                             select p).OrderBy(s => s.Name).Take(400).ToList();
 
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
@@ -472,7 +472,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var model = (from p in db.Products
                          where
-                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)))
+                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)) && p.IsActive)
                          select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
             return PartialView("_ProductList", model);
@@ -676,6 +676,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var cats = db.Categories.ToList();
             cats.ForEach(c => c.Name += " - " + c.SatCode);
 
+            vm.IsActive = true;
             vm.Categories = cats.ToSelectList();
             vm.Systems = db.Systems.ToSelectList();
             vm.Name = ep.Description;
@@ -687,7 +688,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
-
+            
             vm.DealerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)), Cons.Zero);
             vm.StorePrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)), Cons.Zero);
             vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPrice / Cons.OneHundred)), Cons.Zero);
@@ -1146,7 +1147,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var products = (from ep in db.Products.Include(p => p.Category)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Name).Contains(s)))
-                            && (ep.ProductType == ProductType.Single)
+                            && (ep.ProductType == ProductType.Single) && (ep.IsActive)
                             select ep).Take((int)Cons.OneHundred).ToList();
 
             return PartialView("_ListForPackage", products);
@@ -1221,20 +1222,65 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [Authorize(Roles = "Capturista")]
         public ActionResult Delete(int id)
         {
-            var product = db.Products.Include(p => p.Images).FirstOrDefault(p => p.ProductId == id);
-
-            if(product!=null)
+            try
             {
-                var detail = db.TransactionDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
+                var product = db.Products.Include(p => p.Images).Include(p=> p.BranchProducts).
+                    Include(p => p.BranchProducts.Select(bp=> bp.Branch)).
+                    FirstOrDefault(p => p.ProductId == id && p.IsActive);
 
-                //si el producto ya se encuentra en alguna transacción, solo se desactiva
-                if(detail!=null)
+                if (product != null)
                 {
+                   //reviso si el producto tiene existencias en alguna sucursal
+                   foreach(var bProd in product.BranchProducts)
+                    {
+                        if(bProd.Stock > Cons.Zero)
+                        {
+                            return Json(new { Result = "Imposible eliminar",
+                                Message = "Esto producto tiene existencias en la sucursal "+bProd.Branch.Name });
+                        }
+                    }
 
+                    //reviso si el producto ya se encuentra en alguna transacción,
+                    //si es asi solo se desactiva
+                    var detail = db.TransactionDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
+                    
+                    if (detail != null)
+                    {
+                        product.IsActive = false;
+                        product.UpdDate  = DateTime.Now.ToLocal();
+                        product.UpdUser  = User.Identity.Name;
+
+                        db.Entry(product).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        if(product.Images!=null)
+                        {
+                            //Elimino las imagenes guardadas
+                            foreach(var im in product.Images)
+                            {
+                                var pPath = Server.MapPath(im.Path);
+                                System.IO.File.Delete(pPath);
+                            }
+                        }
+
+                        db.Products.Remove(product);
+                    }
+
+                    db.SaveChanges();
+
+                    return Json(new { Result = "OK" });
+                }
+                else
+                {
+                    return Json(new { Result = "Datos no encontrados!",
+                        Message = "El producto seleccionado ya no esta disponible" });
                 }
             }
-
-            return Json(new { Result = "OK" });
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al eliminar el producto", Message = ex.Message });
+            }
         }
 
         protected override void Dispose(bool disposing)

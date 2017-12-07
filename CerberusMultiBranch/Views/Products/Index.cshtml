@@ -9,6 +9,7 @@
 <hr />
 
 
+
 <div id="pnlFilters" class="panel panel-danger top">
     <div class="panel-body">
         <div class="col-md-11">
@@ -86,12 +87,15 @@
 
 <div id="divQuickAdd">
 </div>
-
+ 
+@Html.Partial("_ConfirmDelete")
 
 <script>
 
-    $(document).ready(function () {
-        $("#CarMakeId").change(function () {
+    $(document).ready(function ()
+    {
+        $("#CarMakeId").change(function ()
+        {
             CascadeMake();
         });
 
@@ -107,7 +111,6 @@
 
         $("#btnSearchProvider").click(function ()
         {
-
             var f = $("#txtName").val();
 
             if (f.length < 3)
@@ -134,20 +137,20 @@
 
         $("#btnSwitch").click(function ()
         {
-            if ($("#IsGrid").val() != 'false') {
+            if ($("#IsGrid").val() != 'false')
+            {
                 $("#IsGrid").val('false');
                 LookFor();
                 $("#spSwitch").attr("class", "fa fa-th-large");
                 $("#btnSwitch").prop("title", "ver como tabla");
-
             }
-            else {
+            else
+            {
                 $("#IsGrid").val('true');
                 LookFor();
                 $("#spSwitch").attr("class", "fa fa-list");
                 $("#btnSwitch").prop("title", "ver como lista");
             }
-
         });
 
         $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
@@ -172,8 +175,11 @@
         });
     }
 
-    $(document).keydown(function (e) {
-        if (e.which == 13 || (e.altKey && e.which == 66)) {
+    $(document).keydown(function (e)
+    {
+        if (e.which == 13 || (e.altKey && e.which == 66))
+        {
+            console.log("OnPage");
             $("#btnSearch").click();
         }
 

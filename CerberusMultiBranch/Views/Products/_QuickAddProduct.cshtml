@@ -126,7 +126,7 @@
 
                     <label class="text-danger" id="lblQuickAddError"></label>
                     @Html.HiddenFor(model => model.ProductId)
-                    @Html.HiddenFor(model => model.BuyPrice)
+                    @Html.HiddenFor(model=> model.IsActive)
                 </div>
 
                 <div class="modal-footer">
@@ -186,10 +186,11 @@
         {
             Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#PartSystemId").val(),
             WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
-            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val(), DealerPercentange: $("#DealerPercentange").val(),
-            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(), ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val()
+            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val(), DealerPercentage: $("#DealerPercentage").val(),
+            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(),
+            ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val()
         };
-
+        console.log(product);
         $("#ModalQuickAddProduct").on('hidden.bs.modal', function ()
         {
             LookFor();

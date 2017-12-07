@@ -44,7 +44,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
        
-        public JsonResult ChangeStatus(int transactionId, string comment, TranStatus status)
+        private JsonResult ChangeStatus(int transactionId, string comment, TranStatus status)
         {
             try
             {
@@ -172,6 +172,30 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             else
                 return Json(new { Result = "OK", Message = Cons.Zero.ToString() });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult OpenChangePrice(int productId, int transactionId)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var transDet = db.TransactionDetails.Include(td=> td.Product).Include(td => td.Product.BranchProducts).
+                FirstOrDefault(td => td.ProductId == productId && td.TransactionId == transactionId);
+
+            var bp = transDet.Product.BranchProducts.FirstOrDefault(p => p.BranchId == branchId);
+
+            var model = new PriceSelectorViewModel
+            {
+                PsProductId = productId,
+                PsTransactionId = transactionId,
+                CPrice = transDet.Price,
+                SPrice = bp != null ? bp.StorePrice:Cons.Zero,
+                DPrice = bp != null ? bp.DealerPrice : Cons.Zero,
+                WPrice = bp != null ? bp.WholesalerPrice : Cons.Zero,
+            };
+
+            return PartialView("_PriceSelector", model);
         }
 
         [HttpPost]

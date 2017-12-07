@@ -1,4 +1,5 @@
-﻿
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.PriceSelectorViewModel
+
 <script src="~/Scripts/bootstrap-slider.min.js"></script>
 <link href="~/Content/bootstrap-slider.min.css" rel="stylesheet" />
 
@@ -16,41 +17,18 @@
             </div>
             <div class="modal-body panel-body">
 
-                @Html.Hidden("txtProductId")
-                @*@Html.Hidden("txtPrice")*@
+                @Html.HiddenFor(m=> Model.PsProductId)
+                @Html.HiddenFor(m => Model.PsTransactionId)
 
                 <div class="col-xs-12">
                     <input id="txtPriceSelector" type="text"  class="form-control"  />
                     <hr />
                 </div>
                 <div class="row">
-                    <h3 id="txtPriceSelected" class="col-xs-6 col-xs-offset-3">
-                    </h3>
+                    <input id="txtPriceSelected" class="col-xs-6 col-xs-offset-3 input-lg" type="number" 
+                           max="@Model.SPrice" min="@Model.WPrice" />
                 </div>
-                @*<div class="col-md-12">
-                    @Html.Label("Precio Mostrador", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtSPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
-                        <span class="input-group-addon"><input type="checkbox" id="cbSPrice" onchange="SetCheck(this,'#txtSPrice')" class="checkbox"></span>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    @Html.Label("Precio Distribuidor", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtDPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
-                        <span class="input-group-addon"><input type="checkbox" id="cbDPrice" onchange="SetCheck(this,'#txtDPrice')" class="checkbox"></span>
-                    </div>
-                </div>
-                <div class="col-md-12">
-                    @Html.Label("Precio Mayorista", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.TextBox("txtWPrice", "", htmlAttributes: new { @class = "form-control", @readonly = "true" })
-                        <span class="input-group-addon"><input type="checkbox" id="cbWPrice" onchange="SetCheck(this,'#txtWPrice')" class="checkbox"></span>
-                    </div>
-                </div>*@
+                <label class="text-danger" id="lblPsError"></label>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" type="button" onclick="SetNewPrice()">
@@ -62,24 +40,67 @@
     </div>
 </div>
 
+@Html.HiddenFor(m=> Model.CPrice)
+@Html.HiddenFor(m => Model.SPrice)
+@Html.HiddenFor(m => Model.DPrice)
+@Html.HiddenFor(m => Model.WPrice)
 
 <script>
     $(document).ready(function ()
     {
-        
+        var cPrice = parseFloat($("#CPrice").val());
+        var sPrice = parseFloat($("#SPrice").val());
+        var dPrice = parseFloat($("#DPrice").val());
+        var wPrice =parseFloat($("#WPrice").val());
+
+        $("#txtPriceSelected").val(cPrice);
+
+       
+
+        $('#txtPriceSelector').slider({
+            ticks: [wPrice,  dPrice,  sPrice],
+            ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
+
+            ticks_snap_bounds: 1
+        });
+
+      
+        $("#txtPriceSelector").on("slide", function (slideEvt)
+        {
+            $("#txtPriceSelected").val(slideEvt.value);
+        });
+
+        $("#txtPriceSelector").on("change", function (response)
+        {
+            $("#txtPriceSelected").val(response.value.newValue);
+        });
+
+        $("#ModalPrice").modal({ backdrop: false });
     });
 
     function SetNewPrice()
     {
+        var value = parseFloat($("#txtPriceSelected").val());
+        var sPrice = parseFloat($("#SPrice").val());
+        var wPrice = parseFloat($("#WPrice").val());
+
+        if (value > sPrice || value < wPrice) {
+            $("#lblPsError").text("El precio de venta debe estar entre $" + wPrice + " y $" + sPrice +" pesos");
+            return;
+        }
+        else
+            $("lblPsError").text("");
+
+
         $("#ModalPrice").modal("hide");
 
         var param =
             {
-                productId: $("#txtProductId").val(),
-                transactionId: $("#TransactionId").val(),
-                price: $("#txtPriceSelected").text().replace(/[$,]+/g, "")
+                productId: $("#PsProductId").val(),
+                transactionId: $("#PsTransactionId").val(),
+                price: $("#txtPriceSelected").val()
             }
-        
+
         ExecuteAjax('@Url.Action("SetNewPrice","Sales")', param, function (response)
         {
             if ($.isPlainObject(response))

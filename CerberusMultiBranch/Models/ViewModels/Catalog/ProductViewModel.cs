@@ -73,6 +73,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Systems = new List<PartSystem>().ToSelectList();
             this.PackageDetails = product.PackageDetails;
             this.Quantity = product.Quantity;
+            this.IsActive = product.IsActive;
             this.FillTypes();
         }
 

@@ -41,7 +41,7 @@
                     {
                         <td class="col-md-2 text-center">
                             <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
-                                onclick="ChangePrice(@item.ProductId,@item.Product.StorePrice,@item.Product.DealerPrice,@item.Product.WholesalerPrice,@item.Price,)">
+                                onclick="ChangePrice(@item.ProductId,@item.TransactionId)">
                                 <u>
                                     @Html.DisplayFor(modelItem => item.Price)
                                 </u>
@@ -91,13 +91,8 @@ else
     </div>
 }
 
-
-
-@Html.Partial("_PriceSelector")
-
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         Paginate("#tbCartDetails", 4)
 
         $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.Amount).ToString("c")');
@@ -109,39 +104,18 @@ else
 
     });
 
-    function ChangePrice(pId, sPrice,dPrice, wPrice,cPrice)
-    {
-        $("#txtProductId").val(pId);
-     
-        $("#txtPriceSelected").text(GetCurrency(cPrice));
+    function ChangePrice(prodId, transId) {
+        var param = { productId: prodId, transactionId: transId }
 
-        var bound = 1;
-        //if (cPrice < 1000)
-        //    bound=1
+        ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {
 
-
-        $('#txtPriceSelector').slider({
-            value:cPrice,
-            max: sPrice,
-            min: wPrice,
-
-            ticks: [wPrice, dPrice, sPrice],
-            ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
-
-            ticks_snap_bounds: bound
+            if ($.isPlainObject(response)) {
+                console.log("error");
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+                $("#divPriceSelector").html(response);
         });
-        
-        $("#txtPriceSelector").on("slide", function (slideEvt) {
-            $("#txtPriceSelected").text(GetCurrency(slideEvt.value));
-        });
-
-        $("#txtPriceSelector").on("change", function (response)
-        {
-            $("#txtPriceSelected").text(GetCurrency(response.value.newValue));
-        });
-
-
-        $("#ModalPrice").modal("show");
     }
 
     function QuantityChanged(input) {
@@ -175,16 +149,13 @@ else
             productId: productId
         }
 
-        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response)
-        {
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response) {
             console.log("Ejecución exitosa");
-            if ($.isPlainObject(response))
-            {
+            if ($.isPlainObject(response)) {
                 $("#ModalCart").modal("hide");
                 ShowMessage(response.Result, response.Message, "warning");
             }
-            else
-            {
+            else {
                 CheckCart();
                 $("#divCartDetails").html(response);
             }

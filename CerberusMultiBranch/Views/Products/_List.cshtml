@@ -124,9 +124,11 @@
                                             onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </button>
+                                    <button class="btn btn-danger  btn-lg" title="Eliminar producto"
+                                            onclick="BeginDelete('@prod.ProductId')">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
                                 }
-
-                               
                             </div>
                         }
                     </td>
@@ -141,21 +143,46 @@
     </tbody>
 </table>
 
-
+<input  type="hidden" id="transId" />
 
 <div id="divMovement"></div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetDataTable("#tbProducts", "#txtName");
     });
 
     function Detail(id) {
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view) {
+        ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view)
+        {
             HideLoading();
             $("#divProductDetail").html(view);
+        });
+    }
+
+    function BeginDelete(id)
+    {
+        console.log(id);
+        $("#transId").val(id);
+        $("#ModalConfirmDelete").modal("show");
+    }
+
+    function Delete()
+    {
+        $("#ModalConfirmDelete").modal("hide");
+
+        ShowLoading();
+        ExecuteAjax('@Url.Action("Delete")', { id: $("#transId").val() }, function(response)
+        {
+            HideLoading();
+
+            if(response.Result == "OK")
+                LookFor();
+            else
+                ShowMessage(response.Result, response.Message, 'warning');
         });
     }
 
