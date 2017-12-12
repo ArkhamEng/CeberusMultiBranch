@@ -80,11 +80,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     public enum TranStatus:int
     {
-        OnRevision    = -2,
-        Canceled      = -1,
-        InProcess     = 0,
+        Canceled      = -1, 
+        InProcess     = 0, 
         Reserved      = 1,
-        SemiCompleted = 2,
+        Revision      = 2, 
         Compleated    = 3,
     }
 }

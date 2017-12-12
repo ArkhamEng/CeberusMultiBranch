@@ -9,8 +9,8 @@
                      onmouseover="SetPointer(this)" title="Cambiar foto de perfil"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture","Manage")'" />
             </div>
-          <div class="btn btn-file btn-xs" style="color:whitesmoke !important; font-weight:200; background-color:#c9302c"
-               onmouseover="SetPointer(this)" onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword","Manage")'">              
+          <div class="btn btn-file btn-xs btn-danger col-xs-12"  onmouseover="SetPointer(this)" 
+             onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword","Manage")'">              
              @User.Identity.GetUserName()
           </div>
         </div>
@@ -48,11 +48,6 @@
         @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
         {
             <li><a href="/CashRegister/" onclick="ShowLoading()">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
-            if (User.IsInRole("Cajero"))
-            {
-                <li><a href="/CashRegister/MyHistory" onclick="ShowLoading()">&nbsp;Mi Historial de caja<span class="fa fa-history" style="float:left" /></a></li>
-                <li><a href="/CashRegister/PaymentAndNote" onclick="ShowLoading()">&nbsp;Pagos y notas<span class="badge bg-info"></span><span class="fa fa-credit-card-alt" style="float:left" /></a></li>
-            }
         }
 
 

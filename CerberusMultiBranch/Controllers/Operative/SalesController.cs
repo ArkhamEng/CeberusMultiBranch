@@ -43,7 +43,14 @@ namespace CerberusMultiBranch.Controllers.Operative
            return ChangeStatus(transactionId, comment, TranStatus.Canceled);
         }
 
-       
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public JsonResult SendToRevision(int transactionId, string comment)
+        {
+            return ChangeStatus(transactionId, comment, TranStatus.Revision);
+        }
+
+
         private JsonResult ChangeStatus(int transactionId, string comment, TranStatus status)
         {
             try
@@ -62,17 +69,17 @@ namespace CerberusMultiBranch.Controllers.Operative
                         var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
 
                         bp.LastStock = bp.Stock;
-                        bp.Stock += detail.Quantity;
+                        bp.Stock     += detail.Quantity;
 
                         db.Entry(bp).State = EntityState.Modified;
 
                         //agrego movimiento al inventario
                         StockMovement sm = new StockMovement
                         {
-                            BranchId = bp.BranchId,
+                            BranchId  = bp.BranchId,
                             ProductId = bp.ProductId,
-                            Comment = "Entrada por Cancelacion de venta con folio:" + sale.Folio + " comentario:" + comment,
-                            User = User.Identity.Name,
+                            Comment   = "Entrada por Cancelacion de venta con folio:" + sale.Folio + " comentario:" + comment,
+                            User      = User.Identity.Name,
                             MovementDate = DateTime.Now.ToLocal(),
                             MovementType = MovementType.Entry,
                             Quantity = detail.Quantity
@@ -222,6 +229,21 @@ namespace CerberusMultiBranch.Controllers.Operative
                         detail.Product.DealerPrice = brp != null ? brp.DealerPrice : Cons.Zero;
                         detail.Product.WholesalerPrice = brp != null ? brp.WholesalerPrice : Cons.Zero;
                     }
+                }
+                else
+                {
+                    sale = new Sale();
+                    sale.BranchId = branchId;
+                    sale.UpdUser = User.Identity.GetUserName();
+                    sale.UpdDate = DateTime.Now.ToLocal();
+                    sale.ClientId = clientId;
+                    sale.UserId = User.Identity.GetUserId();
+                    sale.Folio = Cons.CodeMask;
+
+                    db.Sales.Add(sale);
+                    db.SaveChanges();
+
+                    return Json(new { Result = "OK" });
                 }
 
                 var client = db.Clients.Find(clientId);

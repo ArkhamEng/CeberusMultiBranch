@@ -257,6 +257,14 @@
     <Compile Include="Migrations\201712020509359_ProductChanges1.Designer.cs">
       <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712080523368_emailLength.cs" />
+    <Compile Include="Migrations\201712080523368_emailLength.Designer.cs">
+      <DependentUpon>201712080523368_emailLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712120636173_FTRchanges.cs" />
+    <Compile Include="Migrations\201712120636173_FTRchanges.Designer.cs">
+      <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -483,7 +491,7 @@
     <Content Include="Views\CashRegister\RegistPayment.cshtml" />
     <Content Include="Views\Sales\Payments.cshtml" />
     <Content Include="Views\CashRegister\_SalesToPayList.cshtml" />
-    <Content Include="Views\CashRegister\PaymentAndNote.cshtml" />
+    <Content Include="Views\CashRegister\_TicketsAndNotes.cshtml" />
     <Content Include="Views\Purchases\_SearchExternalProduct.cshtml" />
     <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
     <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
@@ -514,6 +522,8 @@
     <Content Include="Views\Products\_QuickAddProduct.cshtml" />
     <Content Include="Views\CashRegister\RegistPayment - Copy.cshtml" />
     <Content Include="Views\Shared\_ConfirmDelete.cshtml" />
+    <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
+    <Content Include="Views\Shared\_PaymentOption.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -568,6 +578,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712020509359_ProductChanges1.resx">
       <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712080523368_emailLength.resx">
+      <DependentUpon>201712080523368_emailLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712120636173_FTRchanges.resx">
+      <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

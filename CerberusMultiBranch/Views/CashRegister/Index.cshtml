@@ -8,109 +8,113 @@
 
 @if (!Model.IsOpen)
 {
+
     <div class="col-md-12 panel-danger">
         <h4 class="text-uppercase text-center panel-heading">
             @Model.OpeningDate.ToString("dddd dd MMMM yyyy")
         </h4>
     </div>
 
-    <div class="col-md-12">
-        <div class="btn-group-vertical text-center col-md-2  col-md-push-5">
-            <label class="control-label">
-                Monto Inicial
-            </label>
-            <input id="txtInitialAmount" class="form-control" type="number" />
+        <div class="col-md-12">
+            <div class="btn-group-vertical text-center col-md-2  col-md-push-5">
+                <label class="control-label">
+                    Monto Inicial
+                </label>
+                <input id="txtInitialAmount" class="form-control" type="number" />
 
-            <button id="btnStart" class="btn-danger btn" type="button">
-                <span class="glyphicon glyphicon-log-out"></span>
-                Abrir Caja
-            </button>
+                <button id="btnStart" class="btn-danger btn" type="button">
+                    <span class="glyphicon glyphicon-log-out"></span>
+                    Abrir Caja
+                </button>
+            </div>
         </div>
-    </div>
-
 }
 else
 {
-
-    <div class="col-md-12 panel-success">
-        <h4 class="text-uppercase text-center panel-heading">
-            @Model.OpeningDate.ToString("dddd dd MMMM yyyy")
-        </h4>
-    </div>
-
-    <div class="col-md-3">
-        <div class="col-md-12  text-center  alert alert-info">
-            <h3>
-                Monto Apertura <br />
-                @Model.InitialAmount.ToString("c")
-            </h3>
+        <div class="col-md-12 panel-success">
+            <h4 class="text-uppercase text-center panel-heading">
+                @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToString("c")
+            </h4>
         </div>
+        
+            <div class="col-md-3">
+                @Html.Partial("_PaymentOption")
+                <div class="col-md-12  text-center btn alert alert-info" onclick="OpenNotes()" title="Buscar notas">
+                    <h3>
+                       <span class="fa fa-ticket"></span>Notas y Tickets<br />
+                        @*Monto Apertura <br />
+                        @Model.InitialAmount.ToString("c") <br />*@
+                    </h3>
+                </div>
 
-        @if (User.IsInRole("Cajero"))
-        {
-            <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
-                 onmouseover="SetPointer(this)" title="Ver y agregar retiros">
-                <h3>
-                    Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
-                </h3>
-            </div>
-        }
-        else
-        {
-            <div class="text-center col-md-12 alert btn-danger disabled"  >
-                <h3>
-                    Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
-                </h3>
-            </div>
-        }
-
-        <div class="text-center col-md-12  alert  btn-success" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
-            @{
-
-                var total = (Model.Incomes.
-                    Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount) + Model.InitialAmount - Model.Withdrawals.Sum(w => w.Amount));
-
-                var totString = total.ToString("c");
-            }
-            <h3>
-                Efectivo en caja <br />
-                @totString
-            </h3>
-        </div>
-    </div>
-    <div class="col-md-9">
-        <div class="col-md-5  text-center  alert bg-primary">
-            <h3>
-                @{
-                    var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount).ToString("c");
+                @if (User.IsInRole("Cajero"))
+                {
+                    <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
+                         onmouseover="SetPointer(this)" title="Ver y agregar retiros">
+                        <h3>
+                            Retiros<br />
+                            @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                        </h3>
+                    </div>
                 }
-                Ventas Efectivo<br />
-                @cash
-            </h3>
-        </div>
-        <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
-            <h3>
-                Ventas Tarjeta<br />
-                @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Tarjeta).Sum(d => d.Amount).ToString("c")
-            </h3>
-        </div>
+                else
+                {
+                    <div class="text-center col-md-12 alert btn-danger disabled">
+                        <h3>
+                            Retiros<br />
+                            @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                        </h3>
+                    </div>
+                }
 
-        <div class="col-md-11">
-            <img class="img-responsive" src="@Model.ChartSource" />
+                <div class="text-center col-md-12  alert  btn-success" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
+                    @{
+
+                        var total = (Model.Incomes.
+                            Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount) + Model.InitialAmount - Model.Withdrawals.Sum(w => w.Amount));
+
+                        var totString = total.ToString("c");
+                    }
+                    <h3>
+                        Cerrar caja con<br />
+                        @totString
+                    </h3>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="col-md-5  text-center  alert bg-primary">
+                    <h3>
+                        @{
+                            var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount).ToString("c");
+                        }
+                        Ventas Efectivo<br />
+                        @cash
+                    </h3>
+                </div>
+                <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
+                    <h3>
+                        Ventas Tarjeta<br />
+                        @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Tarjeta).Sum(d => d.Amount).ToString("c")
+                    </h3>
+                </div>
+
+
+                <div class="col-md-11">
+                    <img class="img-responsive" src="@Model.ChartSource" />
+                </div>
+
+            </div>
+        
+        <div id="divDetails">
         </div>
-
-    </div>
-    <div id="divDetails">
-
-    </div>
         @Html.Partial("_CloseCash", total)
- }
+
+       <div id="divNotes">
+       </div>
+}
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#btnStart").click(function () { OpenCashRegister(); });
 
         $("#btnTerminate").click(function () {
@@ -118,8 +122,17 @@ else
         });
     });
 
-    function OpenWithdrawal()
+    function OpenNotes()
     {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("TicketsAndNotes")', {}, function (response)
+        {
+            HideLoading();
+            $("#divNotes").html(response);
+        });
+    }
+
+    function OpenWithdrawal() {
         $("#hTitle").text("Detalle de retiros");
 
         ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view) {

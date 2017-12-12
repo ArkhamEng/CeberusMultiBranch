@@ -66,7 +66,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress)]
-        [MaxLength(30)]
+        [MaxLength(100)]
         public string Email { get; set; }
 
         [Display(Name = "Teléfono")]

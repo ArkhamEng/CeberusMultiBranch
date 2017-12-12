@@ -20,7 +20,6 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         private CashRegister GetNewCR()
         {
-            // var cs = DateTime.Now.GetShift();
             var cr = new CashRegister();
             cr.OpeningDate = DateTime.Now.ToLocal();
             cr.UserOpen = User.Identity.Name;
@@ -233,21 +232,40 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [Authorize(Roles = "Cajero")]
-        public ActionResult PaymentAndNote()
+        public ActionResult CheckPending()
         {
-            var sales = LookForPayment(DateTime.Today,null,null,null);
-            return View(sales);
+            var branchId = User.Identity.GetBranchId();
+            var count = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved).ToList().Count();
+            return Json(new { Result = "OK", Count = count });
+        }
+
+        [Authorize(Roles = "Cajero")]
+        public ActionResult OpenPending()
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
+                .Include(s=> s.User).Include(s => s.Client).ToList();
+
+            return PartialView("_PendingPayment", model);
+        }
+
+        [Authorize(Roles = "Cajero")]
+        public ActionResult TicketsAndNotes()
+        {
+            var sales = LookForNotes(DateTime.Today,null,null,null);
+            return PartialView("_TicketsAndNotes",sales);
         }
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult SearchPayment(DateTime? begin, DateTime? end, string folio, string client)
+        public ActionResult SearchNotes(DateTime? begin, DateTime? end, string folio, string client)
         {
-            var sales = LookForPayment(begin, end, folio,client);
+            var sales = LookForNotes(begin, end, folio,client);
             return PartialView("_SalesToPayList", sales);
         }
 
-        private List<Sale> LookForPayment(DateTime? begin, DateTime? end,string folio, string client)
+        private List<Sale> LookForNotes(DateTime? begin, DateTime? end,string folio, string client)
         {
            var branchId = User.Identity.GetBranchId();
 
@@ -258,7 +276,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             (end == null || s.TransactionDate <= end) &&
             (folio == null || folio == string.Empty || s.Folio == folio) &&
             (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
-            (s.Status == TranStatus.Reserved || s.Status == TranStatus.Compleated)).
+            (s.Status == TranStatus.Compleated)).
             OrderByDescending(s=> s.TransactionDate).ToList();
 
             return sales;

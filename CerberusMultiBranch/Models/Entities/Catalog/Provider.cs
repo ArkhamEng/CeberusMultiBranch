@@ -39,12 +39,14 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Página Web")]
         [DataType(DataType.Url, ErrorMessage ="error de formato! el sitio debe incluir http:// o https:// ejemplo: http://www.sitio.com")]
-        [MaxLength(30)]
+        [MaxLength(150)]
         public string WebSite { get; set; }
 
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(15)]
+        [Required]
+        [Index("Unq_FTR", IsUnique = true)]
         public string FTR { get; set; }
 
      
@@ -62,7 +64,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress)]
-        [MaxLength(30)]
+        [MaxLength(100)]
         [Index("IDX_Email", IsUnique = false)]
         public string Email { get; set; }
 

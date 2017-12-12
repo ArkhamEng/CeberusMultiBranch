@@ -21,7 +21,7 @@
                 @Html.HiddenFor(m => Model.PsTransactionId)
 
                 <div class="col-xs-12">
-                    <input id="txtPriceSelector" type="text"  class="form-control"  />
+                    <input id="txtPriceSelector" type="text"  />
                     <hr />
                 </div>
                 <div class="row">
@@ -48,35 +48,40 @@
 <script>
     $(document).ready(function ()
     {
+        $("#ModalPrice").on("shown.bs.modal", function ()
+        {
+            SetValues();
+        });
+
+        $("#ModalPrice").modal({ backdrop: false });
+    });
+
+    function SetValues()
+    {
         var cPrice = parseFloat($("#CPrice").val());
         var sPrice = parseFloat($("#SPrice").val());
         var dPrice = parseFloat($("#DPrice").val());
-        var wPrice =parseFloat($("#WPrice").val());
+        var wPrice = parseFloat($("#WPrice").val());
 
         $("#txtPriceSelected").val(cPrice);
 
-       
-
         $('#txtPriceSelector').slider({
-            ticks: [wPrice,  dPrice,  sPrice],
+            value:cPrice,
+            ticks: [wPrice, dPrice, sPrice],
             ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
 
             ticks_snap_bounds: 1
         });
 
-      
-        $("#txtPriceSelector").on("slide", function (slideEvt)
-        {
+
+        $("#txtPriceSelector").on("slide", function (slideEvt) {
             $("#txtPriceSelected").val(slideEvt.value);
         });
 
-        $("#txtPriceSelector").on("change", function (response)
-        {
+        $("#txtPriceSelector").on("change", function (response) {
             $("#txtPriceSelected").val(response.value.newValue);
         });
-
-        $("#ModalPrice").modal({ backdrop: false });
-    });
+    }
 
     function SetNewPrice()
     {

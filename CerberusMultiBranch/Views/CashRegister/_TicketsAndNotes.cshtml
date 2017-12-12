@@ -1,0 +1,110 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
+
+<div id="ModalNotes" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-info panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-uppercase">
+                    <span class="fa fa-ticket" style="float:left">
+                    </span>
+                    &nbsp;Tickets y Notas
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <div id="pnlFilters" class="panel panel-danger top">
+                    <div class="panel-body">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                @Html.TextBox("Folio", "", htmlAttributes: new
+                           {
+                               @class = "form-control",
+                               placeholder = "Folio de venta",
+                               style = "width:30% !important"
+                           })
+                                @Html.TextBox("Client", "", htmlAttributes: new
+                           {
+                               @class = "form-control",
+                               placeholder = "Nombre del cliente",
+                               style = "width:70% !important"
+                           })
+                                <span class="input-group-btn">
+                                    <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                        <u>B</u>uscar
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                        <br /><br /><br />
+                        <div class="col-md-8">
+                            <div class="input-group">
+                                <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                                @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+
+                                <span class="input-group-addon"><a>Fecha final</a></span>
+                                @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                                <span class="input-group-btn">
+                                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear">
+                                        <span class="glyphicon glyphicon-refresh"></span>
+                                        <u>L</u>impiar
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div id="divNotesToPrint">
+                    @Html.Partial("_SalesToPayList", Model)
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#btnSearch").click(function () {
+            ShowLoading();
+            var data = {
+                begin: $("#BeginDate").val(),
+                end: $("#EndDate").val(),
+                folio: $("#Folio").val(),
+                client: $("#Client").val()
+            };
+            ExecuteAjax('@Url.Action("SearchNotes")', data, function (view) {
+                HideLoading();
+                $("#divNotesToPrint").html(view);
+            });
+
+        });
+
+        $("#ModalNotes").modal("show");
+    });
+
+    function Reload() {
+        $("#BeginDate").val(null);
+        $("#EndDate").val(null);
+        $("#Folio").val("");
+        $("#Client").val("");
+        $("#divNotesToPrint").html("");
+    }
+
+    $(document).keydown(function (e) {
+        if (e.which == 13 || (e.altKey && e.which == 66)) {
+            $("#btnSearch").click();
+        }
+
+        if (e.altKey && e.keyCode == 76) {
+            ShowLoading();
+            $("#btnClear").click();
+        }
+    });
+
+
+</script>
+

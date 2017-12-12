@@ -1,0 +1,54 @@
+﻿
+<div id="dPending"  onclick="OpenPending()" class="btn btn-info alert text-center col-md-12">
+    <h3>
+        Ventas por Cobrar <br />
+        <span id="spPendingPayment" class="badge">
+        </span>
+    </h3>
+</div>
+
+<script>
+    var bInter = null;
+    $(document).ready(function ()
+    {
+        CheckPendingPayments();
+        setInterval(function () { CheckPendingPayments(); }, 30000);
+
+    });
+
+    function PendingBlink() {
+        $("#dPending").delay().fadeIn(500).fadeOut(500).fadeIn(500);
+    }
+
+    function CheckPendingPayments()
+    {
+        if (bInter != null)
+        {
+            clearInterval(bInter);
+            $("#dPending").fadeIn(500);
+        }
+
+        ExecuteAjax('@Url.Action("CheckPending","CashRegister")', {},
+            function (response) {
+                if (response.Result = "OK")
+                {
+                    $("#spPendingPayment").text(response.Count);
+
+                    if (response.Count > 0)
+                    {
+                        bInter = setInterval(PendingBlink, 2000);
+                    }
+                }
+            });
+    }
+
+    function OpenPending() {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("OpenPending","CashRegister")', {},
+           function (response) {
+               HideLoading();
+               if (!$.isPlainObject(response))
+                   $("#divModalPending").html(response);
+           });
+    }
+</script>

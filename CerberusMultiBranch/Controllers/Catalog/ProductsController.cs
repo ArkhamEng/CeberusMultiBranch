@@ -947,6 +947,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         bp.ProductId = product.ProductId;
                         bp.BranchId = branchId;
                         bp.Stock = product.Quantity;
+                        bp.BuyPrice = product.BuyPrice;
                         bp.LastStock = Cons.Zero;
                         bp.StorePercentage = product.StorePercentage;
                         bp.DealerPercentage = product.DealerPercentage;
@@ -1011,6 +1012,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         //actualizo precios y porcentajes 
                         bp.StorePercentage = product.StorePercentage;
                         bp.DealerPercentage = product.DealerPercentage;
+                        bp.BuyPrice = product.BuyPrice;
                         bp.WholesalerPercentage = product.WholesalerPercentage;
                         bp.WholesalerPrice = product.WholesalerPrice;
                         bp.DealerPrice = product.DealerPrice;

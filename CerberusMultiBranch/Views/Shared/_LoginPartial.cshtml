@@ -9,15 +9,20 @@
             <li>
                 @Html.Partial("_BranchOption")
             </li>
+
+           
+            @if (User.IsInRole("Vendedor"))
+            {
+                <li>
+                    @Html.Partial("_CartOption")
+                </li>
+            }
            
             <li>
-                @Html.Partial("_CartOption")
-            </li>
-            <li >
-                <a class="btn btn-danger" href="javascript:document.getElementById('logoutForm').submit()" 
+                <a class="btn btn-danger" href="javascript:document.getElementById('logoutForm').submit()"
                    style="color:whitesmoke !important;">
                     &nbsp;Salir
-                    <span class="glyphicon glyphicon-log-out" style="float:left" ></span>
+                    <span class="glyphicon glyphicon-log-out" style="float:left"></span>
                 </a>
             </li>
         </ul>

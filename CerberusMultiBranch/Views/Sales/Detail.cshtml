@@ -88,7 +88,7 @@
                         <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
                         @switch (Model.LastStatus)
                         {
-                            case TranStatus.OnRevision:
+                            case TranStatus.Revision:
                                 <label class="form-control alert alert-warning">Revisión</label>
                                 break;
                             case TranStatus.Canceled:
@@ -115,7 +115,7 @@
                         <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
                         @switch (Model.Status)
                         {
-                            case TranStatus.OnRevision:
+                            case TranStatus.Revision:
                                 <label class="form-control alert alert-warning">Revisión</label>
                                 break;
                             case TranStatus.Canceled:

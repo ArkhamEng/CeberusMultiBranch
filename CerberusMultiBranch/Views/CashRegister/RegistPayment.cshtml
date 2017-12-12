@@ -6,18 +6,20 @@
     ViewBag.Class = "fa fa-money";
 }
 
-@*<h3 class="alert alert-success col-md-4">
-    <span class="fa fa-building"></span>
-    Sucursal @Model.Branch.Name
-</h3>
 
-<h3 class="alert alert-danger col-md-3 col-md-offset-1">
-    Comisión @Model.ComAmount.ToString("c")
-</h3>*@
+@*<h3 class="alert alert-danger col-md-3 col-md-offset-1">
+        Comisión @Model.ComAmount.ToString("c")
+    </h3>*@
 
-<h3 class="alert alert-info col-md-3  col-md-offset-9" >
-    Total <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label> 
-</h3>
+<h4 class="alert alert-info col-md-4">
+    <span class="fa fa-briefcase"></span>
+    @Model.User.UserName
+</h4>
+
+<h4 class="alert alert-success col-md-3  col-md-offset-5" >
+    Total
+    <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label> 
+</h4>
 <hr />
 
 <div class="panel-group">
@@ -62,92 +64,6 @@
                         <span class="input-group-addon"><i class="fa fa-tag"></i></span>
                         <input class="form-control" value="@Model.Folio" readonly />
                     </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group col-md-3">
-                    <label class="control-label">
-                        Agente
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
-                        <input class="form-control" value="@Model.User.UserName" readonly />
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Estado Anterior
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
-                        @switch (Model.LastStatus)
-                        {
-                            case TranStatus.OnRevision:
-                                <label class="form-control alert alert-warning">Revisión</label>
-                                break;
-                            case TranStatus.Canceled:
-                                <label class="form-control alert alert-warning">Cancelado</label>
-                                break;
-                            case TranStatus.InProcess:
-                                <label class="form-control alert alert-danger">En Proceso</label>
-                                break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
-                            case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
-                                break;
-                        }
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Estado Actual
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
-                        @switch (Model.Status)
-                        {
-                            case TranStatus.OnRevision:
-                                <label class="form-control alert alert-warning">Revisión</label>
-                                break;
-                            case TranStatus.Canceled:
-                                <label class="form-control alert alert-warning">Cancelado</label>
-                                break;
-                            case TranStatus.InProcess:
-                                <label class="form-control alert alert-danger">En Proceso</label>
-                                break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
-                            case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
-                                break;
-                        }
-                    </div>
-                </div>
-                <div class="btn-group right col-md-offset-1 col-md-4" style="padding-top:25px !important;">
-                    <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
-                            onclick="ShowLoading(); window.location='@Url.Action("PaymentAndNote")'">
-                        <span class="fa fa-search-plus"></span>
-                        <u>B</u>úsqueda
-                    </button>
-                    @if (User.IsInRole("Supervisor"))
-                    {
-                        <button type="button" class="btn btn-danger" title="cancelar venta"
-                                onclick="$('#ModalCancel').modal('show');" id="btnCancel">
-                            <span class="fa fa-times"></span>
-                            <u>C</u>ancelar
-                        </button>
-                    }
-                    <button class="btn btn-success" type="button" id="btnPayment"
-                            onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
-                        <span class="fa fa-dollar"></span>
-                        <u>P</u>agar
-                    </button>
                 </div>
             </div>
         </div>
@@ -214,6 +130,32 @@
                     }
                 </tbody>
             </table>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
+                        onclick="ShowLoading(); window.location='@Url.Action("PaymentAndNote")'">
+                    <span class="fa fa-search-plus"></span>
+                    <u>B</u>úsqueda
+                </button>
+                @if (User.IsInRole("Supervisor"))
+                {
+                    <button type="button" class="btn btn-danger" title="cancelar venta"
+                            onclick="$('#ModalCancel').modal('show');" id="btnCancel">
+                        <span class="fa fa-times"></span>
+                        <u>C</u>ancelar
+                    </button>
+                }
+                <button class="btn btn-success" type="button" id="btnPayment"
+                        onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
+                    <span class="fa fa-dollar"></span>
+                    Recibir <u>P</u>ago
+                </button>
+                @*<button class="btn btn-info" type="button" id="btnPayment"
+                        onclick="$('#ModalPayment').modal('show')" title="Enviar a revision">
+                    <span class="fa fa-eye"></span>
+                    <u>R</u>evisión
+                </button>*@
+            </div>
+
         </div>
     </div>
 </div>
@@ -227,7 +169,7 @@
 <script>
     $(document).ready(function ()
     {
-        //Paginate("#tbDetails",5)
+       // Paginate("#tbDetails", 5)
     });
 
     function Cancel()
@@ -240,7 +182,7 @@
         ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
         {
             if (j.Result = 'OK')
-                window.location = '@Url.Action("PaymentAndNote")';
+                window.location = '@Url.Action("Index")';
             else
                 ShowMessage(j.Result, j.Message, 'warning');
         });
