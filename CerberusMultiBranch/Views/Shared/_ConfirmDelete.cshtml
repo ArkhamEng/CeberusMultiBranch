@@ -34,16 +34,15 @@
         {
             if (e.keyCode == 13)
             {
-                e.stopImmediatePropagation();
                 Delete();
             }
             else if (e.keyCode == 27)
             {
                 $("#ModalConfirmDelete").modal("hide");
             }
+
+            e.stopImmediatePropagation(); 
         }
-        // e.preventPropagation();
-        
-        
+       
     });
 </script>

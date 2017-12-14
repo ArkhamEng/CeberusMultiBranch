@@ -13,6 +13,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Commission)
                 </th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +29,16 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Commission)
                     </td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditCategory(@item.CategoryId)">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="DeleteCategory(@item.CategoryId)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -36,19 +47,35 @@
 <script>
     $(document).ready(function () 
     {
-        SetDataTable("#tbCategories", "#CategoryName")
+        Paginate("#tbCategories",10);
     });
 
-    function SelectCategory(id,name,code,commission) 
+    function EditCategory(id) 
     {
-        $("#CategoryId").val(id);
-        $("#CategoryName").val(name);
+        ShowLoading();
+        ExecuteAjax('@Url.Action("GetCategory","Configuration")', { categoryId: id }, function (response)
+        {
+            HideLoading();
+            if ($.isPlainObject(response))
+            {
 
-        $("#SatCode").val(code);
-        $("#Commission").val(commission);
+            }
+            else
+                $("#divCategoryEdition").html(response);
+        });
+    }
 
-        $("#btnClearCategory").show();
-        $("#spCategory").attr("class","glyphicon glyphicon-floppy-disk");
-        $("#btnCategory").attr("class","btn btn-success");
+    function DeleteCategory(id) {
+        ShowLoading();
+
+        ExecuteAjax("@Url.Action("DeleteCategory", "Configuration")", { id: id }, function (response) {
+            HideLoading();
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning');
+            else {
+                $("#divCategories").html(response);
+                ShowMessage("Operación exitosa", "La categoría  fue eliminada", "success");
+            }
+        });
     }
 </script>

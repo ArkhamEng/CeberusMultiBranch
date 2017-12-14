@@ -2,11 +2,14 @@
 
 
 
-<table id="tbClients" class="table  table-striped">
+<table id="tbClients" class="table  table-striped ">
     <thead>
         <tr>
             <th class="col-md-1">
                 @Html.DisplayNameFor(model => model.Code)
+            </th>
+            <th class="col-md-2">
+                @Html.DisplayNameFor(model => model.FTR)
             </th>
             <th class="col-md-3">
                 @Html.DisplayNameFor(model => model.Name)
@@ -14,9 +17,7 @@
             <th class="col-md-3">
                 @Html.DisplayNameFor(model => model.Address)
             </th>
-            <th class="col-md-2">
-                @Html.DisplayNameFor(model => model.FTR)
-            </th>
+          
             <th class="col-md-2">
                 @Html.DisplayNameFor(model => model.Phone)
             </th>
@@ -27,19 +28,20 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Address)
-                </td>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.FTR)
                 </td>
-                <td>
+                <td  class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td  class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+               
+                <td  class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
                 <td align="right">

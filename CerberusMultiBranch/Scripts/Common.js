@@ -18,6 +18,8 @@ function ShowMessage(title, text, cls)
    
     if (cls == 'success')
         $("#MessageContent").attr("class", "modal-content panel-success");
+    if(cls=='warning')
+        $("#MessageContent").attr("class", "modal-content panel-warning");
 
     $("#MessageTitle").html(title);
     $("#MessageText").html(text);

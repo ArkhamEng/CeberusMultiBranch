@@ -1,0 +1,92 @@
+﻿@model CerberusMultiBranch.Models.Entities.Config.PartSystem
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<form id="sysForm">
+    <div id="ModalSystem" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel panel-primary">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                        <i class="fa fa-book"></i>
+                        Edición de Sistemas 
+                    </h4>
+                </div>
+                <div class="modal-body panel-body">
+                    @Html.HiddenFor(model => model.PartSystemId)
+
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control", placeholder = "Nombre del sistema" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="SaveSystem()" id="btnSaveSystem">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                        <u>G</u>uardar                        
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#sysForm");
+        form.validate();
+
+        $("#ModalSystem").modal("show");
+
+    }).keydown(function (e)
+    {
+        if ($("#ModalSystem").hasClass('in'))
+        {
+            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71))
+            {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                $("#btnSaveSystem").click();
+            }
+        }
+    });
+
+    function SaveSystem()
+    {
+        var form = $("#sysForm");
+
+        if (!form.valid())
+        {
+            return;
+        }
+
+        $("#ModalSystem").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+            var sys =
+          {
+              PartSystemId: $("#PartSystemId").val(),
+              Name: $("#Name").val()
+          }
+
+            ExecuteAjax('@Url.Action("SaveSystem","Configuration")', { system: sys }, function (response)
+            {
+                HideLoading();
+                if ($.isPlainObject(response))
+                    ShowMessage(response.Result, response.Message, 'warning');
+                else 
+                    $("#divSystems").html(response);
+            });
+        });
+       
+        $("#ModalSystem").modal("hide");
+    }
+
+</script>

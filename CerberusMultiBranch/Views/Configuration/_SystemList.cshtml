@@ -1,0 +1,90 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.PartSystem>
+
+
+    <table id="tbSystems" class="table table-striped ">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayName("Categorias")
+                </th>
+                <th>
+                    @Html.DisplayName("Ultima Modificación")
+                </th>
+                <th>
+                    @Html.DisplayName("Usuario Modifico")
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr onmouseover="$(this).css('cursor', 'pointer')">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                       @item.SystemCategories.Count
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdUser)
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditSystem(@item.PartSystemId)">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="DeleteSystem(@item.PartSystemId)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+<script>
+    $(document).ready(function () 
+    {
+        Paginate("#tbSystems", 10);
+    });
+
+    function EditSystem(id) 
+    {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("GetSystem","Configuration")', { partSystemId: id }, function (response)
+        {
+            HideLoading();
+            if ($.isPlainObject(response))
+            {
+
+            }
+            else
+                $("#divSystemEdition").html(response);
+        });
+    }
+
+    function DeleteSystem(id)
+    {
+        ShowLoading();
+
+        ExecuteAjax("@Url.Action("DeleteSystem", "Configuration")", { id: id }, function (response)
+        {
+            HideLoading();
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning');
+            else
+            {
+                $("#divSystems").html(response);
+                ShowMessage("Operación exitosa","El Sistema seleccionado fue eliminado","success")
+            }
+        });
+    }
+</script>

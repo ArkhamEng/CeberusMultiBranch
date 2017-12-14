@@ -13,11 +13,24 @@ namespace CerberusMultiBranch.Models.Entities.Config
     {
         public int PartSystemId { get; set; }
 
+        [Required(ErrorMessage ="Se requiere un nombre de sistema")]
         [Display(Name = "Sistema")]
+        [MaxLength(50)]
+        [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
+
+        [Required]
+        public DateTime UpdDate { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
 
         public int Id { get { return PartSystemId; } }
 
         public ICollection<Product> Products { get; set; }
+
+        public ICollection<SystemCategory> SystemCategories { get; set; }
+
     }
 }

@@ -265,6 +265,18 @@
     <Compile Include="Migrations\201712120636173_FTRchanges.Designer.cs">
       <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712131808572_SystemCategoryRelation.cs" />
+    <Compile Include="Migrations\201712131808572_SystemCategoryRelation.Designer.cs">
+      <DependentUpon>201712131808572_SystemCategoryRelation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712132351308_CategoryChanges.cs" />
+    <Compile Include="Migrations\201712132351308_CategoryChanges.Designer.cs">
+      <DependentUpon>201712132351308_CategoryChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201712140435152_PartSystemChanges.cs" />
+    <Compile Include="Migrations\201712140435152_PartSystemChanges.Designer.cs">
+      <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -286,6 +298,7 @@
     <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
     <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
+    <Compile Include="Models\Entities\Config\SystemCategory.cs" />
     <Compile Include="Models\Entities\Config\UserBranch.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
@@ -310,6 +323,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
+    <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
@@ -524,6 +538,11 @@
     <Content Include="Views\Shared\_ConfirmDelete.cshtml" />
     <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
     <Content Include="Views\Shared\_PaymentOption.cshtml" />
+    <Content Include="Views\Configuration\_CategoryEdition.cshtml" />
+    <Content Include="Views\Configuration\_Systems.cshtml" />
+    <Content Include="Views\Configuration\_SystemList.cshtml" />
+    <Content Include="Views\Configuration\_SystemEdition.cshtml" />
+    <Content Include="Views\Configuration\SystemCategory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -584,6 +603,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712120636173_FTRchanges.resx">
       <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712131808572_SystemCategoryRelation.resx">
+      <DependentUpon>201712131808572_SystemCategoryRelation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712132351308_CategoryChanges.resx">
+      <DependentUpon>201712132351308_CategoryChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712140435152_PartSystemChanges.resx">
+      <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

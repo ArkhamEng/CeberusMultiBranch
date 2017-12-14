@@ -15,18 +15,33 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         [Display(Name="Categoría")]
         [MaxLength(100)]
-        [Index("IDX_Name", IsUnique = false)]
+        [Required(ErrorMessage ="Se requiere una descripción para la categoría")]
+        [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
 
         [MaxLength(30)]
+        [Required(ErrorMessage = "Clave SAT requerida")]
+        [Index("IDX_SatCode", IsUnique = true)]
         [Display(Name = "Clave SAT")]
         public string SatCode { get; set; }
 
        
         [Display(Name = "% Comision")]
+        [Required(ErrorMessage = "Se require un porcentaje de 0 a 100")]
         public int Commission { get; set; }
+
+        [Required]
+        public DateTime UpdDate { get; set; }
+
+        [Required]
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
 
 
         public int Id { get { return CategoryId; } }
+
+        public ICollection<Product> Products { get; set; }
+
+        public ICollection<SystemCategory> SystemCategories { get; set; }
     }
 }

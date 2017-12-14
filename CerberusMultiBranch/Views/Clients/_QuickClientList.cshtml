@@ -26,19 +26,19 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.FTR)
                 </td>
-                <td>
+                <td class="text-lowercase">
                    @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                <td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
                 <td style="text-align:right">

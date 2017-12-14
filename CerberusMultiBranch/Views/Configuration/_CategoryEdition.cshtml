@@ -1,0 +1,114 @@
+﻿@model CerberusMultiBranch.Models.Entities.Config.Category
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<form id="catForm">
+    <div id="ModalCategory" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel panel-primary">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                        <i class="fa fa-black-tie"></i>
+                        Edición de Categoría SAT
+                    </h4>
+                </div>
+                <div class="modal-body panel-body">
+                    @Html.HiddenFor(model => model.CategoryId)
+
+                    <div class="form-group col-md-6">
+                        @Html.LabelFor(model => model.SatCode, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                            @Html.EditorFor(model => model.SatCode, new { htmlAttributes = new { @class = "form-control", placeholder = "Clave del SAT" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.SatCode, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="form-group col-md-offset-2 col-md-4">
+                        @Html.LabelFor(model => model.Commission, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.Commission, new { htmlAttributes = new { @class = "form-control", placeholder = "Comisión" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Commission, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
+                            @Html.TextAreaFor(model => model.Name, new { @class = "form-control", placeholder = "Descripción del SAT" })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" onclick="SaveCategory()" id="btnSaveCategory">
+                        <span class="glyphicon glyphicon-floppy-disk"></span>
+                        <u>G</u>uardar                        
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#catForm");
+        form.validate();
+
+        $("#ModalCategory").modal("show");
+
+    }).keydown(function (e)
+    {
+        if ($("#ModalCategory").hasClass('in'))
+        {
+            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71))
+            {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                $("#btnSaveCategory").click();
+            }
+        }
+    });
+
+    function SaveCategory()
+    {
+        var form = $("#catForm");
+
+        if (!form.valid())
+        {
+            console.log("Valitation failed");
+            return;
+        }
+
+        $("#ModalCategory").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+            var cat =
+          {
+              CategoryId: $("#CategoryId").val(),
+              Name: $("#Name").val(),
+              SatCode: $("#SatCode").val(),
+              Commission: $("#Commission").val()
+          }
+
+            ExecuteAjax('@Url.Action("SaveCategory","Configuration")', { category: cat }, function (response)
+            {
+                HideLoading();
+                if ($.isPlainObject(response))
+                    ShowMessage(response.Result, response.Message, 'warning');
+                else 
+                    $("#divCategories").html(response);
+            });
+        });
+       
+        $("#ModalCategory").modal("hide");
+      
+    }
+
+</script>

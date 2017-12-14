@@ -1,20 +1,20 @@
 ﻿
-<div id="divCategoryEdition"></div>
+<div id="divSystemEdition"></div>
 
 <div class="panel panel-danger">
     <div class="panel-body">
         <div class="col-md-10">
             <div class="input-group ">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                @Html.TextBox("FilterCategory", "", htmlAttributes: new { @class = "form-control", placeholder = "Descripción o clave SAT" })
+                @Html.TextBox("FilterSystem", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre del sistema" })
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchCategory()">
+                    <button class="btn btn-primary" type="button" id="btnSearchSystem" onclick="SearchSystem()">
                         <span class="glyphicon glyphicon-search"></span>
                         <u>B</u>uscar
                     </button>
-                    <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateNew()">
+                    <button type="button" class="btn btn-success" id="btnCreateSystem" onclick="CreateSystem()">
                         <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>ueva
+                        <u>N</u>uevo
                     </button>
                 </span>
             </div>
@@ -23,7 +23,7 @@
 </div>
 
 <div>
-    <div id="divCategories"></div>
+    <div id="divSystems"></div>
 </div>
 
 
@@ -33,21 +33,21 @@
 
     });
 
-    function CreateNew() {
-        ExecuteAjax('@Url.Action("NewCategory", "Configuration")', {}, function (response) {
-            $("#divCategoryEdition").html(response);
+    function CreateSystem() {
+        ExecuteAjax('@Url.Action("NewSystem", "Configuration")', {}, function (response) {
+            $("#divSystemEdition").html(response);
         });
     }
 
-    function SearchCategory() {
+    function SearchSystem() {
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("SearchCategories","Configuration")',
-            { filter: $("#FilterCategory").val() }, function (response) {
+        ExecuteAjax('@Url.Action("SearchSystems","Configuration")',
+            { filter: $("#FilterSystem").val() }, function (response) {
                 if ($.isPlainObject(response))
                     ShowMessage(response.Result, response.Message, 'warning');
                 else
-                    $("#divCategories").html(response);
+                    $("#divSystems").html(response);
 
                 HideLoading();
             });
@@ -55,23 +55,27 @@
 
     $(document).keydown(function (e)
     {
-        if ($("#liCategory").hasClass('active')) {
-            if ($("#ModalCategory").hasClass('in') && e.which == 13) {
+        if ($("#liSystem").hasClass('active'))
+        {
+            if ($("#ModalSystem").hasClass('in') && e.which == 13) {
 
             }
+
+
             else {
                 if (e.which == 13 || (e.altKey && e.which == 66)) {
                     console.log("enter for search categories");
-                    $("#btnSearchCategory").click();
+                    $("#btnSearchSystem").click();
                 }
 
                 if (e.altKey && e.keyCode == 78) {
-                    $("#btnCreateCategory").click();
+                    $("#btnCreateSystem").click();
                 }
 
                 e.stopImmediatePropagation();
             }
         }
+
     });
 
 

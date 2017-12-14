@@ -1,25 +1,17 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
 
 @{
-    ViewBag.Title = "Configuraciones";
+    ViewBag.Title = "Configuracion Inicial";
+    ViewBag.Class = "fa fa-cogs";
 }
 
-<h3>
-    <span class="fa fa-cogs" style="float:left"></span>
-    &nbsp;&nbsp;Configuración del sistema
-</h3>
 
 
-
+<hr />
 <ul class="nav nav-tabs">
     <li class="active">
         <a data-toggle="tab" href="#Branches">
                 &nbsp;&nbsp;Sucursales<span class="fa fa-industry" style="float:left" />
-        </a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#Categories">
-                &nbsp;&nbsp;Categorias<span class="glyphicon glyphicon-list-alt" style="float:left" />
         </a>
     </li>
     <li>
@@ -38,9 +30,6 @@
     <div id="Branches" class="tab-pane fade in active">
         @Html.Partial("_Branches")
     </div>
-    <div id="Categories" class="tab-pane fade">
-        @Html.Partial("_Categories")
-    </div>
     <div id="Causes" class="tab-pane fade">
         @Html.Partial("_WithdrawalCause")
     </div>
@@ -49,6 +38,7 @@
         @Html.Partial("_Variables")
     </div>
 </div>
+
 
 
 

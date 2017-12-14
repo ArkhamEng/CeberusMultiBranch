@@ -5,14 +5,21 @@ using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Support;
 using System;
+using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
+    [Authorize(Roles = "Administrador")]
     public class ConfigurationController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult SystemCategory()
         {
             return View();
         }
@@ -26,7 +33,6 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         [HttpPost]
-
         public ActionResult SaveCause(string name)
         {
             db.WithdrawalCauses.Add(new Models.Entities.Operative.WithdrawalCause { Name = name, UserAdd = User.Identity.Name, InsDate = DateTime.Now });
@@ -56,40 +62,215 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         [HttpPost]
-        
-        public ActionResult SaveCategory(int? categoryId, string name,string satCode, int commission)
+        public ActionResult GetSystemConfig(int id)
         {
-            
-            if (ModelState.IsValid)
+            // obtengo las categorias configuradas
+            var selected = db.SystemCategories.Where(sc => sc.PartSystemId == id).
+                            Select(sc => sc.Category).ToList();
+
+            var cIds = selected.Select(c => c.CategoryId).ToList();
+
+            var available = db.Categories.Where(c => !cIds.Contains(c.CategoryId)).ToList();
+
+            return PartialView("");
+        }
+
+      
+
+      
+
+        #region Systems
+        [HttpPost]
+        public ActionResult NewSystem()
+        {
+            return PartialView("_SystemEdition");
+        }
+
+        [HttpPost]
+        public ActionResult GetSystem(int partSystemId)
+        {
+            var model = db.Systems.Find(partSystemId);
+            return PartialView("_SystemEdition", model);
+        }
+
+        [HttpPost]
+        public ActionResult SearchSystems(string filter)
+        {
+            string[] arr = new List<string>().ToArray();
+
+            if (filter != null && filter != string.Empty)
+                arr = filter.Trim().Split(' ');
+
+            var model = db.Systems.Include(s=> s.SystemCategories).Where(s =>
+            (filter == null || filter == string.Empty || arr.All(f => (s.Name).Contains(f))))
+            .OrderBy(c => c.Name).ToList();
+
+            return PartialView("_SystemList", model);
+        }
+
+        [HttpPost]
+        public ActionResult SaveSystem(PartSystem system)
+        {
+            try
             {
-                if (categoryId == null)
-                {
-                    var category = new Category {  Name = name,SatCode = satCode, Commission = commission };
-                    db.Categories.Add(category);
-                }
+                system.UpdDate = DateTime.Now.ToLocal();
+                system.UpdUser = User.Identity.Name;
+
+                if (system.PartSystemId == Cons.Zero)
+                    db.Systems.Add(system);
                 else
-                {
-                    var category = new Category
-                    { CategoryId = categoryId.Value, Name = name, SatCode = satCode, Commission = commission };
-                    db.Entry(category).State = EntityState.Modified;
-                }
+                    db.Entry(system).State = EntityState.Modified;
+
                 db.SaveChanges();
+
+                var model = db.Systems.Where(c => c.PartSystemId == system.PartSystemId).ToList();
+                return PartialView("_SystemList", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al  guardar sistema",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult DeleteSystem(int id)
+        {
+            try
+            {
+                var system = db.Systems.Find(id);
+
+                if (system != null)
+                {
+                    var pc = db.Products.Where(p => p.PartSystemId == system.PartSystemId).Count();
+
+                    if (pc == Cons.Zero)
+                    {
+                        db.Systems.Remove(system);
+                        db.SaveChanges();
+                    }
+                        
+                    else
+                        return Json(new
+                        {
+                            Result = "Imposible eliminar el sistema",
+                            Message = "Este sistema esta siendo usando en " + pc + " producto(s)"
+                        });
+                }
+
+                var model = db.Systems.OrderBy(s => s.Name).ToList();
+                return PartialView("_SystemList", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al  eliminar el sistema",
+                    Message = ex.Message
+                });
+            }
+        }
+        #endregion
+
+        #region Categories
+        [HttpPost]
+        public ActionResult NewCategory()
+        {
+            return PartialView("_CategoryEdition");
+        }
+
+        [HttpPost]
+        public ActionResult GetCategory(int categoryId)
+        {
+            var model = db.Categories.Find(categoryId);
+            return PartialView("_CategoryEdition",model);
+        }
+
+        [HttpPost]
+        public ActionResult SaveCategory(Category category)
+        {
+            try
+            {
+                category.UpdDate = DateTime.Now.ToLocal();
+                category.UpdUser = User.Identity.Name;
+
+                if (category.CategoryId == Cons.Zero)
+                    db.Categories.Add(category);
+                else
+                    db.Entry(category).State = EntityState.Modified;
+
+                db.SaveChanges();
+
+
+                var model = db.Categories.Where(c => c.SatCode == category.SatCode).ToList();
+                return PartialView("_CategoryList", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al Agregar la categoría", Message = ex.Message });
             }
 
-            var categories = db.Categories.OrderBy(c => c.CategoryId);
-            return PartialView("_CategoryList", categories);
         }
 
         [HttpPost]
-        public ActionResult GetCategories()
+        public ActionResult SearchCategories(string filter)
         {
-            var categories = db.Categories.OrderBy(c => c.CategoryId).ToList();
+            string[] arr = new List<string>().ToArray();
+
+            if (filter != null && filter != string.Empty)
+                arr = filter.Trim().Split(' ');
+
+            var categories = db.Categories.Where(c =>
+            (filter == null || filter == string.Empty || arr.All(s => (c.SatCode + " " + c.Name).Contains(s))))
+            .OrderBy(c => c.Name).ToList();
+
             return PartialView("_CategoryList", categories);
         }
 
+        [HttpPost]
+        public ActionResult DeleteCategory(int id)
+        {
+            try
+            {
+                var category = db.Categories.Find(id);
+
+                if (category != null)
+                {
+                    var pc = db.Products.Where(p => p.CategoryId == category.CategoryId).Count();
+
+                    if (pc == Cons.Zero)
+                    {
+                        db.Categories.Remove(category);
+                        db.SaveChanges();
+                    }
+                       
+                    else
+                        return Json(new
+                        {
+                            Result = "Imposible eliminar el la categoria SAT",
+                            Message = "Esta categoría esta siendo usanda en (" + pc + ") producto(s)"
+                        });
+                }
+
+                var model = db.Categories.OrderBy(s => s.Name).ToList();
+                return PartialView("_CategoryList", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al  eliminar la categoría",
+                    Message = ex.Message
+                });
+            }
+        }
+
+        #endregion
 
         [HttpPost]
-
         public ActionResult SaveBranch(int? branchId, string name)
         {
 
@@ -114,7 +295,7 @@ namespace CerberusMultiBranch.Controllers.Config
 
         public ActionResult GetBranches()
         {
-            var branches = db.Branches.OrderBy(b=> b.BranchId).ToList();
+            var branches = db.Branches.OrderBy(b => b.BranchId).ToList();
             return PartialView("_BranchList", branches);
         }
 

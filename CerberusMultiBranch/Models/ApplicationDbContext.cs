@@ -30,6 +30,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<PartSystem> Systems { get; set; }
 
+        public DbSet<SystemCategory> SystemCategories { get; set; }
+
         public DbSet<UserBranch> UserBranches { get; set; }
 
         public DbSet<State> States { get; set; }
