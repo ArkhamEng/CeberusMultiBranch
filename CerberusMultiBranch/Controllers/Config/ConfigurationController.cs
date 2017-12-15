@@ -6,6 +6,7 @@ using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
+using CerberusMultiBranch.Models.ViewModels.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
@@ -61,9 +62,28 @@ namespace CerberusMultiBranch.Controllers.Config
             return PartialView("_CategoryList", variables);
         }
 
+   
+
+        #region Systems
+        [HttpPost]
+        public ActionResult NewSystem()
+        {
+
+            return PartialView("_SystemEdition",new PartSystem());
+        }
+
+        [HttpPost]
+        public ActionResult GetSystem(int partSystemId)
+        {
+            var model = db.Systems.Find(partSystemId);
+            return PartialView("_SystemEdition", model);
+        }
+
         [HttpPost]
         public ActionResult GetSystemConfig(int id)
         {
+            var model = new SystemCategoryViewModel();
+
             // obtengo las categorias configuradas
             var selected = db.SystemCategories.Where(sc => sc.PartSystemId == id).
                             Select(sc => sc.Category).ToList();
@@ -72,25 +92,10 @@ namespace CerberusMultiBranch.Controllers.Config
 
             var available = db.Categories.Where(c => !cIds.Contains(c.CategoryId)).ToList();
 
-            return PartialView("");
-        }
+            model.AvailableCategories = available.ToSelectList();
+            model.AssignedCategories = selected;
 
-      
-
-      
-
-        #region Systems
-        [HttpPost]
-        public ActionResult NewSystem()
-        {
-            return PartialView("_SystemEdition");
-        }
-
-        [HttpPost]
-        public ActionResult GetSystem(int partSystemId)
-        {
-            var model = db.Systems.Find(partSystemId);
-            return PartialView("_SystemEdition", model);
+            return PartialView("_SystemCategory", model);
         }
 
         [HttpPost]
@@ -123,7 +128,8 @@ namespace CerberusMultiBranch.Controllers.Config
 
                 db.SaveChanges();
 
-                var model = db.Systems.Where(c => c.PartSystemId == system.PartSystemId).ToList();
+                var model = db.Systems.Include(s=> s.SystemCategories).
+                    Where(c => c.PartSystemId == system.PartSystemId).ToList();
                 return PartialView("_SystemList", model);
             }
             catch (Exception ex)
@@ -161,7 +167,7 @@ namespace CerberusMultiBranch.Controllers.Config
                         });
                 }
 
-                var model = db.Systems.OrderBy(s => s.Name).ToList();
+                var model = db.Systems.Include(s=> s.SystemCategories).OrderBy(s => s.Name).ToList();
                 return PartialView("_SystemList", model);
             }
             catch (Exception ex)
@@ -172,6 +178,50 @@ namespace CerberusMultiBranch.Controllers.Config
                     Message = ex.Message
                 });
             }
+        }
+
+        [HttpPost]
+        public ActionResult AddSystemCategory(SystemCategory sysCat)
+        {
+            try
+            {
+                var system = db.Systems.Find(sysCat.PartSystemId);
+                system.UpdDate = DateTime.Now.ToLocal();
+                system.UpdUser = User.Identity.Name;
+
+                sysCat.UpdDate = DateTime.Now.ToLocal();
+                sysCat.UpdUser = User.Identity.Name;
+                db.SystemCategories.Add(sysCat);
+
+                db.Entry(system).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return GetSystemConfig(sysCat.PartSystemId);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al agregar la categoría", Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult RemoveSystemCategory(int partSystemId, int categoryId)
+        {
+            var sysCat = db.SystemCategories.Find(partSystemId, categoryId);
+            
+            if(sysCat!=null)
+            {
+                var system = db.Systems.Find(partSystemId);
+                system.UpdDate = DateTime.Now.ToLocal();
+                system.UpdUser = User.Identity.Name;
+
+                db.SystemCategories.Remove(sysCat);
+
+                db.Entry(system).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            return GetSystemConfig(partSystemId);
         }
         #endregion
 
@@ -240,19 +290,22 @@ namespace CerberusMultiBranch.Controllers.Config
                 if (category != null)
                 {
                     var pc = db.Products.Where(p => p.CategoryId == category.CategoryId).Count();
+                    var scc = db.SystemCategories.Where(sc => sc.CategoryId == category.CategoryId).Count();
 
-                    if (pc == Cons.Zero)
+                    if (pc == Cons.Zero && scc == Cons.Zero)
                     {
                         db.Categories.Remove(category);
                         db.SaveChanges();
                     }
-                       
-                    else
+                    else if(pc> Cons.Zero)
+                    {
                         return Json(new
                         {
-                            Result = "Imposible eliminar el la categoria SAT",
-                            Message = "Esta categoría esta siendo usanda en (" + pc + ") producto(s)"
+                            Result = "Imposible eliminar la categoria SAT",
+                            Message = string.Format("Esta categoría esta siendo usada en {0} producto(s) "+
+                            "y ha sido configurada en {1} sistema(s)", pc, scc )
                         });
+                    }
                 }
 
                 var model = db.Categories.OrderBy(s => s.Name).ToList();

@@ -5,57 +5,94 @@
     int imgIndex = 0;
 }
 
-<div id="divCarousel" class="carousel slide" data-ride="carousel">
-    <div id="imgContainer" class="carousel-inner">
-        @foreach (var file in Model)
+<div class="btn-group-vertical  col-md-9 col-md-off-1">
+    <div id="divCarousel" class="carousel slide" data-ride="carousel">
+        <div id="imgContainer" class="carousel-inner">
+            @foreach (var file in Model)
             {
                 var imgSrc = file.Path;
                 var a = imgIndex == Decimal.Zero ? "active" : "";
 
-            <div id="div+@file.ProductImageId" class="item @a thumbnail">
-                <img src="@imgSrc" />
-                <div class="carousel-caption">
-                    <h4>
-                        <span class="glyphicon glyphicon-trash danger" onclick="DeleteImage(@file.ProductImageId)"></span>
-                    </h4>
+                <div id="div+@file.ProductImageId" class="item @a thumbnail">
+                    <img src="@imgSrc" />
+                    <div class="carousel-caption">
+                        <h4>
+                            <span class="glyphicon glyphicon-trash danger" onclick="DeleteImage(@file.ProductImageId)"></span>
+                        </h4>
+                    </div>
                 </div>
-            </div>
 
                 imgIndex++;
             }
 
-        @if (imgIndex == 0)
+            @if (imgIndex == 0)
             {
-            <div class="item active thumbnail">
-                <img src="~/Content/Images/sinimagen.jpg" />
-            </div>
+                <div class="item active thumbnail">
+                    <img src="~/Content/Images/sinimagen.jpg" />
+                </div>
             }
+        </div>
+
+        <a class="left carousel-control" href="#divCarousel" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+
+        <a class="right carousel-control" href="#divCarousel" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
 
-    <a class="left carousel-control" href="#divCarousel" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-        <span class="sr-only">Previous</span>
-    </a>
-
-    <a class="right carousel-control" href="#divCarousel" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right"></span>
-        <span class="sr-only">Next</span>
-    </a>
+    <label id="uplPicture" class="btn btn-primary">
+        <span class="fa fa-upload"></span>
+        Agregar Imagen al producto
+        <input type="file"  id="imgUploader" onchange="ImageLoaded()" style="display: none;">
+    </label>
 </div>
-
-
 <script>
-    $(document).ready(function () {
-
+    $(document).ready(function ()
+    {
         $("#Pictures").val("@imgIndex");
-
     });
 
-    function DeleteImage(id) {
-        console.log("Deleting Image Id: " + id);
+    function DeleteImage(id)
+    {
+        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response) {
+            $("#divImages").html(response);
+        });
+    }
 
-        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (view) {
-            $("#imgPartial").html(view);
+    function ImageLoaded()
+    {
+        var data = new FormData();
+        var files = $("#imgUploader").get(0).files
+
+        console.log(data);
+        console.log(files);
+
+        if (files.length > 0)
+        {
+            data.append("image", files[0]);
+            data.append("productId", $("#ProductId").val());
+        }
+        console.log("hasta aqui ok");
+
+        $.ajax({
+            url: '@Url.Action("SaveImage")',
+            type: "POST",
+            processData: false,
+            contentType: false,
+            data: data,
+            
+            success: function (response) {
+                $("#divImages").html(response);
+            },
+            error: function (er) {
+                alert(er);
+            }
+
         });
     }
 </script>
+

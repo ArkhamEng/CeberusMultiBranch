@@ -55,6 +55,17 @@ namespace CerberusMultiBranch.Controllers.Common
         }
 
         [HttpPost]
+        public JsonResult GetCategories(int parentId)
+        {
+            var list = db.SystemCategories.Where(sc => sc.PartSystemId == parentId).
+                Select(sc=> sc.Category).OrderBy(c=> c.Name).ToList();
+
+            list.ForEach(c => c.Name = c.Name + " | " + c.SatCode);
+
+            return Json(list.ToSelectList());
+        }
+
+        [HttpPost]
         public JsonResult GetModels(int parentId)
         {
             var list = db.CarModels.Where(m => m.CarMakeId == parentId).ToSelectList();

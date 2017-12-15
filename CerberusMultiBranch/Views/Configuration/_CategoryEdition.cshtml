@@ -38,7 +38,7 @@
                         @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
-                            @Html.TextAreaFor(model => model.Name, new { @class = "form-control", placeholder = "Descripción del SAT" })
+                            @Html.TextAreaFor(model => model.Name, new { @class = "form-control", placeholder = "Descripción del SAT",id="CategoryName" })
                         </div>
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
@@ -92,7 +92,7 @@
             var cat =
           {
               CategoryId: $("#CategoryId").val(),
-              Name: $("#Name").val(),
+              Name: $("#CategoryName").val(),
               SatCode: $("#SatCode").val(),
               Commission: $("#Commission").val()
           }

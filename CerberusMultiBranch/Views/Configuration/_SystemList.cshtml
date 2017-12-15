@@ -40,7 +40,7 @@
                             <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditSystem(@item.PartSystemId)">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="DeleteSystem(@item.PartSystemId)">
+                            <button type="button" class="btn btn-danger btn-xs" id="btnDeleteSystem" title="Eliminar" onclick="BeginDeleteSystem(@item.PartSystemId)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
@@ -49,7 +49,7 @@
             }
         </tbody>
     </table>
-
+<input hidden id="hdnSystemDel" />
 <script>
     $(document).ready(function () 
     {
@@ -71,8 +71,15 @@
         });
     }
 
-    function DeleteSystem(id)
+    function BeginDeleteSystem(id)
     {
+        $("#hdnSystemDel").val(id);
+        $("#ModalConfirmDelete").modal("show");
+    }
+
+    function DeleteSystem()
+    {
+        var id =  $("#hdnSystemDel").val();
         ShowLoading();
 
         ExecuteAjax("@Url.Action("DeleteSystem", "Configuration")", { id: id }, function (response)

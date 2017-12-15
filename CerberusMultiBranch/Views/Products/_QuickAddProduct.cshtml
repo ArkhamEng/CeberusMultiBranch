@@ -1,4 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+@using CerberusMultiBranch.Support
 
 @section Scripts
 {
@@ -7,130 +8,84 @@
 <script src="~/Scripts/jquery.validate.js"></script>
 <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 
+
+
 <form id="mForm">
     <div id="ModalQuickAddProduct" class="modal fade" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content panel panel-primary panel-group">
                 <div class="modal-header panel-heading">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Captura rápida de producto</h4>
+                    <h4 class="modal-title">
+                        <span class="fa fa-archive"></span>
+                        Edición de Producto
+                    </h4>
                 </div>
                 <div class="modal-body panel-body panel-group row">
 
-                    <div class="col-md-5 form-group">
-                        @Html.Label("Codigo", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
-                            @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a data-toggle="tab" href="#general">
+                                <span class="fa fa-columns"></span>
+                                Detalle
+                            </a>
+                        </li>
+
+                        @if (Model.ProductId > Cons.Zero)
+                        {
+                            <li>
+                                <a data-toggle="tab" href="#models">
+                                    <span class="fa fa-car"></span> Autos
+                                    <span class="bg-danger badge">
+                                        @Model.Compatibilities.Count
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#images">
+                                    <span class="fa fa-image"></span> Imagenes
+                                    <span class="bg-danger badge">
+                                        @Model.Images.Count
+                                    </span>
+                                </a>
+                            </li>
+                        }
+
+                        @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
+                        {
+                            <li><a data-toggle="tab" href="#detail">Productos del paquete </a></li>
+                        }
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="general" class="tab-pane fade in active">
+                            @Html.Partial("_GeneralData",Model)
                         </div>
-                        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group col-md-6 col-md-offset-1">
-                        @Html.Label("Sistema", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                            @Html.DropDownListFor(m => m.PartSystemId, Model.Systems, "", new { @class = "form-control text-uppercase", required = "true" })
+
+                        <div id="detail" class="tab-pane fade">
+                            <div id="divPackageDetails">
+                                @Html.Partial("_PackageDetails", Model.PackageDetails)
+                            </div>
                         </div>
-                        @Html.ValidationMessageFor(m => m.PartSystemId, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="form-group col-md-9">
-                        @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-                            @Html.DropDownListFor(m => m.CategoryId, Model.Categories, "", new { @class = "form-control text-uppercase" })
+
+                        <div id="models" class="tab-pane fade">
+                            <div>
+                                @Html.Partial("_CarModelSelector", Model)
+                            </div>
                         </div>
-                        @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
+                        <div id="images" class="tab-pane fade">
+                            <div>
+                                <div class="col-md-12" id="divImages" style="align-items:center">
+                                    @Html.Partial("_ImagesLoaded", Model.Images)
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-3 form-group">
-                        @Html.Label("Existencias", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                            @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", required = "true" } })
-                            @*<input type="number" name="intialAmount" id="intialAmount" class="form-control" required />*@
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
-                        @*@Html.ValidationMessage("intialAmount", "", new { @class = "text-danger" })*@
-                    </div>
-
-                    <div class="col-md-12 form-group">
-                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-                            @Html.TextAreaFor(model => model.Name, 2, 1, htmlAttributes: new { @class = "form-control text-uppercase" })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-6 form-group">
-                        @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-                            @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control text-uppercase", required = "true" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-3 form-group">
-                        @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
-                            @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control text-uppercase", required = "true" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-3 form-group">
-                        @Html.Label("Precio compra", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", required = "true" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-4 form-group">
-                        @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
-                        @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
-                    </div>
-                    <div class="col-md-4 form-group">
-                        @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
-                        @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="col-md-4 form-group">
-                        @Html.LabelFor(model => model.WholesalerPrice, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control" } })
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
-                        @Html.ValidationMessageFor(model => model.WholesalerPercentage, "", new { @class = "text-danger" })
-                    </div>
-
-                    <label class="text-danger" id="lblQuickAddError"></label>
-                    @Html.HiddenFor(model => model.ProductId)
-                    @Html.HiddenFor(model=> model.IsActive)
                 </div>
 
                 <div class="modal-footer">
-                  <button class="btn btn-success" id="btnQuickSave" onclick="Send()" type="button">
+                    <button class="btn btn-success" id="btnQuickSave" onclick="Send()" type="button">
                         <span class="glyphicon glyphicon-floppy-disk"></span>
                         <u>G</u>uardar
                     </button>
@@ -144,8 +99,9 @@
 </form>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
+        SetCascade("#PartSystemId", "#CategoryId", 'GetCategories');
+
         var form = $("#mForm");
         form.validate();
 
@@ -161,10 +117,20 @@
         $("#BuyPrice").keyup(SetPrice);
         $("#BuyPrice").click(SetPrice);
 
+    }).keydown(function (e)
+    {
+        if ($("#ModalQuickAddProduct").hasClass('in'))
+        {
+            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71))
+            {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                $("#btnQuickSave").click();
+            }
+        }
     });
 
-    function SetPrice()
-    {
+    function SetPrice() {
         var sp = (1 + $("#StorePercentage").val() / 100);
         var dp = (1 + $("#WholesalerPercentage").val() / 100);
         var wp = (1 + $("#DealerPercentage").val() / 100);
@@ -174,8 +140,7 @@
         $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
     }
 
-    function Send(providerId, code)
-    {
+    function Send(providerId, code) {
         $("lblQuickAddError").text("");
         var form = $("#mForm");
 
@@ -191,23 +156,19 @@
             ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val()
         };
         console.log(product);
-        $("#ModalQuickAddProduct").on('hidden.bs.modal', function ()
-        {
+        $("#ModalQuickAddProduct").on('hidden.bs.modal', function () {
             LookFor();
         });
 
-        if (product.ProductId == 0)
-        {
+        if (product.ProductId == 0) {
             var param = {
                 product: product, providerId: $("#ProviderId").val(),
                 code: $("#Code").val()
             };
 
 
-            ExecuteAjax('@Url.Action("Copy","Products")', param, function (response)
-            {
-                if (response.Result != 'OK')
-                {
+            ExecuteAjax('@Url.Action("Copy","Products")', param, function (response) {
+                if (response.Result != 'OK') {
                     $("lblQuickAddError").text(response.Message);
                 }
                 else {
@@ -222,14 +183,11 @@
             };
 
 
-            ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response)
-            {
-                if (response.Result != 'OK')
-                {
+            ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response) {
+                if (response.Result != 'OK') {
                     $("lblQuickAddError").text(response.Message);
                 }
-                else
-                {
+                else {
                     $("#ModalQuickAddProduct").modal('hide');
                     $("#txtName").val(response.Code);
                 }

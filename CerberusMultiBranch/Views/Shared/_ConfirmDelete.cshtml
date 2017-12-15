@@ -27,11 +27,11 @@
 </div>
 
 <script>
-
     $(document).keydown(function (e)
     {
         if ($("#ModalConfirmDelete").hasClass('in'))
         {
+            e.preventDefault();
             if (e.keyCode == 13)
             {
                 Delete();

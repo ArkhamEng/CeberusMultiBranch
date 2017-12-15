@@ -13,13 +13,19 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Commission)
                 </th>
+                <th>
+                    @Html.DisplayName("Fecha Mod")
+                </th>
+                <th>
+                    @Html.DisplayName("Usuario Mod")
+                </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr onmouseover="$(this).css('cursor', 'pointer')" onclick="SelectCategory('@item.CategoryId','@item.Name','@item.SatCode','@item.Commission')">
+                <tr>
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
@@ -30,11 +36,17 @@
                         @Html.DisplayFor(modelItem => item.Commission)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.UpdDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UpdUser)
+                    </td>
+                    <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditCategory(@item.CategoryId)">
                                 <span class="glyphicon glyphicon-pencil"></span>
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="DeleteCategory(@item.CategoryId)">
+                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="BeginDeleteCategory(@item.CategoryId)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
@@ -43,7 +55,7 @@
             }
         </tbody>
     </table>
-
+<input type="hidden" id="hdnCategoryDel" />
 <script>
     $(document).ready(function () 
     {
@@ -65,7 +77,16 @@
         });
     }
 
-    function DeleteCategory(id) {
+    function BeginDeleteCategory(id)
+    {
+        $("#hdnCategoryDel").val(id);
+        $("#ModalConfirmDelete").modal("show");
+    }
+
+    function DeleteCategory()
+    {
+        console.log("deleting");
+        var id = $("#hdnCategoryDel").val();
         ShowLoading();
 
         ExecuteAjax("@Url.Action("DeleteCategory", "Configuration")", { id: id }, function (response) {

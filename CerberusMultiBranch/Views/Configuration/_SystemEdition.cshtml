@@ -25,6 +25,13 @@
                         </div>
                         @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                     </div>
+
+                    @if (Model.PartSystemId > 0)
+                    {
+                        <div id="divSystemCategory">
+                           
+                        </div>
+                    }
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-success" onclick="SaveSystem()" id="btnSaveSystem">
@@ -40,6 +47,8 @@
 <script>
     $(document).ready(function ()
     {
+        GetAssignedCategories();
+
         var form = $("#sysForm");
         form.validate();
 
@@ -57,6 +66,18 @@
             }
         }
     });
+
+    function GetAssignedCategories()
+    {
+        if($("#PartSystemId").val() != 0)
+        {
+            ExecuteAjax('@Url.Action("GetSystemConfig", "Configuration")', { id: $("#PartSystemId").val() },
+                function (response)
+                {
+                    $("#divSystemCategory").html(response);
+                });
+        }
+    }
 
     function SaveSystem()
     {
@@ -81,11 +102,11 @@
                 HideLoading();
                 if ($.isPlainObject(response))
                     ShowMessage(response.Result, response.Message, 'warning');
-                else 
+                else
                     $("#divSystems").html(response);
             });
         });
-       
+
         $("#ModalSystem").modal("hide");
     }
 

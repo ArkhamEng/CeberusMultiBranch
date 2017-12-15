@@ -53,17 +53,19 @@
             });
     }
 
-    $(document).keydown(function (e)
-    {
+    $(document).keydown(function (e) {
         if ($("#liSystem").hasClass('active'))
         {
-            if ($("#ModalSystem").hasClass('in') && e.which == 13) {
-
+            if ($("#ModalSystem").hasClass('in') || $("#ModalConfirmDelete").hasClass('in'))
+            {
+                return;
             }
+            else
+            {
+                console.log("Click entes on system");
 
-
-            else {
-                if (e.which == 13 || (e.altKey && e.which == 66)) {
+                if (e.which == 13 || (e.altKey && e.which == 66))
+                {
                     console.log("enter for search categories");
                     $("#btnSearchSystem").click();
                 }
@@ -75,7 +77,6 @@
                 e.stopImmediatePropagation();
             }
         }
-
     });
 
 

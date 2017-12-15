@@ -5,6 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <hr />
+
+@Html.Partial("_ConfirmDelete");
+
 <ul class="nav nav-tabs">
     <li id="liSystem" class="active">
         <a data-toggle="tab" href="#Systems">
@@ -27,3 +30,20 @@
         @Html.Partial("_Categories")
     </div>
 </div>
+
+<script>
+    function Delete()
+    {
+        $("#ModalConfirmDelete").modal("hide");
+
+        if ($("#liSystem").hasClass('active'))
+        {
+            DeleteSystem();
+        }
+
+        if ($("#liCategory").hasClass('active'))
+        {
+            DeleteCategory();
+        }
+    }
+</script>

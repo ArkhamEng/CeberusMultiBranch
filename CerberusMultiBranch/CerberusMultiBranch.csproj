@@ -543,6 +543,8 @@
     <Content Include="Views\Configuration\_SystemList.cshtml" />
     <Content Include="Views\Configuration\_SystemEdition.cshtml" />
     <Content Include="Views\Configuration\SystemCategory.cshtml" />
+    <Content Include="Views\Configuration\_SystemCategory.cshtml" />
+    <Content Include="Views\Products\_GeneralData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

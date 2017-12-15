@@ -177,17 +177,21 @@
 
     $(document).keydown(function (e)
     {
-        if (e.which == 13 || (e.altKey && e.which == 66))
+        if (!$("#ModalQuickAddProduct").hasClass('in'))
         {
-            console.log("OnPage");
-            $("#btnSearch").click();
-        }
+            if (e.which == 13 || (e.altKey && e.which == 66)) {
+                console.log("OnPage");
+                $("#btnSearch").click();
+            }
 
-        if (e.altKey && e.keyCode == 76) {
-            $("#btnClear").click();
-        }
-        if (e.altKey && e.keyCode == 78) {
-            $("#btnCreate").click();
+            if (e.altKey && e.keyCode == 76) {
+                $("#btnClear").click();
+            }
+            if (e.altKey && e.keyCode == 78) {
+                $("#btnCreate").click();
+            }
+
+            e.stopPropagation();
         }
     });
 

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -529,6 +530,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var branchId = User.Identity.GetBranchId();
 
+            var cats = new List<Category>();
             ProductViewModel model;
             if (id == null)
             {
@@ -546,7 +548,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     Include(p => p.PackageDetails).
                     Include(p => p.Compatibilities).FirstOrDefault(p => p.ProductId == id);
 
-
                 var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
                 product.Quantity = bp != null ? bp.Stock : Cons.Zero;
                 product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
@@ -559,17 +560,20 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 product.Row = bp != null ? bp.Row : string.Empty;
                 product.Row = bp != null ? bp.Ledge : string.Empty;
 
+                if (product.PartSystemId > Cons.Zero)
+                {
+                    cats = db.SystemCategories.Where(sc => sc.PartSystemId == product.PartSystemId).
+                        Select(sc => sc.Category).OrderBy(c => c.Name).ToList();
 
+                    cats.ForEach(c => c.Name += " | " + c.SatCode);
+                }
 
                 model = new ProductViewModel(product);
             }
 
-            var categories = db.Categories.ToList();
-            categories.ForEach(c => c.Name = c.Name + " - " + c.SatCode);
-
-            model.Categories = categories.ToSelectList();
-            model.CarMakes = db.CarMakes.ToSelectList();
-            model.Systems = db.Systems.ToSelectList();
+            model.Categories = cats.ToSelectList();
+            model.CarMakes   = db.CarMakes.ToSelectList();
+            model.Systems    = db.Systems.ToSelectList();
             return View(model);
         }
 
@@ -621,14 +625,46 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 Where(pkD => pkD.PackageId == packagedId).ToList();
 
             return PartialView("_PackageDetails", model);
+        }
 
+        [HttpPost]
+        public ActionResult SaveImage()
+        {
+            var productId = System.Web.HttpContext.Current.Request.Form["productId"].ToInt();
+            if (System.Web.HttpContext.Current.Request.Files.AllKeys.Any())
+            {
+                var file = System.Web.HttpContext.Current.Request.Files["image"];
+                
+              
+                if (file.ContentLength > 0)
+                {
+                    if (file != null)
+                    {
+                        ProductImage f = new ProductImage();
+
+                        f.Path = FileManager.SaveImage(file, productId.ToString(), ImageType.Products);
+                        f.ProductId = productId;
+                        f.Name = file.FileName;
+                        f.Type = file.ContentType;
+                        f.Size = file.ContentLength;
+
+                        db.ProductImages.Add(f);
+                        db.SaveChanges();
+                    }
+                }
+            }
+
+            var images = db.ProductImages.Where(i => i.ProductId == productId);
+            return PartialView("_ImagesLoaded", images);
         }
 
         [HttpPost]
         public ActionResult QuickEdit(int productId)
         {
             var branchId = User.Identity.GetBranchId();
-            var product = db.Products.Include(p=> p.BranchProducts).FirstOrDefault(p=> p.ProductId == productId);
+            var product = db.Products.Include(p=> p.BranchProducts).
+                Include(p=> p.Compatibilities).Include(p=> p.Images).
+                FirstOrDefault(p=> p.ProductId == productId);
 
             var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
 
@@ -642,16 +678,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
             product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
             product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
        
-
             ProductViewModel vm = new ProductViewModel(product);
 
-            //obtengo categorias
-            var cats = db.Categories.ToList();
-            cats.ForEach(c => c.Name += " - " + c.SatCode);
+            List<Category> cats = new List<Category>();
 
+            if (vm.PartSystemId > Cons.Zero)
+            {
+                cats = db.SystemCategories.Where(sc=> sc.PartSystemId == vm.PartSystemId).
+                    Select(sc=> sc.Category).OrderBy(c=> c.Name).ToList();
+
+                cats.ForEach(c => c.Name += " | " + c.SatCode);
+            }
+         
             vm.Categories = cats.ToSelectList();
             vm.Systems = db.Systems.ToSelectList();
 
+            if(vm.ProductId> Cons.Zero)
+            {
+                vm.CarMakes = db.CarMakes.ToSelectList();
+                vm.Systems = db.Systems.ToSelectList();
+            }
+          
 
             if (vm.StorePercentage <= Cons.Zero)
             {
@@ -673,11 +720,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             ProductViewModel vm = new ProductViewModel();
 
-            var cats = db.Categories.ToList();
-            cats.ForEach(c => c.Name += " - " + c.SatCode);
-
             vm.IsActive = true;
-            vm.Categories = cats.ToSelectList();
+            vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
             vm.Systems = db.Systems.ToSelectList();
             vm.Name = ep.Description;
             vm.TradeMark = ep.TradeMark;
@@ -1027,6 +1071,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     int i = Cons.Zero;
 
+                    /*
                     //Guardado Imagenes
                     foreach (var file in product.Files)
                     {
@@ -1044,7 +1089,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                             i++;
                         }
-                    }
+                    }*/
 
                     //if (i > Cons.Zero)
                     db.SaveChanges();
