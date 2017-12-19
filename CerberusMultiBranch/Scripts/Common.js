@@ -6,6 +6,20 @@
     });
 });
 
+//CONFIRM WINDOW FUNCTIONS
+function ShowConfirm(header, text, backdrop, action)
+{
+    $("#cnfHeader").text(header);
+    $("#cnfText").text(text);
+    $("#ModalConfirm").modal({backdrop:backdrop});
+
+    $("#btnConfirm").click(function ()
+    {
+        $("#ModalConfirm").modal("hide");
+        $("#btnConfirm").off("click");
+        action();
+    });
+}
 
 
 function GetCurrency(value)
@@ -138,7 +152,9 @@ function Search(url, data, target)
     });
 }
 
-function Paginate(table, records) {
+function Paginate(table, records)
+{
+    console.log("pagining");
     var oTable = $(table).DataTable(
        {
            destroy: true,

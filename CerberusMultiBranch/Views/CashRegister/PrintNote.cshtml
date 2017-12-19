@@ -286,7 +286,7 @@
                     Folio <br/> @Model.Folio
                 </td>
                 <td align="center">
-                    Fecha <br /> @Model.TransactionDate.ToString("dd/mm/yyyy")
+                    Fecha <br /> @Model.TransactionDate.ToString("dd/MM/yyyy")
                 </td>
             </tr>
             <tr>
@@ -335,7 +335,9 @@
                                     
                                 </td>
                             </tr>
-                            if (tI.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
+
+                            <tr><td colspan="4" style="height:10px"></td></tr>
+                            @*if (tI.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
                             {
                                 <tr style="border-bottom:solid 1px gray;">
                                     <td colspan="4" class="text-uppercase text-center" style="height:10px">
@@ -345,8 +347,7 @@
                             else
                             {
                                 <tr><td colspan="4" style="height:10px"></td></tr>
-                            }
-
+                            }*@
                         }
                         <tr>
                             <td colspan="4" style="height:20px"></td>
@@ -358,9 +359,13 @@
                                 @Model.TotalAmount.ToString("c")
                             </td>
                         </tr>
+                        <tr style="height:60px">
+                            <td colspan="4" />
+                        </tr>
                         <tr style="height:30px">
                             <td colspan="4" align="center">
-                                NO VALIDO COMO PROMPRANTE FISCAL
+                                <br/><br /><br />
+                                NO VALIDO COMO COMPROBANTE FISCAL
                             </td>
                         </tr>
                         <tr style="height:30px">
@@ -372,14 +377,13 @@
                 </td>
             </tr>
         </table>
-
     </div>
 </div>
 
 <div class="btn-group">
     <button class="btn btn-primary" type="button" onclick="window.location='@Url.Action("Index")'">
-        <span class="fa fa-search"></span>
-        Buscar
+        <span class="fa fa-backward"></span>
+        Volver a Cajar
     </button>
     <button class="btn btn-success" type="button" onclick="PrintNote()">
         <span class="fa fa-print"></span>

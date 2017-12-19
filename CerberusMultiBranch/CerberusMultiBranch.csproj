@@ -535,7 +535,7 @@
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
     <Content Include="Views\Products\_QuickAddProduct.cshtml" />
     <Content Include="Views\CashRegister\RegistPayment - Copy.cshtml" />
-    <Content Include="Views\Shared\_ConfirmDelete.cshtml" />
+    <Content Include="Views\Shared\_Confirm.cshtml" />
     <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
     <Content Include="Views\Shared\_PaymentOption.cshtml" />
     <Content Include="Views\Configuration\_CategoryEdition.cshtml" />
@@ -545,6 +545,7 @@
     <Content Include="Views\Configuration\SystemCategory.cshtml" />
     <Content Include="Views\Configuration\_SystemCategory.cshtml" />
     <Content Include="Views\Products\_GeneralData.cshtml" />
+    <Content Include="Views\Clients\_ClientEdition.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -615,6 +616,9 @@
     <EmbeddedResource Include="Migrations\201712140435152_PartSystemChanges.resx">
       <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -8,14 +8,12 @@
 
 <hr />
 
-
-
 <div id="pnlFilters" class="panel panel-danger top">
     <div class="panel-body">
-        <div class="col-md-11">
+        <div class="col-md-12">
             <div class="input-group">
                 @Html.DropDownList("SystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
-                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
+                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
                 <div class="input-group-btn">
                     <button class="btn btn-default btn-lg hidden-xs hidden-sm" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
                         <span class="fa fa-binoculars"></span>
@@ -46,11 +44,9 @@
                 <span class="glyphicon glyphicon-refresh" />
             </button>*@
 
-
-
         <br /><br />
         <br /><br />
-        <div  class="col-md-10 hidden-xs hidden-sm">
+        <div class="col-md-10 hidden-xs hidden-sm">
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-registered"></i></span>
                 @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
@@ -87,15 +83,11 @@
 
 <div id="divQuickAdd">
 </div>
- 
-@Html.Partial("_ConfirmDelete")
 
 <script>
 
-    $(document).ready(function ()
-    {
-        $("#CarMakeId").change(function ()
-        {
+    $(document).ready(function () {
+        $("#CarMakeId").change(function () {
             CascadeMake();
         });
 
@@ -103,49 +95,61 @@
             CascadeModel();
         });
 
-        $("#btnCreate").click(function () { window.location = '@Url.Action("Create","Products")'; });
-
-        $("#btnSearch").click(function () {
-            LookFor();
-        });
-
-        $("#btnSearchProvider").click(function ()
+        $("#btnCreate").click(function ()
         {
-            var f = $("#txtName").val();
-
-            if (f.length < 3)
-            {
-                ShowMessage("Datos insuficientes!", "Para realizar una busqueda en el catálogo de proveedores"
-                    + "es necesario ingresar por lo menos 3 caracteres en el filtro de descripción / código","warning");
-                return;
-            }
-
             ShowLoading();
-            ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response)
+            ExecuteAjax('@Url.Action("Edit","Products")', {}, function (response)
             {
                 HideLoading();
-                if($.isPlainObject(response))
+                if ($.isPlainObject(response))
                 {
+                    console.log("response plain object");
+                    console.log(response);
                     ShowMessage(response.Result, response.Message, "warning");
                 }
                 else
                 {
+                    console.log("response partial");
+                    console.log(response);
+                    $("#divQuickAdd").html(response)
+                }
+            });
+        });
+
+        $("#btnSearch").click(function ()
+        {
+            LookFor();
+        });
+
+        $("#btnSearchProvider").click(function () {
+            var f = $("#txtName").val();
+
+            if (f.length < 3) {
+                ShowMessage("Datos insuficientes!", "Para realizar una busqueda en el catálogo de proveedores"
+                    + "es necesario ingresar por lo menos 3 caracteres en el filtro de descripción / código", "warning");
+                return;
+            }
+
+            ShowLoading();
+            ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response) {
+                HideLoading();
+                if ($.isPlainObject(response)) {
+                    ShowMessage(response.Result, response.Message, "warning");
+                }
+                else {
                     $("#divProviderProducts").html(response);
                 }
             });
         });
 
-        $("#btnSwitch").click(function ()
-        {
-            if ($("#IsGrid").val() != 'false')
-            {
+        $("#btnSwitch").click(function () {
+            if ($("#IsGrid").val() != 'false') {
                 $("#IsGrid").val('false');
                 LookFor();
                 $("#spSwitch").attr("class", "fa fa-th-large");
                 $("#btnSwitch").prop("title", "ver como tabla");
             }
-            else
-            {
+            else {
                 $("#IsGrid").val('true');
                 LookFor();
                 $("#spSwitch").attr("class", "fa fa-list");
@@ -156,8 +160,8 @@
         $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
     });
 
-    function LookFor()
-    {
+    function LookFor() {
+
         ShowLoading();
         var data =
         {
@@ -170,17 +174,16 @@
             partSystemId: $("#SystemId").val()
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view) {
+
             HideLoading();
+
             $("#divProducts").html(view);
         });
     }
 
-    $(document).keydown(function (e)
-    {
-        if (!$("#ModalQuickAddProduct").hasClass('in'))
-        {
+    $(document).keydown(function (e) {
+        if (!$("#ModalQuickAddProduct").hasClass('in')) {
             if (e.which == 13 || (e.altKey && e.which == 66)) {
-                console.log("OnPage");
                 $("#btnSearch").click();
             }
 
@@ -191,7 +194,7 @@
                 $("#btnCreate").click();
             }
 
-            e.stopPropagation();
+            e.stopImmediatePropagation();
         }
     });
 

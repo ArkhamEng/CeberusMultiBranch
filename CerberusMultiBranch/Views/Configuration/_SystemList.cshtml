@@ -62,10 +62,7 @@
         ExecuteAjax('@Url.Action("GetSystem","Configuration")', { partSystemId: id }, function (response)
         {
             HideLoading();
-            if ($.isPlainObject(response))
-            {
-
-            }
+            if ($.isPlainObject(response)){ }
             else
                 $("#divSystemEdition").html(response);
         });
@@ -74,11 +71,14 @@
     function BeginDeleteSystem(id)
     {
         $("#hdnSystemDel").val(id);
-        $("#ModalConfirmDelete").modal("show");
+
+        ShowConfirm("¿Quieres eliminar el sistema?", "Al realizar esta acción no se podra recuperar el registro",
+            true,DeleteSystem);
     }
 
     function DeleteSystem()
     {
+        console.log("Deleting system");
         var id =  $("#hdnSystemDel").val();
         ShowLoading();
 

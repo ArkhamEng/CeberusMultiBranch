@@ -23,14 +23,37 @@
 </div>
 
 <div>
-    <div id="divCategories"></div>
+    <div id="divCategories">
+        @Html.Partial("_CategoryList", new List<CerberusMultiBranch.Models.Entities.Config.Category>())
+    </div>
 </div>
 
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready().keydown(function (e)
+    {
+        if ($("#liCategory").hasClass('active'))
+        {
+            if ($("#ModalCategory").hasClass('in'))
+            {
+                console.log("category tab no hace nada")
+            }
+            else
+            {
+                if (e.which == 13 || (e.altKey && e.which == 66))
+                {
+                    console.log("enter for search categories");
+                    $("#btnSearchCategory").click();
+                }
 
+                if (e.altKey && e.keyCode == 78)
+                {
+                    $("#btnCreateCategory").click();
+                }
+                e.stopImmediatePropagation();
+            }
+        }
     });
 
     function CreateNew() {
@@ -39,7 +62,8 @@
         });
     }
 
-    function SearchCategory() {
+    function SearchCategory()
+    {
         ShowLoading();
 
         ExecuteAjax('@Url.Action("SearchCategories","Configuration")',
@@ -52,27 +76,5 @@
                 HideLoading();
             });
     }
-
-    $(document).keydown(function (e)
-    {
-        if ($("#liCategory").hasClass('active')) {
-            if ($("#ModalCategory").hasClass('in') && e.which == 13) {
-
-            }
-            else {
-                if (e.which == 13 || (e.altKey && e.which == 66)) {
-                    console.log("enter for search categories");
-                    $("#btnSearchCategory").click();
-                }
-
-                if (e.altKey && e.keyCode == 78) {
-                    $("#btnCreateCategory").click();
-                }
-
-                e.stopImmediatePropagation();
-            }
-        }
-    });
-
 
 </script>

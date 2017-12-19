@@ -91,16 +91,9 @@
                         </div>
                         <div class="col-md-3 col-md-offset-2" id="divProductType">
                             @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
-                            @*@if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
-                            {*@
                                 @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase" })
                                 @Html.HiddenFor(model => model.ProductType)
-                            @*}
-                            else
-                            {
-                                @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control", disabled = "true" })
-                            }*@
-
+                          
                         </div>
 
                        

@@ -132,9 +132,9 @@
             </table>
             <div class="btn-group">
                 <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
-                        onclick="ShowLoading(); window.location='@Url.Action("PaymentAndNote")'">
-                    <span class="fa fa-search-plus"></span>
-                    <u>B</u>úsqueda
+                        onclick="ShowLoading(); window.location='@Url.Action("Index")'">
+                    <span class="fa fa-backward"></span>
+                    <u>V</u>olver a cája
                 </button>
                 @if (User.IsInRole("Supervisor"))
                 {
@@ -149,11 +149,6 @@
                     <span class="fa fa-dollar"></span>
                     Recibir <u>P</u>ago
                 </button>
-                @*<button class="btn btn-info" type="button" id="btnPayment"
-                        onclick="$('#ModalPayment').modal('show')" title="Enviar a revision">
-                    <span class="fa fa-eye"></span>
-                    <u>R</u>evisión
-                </button>*@
             </div>
 
         </div>
@@ -211,7 +206,7 @@
             $("#btnCancel").click();
         }
 
-        if (e.altKey && e.keyCode == 66)
+        if (e.altKey && e.keyCode == 86)
         {
             $("#btnSearch").click();
         }

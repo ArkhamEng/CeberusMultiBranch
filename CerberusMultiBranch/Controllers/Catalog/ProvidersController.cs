@@ -31,7 +31,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string name, string phone)
+        public ActionResult Search(int? stateId, int? cityId, string name, string ftr)
         {
             string[] arr = new List<string>().ToArray();
 
@@ -43,7 +43,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
                              (stateId == null || c.City.StateId == stateId) &&
                              (cityId == null || c.CityId == cityId) &&
-                             (phone == null || phone == string.Empty || c.Phone == phone)
+                             (ftr == null || ftr == string.Empty || c.FTR == ftr)
                          select c).ToList();
 
             return PartialView("_List", model);

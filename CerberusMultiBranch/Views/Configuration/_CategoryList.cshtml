@@ -1,6 +1,5 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
 
-
     <table id="tbCategories" class="table table-striped ">
         <thead>
             <tr>
@@ -68,10 +67,7 @@
         ExecuteAjax('@Url.Action("GetCategory","Configuration")', { categoryId: id }, function (response)
         {
             HideLoading();
-            if ($.isPlainObject(response))
-            {
-
-            }
+            if ($.isPlainObject(response)){}
             else
                 $("#divCategoryEdition").html(response);
         });
@@ -80,12 +76,13 @@
     function BeginDeleteCategory(id)
     {
         $("#hdnCategoryDel").val(id);
-        $("#ModalConfirmDelete").modal("show");
+        ShowConfirm("¿Estas seguro de borrar esta categoría?",
+            "una vez eliminada no se podra agregar a ningun sistema o producto", true, DeleteCategory);
     }
 
     function DeleteCategory()
     {
-        console.log("deleting");
+        console.log("deleting category");
         var id = $("#hdnCategoryDel").val();
         ShowLoading();
 

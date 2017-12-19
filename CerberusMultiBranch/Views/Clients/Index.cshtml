@@ -11,10 +11,10 @@
     <div class="panel-body">
         <div class="col-md-10">
             <div class="input-group ">
-                @Html.TextBox("Phone", "", htmlAttributes: new
+                @Html.TextBox("Ftr", "", htmlAttributes: new
            {
                @class = "form-control",
-               placeholder = "Teléfono",
+               placeholder = "RFC",
                style = "width:30%"
            })
                 @Html.TextBox("txtName", "", htmlAttributes: new
@@ -80,7 +80,7 @@
         $("#btnSearch").click(function ()
         {
             ShowLoading();
-            var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#txtName").val(), phone: $("#Phone").val() };
+            var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#txtName").val(), ftr: $("#Ftr").val() };
 
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
