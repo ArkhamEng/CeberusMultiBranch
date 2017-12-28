@@ -27,7 +27,7 @@ function GetCurrency(value)
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
 
-function ShowMessage(title, text, cls)
+function ShowMessage(title, text, cls, backdrop)
 {
    
     if (cls == 'success')
@@ -38,7 +38,7 @@ function ShowMessage(title, text, cls)
     $("#MessageTitle").html(title);
     $("#MessageText").html(text);
     $("#MessageImage").attr("src", "/Content/Images/" + cls + ".png");
-    $("#MessageBox").modal();
+    $("#MessageBox").modal({ backdrop: backdrop });
 }
 
 function ShowLoading()

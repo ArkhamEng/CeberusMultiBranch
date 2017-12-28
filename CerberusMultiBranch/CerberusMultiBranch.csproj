@@ -277,6 +277,10 @@
     <Compile Include="Migrations\201712140435152_PartSystemChanges.Designer.cs">
       <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712280219324_reservedProduct.cs" />
+    <Compile Include="Migrations\201712280219324_reservedProduct.Designer.cs">
+      <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -615,6 +619,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712140435152_PartSystemChanges.resx">
       <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712280219324_reservedProduct.resx">
+      <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

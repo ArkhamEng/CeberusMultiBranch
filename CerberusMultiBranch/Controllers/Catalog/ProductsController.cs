@@ -325,6 +325,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
+        public ActionResult SearchEdit(string code)
+        {
+            var model = LookFor(null, null, null, null, null, code, null, false);
+            return PartialView("_List", model);
+        }
+
+        [HttpPost]
         public ActionResult ExternalSearch(string filter)
         {
             string[] arr = new List<string>().ToArray();
@@ -389,21 +396,35 @@ namespace CerberusMultiBranch.Controllers.Catalog
             string[] arr = new List<string>().ToArray();
 
             if (name != null && name != string.Empty)
+            {
                 arr = name.Trim().Split(' ');
+                code = arr.FirstOrDefault();
+            }
 
+            List<Product> products = new List<Product>();
 
-            var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
-                            .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
+            if (code != null)
+            {
+                products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
+                             .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
+                            where (p.Code == code)
+                            select p).ToList();
+            }
+
+            if (products.Count == Cons.Zero)
+            {
+                products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
+                               .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
+                            && (name == null || name == string.Empty || arr.All(s => (p.Name + " " + p.TradeMark).Contains(s)))
 
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
                             && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
                             && (p.IsActive)
                             select p).OrderBy(s => s.Name).Take(400).ToList();
-
+            }
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
             {
@@ -753,7 +774,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             vm.Unit = ep.Unit;
             vm.BuyPrice = ep.Price;
             vm.MinQuantity = Cons.One;
-            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
+            vm.Code = ep.Code;//Regex.Replace(ep.Code, @"^[a-zA-Z0-9]+$", "");
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -878,9 +899,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 product.UpdDate = DateTime.Now;
                 product.UpdUser = User.Identity.GetUserName();
 
+                //si el producto es nuevo
                 if (product.ProductId == Cons.Zero)
                 {
-                    product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
                     var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
 
                     if (pc == Cons.Zero)
@@ -912,10 +933,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
                         });
                     }
+
+                    return Edit(product.ProductId);
                 }
                 else
                 {
-                    db.Entry(product).State = EntityState.Modified;
                     switch (product.ProductType)
                     {
                         case ProductType.Single:
@@ -925,9 +947,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             SavePackage(product);
                             break;
                     }
-                }
 
-                return Edit(product.ProductId);
+                    return Json(new
+                    {
+                        Result = "OK",
+                        Message = "Los cambios al producto se aplicaron correctamente " + product.Code
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -936,115 +962,196 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         }
 
-        private void SavePackage(Product product)
+        private void SavePackage(Product package)
         {
+            bool isNewProduct, isNewBp = false;
             var branchId = User.Identity.GetBranchId();
 
+            isNewProduct = package.ProductId == Cons.Zero;
             //si es un paquete nuevo lo guardo inmediatamente para generar un Id
-            if (product.ProductId == Cons.Zero)
+            if (isNewProduct)
             {
-                db.Products.Add(product);
+                isNewProduct = true;
+                db.Products.Add(package);
                 db.SaveChanges();
             }
             else
-                db.Entry(product).State = EntityState.Modified;
+            {
+                if (package.Quantity > Cons.Zero && db.PackageDetails.Where(pd => pd.PackageId == package.ProductId).Count() == Cons.Zero)
+                {
+                    throw new Exception("No es posible agregar una cantidad  mayor a cero a un paquete " +
+                                                 "sin haber configurado al menos un producto en su contenido");
+                }
+                db.Entry(package).State = EntityState.Modified;
+            }
+
 
             //consulto la relación sucursal-producto
-            var branchP = db.BranchProducts.Include(bp => bp.Product).Include(bp => bp.Product.PackageDetails)
-                .FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == product.ProductId);
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                Include(bp => bp.Product.PackageDetails)
+                .FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == package.ProductId);
 
+            isNewBp = branchP == null;
 
             //si no hay una relación la creo
-
-            #region Salida
-            if (movementType == MovementType.Exit)
+            if (isNewBp)
             {
-                if (branchP.Stock < parentQuantity)
-                    return "La cantidad a descontar es menor que los paquetes disponibles";
-
-                foreach (var det in branchP.Product.PackageDetails)
+                branchP = new BranchProduct
                 {
-                    var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
-
-                    //cantidad de producto requerida
-                    var requiredAmount = (det.Quantity * parentQuantity);
-
-                    dtBranchP.LastStock = dtBranchP.Stock;
-                    dtBranchP.Stock += requiredAmount;
-
-                    db.Entry(dtBranchP).State = EntityState.Modified;
-
-                    //creo los reingresos del producto al inventario
-                    var sm = new StockMovement
-                    {
-                        BranchId = dtBranchP.BranchId,
-                        ProductId = dtBranchP.ProductId,
-                        Quantity = det.Quantity,
-                        MovementType = MovementType.Entry,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now.ToLocal(),
-                        Comment = "Reingreso por disolución de paquete"
-                    };
-
-                    db.StockMovements.Add(sm);
-                }
+                    BranchId = branchId,
+                    ProductId = package.ProductId,
+                };
             }
-            #endregion
 
+            branchP.BuyPrice = package.BuyPrice;
+            branchP.DealerPercentage = package.DealerPercentage;
+            branchP.DealerPrice = package.DealerPrice;
+            branchP.Ledge = package.Ledge;
+            branchP.Row = package.Row;
+            branchP.StorePercentage = package.StorePercentage;
+            branchP.StorePrice = package.StorePrice;
+            branchP.UpdDate = package.UpdDate;
+            branchP.WholesalerPercentage = package.WholesalerPercentage;
+            branchP.WholesalerPrice = package.WholesalerPrice;
+
+            //si es un producto  nuevo en "sucursal" agrego su relacion con esta
+            if (isNewProduct)
+            {
+                db.BranchProducts.Add(branchP);
+                db.SaveChanges();
+            }
+            //si el paquete ya existe 
             else
             {
-                var ids = branchP.Product.PackageDetails.Select(pd => pd.DetailtId).ToList();
-                var stockList = db.BranchProducts.Where(bp => ids.Contains(bp.ProductId));
-
-                foreach (var det in branchP.Product.PackageDetails)
+                if (isNewBp)
                 {
-                    var stDete = stockList.FirstOrDefault(s => s.ProductId == det.DetailtId);
+                    db.BranchProducts.Add(branchP);
+                    db.SaveChanges();
 
-                    if (stDete != null)
+                    branchP = db.BranchProducts.Include(bp => bp.Product).Include(bp => bp.Product.PackageDetails)
+                        .FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == package.ProductId);
+
+                }
+
+                //busco si ya tiene detalles (productos asignados al paquete)
+                var products = db.PackageDetails.Where(pd => pd.PackageId == package.ProductId).ToList();
+
+                //si la cantidad indicada es igual a la cantidad en stock, hago una actualizacón de precios y porcentajes
+                if (package.Quantity == branchP.Stock)
+                    db.Entry(branchP).State = EntityState.Modified;
+
+                //si hay diferencia
+                else
+                {
+                    var ids = branchP.Product.PackageDetails.Select(pd => pd.DetailtId).ToList();
+                    var stockList = db.BranchProducts.Where(bp => ids.Contains(bp.ProductId) && bp.BranchId == branchId).ToList();
+
+                    double amount = Cons.Zero;
+                    //si la cantidad ingresada es mayor a la existente, debo registrar un ingreso del paquete
+                    if (package.Quantity > branchP.Stock)
                     {
-                        var requiredAmount = (det.Quantity * parentQuantity);
+                        var packageAmount = package.Quantity - branchP.Stock;
 
-                        //si la cantidad en stock  es suficiente para suplir la cantidad demandada
-                        //el producuto detalle es descontado del inventario
-                        if (stDete.Stock >= requiredAmount)
+                        foreach (var prod in products)
                         {
-                            //creo la salida del producto  q formara parte del paquete
-                            var m = new StockMovement
+                            amount = packageAmount * prod.Quantity;
+
+                            var stDete = stockList.FirstOrDefault(s => s.ProductId == prod.DetailtId);
+
+                            if (stDete != null && stDete.Stock >= amount)
                             {
-                                BranchId = branchId,
-                                ProductId = det.DetailtId,
-                                Quantity = requiredAmount,
-                                MovementType = MovementType.Exit,
-                                User = User.Identity.Name,
-                                MovementDate = DateTime.Now.ToLocal(),
-                                Comment = "Salida hacia paquete " + det.Detail.Code
-                            };
+                                stDete.Stock -= amount;
+                                stDete.Reserved += amount;
+                                stDete.UpdDate = DateTime.Now.ToLocal();
 
-                            db.StockMovements.Add(m);
-
-                            stDete.LastStock = stDete.Stock;
-                            stDete.Stock -= requiredAmount;
-                            stDete.UpdDate = DateTime.Now.ToLocal();
-
-                            db.Entry(stDete).State = EntityState.Modified;
+                                StockMovement sm = new StockMovement
+                                {
+                                    BranchId = branchId,
+                                    ProductId = prod.DetailtId,
+                                    Comment = "Reservado para paquete",
+                                    Quantity = amount,
+                                    MovementDate = DateTime.Now.ToLocal(),
+                                    User = User.Identity.Name,
+                                    MovementType = MovementType.Reservation
+                                };
+                                db.Entry(stDete).State = EntityState.Modified;
+                                db.StockMovements.Add(sm);
+                            }
+                            else
+                                throw new Exception("No hay cantidad suficiente de producto para agregar el paquete, revise la configuración");
                         }
-                        else
+                       
+                        branchP.LastStock = branchP.Stock;
+                        branchP.Stock = package.Quantity;
+
+                        StockMovement pSm = new StockMovement
                         {
-                            var proDet = db.Products.Find(det.DetailtId);
-                            return string.Format("El Paquete requiere {0} unidades del producto {1} y solo hay {2} disponibles",
-                                det.Quantity, proDet.Code, stDete.Stock);
-                        }
+                            BranchId = branchId,
+                            ProductId = package.ProductId,
+                            Comment = "Ingreso  manual",
+                            Quantity = packageAmount,
+                            MovementDate = DateTime.Now.ToLocal(),
+                            User = User.Identity.Name,
+                            MovementType = MovementType.Entry
+                        };
+                        db.StockMovements.Add(pSm);
+
                     }
                     else
                     {
-                        var proDet = db.Products.Find(det.DetailtId);
-                        return string.Format("El Paquete requiere {0} unidades del producto {1} y solo hay {2} disponibles",
-                            det.Quantity, proDet.Code, Cons.Zero);
+                        var packageAmount = branchP.Stock - package.Quantity;
+                        foreach (var prod in products)
+                        {
+                            amount = packageAmount * prod.Quantity;
+
+                            var stDete = stockList.FirstOrDefault(s => s.ProductId == prod.DetailtId);
+
+                            if (stDete != null)
+                            {
+                                stDete.Stock += amount;
+                                stDete.Reserved -= amount;
+                                stDete.UpdDate = DateTime.Now.ToLocal();
+
+                                StockMovement sm = new StockMovement
+                                {
+                                    BranchId = branchId,
+                                    ProductId = prod.DetailtId,
+                                    Comment = "Disolución de paquete",
+                                    Quantity = amount,
+                                    MovementDate = DateTime.Now.ToLocal(),
+                                    User = User.Identity.Name,
+                                    MovementType = MovementType.Release
+                                };
+                                db.Entry(stDete).State = EntityState.Modified;
+                                db.StockMovements.Add(sm);
+                            }
+                            else
+                            {
+                                throw new Exception("Un producto del paquete no existe en la sucursal");
+                            }
+                        }
+
+                      
+                        branchP.LastStock = branchP.Stock;
+                        branchP.Stock = package.Quantity;
+
+                        StockMovement pSm = new StockMovement
+                        {
+                            BranchId = branchId,
+                            ProductId = package.ProductId,
+                            Comment = "Salida  manual",
+                            Quantity = packageAmount,
+                            MovementDate = DateTime.Now.ToLocal(),
+                            User = User.Identity.Name,
+                            MovementType = MovementType.Exit
+                        };
+                        db.StockMovements.Add(pSm);
                     }
+                    //si todo se cumple guardo los cambios
+                    db.Entry(branchP).State = EntityState.Modified;
+                    db.SaveChanges();
                 }
             }
-
-            return Cons.ResponseOK;
         }
 
         [HttpPost]
@@ -1055,7 +1162,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             product.IsActive = true;
             try
             {
-                product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
                 var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
 
                 if (pc == Cons.Zero)

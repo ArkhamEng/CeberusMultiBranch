@@ -24,6 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Código")]
         [Required]
         [MaxLength(30)]
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage ="El código solo admite letras y numeros (sin espacios en blanco)")]
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
 

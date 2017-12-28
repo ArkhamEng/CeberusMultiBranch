@@ -40,37 +40,40 @@
 
                         @if (Model.ProductId > Cons.Zero)
                         {
-                        <li>
-                            <a data-toggle="tab" href="#models">
-                                <span class="fa fa-car"></span> Autos
-                                <span class="bg-danger badge">
-                                    @Model.Compatibilities.Count
-                                </span>
-                            </a>
-                        </li>
-                        <li>
-                            <a data-toggle="tab" href="#images">
-                                <span class="fa fa-image"></span> Imagenes
-                                <span class="bg-danger badge">
-                                    @Model.Images.Count
-                                </span>
-                            </a>
-                        </li>
+                            <li>
+                                <a data-toggle="tab" href="#models">
+                                    <span class="fa fa-car"></span> Autos
+                                    <span class="bg-danger badge">
+                                        @Model.Compatibilities.Count
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#images">
+                                    <span class="fa fa-image"></span> Imagenes
+                                    <span class="bg-danger badge">
+                                        @Model.Images.Count
+                                    </span>
+                                </a>
+                            </li>
                         }
 
                         @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
                         {
-                        <li><a data-toggle="tab" href="#detail">
-                            <span class="fa fa-cubes"></span> Productos
-                            <span class="bg-danger badge">
-                            @Model.PackageDetails.Sum(pd=> pd.Quantity)
-                            </span></a></li>
+                            <li>
+                                <a data-toggle="tab" href="#detail">
+                                    <span class="fa fa-cubes"></span> Productos
+                                    <span class="bg-danger badge">
+                                        @Model.PackageDetails.Sum(pd => pd.Quantity)
+                                    </span>
+                                </a>
+                            </li>
                         }
                     </ul>
 
                     <div class="tab-content">
                         <div id="general" class="tab-pane fade in active">
-                            @Html.Partial("_GeneralData",Model)
+                            @Html.Partial("_GeneralData", Model)
                         </div>
 
                         @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
@@ -143,8 +146,7 @@
         }
     });
 
-    function SetPrice()
-    {
+    function SetPrice() {
         var sp = (1 + $("#StorePercentage").val() / 100);
         var dp = (1 + $("#WholesalerPercentage").val() / 100);
         var wp = (1 + $("#DealerPercentage").val() / 100);
@@ -164,19 +166,20 @@
         ShowLoading();
         var product =
         {
-            Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#PartSystemId").val(),
+            Code: $("#Code").val().toUpperCase(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val().toUpperCase(), Name: $("#Name").val().toUpperCase(), PartSystemId: $("#PartSystemId").val(),
             WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
-            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val(), DealerPercentage: $("#DealerPercentage").val(),
+            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val().toUpperCase(), DealerPercentage: $("#DealerPercentage").val(),
             WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(),
             ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val(), ProductType: $("#ProductType").val()
         };
 
         //si el ProviderId tiene valor, quiere decir que es una copia de producto del proveedor
         if ($("#ProviderId").val() != '') {
-            var param = {
-                product: product, providerId: $("#ProviderId").val(),
-                code: $("#Code").val()
-            };
+            var param =
+                {
+                    product: product, providerId: $("#ProviderId").val(),
+                    code: $("#Code").val()
+                };
 
             ExecuteAjax('@Url.Action("Copy","Products")', param, function (response) {
                 HideLoading();
@@ -190,26 +193,36 @@
                     $("#ModalQuickAddProduct").on("hidden.bs.modal", function () {
                         LookFor();
                         $("#divQuickAdd").html(response)
-
                     });
                 }
             });
         }
-            //de lo contrario es una edición o creacíon nuevo registro
+            //de lo contrario es una edición o creación nuevo registro
         else {
             var param = { product: product };
 
             ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response) {
                 HideLoading();
-                if ($.isPlainObject(response)) {
-                    if (response.Result != "OK") {
-                        ShowMessage(response.Result, response.Message, 'warning');
-                    }
+                if ($.isPlainObject(response))
+                {
+                    $("#ModalQuickAddProduct").modal("hide");
+                    $("#ModalQuickAddProduct").on("hidden.bs.modal", function ()
+                    {
+                        if (response.Result != "OK")
+                        {
+                            ShowMessage(response.Result, response.Message, 'warning');
+                        }
+                        else
+                        {
+                            SearchEdited(product.Code);
+                            ShowMessage(response.Result, response.Message, 'success');
+                        }
+                    });
                 }
                 else {
                     $("#ModalQuickAddProduct").modal("hide");
                     $("#ModalQuickAddProduct").on("hidden.bs.modal", function () {
-                        //LookFor();
+                        SearchEdited(product.Code);
                         $("#divQuickAdd").html(response)
                     });
                 }
@@ -217,6 +230,14 @@
         }
     }
 
+
+    function SearchEdited(code)
+    {
+        ExecuteAjax('@Url.Action("SearchEdit")', {code: code}, function (response)
+        {
+            $("#divProducts").html(response);
+        });
+    }
 
     @*function Copy()
     {

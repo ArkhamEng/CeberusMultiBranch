@@ -22,6 +22,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public double LastStock { get; set; }
 
+        public double Reserved { get; set; }
+
         public DateTime UpdDate { get; set; }
 
 
@@ -99,5 +101,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         Entry=1,
         Exit=2,
+        Reservation =3,
+        Release = 4
     }
 }
