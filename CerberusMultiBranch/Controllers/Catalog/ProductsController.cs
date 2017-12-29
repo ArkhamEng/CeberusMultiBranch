@@ -417,7 +417,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                                .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s => (p.Name + " " + p.TradeMark).Contains(s)))
+                            && (name == null || name == string.Empty || arr.All(s => (p.Code+" "+p.Name + " " + p.TradeMark).Contains(s)))
 
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
@@ -1014,7 +1014,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             branchP.WholesalerPercentage = package.WholesalerPercentage;
             branchP.WholesalerPrice = package.WholesalerPrice;
 
-            //si es un producto  nuevo en "sucursal" agrego su relacion con esta
+            //si es un paquete  nuevo agrego la relacion a la sucursal en turno
             if (isNewProduct)
             {
                 db.BranchProducts.Add(branchP);
@@ -1023,6 +1023,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             //si el paquete ya existe 
             else
             {
+                //si el paquete existe pero no tiene relación con la sucursal, la creo
                 if (isNewBp)
                 {
                     db.BranchProducts.Add(branchP);
@@ -1030,7 +1031,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     branchP = db.BranchProducts.Include(bp => bp.Product).Include(bp => bp.Product.PackageDetails)
                         .FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == package.ProductId);
-
                 }
 
                 //busco si ya tiene detalles (productos asignados al paquete)
@@ -1038,7 +1038,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 //si la cantidad indicada es igual a la cantidad en stock, hago una actualizacón de precios y porcentajes
                 if (package.Quantity == branchP.Stock)
+                {
                     db.Entry(branchP).State = EntityState.Modified;
+                    db.SaveChanges();
+                }
+                    
 
                 //si hay diferencia
                 else
@@ -1466,14 +1470,26 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult SearchForPackage(string filter)
         {
             string[] arr = new List<string>().ToArray();
-
+            string code = string.Empty;
             if (filter != null && filter != string.Empty)
+            {
                 arr = filter.Trim().Split(' ');
+                code = arr.FirstOrDefault();
+            }
 
-            var products = (from ep in db.Products.Include(p => p.Category)
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Name).Contains(s)))
+            List<Product> products = new List<Product>();
+
+            products = (from ep in db.Products.Include(p => p.Category)
+                        where (ep.Code == code) && (ep.ProductType == ProductType.Single) && (ep.IsActive)
+                        select ep).Take((int)Cons.OneHundred).ToList();
+            if(products.Count == Cons.Zero)
+            {
+                products = (from ep in db.Products.Include(p => p.Category)
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
                             && (ep.ProductType == ProductType.Single) && (ep.IsActive)
                             select ep).Take((int)Cons.OneHundred).ToList();
+            }
+            
 
             return PartialView("_ListForPackage", products);
         }

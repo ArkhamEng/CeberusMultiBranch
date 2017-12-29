@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProviderViewModel();
-            model.Providers = db.Providers.Include(c => c.ExternalProducts).ToList();
+            model.Providers = db.Providers.ToList();
             model.States = db.States.ToSelectList();
 
             return View(model);
@@ -38,7 +38,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
 
-            var model = (from c in db.Providers.Include(c=> c.ExternalProducts)
+            var model = (from c in db.Providers
                          where
                              (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
                              (stateId == null || c.City.StateId == stateId) &&
@@ -83,6 +83,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [ValidateAntiForgeryToken]
         public ActionResult Create(Provider provider)
         {
+            provider.UdpUser = User.Identity.Name;
+            provider.UpdDate = DateTime.Now.ToLocal();
+
             if (provider.ProviderId == Cons.Zero)
             {
                 provider.Code = db.Providers.Max(c => c.Code).ToCode();
@@ -182,6 +185,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         DBHelper.DeleteExternal(providerId);
                         //agrego el rango de productos nuevos al data context
                         DBHelper.BulkInsertBulkCopy(toInsert);
+
+                        var provider = db.Providers.Find(providerId);
+                        provider.Catalog = toInsert.Count();
+                        provider.UdpUser = User.Identity.Name;
+                        provider.UpdDate = DateTime.Now.ToLocal();
+
+                        db.Entry(provider).State = EntityState.Modified;
+                        db.SaveChanges();
                     }
                     catch (Exception ex)
                     {

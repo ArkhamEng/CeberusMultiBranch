@@ -107,7 +107,7 @@
 
 <div class="col-md-3" id="divProductType">
     @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
-    @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase" })
+    @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase btnToHide" })
     @Html.HiddenFor(model => model.ProductType)
 
 </div>

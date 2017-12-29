@@ -48,7 +48,7 @@
                         </td>
 
                         <td class="col-md-1 btn-group">
-                            <button class="btn btn-warning btn-xs" onclick="AddToPackage(this)" title="agregar a paquete">
+                            <button class="btn btn-warning btn-xs" onclick="AddToPackage(this)" title="agregar a paquete" type="button">
                                 <span class="fa fa-plus"></span>
                             </button>
                         </td>
@@ -63,11 +63,9 @@
     $(document).ready(function () {
         Paginate("#tbInternalProducts", 6);
     });
+
     function AddToPackage(input)
     {
-        $("#ModalInternalProduct").modal("hide");
-        ShowLoading();
-
         var row = $(input).parent().parent();
 
         productId = row.find("#txtProductId").val();
@@ -75,10 +73,8 @@
 
         var param = { packagedId: $("#ProductId").val(), productId: productId, quantity: quantity }
 
-
         ExecuteAjax('@Url.Action("AddToPackage")', param, function (response)
         {
-            HideLoading();
             if ($.isPlainObject(response))
             {
                 ShowMessage(response.Result, response.Message, 'warning');
@@ -87,8 +83,6 @@
             {
                 $("#divPackageDetails").html(response);
             }
-
-       
         });
     }
 </script>

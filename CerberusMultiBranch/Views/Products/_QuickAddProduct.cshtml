@@ -63,7 +63,7 @@
                             <li>
                                 <a data-toggle="tab" href="#detail">
                                     <span class="fa fa-cubes"></span> Productos
-                                    <span class="bg-danger badge">
+                                    <span  id="spDetCount" class="bg-danger badge">
                                         @Model.PackageDetails.Sum(pd => pd.Quantity)
                                     </span>
                                 </a>
@@ -75,7 +75,7 @@
                         <div id="general" class="tab-pane fade in active">
                             @Html.Partial("_GeneralData", Model)
                         </div>
-
+                        
                         @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
                         {
                             <div id="detail" class="tab-pane fade">
@@ -83,6 +83,12 @@
                                     @Html.Partial("_PackageDetails", Model.PackageDetails)
                                 </div>
                             </div>
+                        }
+                        @if (Model.Quantity > Cons.Zero)
+                        {
+                            <script>
+                                $(".btnToHide").prop("disabled", true);
+                            </script>
                         }
                         <div id="models" class="tab-pane fade">
                             <div>
@@ -203,17 +209,13 @@
 
             ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response) {
                 HideLoading();
-                if ($.isPlainObject(response))
-                {
+                if ($.isPlainObject(response)) {
                     $("#ModalQuickAddProduct").modal("hide");
-                    $("#ModalQuickAddProduct").on("hidden.bs.modal", function ()
-                    {
-                        if (response.Result != "OK")
-                        {
+                    $("#ModalQuickAddProduct").on("hidden.bs.modal", function () {
+                        if (response.Result != "OK") {
                             ShowMessage(response.Result, response.Message, 'warning');
                         }
-                        else
-                        {
+                        else {
                             SearchEdited(product.Code);
                             ShowMessage(response.Result, response.Message, 'success');
                         }
@@ -231,10 +233,8 @@
     }
 
 
-    function SearchEdited(code)
-    {
-        ExecuteAjax('@Url.Action("SearchEdit")', {code: code}, function (response)
-        {
+    function SearchEdited(code) {
+        ExecuteAjax('@Url.Action("SearchEdit")', { code: code }, function (response) {
             $("#divProducts").html(response);
         });
     }

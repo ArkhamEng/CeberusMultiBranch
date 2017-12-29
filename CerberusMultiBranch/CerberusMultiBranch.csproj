@@ -281,6 +281,10 @@
     <Compile Include="Migrations\201712280219324_reservedProduct.Designer.cs">
       <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712290213497_ProvidereProperties.cs" />
+    <Compile Include="Migrations\201712290213497_ProvidereProperties.Designer.cs">
+      <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -525,8 +529,6 @@
     <Content Include="Views\CashRegister\_MyCashRegisterList.cshtml" />
     <Content Include="Views\CashRegister\MyDetail.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
-    <Content Include="Views\Purchases\MyPurchases.cshtml" />
-    <Content Include="Views\Purchases\_MyPurchaseList.cshtml" />
     <Content Include="Views\Purchases\MyDetail.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
     <Content Include="Views\Shared\_Cancelation.cshtml" />
@@ -622,6 +624,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712280219324_reservedProduct.resx">
       <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712290213497_ProvidereProperties.resx">
+      <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -35,11 +35,15 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Name = provider.Name;
             this.Phone = provider.Phone;
             this.UpdDate = provider.UpdDate;
+            this.UdpUser = provider.UdpUser;
             this.ZipCode = provider.ZipCode;
             this.WebSite = provider.WebSite;
             this.Agent = provider.Agent;
             this.AgentPhone = provider.AgentPhone;
             this.Line = provider.Line;
+            this.CreditLimit = provider.CreditLimit;
+            this.DaysToPay = provider.DaysToPay;
+            this.Catalog = provider.Catalog;
 
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();

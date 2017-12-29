@@ -52,13 +52,13 @@
 
 
 
-        @if (User.IsInRole("Capturista"))
+        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
         {
-            <li><a href="/Purchases/Create" onclick="ShowLoading()">&nbsp;Registrar Compra<span class="fa fa-cart-plus" style="float:left" /></a></li>
-            <li><a href="/Purchases/MyPurchases" onclick="ShowLoading()">&nbsp;Mis Compras<span class="fa fa-shopping-basket" style="float:left" /></a></li>
+            <li><a href="/Purchases/Create" onclick="ShowLoading()">&nbsp;Registor de Compra<span class="fa fa-cart-plus" style="float:left" /></a></li>
+            <li><a href="/Purchases/History" onclick="ShowLoading()">&nbsp;Compras<span class="fa fa-shopping-basket" style="float:left" /></a></li>
         }
 
-        @if (User.IsInRole("Supervisor"))
+        @*@if (User.IsInRole("Supervisor"))
         {
             <li>
                 <a href="#reports" data-toggle="collapse" aria-expanded="false">
@@ -69,7 +69,7 @@
                     <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-history" style="float:left" /></a></li>
                 </ul>
             </li>
-        }
+        }*@
 
         @if (User.IsInRole("Administrador"))
         {

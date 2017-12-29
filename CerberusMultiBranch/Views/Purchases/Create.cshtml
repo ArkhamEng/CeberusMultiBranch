@@ -96,8 +96,9 @@
 
                 <div class="row">
                     <div class="btn-group col-md-6">
-                        <button type="button" class="btn btn-info" title="Nueva búsqueda" onclick="ShowLoading(); window.location='@Url.Action("MyPurchases")'">
+                        <button type="button" class="btn btn-primary" title="Nueva búsqueda" onclick="ShowLoading(); window.location='@Url.Action("History")'">
                             <span class="fa fa-search-plus"></span>
+                           <u>B</u>úsqueda
                         </button>
                         @Html.Partial("_CatalogButtonGroup")
                         <button id="btnCompleate" type="button" class="btn btn-warning Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">

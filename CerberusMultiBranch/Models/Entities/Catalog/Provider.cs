@@ -96,6 +96,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(100)]
         public string UdpUser { get; set; }
 
+        [Display(Name="Limite de Credito")]
+        public double CreditLimit { get; set; }
+
+        public int DaysToPay { get; set; }
+
+        public int Catalog { get; set; }
 
         public virtual City City { get; set; }
 

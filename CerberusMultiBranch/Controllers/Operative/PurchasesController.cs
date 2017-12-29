@@ -19,14 +19,11 @@ using System.Text.RegularExpressions;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [Authorize]
+    [Authorize(Roles = "Supervisor,Capturista")]
     public class PurchasesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-
-
-        [Authorize(Roles = "Supervisor")]
         public ActionResult History()
         {
             //obtengo las sucursales configuradas para el empleado
@@ -34,20 +31,22 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Purchases = LookFor(null, DateTime.Today, null, null, null, null, null);
+            model.Purchases = new List<Purchase>();
 
             return View(model);
         }
 
-        [Authorize(Roles = "Supervisor")]
         public ActionResult Detail(int id)
         {
             //obtengo las sucursales configuradas para el empleado
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
+            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
+
             var purchase = db.Purchases.Include(p => p.TransactionDetails).Include(p => p.User).
                    Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
-                   FirstOrDefault(p => p.TransactionId == id && brancheIds.Contains(p.BranchId));
+                   FirstOrDefault(p => p.TransactionId == id && brancheIds.Contains(p.BranchId) 
+                   && (userId == null || p.UserId == userId) );
 
             if (purchase == null)
                 return RedirectToAction("History");
@@ -56,11 +55,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
             string bill, string provider, string user)
         {
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, null);
+            //si el usuario no es un supervisor, busco solo las comprar registradas por el 
+            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
+
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId);
             return PartialView("_PurchaseList", model);
         }
 
@@ -126,46 +127,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "Error al cancelar la compra", Message = ex.Message });
             }
         }
-
-        [Authorize(Roles = "Capturista")]
-        public ActionResult MyPurchases()
-        {
-            var branchId = User.Identity.GetBranchId();
-            var userId = User.Identity.GetUserId();
-
-            TransactionViewModel model = new TransactionViewModel();
-            model.Purchases = LookFor(branchId, DateTime.Today, null, null, null, null, userId);
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Capturista")]
-        public ActionResult MySearch(DateTime? beginDate, DateTime? endDate, string bill, string provider)
-        {
-            var branchId = User.Identity.GetBranchId();
-            var userId = User.Identity.GetUserId();
-
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, null, userId);
-            return PartialView("_MyPurchaseList", model);
-        }
-
-
-        [Authorize(Roles = "Capturista")]
-        public ActionResult MyDetail(int id)
-        {
-            var userId = User.Identity.GetUserId();
-
-            var model = db.Purchases.Include(p => p.TransactionDetails).
-                Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
-                FirstOrDefault(p => p.TransactionId == id && p.UserId == userId);
-
-            if (model == null)
-                return RedirectToAction("MyPurchases");
-
-            return View(model);
-        }
-
 
         private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, string userId)
         {
@@ -422,7 +383,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             vm.Unit = ep.Unit;
             vm.BuyPrice = ep.Price;
             vm.MinQuantity = Cons.One;
-            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+", "");
+            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+$", "");
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);

@@ -1,8 +1,8 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Catalog.PackageDetail>
-
+@using CerberusMultiBranch.Support
 
 <div class="panel panel-danger">
-    <div class="panel-body">
+    <div id="divPckContent" class="panel-body">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -14,54 +14,88 @@
             </thead>
             <tbody>
                 @foreach (var item in Model)
-                    {
+                {
                     <tr class="text-uppercase">
                         <td>@Html.DisplayFor(m => item.Detail.Code)</td>
                         <td>@Html.DisplayFor(m => item.Detail.Name)</td>
                         <td>@Html.DisplayFor(m => item.Quantity)</td>
                         <td>
-                            <button type="button" class="btn btn-xs btn-danger" title="Quitar del paquete"
+                            <button type="button" class="btn btn-xs btn-danger btnToHide" title="Quitar del paquete"
                                     onclick="RemoveFromPackage(@item.DetailtId)">
                                 <span class="fa fa-trash"></span>
                             </button>
                         </td>
                     </tr>
-                    }
+                }
             </tbody>
         </table>
-        <button type="button" class="btn btn-primary" 
-                title="Agregar productos al paquete" onclick="BeginAdd()">
-            Agregar productos
-            <span class="fa fa-plus" />
-        </button>
+        <div class="col-md-10">
+            <div class="input-group ">
+                @Html.TextBox("txtFilterDetail", "", htmlAttributes: new
+           {
+               @class = "form-control",
+               placeholder = "Clave o descripción"
+           })
 
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary btnToHide"
+                            title="Buscar productos para el paquete" onclick="SearchIntProduct()">
+                        Buscar productos
+                        <span class="fa fa-search" />
+                    </button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-6 col-md-offset-3">
+            <img id="imgIntLoading" src="~/Content/Images/loading.gif" class="img-responsive hide" />
+        </div>
+        <div class="col-md-12" id="divInternalProductList">
+
+        </div>
     </div>
 </div>
+@if (Model.Count > Cons.Zero)
+{
+    <script>
+        $("#ProductType").prop("disabled", true);
+        $("#spDetCount").text(@Model.Count)
+    </script>
+}
+else
+{
+    <script>
+        $("#ProductType").prop("disabled", false);
+        $("#spDetCount").text(@Model.Count)
+    </script>
+}
+
 
 <script>
-    function BeginAdd()
-    {
-        $("#ModalInternalProduct").modal("show");
-    }
 
-    function RemoveFromPackage(detailId)
-    {
-        ShowLoading();
+    function RemoveFromPackage(detailId) {
+
         var param = { packageId: $("#ProductId").val(), productId: detailId }
 
-        ExecuteAjax('@Url.Action("RemoveFromPackage")', param, function (response)
-        {
-            HideLoading();
-            if ($.isPlainObject(response))
-            {
-                console.log("Mostrar mensaje");
+        ExecuteAjax('@Url.Action("RemoveFromPackage")', param, function (response) {
+
+            if ($.isPlainObject(response)) {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
-            else
-            {
+            else {
                 $("#divPackageDetails").html(response);
             }
+        });
+    }
 
+    function SearchIntProduct() {
+        $("#divInternalProductList").html('');
+        $("#imgIntLoading").attr("class", "img-responsive");
+
+        var param = { filter: $("#txtFilterDetail").val() }
+
+        ExecuteAjax('@Url.Action("SearchForPackage")', param, function (view) {
+            $("#imgIntLoading").attr("class", "img-responsive hide");
+            $("#divInternalProductList").html(view);
         });
     }
 </script>
