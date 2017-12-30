@@ -13,7 +13,7 @@ using Microsoft.AspNet.Identity;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [Authorize]
+    [Authorize(Roles = "Supervisor,Cajero")]
     public class CashRegisterController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -27,38 +27,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return cr;
         }
 
-        [Authorize(Roles ="Cajero")]
-        public ActionResult MyHistory()
-        {
-            var branchId = User.Identity.GetBranchId();
-            var model = LookForCashReg(branchId, DateTime.Today, null, User.Identity.Name);
 
-            return View(model);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Cajero")]
-        public ActionResult MySearch(DateTime? beginDate, DateTime? endDate)
-        {
-            var branchId = User.Identity.GetBranchId();
-            var model = LookForCashReg(branchId, beginDate, endDate, User.Identity.Name);
-
-            return PartialView("_MyCashRegisterList", model);
-        }
-
-        [Authorize(Roles ="Cajero")]
-        public ActionResult MyDetail(int id)
-        {
-            var model = db.CashRegisters.Include(cr => cr.CashDetails).
-                FirstOrDefault(cr => cr.CashRegisterId == id && cr.UserOpen == User.Identity.Name);
-
-            if (model == null)
-                return RedirectToAction("MyHistory");
-
-            return View(model);
-        }
-
-        [Authorize(Roles ="Supervisor")]
         public ActionResult History()
         {
             var model = LookForCashReg(null, DateTime.Today, null, null);
@@ -67,7 +36,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(model);
         }
 
-        [Authorize(Roles = "Supervisor")]
         public ActionResult Detail(int id)
         {
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
@@ -81,10 +49,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
-        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string user)
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate)
         {
-            var model = LookForCashReg(branchId, beginDate, endDate, user);
+            string user = null;
+            if (!User.IsInRole("Supervisor"))
+                user = User.Identity.GetUserName();
+
+            var model = LookForCashReg(branchId, beginDate, endDate,user);
 
             return PartialView("_CashRegisterList",model);
         }
@@ -104,11 +75,23 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         }
 
+        private CashRegister GetCashRegister()
+        {
+            var brachId = User.Identity.GetBranchId();
+
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
+                    FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
+
+                return cash;
+            }
+        }
+
         // GET: CashRegister
-        [Authorize(Roles = "Supervisor,Cajero")]
         public ActionResult Index()
         {
-            var cr = User.Identity.GetCashRegister();
+            var cr = GetCashRegister();
 
             if (cr == null)
             {
@@ -156,7 +139,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public JsonResult CashRegStatus()
         {
-            var cr = User.Identity.GetCashRegister();
+            var cr = GetCashRegister();
 
             if (cr != null)
                 return Json("OK");
@@ -190,9 +173,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult GetWithdrawals()
         {
-            var cr = User.Identity.GetCashRegister();
+            var cr = GetCashRegister();
 
-            var list = db.Withdrawals.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId).ToList();
+            var list = db.CashDetails.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType==Cons.Zero).ToList();
             ViewBag.Causes = db.WithdrawalCauses.ToSelectList();
             return PartialView("_Withdrawals", list);
         }
@@ -201,23 +184,22 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Cajero")]
         public ActionResult AddWithdrawal(double amount, string comment, int causeId)
         {
-            var cr = User.Identity.GetCashRegister();
+            var cr = GetCashRegister();
 
-            var wd = new Withdrawal { Amount = amount, InsDate = DateTime.Now.ToLocal(),
+            var wd = new CashDetail { Amount = amount, InsDate = DateTime.Now.ToLocal(),
                 User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId,
-                WithdrawalCauseId = causeId };
+                WithdrawalCauseId = causeId, DetailType = Cons.Zero, Type = PaymentType.Efectivo };
 
-            db.Withdrawals.Add(wd);
+            db.CashDetails.Add(wd);
             db.SaveChanges();
 
             return Json("OK");
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero,Supervisor")]
         public ActionResult Close(double amount, string comment)
         {
-            var cr = User.Identity.GetCashRegister();
+            var cr = GetCashRegister();
 
             cr.FinalAmount = Math.Round(amount, Cons.Two);
             cr.UserClose = User.Identity.Name;
@@ -250,7 +232,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_PendingPayment", model);
         }
 
-        [Authorize(Roles = "Cajero")]
         public ActionResult TicketsAndNotes()
         {
             var sales = LookForNotes(DateTime.Today,null,null,null);
@@ -258,7 +239,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
         public ActionResult SearchNotes(DateTime? begin, DateTime? end, string folio, string client)
         {
             var sales = LookForNotes(begin, end, folio,client);
@@ -282,8 +262,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return sales;
         }
 
-     
-        [Authorize(Roles = "Cajero")]
+    
         public ActionResult PrintNote(int id)
         {
             var branchId = User.Identity.GetBranchId();
@@ -379,7 +358,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 #region registro de Ingreso a caja
                 //obtengo el registro de caja activo
-                var cr = User.Identity.GetCashRegister();
+                var cr = GetCashRegister();
 
                 if (cr == null)
                 {
@@ -392,14 +371,17 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //por cada registro de pago agrego una registro de entrada a la caja
                 foreach (var pay in sale.Payments)
                 {
-                    var dt = new Income();
+                    var dt = new CashDetail();
                     dt.CashRegisterId = cr.CashRegisterId;
                     dt.Amount = pay.Amount;
                     dt.InsDate = DateTime.Now.ToLocal();
                     dt.User = User.Identity.Name;
                     dt.Type = pay.PaymentType;
                     dt.SaleFolio = sale.Folio;
-                    db.Incomes.Add(dt);
+                    dt.DetailType = Cons.One;
+                    dt.Comment = "VENTA CON FOLIO "+sale.Folio;
+
+                    db.CashDetails.Add(dt);
                 }
                 #endregion
 

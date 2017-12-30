@@ -98,20 +98,6 @@ namespace CerberusMultiBranch.Support
             }
         }
 
-        public static CashRegister GetCashRegister(this IIdentity user)
-        {
-            var brachId = user.GetBranchId();
-
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
-                    FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
-
-                return cash;
-            }
-        }
-
-      
 
         public static Shift GetShift(this DateTime date)
         {

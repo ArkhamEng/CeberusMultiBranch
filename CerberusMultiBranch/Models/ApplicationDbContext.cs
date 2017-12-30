@@ -71,9 +71,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<CashRegister> CashRegisters { get; set; }
 
-        public DbSet<Income> Incomes { get; set; }
-
-        public DbSet<Withdrawal> Withdrawals { get; set; }
+        public DbSet<CashDetail> CashDetails { get; set; }
 
         public DbSet<TransactionDetail> TransactionDetails { get; set; }
 

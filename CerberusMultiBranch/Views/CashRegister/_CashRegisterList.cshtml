@@ -8,16 +8,16 @@
                 @Html.DisplayName("Sucursal")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserOpen)
+                @Html.DisplayName("Cajero")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OpeningDate)
+                @Html.DisplayName("Fecha")
             </th>
             <th>
-                @Html.DisplayName("Hora Inicio")
+                @Html.DisplayName("Inicio")
             </th>
             <th>
-                @Html.DisplayName("Hora Cierre")
+                @Html.DisplayName("Cierre")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.InitialAmount)
@@ -53,7 +53,6 @@
                     {
                         @item.ClosingDate.Value.ToString("hh:mm tt")
                     }
-                    
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.InitialAmount)

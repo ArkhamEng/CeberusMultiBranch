@@ -62,31 +62,39 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //regreso los productos al stock
                 foreach (var detail in sale.TransactionDetails)
                 {
+                    var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
+
+                    //agrego movimiento al inventario
+                    StockMovement sm = new StockMovement
+                    {
+                        BranchId = bp.BranchId,
+                        ProductId = bp.ProductId,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now.ToLocal(),
+                        Quantity = detail.Quantity
+                    };
+
                     //se  regresa al inventario todo producto de la venta
-                    //en el caso de los paquetes solo el producto padre
+                    //en el caso de los paquetes sus detalles regresan a reservado
                     if (detail.ParentId == null)
                     {
-                        var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
-
                         bp.LastStock = bp.Stock;
                         bp.Stock     += detail.Quantity;
 
-                        db.Entry(bp).State = EntityState.Modified;
-
-                        //agrego movimiento al inventario
-                        StockMovement sm = new StockMovement
-                        {
-                            BranchId  = bp.BranchId,
-                            ProductId = bp.ProductId,
-                            Comment   = "Entrada por Cancelacion de venta con folio:" + sale.Folio + " comentario:" + comment,
-                            User      = User.Identity.Name,
-                            MovementDate = DateTime.Now.ToLocal(),
-                            MovementType = MovementType.Entry,
-                            Quantity = detail.Quantity
-                        };
-
-                        db.StockMovements.Add(sm);
+                        sm.Comment = "Cancelación de venta folio:" + sale.Folio;
+                        sm.MovementType = MovementType.Entry;
                     }
+                    else
+                    {
+                        bp.LastStock = bp.Stock + bp.Reserved;
+                        bp.Reserved += detail.Quantity;
+
+                        sm.Comment = "Cancelación de venta folio:" + sale.Folio;
+                        sm.MovementType = MovementType.Reservation;
+                    }
+
+                    db.StockMovements.Add(sm);
+                    db.Entry(bp).State = EntityState.Modified;
                 }
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
@@ -97,7 +105,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.Comment    = comment;
 
                 db.Entry(sale).State = EntityState.Modified;
-
                 db.SaveChanges();
 
                 return Json(new { Result = "OK", Message = "Venta Cancelada, el producto ha sido regreado al stock" });
@@ -637,8 +644,27 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 SortOrder = sortOrder,
                                 ParentId = pckDet.PackageId,
                             };
+                            //busco el stock del detalle en sucursal y resto el producto de los reservados
+                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
+                            detBP.LastStock = (detBP.Stock + detBP.Reserved);
+                            detBP.Reserved -= pckDet.Quantity;
 
+                            //agrego el moviento al inventario
+                            StockMovement detSm = new StockMovement
+                            {
+                                BranchId     = branchId,
+                                ProductId    = pckDet.DetailtId,
+                                MovementType = MovementType.Exit,
+                                Comment      = "Salida en Paquete venta folio:" + folio,
+                                User         = User.Identity.Name,
+                                MovementDate = DateTime.Now.ToLocal(),
+                                Quantity     = detail.Quantity
+                            };
+
+                            db.StockMovements.Add(detSm);
                             db.TransactionDetails.Add(tDeatil);
+
+                            db.Entry(detBP).State = EntityState.Modified;
                         }
                     }
 
@@ -648,7 +674,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         BranchId = pb.BranchId,
                         ProductId = pb.ProductId,
                         MovementType = MovementType.Exit,
-                        Comment = "Salida por venta Folio:" + folio,
+                        Comment = "Venta folio:" + folio,
                         User = User.Identity.Name,
                         MovementDate = DateTime.Now.ToLocal(),
                         Quantity = detail.Quantity

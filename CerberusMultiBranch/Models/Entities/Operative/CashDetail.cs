@@ -28,11 +28,27 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name = "Hora")]
         public DateTime InsDate { get; set; }
 
+        public PaymentType Type { get; set; }
+
+        public string SaleFolio { get; set; }
+
+        [Display(Name = "Comentario")]
+        [Required]
+        [MaxLength(100)]
+        public string Comment { get; set; }
+
+        [ForeignKey("Cause")]
+        public int? WithdrawalCauseId { get; set; }
+
+        public int DetailType { get; set; }
+
+        public virtual WithdrawalCause Cause { get; set; }
+
         public virtual CashRegister CashRegister { get; set; }
 
     }
 
-    public class Withdrawal : CashDetail
+ /*   public class Withdrawal : CashDetail
     {
         [Display(Name = "Comentario")]
         [Required]
@@ -50,7 +66,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public PaymentType Type { get; set; }
         
         public string SaleFolio { get; set; }    
-    }
+    }*/
 
     [Table("WithdrawalCause", Schema = "Operative")]
     public class WithdrawalCause:ISelectable
@@ -63,7 +79,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime InsDate { get; set; }
 
-        public ICollection<Withdrawal> Withdrawals { get; set; }
+        public ICollection<CashDetail> Withdrawals { get; set; }
 
         public int Id { get { return this.WithdrawalCauseId; } }
        

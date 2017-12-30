@@ -1,11 +1,13 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
+@using CerberusMultiBranch.Models.Entities.Operative
+
 
 <table id="tbSales" class="table table-striped small">
     <thead>
         <tr>
             <th class="col-md-1 text-center">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Fecha")</th>   
+            <th class="col-md-2 text-center">@Html.DisplayName("Fecha")</th>
             <th class="col-md-2 text-center">@Html.DisplayName("Cliente")</th>
             <th class="col-md-2 text-center">@Html.DisplayName("Usuario")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Comision")</th>
@@ -24,35 +26,35 @@
                 <td>@Html.DisplayFor(m => item.Client.Name)</td>
                 <td>@Html.DisplayFor(m => item.User.UserName)</td>
                 <td>@Html.DisplayFor(m => item.ComAmount)</td>
-                
+
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
 
 
-               @switch (item.Status)
+                @switch (item.Status)
                 {
                     case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
-                    <td align="center" class="alert alert-danger">
-                        Cancelado
-                    </td>
-                       break;
-                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
-                    <td align="center" class="alert alert-success">
-                        Pagado <br />
-                        @item.PaymentType.ToString()
-                    </td>
-                       break;
-                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                    <td align="center" class="alert alert-warning">
-                        Abierto
-                    </td>
-                       break;
-                   case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
-                    <td align="center" class="alert alert-info">
-                        Rerservado
-                    </td>
-                       break;
-               }
+                        <td align="center" class="alert alert-danger">
+                            Cancelado
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                        <td align="center" class="alert alert-success">
+                            Pagado <br />
+                            @item.PaymentType.ToString()
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                        <td align="center" class="alert alert-warning">
+                            Abierto
+                        </td>
+                        break;
+                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                        <td align="center" class="alert alert-info">
+                            Rerservado
+                        </td>
+                        break;
+                }
                 <td align="center">
                     <button class="btn btn-primary  btn-xs" title="Ver detalle"
                             onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.TransactionId })'">
@@ -60,26 +62,26 @@
                     </button>
                 </td>
             </tr>
-        }
+                    }
     </tbody>
     @{
-        var totalQuantity = Model.Sum(sale => sale.TransactionDetails.Sum(s => s.Quantity));
+        var totalCommision = Model.Sum(sale => sale.ComAmount);
         var totalAmount = Model.Sum(sale => sale.TotalAmount);
     }
+   
 </table>
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetDataTable("#tbSales", "#txtFilter");
 
-        var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
+        var tAmount = "Ventas: " + GetCurrency(parseFloat('@totalAmount'));
 
-        var tQuantity = "Articulos: " + '@totalQuantity';
+        var tComission = "Comisiones: " + GetCurrency(parseFloat('@totalCommision'));
 
-        $("#lblTotalAmount").text(tAmount);
-        $("#lblTotalQuantity").text(tQuantity);
+        $("#hCommision").text(tComission);
+        $("#hTotal").text(tAmount);
     });
 
 

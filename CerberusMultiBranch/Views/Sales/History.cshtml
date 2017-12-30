@@ -5,7 +5,9 @@
     ViewBag.Class = "fa fa-shopping-bag";
 }
 
+<h4 id="hCommision" class="alert alert-danger col-md-3 col-md-offset-5"></h4>
 
+<h4 id="hTotal" class="alert alert-info col-md-3  col-md-offset-1"></h4>
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
@@ -34,7 +36,7 @@
             </div>
         </div>
 
-        <br /><br /><br />
+        <br /><br /><br /><br />
         <div class="col-md-10">
             <div class="input-group">
                 @if (User.IsInRole("Supervisor"))
@@ -56,18 +58,6 @@
         </div>
     </div>
 </div>
-
-@*<div class="col-md-3">
-        <h5>
-            <label class="text-danger" id="lblTotalAmount"></label>
-        </h5>
-    </div>
-    <div class="col-md-2">
-        <h5>
-            <label class="text-danger" id="lblTotalQuantity"></label>
-        </h5>
-    </div>*@
-
 
 
 <div id="divSales">

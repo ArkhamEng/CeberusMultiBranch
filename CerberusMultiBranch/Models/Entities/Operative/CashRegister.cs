@@ -48,10 +48,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ICollection<CashDetail> CashDetails { get; set; }
 
         [NotMapped]
-        public ICollection<Withdrawal> Withdrawals { get { return this.CashDetails.OfType<Withdrawal>().ToList(); } }
+        public ICollection<CashDetail> Withdrawals { get { return this.CashDetails.Where(d=> d.DetailType == Cons.Zero).ToList(); } }
 
         [NotMapped]
-        public ICollection<Income> Incomes { get { return this.CashDetails.OfType<Income>().ToList(); } }
+        public ICollection<CashDetail> Incomes { get { return this.CashDetails.Where(d => d.DetailType == Cons.One).ToList(); } }
 
         [NotMapped]
         public string ChartSource { get; set; }

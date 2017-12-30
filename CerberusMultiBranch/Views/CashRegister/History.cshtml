@@ -1,75 +1,33 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.CashRegister>
 
 @{
-    ViewBag.Title = "Mi Historial de caja";
-    ViewBag.Class = "fa fa-history";
+    ViewBag.Title = "Historial de caja";
+    ViewBag.Class = "fa fa-hourglass-o";
 }
 
-
-
-@*<h3>
-    <span class="fa fa-history" style="float:left"></span>
-    &nbsp;&nbsp;Historial de Caja
-</h3>*@
 <hr />
-<div class="col-md-7">
-    <div class="input-group ">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtFilter", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button class="btn btn-default" type="button" title="buscar" onclick="Search()">
-                <span class="glyphicon glyphicon-search" />
-            </button>
-            <button class="btn btn-default" type="button" title="recargar" onclick="Reload()">
-                <span class="glyphicon glyphicon-refresh" />
-            </button>
-            <button id="btnFilter" type="button" class="btn btn-warning" data-toggle="collapse" data-target="#divFilters"
-                    title="Ver / Ocultar filtros">
-                <span class="glyphicon glyphicon-eye-open"></span>
-            </button>
-        </span>
-    </div>
-</div>
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-11">
+            <div class="input-group ">
+                @Html.DropDownList("BranchId", (SelectList)ViewBag.Branches, "Sucursal", new { @class = "form-control" })
+                <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
 
-<br /><br /><br />
-
-<div id="divFilters" class="col-md-4  collapse">
-    <div class="panel panel-danger">
-        <div class="panel-body">
-            <div class="row">
-                <div class="form-group col-md-12">
-                    @Html.Label("Sucursales", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.DropDownList("BranchId", (SelectList)ViewBag.Branches, "", new { @class = "form-control" })
-                    </div>
-                </div>
-                <div class="form-group col-md-12">
-                    @Html.Label("Desde", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
-                    </div>
-                </div>
-
-                <div class="form-group col-md-12">
-                    @Html.Label("Hasta", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
-                    </div>
-                </div>
- 
-                <div class="form-group col-md-12">
-                    @Html.Label("Usuario", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                        @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control" })
-                    </div>
-                </div>
+                <span class="input-group-addon"><a>Fecha final</a></span>
+                @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
+                        <span class="glyphicon glyphicon-search"></span>
+                        <u>B</u>uscar
+                    </button>
+                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        <u>L</u>impiar
+                    </button>
+                </span>
             </div>
         </div>
-    
     </div>
 </div>
 
@@ -81,14 +39,13 @@
 <script>
     $(document).ready(function ()
     {
-        SetFilterControls("#divFilters", "#btnFilter", "#divCashRegisterList");
-
+        $("#btnSearch").click(function () { Search(); });
     });
 
     function Search()
     {
         ShowLoading();
-        var param = { branchId: $("#BranchId").val(), beginDate: $("#BeginDate").val(), endDate: $("#EndDate").val(), user: $("#User").val() }
+        var param = { branchId: $("#BranchId").val(), beginDate: $("#BeginDate").val(), endDate: $("#EndDate").val() }
         console.log(param);
         ExecuteAjax('@Url.Action("Search")', param, function (view)
         {

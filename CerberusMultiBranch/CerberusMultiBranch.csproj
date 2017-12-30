@@ -285,6 +285,10 @@
     <Compile Include="Migrations\201712290213497_ProvidereProperties.Designer.cs">
       <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201712292250081_CashRegisterDetailChanges.cs" />
+    <Compile Include="Migrations\201712292250081_CashRegisterDetailChanges.Designer.cs">
+      <DependentUpon>201712292250081_CashRegisterDetailChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -525,9 +529,6 @@
     <Content Include="Views\Shared\PageLayout.cshtml" />
     <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
-    <Content Include="Views\CashRegister\MyHistory.cshtml" />
-    <Content Include="Views\CashRegister\_MyCashRegisterList.cshtml" />
-    <Content Include="Views\CashRegister\MyDetail.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
     <Content Include="Views\Purchases\MyDetail.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
@@ -540,7 +541,6 @@
     <Content Include="Views\Shared\_BranchOption.cshtml" />
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
     <Content Include="Views\Products\_QuickAddProduct.cshtml" />
-    <Content Include="Views\CashRegister\RegistPayment - Copy.cshtml" />
     <Content Include="Views\Shared\_Confirm.cshtml" />
     <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
     <Content Include="Views\Shared\_PaymentOption.cshtml" />
@@ -627,6 +627,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201712290213497_ProvidereProperties.resx">
       <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201712292250081_CashRegisterDetailChanges.resx">
+      <DependentUpon>201712292250081_CashRegisterDetailChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

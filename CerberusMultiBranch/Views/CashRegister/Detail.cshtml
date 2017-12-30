@@ -1,158 +1,246 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.CashRegister
-
+@using CerberusMultiBranch.Models.Entities.Operative
 @{
     ViewBag.Title = "Detalle de caja";
     ViewBag.Class = "fa fa-calculator";
 }
-<h3>
-    <button type="button" class="btn btn-default" title="volver al Historial de caja"
-            onclick="ShowLoading(); window.location='@Url.Action("History")'">
-        <span class="fa fa-arrow-left"></span>
-    </button>
-    
-    sucursal <label class="text-lowercase">@Model.Branch.Name</label>
-</h3>
+
+
+<script src="~/Scripts/printThis.js"></script>
+
+
+<h4 class="alert alert-info col-md-4">
+    <span class="fa fa-industry"></span>@Model.Branch.Name
+</h4>
+
 <hr />
-<div class="panel-group">
-    <div class="col-md-12">
-        <div class="panel panel-danger">
-           
-            <div class="panel-body">
-                <div class="col-md-3">
-                    @Html.LabelFor(model => model.OpeningDate, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
-                        @Html.EditorFor(model => model.OpeningDate, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                    </div>
-                </div>
 
-                <div class="col-md-4 col-md-offset-1">
-                    @Html.LabelFor(model => model.UserOpen, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
-                        @Html.EditorFor(model => model.UserOpen, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                    </div>
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-9">
+            <div class="panel panel-default col-md-5 alert alert-success">
+                <div class="panel-body">
+                    <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToString("c")</h4> <hr />
+                    <h5 class="col-md-6">
+                        <label class="control-label"> Hora</label><br />@Model.OpeningDate.ToString("HH:mm:ss")
+                    </h5>
+                    <h5 class="col-md-6">
+                        <label class="control-label"> Cajero</label><br /> @Model.UserOpen
+                    </h5>
                 </div>
+            </div>
 
-                <div class="col-md-2 col-md-offset-1">
-                    @Html.LabelFor(model => model.InitialAmount, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.EditorFor(model => model.InitialAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true", type = "currency" } })
-                    </div>
+            <div class="panel panel-default col-md-5 col-md-offset-2 alert alert-danger">
+                <div class="panel-body">
+                    <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToString("c")</h4> <hr />
+                    <h5 class="col-md-6">
+                        <label class="control-label"> Hora</label><br />@if (Model.ClosingDate != null)
+                        { <a>@Model.ClosingDate.Value.ToString("HH:mm:ss")</a>}
+                    </h5>
+                    <h5 class="col-md-6">
+                        <label class="control-label"> Cerrado por</label><br /> @Model.UserClose
+                    </h5>
                 </div>
+            </div>
+            <div class="panel panel-default col-md-12 ">
+                <div class="panel-body">
+                    <h4>
+                        <span class="fa fa-comments"></span>
+                        Comentarios: @Model.CloseComment
+                    </h4>
+                </div>
+            </div>
 
-                <div class="col-md-3">
-                    @Html.LabelFor(model => model.ClosingDate, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-calendar-times-o"></i></span>
-                        @Html.EditorFor(model => model.ClosingDate, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                    </div>
-                </div>
+        </div>
+        <div class="panel panel-default col-md-3 alert alert-info">
+            <div class="panel-body ">
 
-                <div class="col-md-4 col-md-offset-1">
-                    @Html.LabelFor(model => model.UserClose, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
-                        @Html.EditorFor(model => model.UserClose, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                    </div>
-                </div>
+                <span class="fa fa-money"></span> Efectivo<br />
+                @Model.Incomes.Where(i => i.Type == PaymentType.Efectivo).Sum(i => i.Amount).ToString("c")<hr />
 
-                <div class="col-md-2 col-md-offset-1">
-                    @Html.LabelFor(model => model.FinalAmount, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        @Html.EditorFor(model => model.FinalAmount, new { htmlAttributes = new { @class = "form-control", @readonly = "true", type = "currency" } })
-                    </div>
-                </div>
 
-                <div class="col-md-8">
-                    @Html.LabelFor(model => model.CloseComment, htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-comments"></i></span>
-                        @Html.EditorFor(model => model.CloseComment, new { htmlAttributes = new { @class = "form-control", @readonly = "true" } })
-                    </div>
-                </div>
+                <span class="fa fa-credit-card"></span> Tarjeta<br />
+                @Model.Incomes.Where(i => i.Type == PaymentType.Tarjeta).Sum(i => i.Amount).ToString("c")<hr />
+
+                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToString("c")
 
             </div>
         </div>
     </div>
+</div>
 
-    <div class="col-md-6">
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <span class="fa fa-money" style="float:left"></span>
-                    &nbsp;&nbsp;Ingresos
-                </div>
-            </div>
-            <div class="panel-body">
-                <table id="tdIncomes" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
-                            <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
-                            <th>@Html.DisplayName("Venta")</th>
-                            <th>@Html.DisplayName("T. pago")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Incomes)
+<div class="col-md-12">
+    <table id="tdDetails" class="table table-condensed">
+        <thead>
+            <tr>
+                <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
+                <th>@Html.DisplayName("Movimiento")</th>
+                <td></td>
+                <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
+                <th>@Html.DisplayName("Comentario")</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CashDetails)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(m => item.InsDate)</td>
+
+                    <td>
+                        @if (item.DetailType == 0)
                         {
-                            <tr>
-                                <td>@Html.DisplayFor(m => item.Amount)</td>
-                                <td>@Html.DisplayFor(m => item.InsDate)</td>
-                                <td>@Html.DisplayFor(m => item.SaleFolio)</td>
-                                <td>@Html.DisplayFor(m => item.Type)</td>
-                            </tr>
+                            <a>Retiro</a>
                         }
-                    </tbody>
-                </table>
+                        else
+                        {
+                            <a>Ingreso</a>
+                        }
+                    </td>
+                    <td>
+                        @switch (item.Type)
+                        {
+                            case PaymentType.Efectivo:
+                                <span class="fa fa-money"></span>
+                                break;
+                            case PaymentType.Tarjeta:
+                                <span class="fa fa-credit-card"></span>
+                                break;
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(m => item.Amount)
+                    </td>
+
+                    <td>@Html.DisplayFor(m => item.Comment)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div class="btn-group">
+    <button type="button" class="btn btn-primary" onclick="GoBack()">
+        <span class="fa fa-backward"></span>Ir a Historial
+    </button>
+    <button type="button" class="btn btn-success" onclick="Print()">
+        <span class="fa fa-print"></span>Imprimir detalle
+    </button>
+</div>
+
+<div style="display:none">
+    <div id="divPrint">
+        <div class="row">
+            <div class="col-xs-3">
+                <img src="~/Content/Images/logo2.png" class="img-responsive" /><br />
+                <span class="fa fa-industry"></span> Sucursal @Model.Branch.Name
+            </div>
+            <div class="col-xs-8">
+                <h3>
+                    Detalle de caja @Model.OpeningDate.ToString("dddd dd MMMM yyyy")
+                </h3>
             </div>
         </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="panel panel-danger">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <span class="fa fa-minus-circle" style="float:left"></span>
-                    &nbsp;&nbsp;Retiros
-                </div>
+        <div class="row">
+            <div class="col-xs-6" style="border:solid 1px">
+                <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToString("c")</h4> <hr />
+                <h5 class="col-xs-4">
+                    <label class="control-label"> Hora</label><br />@Model.OpeningDate.ToString("HH:mm:ss")
+                </h5>
+                <h5 class="col-xs-8">
+                    <label class="control-label"> Cajero</label><br /> @Model.UserOpen
+                </h5>
             </div>
-            <div class="panel-body">
-                <table id="tdWithdrawals" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>@Html.DisplayNameFor(m=> m.Withdrawals.First().Amount)</th>
-                            <th>@Html.DisplayNameFor(m => m.Withdrawals.First().InsDate)</th>
-                            <th>@Html.DisplayNameFor(m => m.Withdrawals.First().Cause.Name)</th>
-                            <th>@Html.DisplayNameFor(m => m.Withdrawals.First().Comment)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Withdrawals)
-                    {
-                            <tr>
-                                <td>@Html.DisplayFor(m=> item.Amount)</td>
-                                <td>@Html.DisplayFor(m => item.InsDate)</td>
-                                <td>@Html.DisplayFor(m => item.Cause.Name)</td>
-                                <td>@Html.DisplayFor(m => item.Comment)</td>
-                            </tr>
-                    }
-                    </tbody>
-                </table>
+            <div class="col-xs-6" style="border:solid 1px">
+                <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToString("c")</h4> <hr />
+                <h5 class="col-xs-4">
+                    <label class="control-label"> Hora</label><br />@if (Model.ClosingDate != null)
+            { <a>@Model.ClosingDate.Value.ToString("HH:mm:ss")</a>}
+                </h5>
+                <h5 class="col-xs-8">
+                    <label class="control-label"> Cerrado por</label><br /> @Model.UserClose
+                </h5>
             </div>
         </div>
-    </div>
+        <div class="col-xs-12" style="border-bottom:solid 1px">
+            <div class="col-xs-4">
+                <span class="fa fa-money"></span> Efectivo<br />
+                @Model.Incomes.Where(i => i.Type == PaymentType.Efectivo).Sum(i => i.Amount).ToString("c")
+            </div>
+            <div class="col-xs-4">
+                <span class="fa fa-credit-card"></span> Tarjeta<br />
+                @Model.Incomes.Where(i => i.Type == PaymentType.Tarjeta).Sum(i => i.Amount).ToString("c")
+            </div>
+            <div class="col-xs-4">
+                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToString("c")
+            </div>
+        </div>
+        <div class="col-xs-12">
+            <h4>
+                <span class="fa fa-comments"></span>
+                Comentarios: @Model.CloseComment
+            </h4>
+        </div>
+        <table class="table table-condensed col-xs-12">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
+                    <th>@Html.DisplayName("Movimiento")</th>
+                    <th></th>
+                    <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
+                    <th>@Html.DisplayName("Comentario")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.CashDetails)
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => item.InsDate)</td>
 
-  
+                        <td>
+                            @if (item.DetailType == 0)
+                            {
+                                <a>Retiro</a>
+                            }
+                            else
+                            {
+                                <a>Ingreso</a>
+                            }
+                        </td>
+                        <td>
+                            @switch (item.Type)
+                            {
+                                case PaymentType.Efectivo:
+                                    <span class="fa fa-money"></span>
+                                    break;
+                                case PaymentType.Tarjeta:
+                                    <span class="fa fa-credit-card"></span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Amount)
+
+                        </td>
+
+                        <td>@Html.DisplayFor(m => item.Comment)</td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
-        Paginate("#tdWithdrawals", 10)
-        Paginate("#tdIncomes", 10)
+    $(document).ready(function () {
+        Paginate("#tdDetails", 6)
     });
+
+    function GoBack() {
+        window.location = '@Url.Action("History")'
+    }
+
+    function Print() {
+        $("#divPrint").printThis();
+    }
 </script>
