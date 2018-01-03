@@ -31,7 +31,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult History()
         {
             var model = LookForCashReg(null, DateTime.Today, null, null);
-            ViewBag.Branches =  User.Identity.GetBranches().ToSelectList();
+            ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
 
             return View(model);
         }
@@ -39,11 +39,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Detail(int id)
         {
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
-            var model    = db.CashRegisters.Include(cr => cr.CashDetails).
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).
                 FirstOrDefault(cr => cr.CashRegisterId == id && brancheIds.Contains(cr.BranchId));
 
             if (model == null)
                 return RedirectToAction("History");
+
+            model.CashDetails.OrderBy(d => d.InsDate);
 
             return View(model);
         }
@@ -55,9 +57,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (!User.IsInRole("Supervisor"))
                 user = User.Identity.GetUserName();
 
-            var model = LookForCashReg(branchId, beginDate, endDate,user);
+            var model = LookForCashReg(branchId, beginDate, endDate, user);
 
-            return PartialView("_CashRegisterList",model);
+            return PartialView("_CashRegisterList", model);
         }
 
 
@@ -65,8 +67,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var branchIds = User.Identity.GetBranches().Select(b => b.Id);
 
-            var model = db.CashRegisters.Include(cr => cr.CashDetails).Include(cr=> cr.Branch).
-            Where(cr => (branchId ==null && branchIds.Contains(cr.BranchId) || cr.BranchId == branchId) &&
+            var model = db.CashRegisters.Include(cr => cr.CashDetails).Include(cr => cr.Branch).
+            Where(cr => (branchId == null && branchIds.Contains(cr.BranchId) || cr.BranchId == branchId) &&
                         (beginDate == null || cr.OpeningDate >= beginDate) &&
                         (endDate == null || cr.OpeningDate <= endDate) &&
                         (user == null || user == string.Empty || cr.UserOpen == user)).ToList();
@@ -84,6 +86,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
                     FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
 
+                if (cash != null && cash.CashDetails != null)
+                    cash.CashDetails.OrderBy(d => d.InsDate);
                 return cash;
             }
         }
@@ -99,18 +103,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return View(cr);
             }
 
-            var incomes = cr.Incomes.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
-            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Efectivo).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
-            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Tarjeta).GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
-            var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key.ToString("HH:mm") }).ToList();
+            var incomes = cr.Incomes.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
+            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Efectivo).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
+            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Tarjeta).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
+            var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
 
             var accum = new List<double>();
             var accumN = new List<int>();
 
-            incomes.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
-            cash.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
-            card.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
-            Withdrawals.Add(new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm") });
+            //incomes.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
+            //cash.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
+            //card.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
+            //Withdrawals.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
 
 
             incomes = incomes.OrderBy(c => c.Key).ToList();
@@ -127,7 +131,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             balance.AddSeries("Retiros", chartType: "Column", yValues: Withdrawals.Select(i => i.Total).ToList(), xValue: Withdrawals.Select(i => i.Key).ToList());
             //balance.AddSeries("Acumulado", chartType: "Line", yValues: accum, xValue: accumN, yFields: "Cantidad", xField: "Hora");
 
-            balance.AddLegend("Balance de Caja");
+            balance.AddLegend("Movimiento de caja X Hora");
 
             var imgS = balance.GetBytes();
             var baseS = Convert.ToBase64String(imgS);
@@ -147,7 +151,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json("No se ha abierto el modulo de caja");
         }
 
-   
+
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]
@@ -175,7 +179,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = GetCashRegister();
 
-            var list = db.CashDetails.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType==Cons.Zero).ToList();
+            var list = db.CashDetails.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
             ViewBag.Causes = db.WithdrawalCauses.ToSelectList();
             return PartialView("_Withdrawals", list);
         }
@@ -186,9 +190,17 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = GetCashRegister();
 
-            var wd = new CashDetail { Amount = amount, InsDate = DateTime.Now.ToLocal(),
-                User = User.Identity.Name, Comment = comment, CashRegisterId = cr.CashRegisterId,
-                WithdrawalCauseId = causeId, DetailType = Cons.Zero, Type = PaymentType.Efectivo };
+            var wd = new CashDetail
+            {
+                Amount = amount,
+                InsDate = DateTime.Now.ToLocal(),
+                User = User.Identity.Name,
+                Comment = comment,
+                CashRegisterId = cr.CashRegisterId,
+                WithdrawalCauseId = causeId,
+                DetailType = Cons.Zero,
+                Type = PaymentType.Efectivo
+            };
 
             db.CashDetails.Add(wd);
             db.SaveChanges();
@@ -227,42 +239,42 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
 
             var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
-                .Include(s=> s.User).Include(s => s.Client).ToList();
+                .Include(s => s.User).Include(s => s.Client).ToList();
 
             return PartialView("_PendingPayment", model);
         }
 
         public ActionResult TicketsAndNotes()
         {
-            var sales = LookForNotes(DateTime.Today,null,null,null);
-            return PartialView("_TicketsAndNotes",sales);
+            var sales = LookForNotes(DateTime.Today, null, null, null);
+            return PartialView("_TicketsAndNotes", sales);
         }
 
         [HttpPost]
         public ActionResult SearchNotes(DateTime? begin, DateTime? end, string folio, string client)
         {
-            var sales = LookForNotes(begin, end, folio,client);
+            var sales = LookForNotes(begin, end, folio, client);
             return PartialView("_SalesToPayList", sales);
         }
 
-        private List<Sale> LookForNotes(DateTime? begin, DateTime? end,string folio, string client)
+        private List<Sale> LookForNotes(DateTime? begin, DateTime? end, string folio, string client)
         {
-           var branchId = User.Identity.GetBranchId();
+            var branchId = User.Identity.GetBranchId();
 
             //busco las ventas de la sucursal que esten reservadas o completadas (ya pagadas)
-            var sales = db.Sales.Include(s=> s.Client).Include(s => s.TransactionDetails).
+            var sales = db.Sales.Include(s => s.Client).Include(s => s.TransactionDetails).
                 Include(s => s.User).Where(s => s.BranchId == branchId &&
             (begin == null || s.TransactionDate >= begin) &&
             (end == null || s.TransactionDate <= end) &&
             (folio == null || folio == string.Empty || s.Folio == folio) &&
             (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
             (s.Status == TranStatus.Compleated)).
-            OrderByDescending(s=> s.TransactionDate).ToList();
+            OrderByDescending(s => s.TransactionDate).ToList();
 
             return sales;
         }
 
-    
+
         public ActionResult PrintNote(int id)
         {
             var branchId = User.Identity.GetBranchId();
@@ -274,7 +286,7 @@ namespace CerberusMultiBranch.Controllers.Operative
              Include(s => s.Branch).
              FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated && s.BranchId == branchId);
 
-            if(sale == null)
+            if (sale == null)
                 return RedirectToAction("Index");
 
             sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
@@ -292,7 +304,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                        Include(s => s.TransactionDetails.Select(td => td.Product)).
                        Include(s => s.User).
                        Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id && 
+                       FirstOrDefault(s => s.TransactionId == id &&
                        s.Status == TranStatus.Reserved && s.BranchId == branchId);
 
             if (sale == null)
@@ -314,12 +326,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                     FirstOrDefault(s => s.TransactionId == transactionId);
 
                 //marco la venta como pagada y coloco el tipo de pago
-                sale.LastStatus     = sale.Status;
-                sale.Status         = TranStatus.Compleated;
-                sale.UpdDate        = DateTime.Now.ToLocal();
-                sale.UpdUser        = User.Identity.Name;
-                sale.PaymentType    = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
-                sale.Payments       = new List<Payment>();
+                sale.LastStatus = sale.Status;
+                sale.Status = TranStatus.Compleated;
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.UpdUser = User.Identity.Name;
+                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
+                sale.Payments = new List<Payment>();
 
                 #region Registros de pago
                 //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
@@ -340,12 +352,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                 {
                     var pm = new Payment
-                    { TransactionId = sale.TransactionId, Amount = cash.Value,
-                        PaymentDate = DateTime.Now.ToLocal(), PaymentType = PaymentType.Efectivo };
+                    {
+                        TransactionId = sale.TransactionId,
+                        Amount = cash.Value,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentType = PaymentType.Efectivo
+                    };
 
                     var pc = new Payment
-                    { TransactionId = sale.TransactionId, Amount = card.Value,
-                        PaymentDate = DateTime.Now.ToLocal(), PaymentType = PaymentType.Tarjeta };
+                    {
+                        TransactionId = sale.TransactionId,
+                        Amount = card.Value,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentType = PaymentType.Tarjeta
+                    };
 
                     sale.Payments.Add(pm);
                     sale.Payments.Add(pc);
@@ -379,7 +399,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     dt.Type = pay.PaymentType;
                     dt.SaleFolio = sale.Folio;
                     dt.DetailType = Cons.One;
-                    dt.Comment = "VENTA CON FOLIO "+sale.Folio;
+                    dt.Comment = "VENTA CON FOLIO " + sale.Folio;
 
                     db.CashDetails.Add(dt);
                 }
@@ -387,14 +407,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message= sale.TransactionId.ToString() });
+                return Json(new { Result = "OK", Message = sale.TransactionId.ToString() });
             }
             catch (Exception ex)
             {
                 return Json(new
                 {
                     Result = "Error al registrar el pago!",
-                    Message = "Detalle de la excepción " + ex.Message + " " 
+                    Message = "Detalle de la excepción " + ex.Message + " "
                     + ex.InnerException != null ? ex.InnerException.Message : string.Empty
                 });
             }

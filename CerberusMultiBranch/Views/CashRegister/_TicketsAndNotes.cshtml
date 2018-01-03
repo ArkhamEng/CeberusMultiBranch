@@ -2,7 +2,7 @@
 
 <div id="ModalNotes" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content panel panel-info panel-group">
+        <div class="modal-content panel panel-primary panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title text-uppercase">
@@ -15,7 +15,7 @@
 
                 <div id="pnlFilters" class="panel panel-danger top">
                     <div class="panel-body">
-                        <div class="col-md-10">
+                        <div class="col-md-12">
                             <div class="input-group">
                                 @Html.TextBox("Folio", "", htmlAttributes: new
                            {
@@ -38,7 +38,7 @@
                             </div>
                         </div>
                         <br /><br /><br />
-                        <div class="col-md-8">
+                        <div class="col-md-10">
                             <div class="input-group">
                                 <span class="input-group-addon"><a>Fecha Inicial</a></span>
                                 @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })

@@ -85,7 +85,7 @@
             @foreach (var item in Model.CashDetails)
             {
                 <tr>
-                    <td>@Html.DisplayFor(m => item.InsDate)</td>
+                    <td>@item.InsDate.ToString("HH:mm:ss")</td>
 
                     <td>
                         @if (item.DetailType == 0)
@@ -183,10 +183,10 @@
         <table class="table table-condensed col-xs-12">
             <thead>
                 <tr>
-                    <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
+                    <th>@Html.DisplayNameFor(m => m.CashDetails.First().InsDate)</th>
                     <th>@Html.DisplayName("Movimiento")</th>
                     <th></th>
-                    <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
+                    <th>@Html.DisplayNameFor(m => m.CashDetails.First().Amount)</th>
                     <th>@Html.DisplayName("Comentario")</th>
                 </tr>
             </thead>
@@ -194,7 +194,7 @@
                 @foreach (var item in Model.CashDetails)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(m => item.InsDate)</td>
+                        <td>@item.InsDate.ToString("HH:mm:ss")</td>
 
                         <td>
                             @if (item.DetailType == 0)

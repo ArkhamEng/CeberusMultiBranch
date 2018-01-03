@@ -93,6 +93,11 @@
                             @Model.User.UserName
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="2" class="text-center">
+                            <label>Tipo de pago:</label> @Model.PaymentType
+                        </td>
+                    </tr>
                 </table>
 
             </td>
@@ -102,7 +107,7 @@
         </tr>
         <tr>
             <td colspan="3">
-                <table style="width:816px" class="table-bordered">
+                <table style="width:816px;border:1px solid gray;" class="table-bordered">
                     <tr>
                         <td colspan="3" class="text-center">
                             <label>Datos del cliente</label>
@@ -275,6 +280,11 @@
 
             <tr>
                 <td align="center" colspan="2">
+                   Sucursal @Model.Branch.Name
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
                     @Model.Branch.Address
                 </td>
             </tr>
@@ -296,6 +306,11 @@
                 <td align="center">
                     Hora<br />
                     @Model.TransactionDate.ToString("HH:mm:ss")
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                   Tipo pago: @Model.PaymentType
                 </td>
             </tr>
             <tr>

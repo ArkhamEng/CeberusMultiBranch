@@ -67,7 +67,7 @@ else
                     </div>
                 }
 
-                <div class="text-center col-md-12  alert  btn-success" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
+                <div class="text-center col-md-12  alert  btn-warning" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
                     @{
 
                         var total = (Model.Incomes.
@@ -76,29 +76,45 @@ else
                         var totString = total.ToString("c");
                     }
                     <h3>
-                        Cerrar caja con<br />
-                        @totString
+                        <span class="fa fa-power-off"></span>
+                        Cierre de Caja<br />
+                        @*@totString*@
                     </h3>
                 </div>
             </div>
             <div class="col-md-9">
-                <div class="col-md-5  text-center  alert bg-primary">
-                    <h3>
-                        @{
-                            var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount).ToString("c");
-                        }
-                        Ventas Efectivo<br />
-                        @cash
-                    </h3>
-                </div>
-                <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
-                    <h3>
-                        Ventas Tarjeta<br />
-                        @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Tarjeta).Sum(d => d.Amount).ToString("c")
-                    </h3>
-                </div>
+                <div class="panel-group">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" href="#collapse1">Resumen de Ingresos</a>
+                            </h4>
+                        </div>
+                        <div id="collapse1" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <div class="col-md-5  text-center  alert bg-primary">
+                                    <h3>
+                                        @{
+                                            var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Efectivo).Sum(d => d.Amount).ToString("c");
+                                        }
+                                        Ventas Efectivo<br />
+                                        @cash
+                                    </h3>
+                                </div>
+                                <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
+                                    <h3>
+                                        Ventas Tarjeta<br />
+                                        @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentType.Tarjeta).Sum(d => d.Amount).ToString("c")
+                                    </h3>
+                                </div>
 
 
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
                 <div class="col-md-11">
                     <img class="img-responsive" src="@Model.ChartSource" />
                 </div>
