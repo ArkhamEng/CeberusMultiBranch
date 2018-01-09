@@ -43,8 +43,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.PaymentType = sale.PaymentType;
             this.TotalAmount = sale.TotalAmount;
             this.TransactionDate = sale.TransactionDate;
-            this.TransactionDetails = sale.TransactionDetails;
-            this.TransactionId = sale.TransactionId;
+            this.SaleDetails = sale.SaleDetails;
+            this.SaleId = sale.SaleId;
             this.UpdDate = sale.UpdDate;
             this.User = sale.User;
             this.UserId = sale.UserId;

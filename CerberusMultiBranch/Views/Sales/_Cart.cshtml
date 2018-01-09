@@ -15,7 +15,7 @@
 
             <div class="modal-body panel-body">
 
-                @Html.HiddenFor(m => m.TransactionId)
+                @Html.HiddenFor(m => m.SaleId)
 
                 @Html.HiddenFor(m => m.ClientId)
 
@@ -34,7 +34,7 @@
 
                 <div class="panel panel-danger col-md-12">
                     <div id="divCartDetails" class="row">
-                            @Html.Partial("_CartDetails", Model.TransactionDetails)
+                            @Html.Partial("_CartDetails", Model.SaleDetails)
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
                                 <span class="fa fa-user-plus"></span>
                                 Cargo a cliente
                             </button>
-                            <button class="btn btn-primary" type="button" id="btnCompleate" onclick="CompleateSale('@Model.TransactionId')">
+                            <button class="btn btn-primary" type="button" id="btnCompleate" onclick="CompleateSale('@Model.SaleId')">
                                 <span class="fa fa-upload"></span>
                                 Terminar venta
                             </button>

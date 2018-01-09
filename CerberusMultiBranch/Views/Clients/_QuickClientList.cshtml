@@ -59,7 +59,7 @@
 
     function ClientSelected(id, name, ftr)
     {
-        var param = { clientId: id, transactionId: $("#TransactionId").val() }
+        var param = { clientId: id, transactionId: $("#SaleId").val() }
 
         ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j)
         {

@@ -43,9 +43,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
-            var purchase = db.Purchases.Include(p => p.TransactionDetails).Include(p => p.User).
-                   Include(p => p.TransactionDetails.Select(td => td.Product.Images)).
-                   FirstOrDefault(p => p.TransactionId == id && brancheIds.Contains(p.BranchId) 
+            var purchase = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.User).
+                   Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
+                   FirstOrDefault(p => p.PurchaseId == id && brancheIds.Contains(p.BranchId) 
                    && (userId == null || p.UserId == userId) );
 
             if (purchase == null)
@@ -72,11 +72,11 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a cancelar
-                var purchase = db.Purchases.Include(s => s.TransactionDetails).
-                    FirstOrDefault(s => s.TransactionId == transactionId);
+                var purchase = db.Purchases.Include(s => s.PurchaseDetails).
+                    FirstOrDefault(s => s.PurchaseId == transactionId);
 
                 //regreso los productos al stock
-                foreach (var detail in purchase.TransactionDetails)
+                foreach (var detail in purchase.PurchaseDetails)
                 {
                     var bp = db.BranchProducts.Find(purchase.BranchId, detail.ProductId);
 
@@ -134,7 +134,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             //Busco las compras hechas en las sucursales asignadas del usuario
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.TransactionDetails)
+            var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.PurchaseDetails)
                              where (branchId == null || branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
@@ -151,12 +151,12 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Capturista")]
         public ActionResult Create(int? id)
         {
-            Transaction model = null;
+            Purchase model = null;
 
             if (id != null)
             {
-                model = db.Purchases.Include(p => p.TransactionDetails.Select(d => d.Product.Images)).
-                    FirstOrDefault(p => p.TransactionId == id);
+                model = db.Purchases.Include(p => p.PurchaseDetails.Select(d => d.Product.Images)).
+                    FirstOrDefault(p => p.PurchaseId == id);
             }
 
             if (model == null)
@@ -181,7 +181,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 purchase.UpdDate = DateTime.Now;
                 purchase.UpdUser = User.Identity.Name;
 
-                if (purchase.TransactionId == Cons.Zero)
+                if (purchase.PurchaseId == Cons.Zero)
                     db.Purchases.Add(purchase);
                 else
                 {
@@ -193,18 +193,18 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (purchase.Status == TranStatus.Compleated)
                 {
-                    var detailes = db.TransactionDetails.Where(td => td.TransactionId == purchase.TransactionId).ToList();
+                    var detailes = db.PurchaseDetails.Where(td => td.PurchaseId == purchase.PurchaseId).ToList();
 
-                    if (purchase.PaymentType == PaymentType.Contado)
-                    {
-                        Payment p = new Payment();
-                        p.Amount = purchase.TotalAmount;
-                        p.PaymentDate = purchase.TransactionDate;
-                        p.TransactionId = purchase.TransactionId;
-                        p.PaymentType = PaymentType.Contado;
+                    //if (purchase.PaymentType == PaymentType.Contado)
+                    //{
+                    //    Payment p = new Payment();
+                    //    p.Amount = purchase.TotalAmount;
+                    //    p.PaymentDate = purchase.TransactionDate;
+                    //    p.TransactionId = purchase.PurchaseId;
+                    //    p.PaymentType = PaymentType.Contado;
 
-                        db.Payments.Add(p);
-                    }
+                    //    db.Payments.Add(p);
+                    //}
 
                     foreach (var det in detailes)
                     {
@@ -276,7 +276,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 db.SaveChanges();
-                return RedirectToAction("Create", new { id = purchase.TransactionId });
+                return RedirectToAction("Create", new { id = purchase.PurchaseId });
             }
 
             return View(purchase);
@@ -439,8 +439,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var detail = db.TransactionDetails.
-                    FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+                var detail = db.PurchaseDetails.
+                    FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == transactionId);
 
                 if (detail != null)
                 {
@@ -451,16 +451,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 else
                 {
-                    detail = new TransactionDetail
+                    detail = new PurchaseDetail
                     {
                         ProductId = productId,
-                        TransactionId = transactionId,
+                        PurchaseId = transactionId,
                         Quantity = quantity,
                         Price = price,
                         Amount = price * quantity
                     };
 
-                    db.TransactionDetails.Add(detail);
+                    db.PurchaseDetails.Add(detail);
                 }
 
                 db.SaveChanges();
@@ -470,8 +470,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 ModelState.AddModelError("AddDetail", ex);
             }
 
-            var model = db.TransactionDetails.Include(d => d.Product.Images).
-                Where(d => d.TransactionId == transactionId).ToList();
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).
+                Where(d => d.PurchaseId == transactionId).ToList();
 
 
             return PartialView("_Details", model);
@@ -480,61 +480,25 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult RemoveDetail(int transactionId, int productId)
         {
-            var detail = db.TransactionDetails.FirstOrDefault(d => d.ProductId == productId && d.TransactionId == transactionId);
+            var detail = db.PurchaseDetails.FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == transactionId);
 
             if (detail != null)
             {
-                db.TransactionDetails.Remove(detail);
+                db.PurchaseDetails.Remove(detail);
                 db.SaveChanges();
             }
 
-            var model = db.TransactionDetails.Include(d => d.Product.Images).
-              Where(d => d.TransactionId == transactionId).ToList();
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).
+              Where(d => d.PurchaseId == transactionId).ToList();
 
 
             return PartialView("_Details", model);
         }
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "PurchaseId,ProviderId,BranchId,TotalAmount,Bill,PurchaseDate,InsDate,UpdDate,EmployeeId")] Transaction purchase)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(purchase).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(purchase);
-        }
 
-        // GET: Purchases/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Transaction purchase = db.Purchases.Find(id);
-            if (purchase == null)
-            {
-                return HttpNotFound();
-            }
-            return View(purchase);
-        }
 
-        // POST: Purchases/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            var purchase = db.Purchases.Find(id);
-            db.Purchases.Remove(purchase);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
+    
         protected override void Dispose(bool disposing)
         {
             if (disposing)

@@ -105,7 +105,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual City City { get; set; }
 
-        public ICollection<Purchase> Purchases { get; set; }
+       public ICollection<Purchase> Purchases { get; set; }
 
         public ICollection<ExternalProduct> ExternalProducts { get; set; }
 

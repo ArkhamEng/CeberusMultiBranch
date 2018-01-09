@@ -23,7 +23,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         public int PaymentId { get; set; }
 
-        public int TransactionId { get; set; }
+        public int SaleId { get; set; }
 
         public double Amount { get; set; }
 
@@ -31,7 +31,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime PaymentDate { get; set; }
 
-        public virtual Transaction Transaction { get; set; }
+        public virtual Sale Sale { get; set; }
 
     }
 }

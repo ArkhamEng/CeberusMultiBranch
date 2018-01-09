@@ -28,7 +28,7 @@
                 <td>@Html.DisplayFor(m => item.ComAmount)</td>
 
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
-                @{ var quantity = item.TransactionDetails.Sum(td => td.Quantity);  }
+                @{ var quantity = item.SaleDetails.Sum(td => td.Quantity);  }
 
 
                 @switch (item.Status)
@@ -57,7 +57,7 @@
                 }
                 <td align="center">
                     <button class="btn btn-primary  btn-xs" title="Ver detalle"
-                            onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.TransactionId })'">
+                            onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.SaleId })'">
                         <span class="fa fa-eye" />
                     </button>
                 </td>

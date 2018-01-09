@@ -26,7 +26,7 @@
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
 
                 <td align="center">
-                    <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("PrintNote", new { id = item.TransactionId })'">
+                    <button class="btn btn-primary  btn-xs" title="Ver factura" onclick="window.location = '@Url.Action("PrintNote", new { id = item.SaleId })'">
                         <span class="fa fa-file-text-o" />
                     </button>
                 </td>
@@ -34,7 +34,7 @@
           }
     </tbody>
     @{
-        var totalQuantity = Model.Sum(sale => sale.TransactionDetails.Sum(s => s.Quantity));
+        var totalQuantity = Model.Sum(sale => sale.SaleDetails.Sum(s => s.Quantity));
         var totalAmount = Model.Sum(sale => sale.TotalAmount);
     }
 </table>

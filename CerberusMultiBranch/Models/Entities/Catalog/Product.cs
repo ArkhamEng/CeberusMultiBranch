@@ -76,7 +76,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Compatibility> Compatibilities { get; set; }
 
-        public ICollection<TransactionDetail> TransactionDetails { get; set; }
+        public ICollection<SaleDetail> TransactionDetails { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
 

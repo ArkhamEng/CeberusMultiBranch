@@ -160,7 +160,7 @@
 
         if ($("#rdCash").is(":checked")) {
             param = {
-                transactionId: $("#TransactionId").val(),
+                transactionId: $("#SaleId").val(),
                 payment: $("#rdCash").val(),
                 cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
             };
@@ -168,14 +168,14 @@
 
         else if ($("#rdCard").is(":checked")) {
             param = {
-                transactionId: $("#TransactionId").val(),
+                transactionId: $("#SaleId").val(),
                 payment: $("#rdCard").val(),
                 cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
             };
         }
         else {
             param = {
-                transactionId: $("#TransactionId").val(),
+                transactionId: $("#SaleId").val(),
                 payment: $("#rdMix").val(),
                 cash: $("#txtCash").val(),
                 card: $("#txtCard").val()

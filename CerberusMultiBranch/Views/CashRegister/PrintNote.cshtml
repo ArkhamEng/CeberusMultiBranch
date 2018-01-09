@@ -169,7 +169,7 @@
                             <label>Total</label>
                         </td>
                     </tr>
-                    @foreach (var item in Model.TransactionDetails)
+                    @foreach (var item in Model.SaleDetails)
                     {
                         string st = "height:20px";
                         if (item.ParentId == null)
@@ -319,7 +319,7 @@
             <tr>
                 <td align="center" colspan="2">
                     <table style="width:100%">
-                        @foreach (var tI in Model.TransactionDetails)
+                        @foreach (var tI in Model.SaleDetails)
                         {
                             var i = tI.Product.Code.Length - 4;
                             var sCode = tI.Product.Code.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);

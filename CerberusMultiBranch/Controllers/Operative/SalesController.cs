@@ -56,11 +56,11 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a la que se le cambiara el status
-                var sale = db.Sales.Include(s => s.TransactionDetails).
-                    FirstOrDefault(s => s.TransactionId == transactionId);
+                var sale = db.Sales.Include(s => s.SaleDetails).
+                    FirstOrDefault(s => s.SaleId == transactionId);
 
                 //regreso los productos al stock
-                foreach (var detail in sale.TransactionDetails)
+                foreach (var detail in sale.SaleDetails)
                 {
                     var bp = db.BranchProducts.Find(sale.BranchId, detail.ProductId);
 
@@ -135,15 +135,15 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.User).
-                Include(s => s.TransactionDetails.Select(td => td.Product.Category)).
-                Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                FirstOrDefault(s => s.TransactionId == id && brancheIds.Contains(s.BranchId));
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.User).
+                Include(s => s.SaleDetails.Select(td => td.Product.Category)).
+                Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                FirstOrDefault(s => s.SaleId == id && brancheIds.Contains(s.BranchId));
 
             if (sale == null)
                 return RedirectToAction("History");
 
-            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
+            sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
             return View(sale);
         }
@@ -154,7 +154,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.TransactionDetails)
+            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.SaleDetails)
                          where
                             (branchId == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
@@ -175,12 +175,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).
+            var sale = db.Sales.Include(s => s.SaleDetails).
                 FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId && s.Status == TranStatus.InProcess);
 
             if (sale != null)
             {
-                var list = sale.TransactionDetails;
+                var list = sale.SaleDetails;
                 return Json(new { Result = "OK", Message = (list.Sum(td => td.Quantity)).ToString() });
             }
 
@@ -194,8 +194,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var branchId = User.Identity.GetBranchId();
 
-            var transDet = db.TransactionDetails.Include(td=> td.Product).Include(td => td.Product.BranchProducts).
-                FirstOrDefault(td => td.ProductId == productId && td.TransactionId == transactionId);
+            var transDet = db.SaleDetails.Include(td=> td.Product).Include(td => td.Product.BranchProducts).
+                FirstOrDefault(td => td.ProductId == productId && td.SaleId == transactionId);
 
             var bp = transDet.Product.BranchProducts.FirstOrDefault(p => p.BranchId == branchId);
 
@@ -220,15 +220,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 var branchId = User.Identity.GetBranchId();
 
-                var sale = db.Sales.Include(s => s.TransactionDetails).
-                    Include(s => s.TransactionDetails.Select(td => td.Product)).
+                var sale = db.Sales.Include(s => s.SaleDetails).
+                    Include(s => s.SaleDetails.Select(td => td.Product)).
                     //Include(s => s.TransactionDetails.Select(td => td.Product.Category)).
-                    Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-                    FirstOrDefault(s => s.TransactionId == transactionId);
+                    Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
+                    FirstOrDefault(s => s.SaleId == transactionId);
 
                 if (sale != null)
                 {
-                    foreach (var detail in sale.TransactionDetails)
+                    foreach (var detail in sale.SaleDetails)
                     {
                         var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
                         detail.Product.Quantity = brp != null ? brp.Stock : Cons.Zero;
@@ -257,7 +257,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 sale.ClientId = clientId;
 
-                foreach (var deteail in sale.TransactionDetails)
+                foreach (var deteail in sale.SaleDetails)
                 {
                     //ajusto el precio dependiendo de la configuración del cliente
                     switch (client.Type)
@@ -294,8 +294,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var det = db.TransactionDetails.Include(td => td.Product).Include(td => td.Product.Images)
-             .FirstOrDefault(td => td.TransactionId == transactionId && td.ProductId == productId);
+                var det = db.SaleDetails.Include(td => td.Product).Include(td => td.Product.Images)
+             .FirstOrDefault(td => td.SaleId == transactionId && td.ProductId == productId);
 
                 det.Price = price;
                 var newAmount = det.Price * det.Quantity;
@@ -322,8 +322,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Entry(det.Sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                var model = db.TransactionDetails.Include(s => s.Product).
-                    Include(s => s.Product.Images).Where(s => s.TransactionId == transactionId).ToList();
+                var model = db.SaleDetails.Include(s => s.Product).
+                    Include(s => s.Product.Images).Where(s => s.SaleId == transactionId).ToList();
 
                 return PartialView("_CartDetails", model);
             }
@@ -341,10 +341,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
             string userId = User.Identity.GetUserId();
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
-                Include(s => s.TransactionDetails.Select(td => td.Product)).
-                Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).
+                Include(s => s.SaleDetails.Select(td => td.Product)).
+                Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
 
                 FirstOrDefault(s => (userId == null || s.UserId == userId)
                                && (s.Status == TranStatus.InProcess)
@@ -352,7 +352,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (sale != null)
             {
-                foreach (var detail in sale.TransactionDetails)
+                foreach (var detail in sale.SaleDetails)
                 {
                     var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
                     detail.Product.Quantity = brp != null ? brp.Stock : Cons.Zero;
@@ -369,7 +369,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UserId = userId;
                 model.BranchId = branchId;
-                model.TransactionDetails = new List<TransactionDetail>();
+                model.SaleDetails = new List<SaleDetail>();
             }
 
             model.UpdUser = User.Identity.Name;
@@ -380,18 +380,18 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public ActionResult RemoveFromCart(int transactionId, int productId)
         {
-            var detail = db.TransactionDetails.Find(transactionId, productId);
+            var detail = db.SaleDetails.Find(transactionId, productId);
 
             if (detail != null)
             {
                 try
                 {
-                    db.TransactionDetails.Remove(detail);
+                    db.SaleDetails.Remove(detail);
                     db.SaveChanges();
 
-                    var model = db.TransactionDetails.Include(t => t.Product).
+                    var model = db.SaleDetails.Include(t => t.Product).
                         Include(t => t.Product.Images).
-                        Where(t => t.TransactionId == transactionId).ToList();
+                        Where(t => t.SaleId == transactionId).ToList();
 
                     var sale = db.Sales.Find(transactionId);
 
@@ -523,8 +523,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
 
             //checo si el producto ya esta en la venta
-            var detail = db.TransactionDetails.
-                FirstOrDefault(td => td.ProductId == productId && td.TransactionId == sale.TransactionId);
+            var detail = db.SaleDetails.
+                FirstOrDefault(td => td.ProductId == productId && td.SaleId == sale.SaleId);
 
             //si lo esta, sumo la cantidad
             if (detail != null)
@@ -551,16 +551,16 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
             else
             {
-                detail = new TransactionDetail
+                detail = new SaleDetail
                 {
                     ProductId = productId,
-                    TransactionId = sale.TransactionId,
+                    SaleId = sale.SaleId,
                     Price = price,
                     Quantity = quantity,
                     Amount = amount
                 };
 
-                db.TransactionDetails.Add(detail);
+                db.SaleDetails.Add(detail);
             }
             sale.TotalAmount += amount;
 
@@ -582,8 +582,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public JsonResult CompleateSale(int transactionId, int sending)
         {
-            var sale = db.Sales.Include(s => s.TransactionDetails).
-                FirstOrDefault(s => s.TransactionId == transactionId);
+            var sale = db.Sales.Include(s => s.SaleDetails).
+                FirstOrDefault(s => s.SaleId == transactionId);
 
             try
             {
@@ -599,7 +599,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 int sortOrder = Cons.One;
 
-                foreach (var detail in sale.TransactionDetails)
+                foreach (var detail in sale.SaleDetails)
                 {
                     //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
                     var pb = db.BranchProducts.Include(brp => brp.Product).
@@ -634,9 +634,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                         foreach (var pckDet in pb.Product.PackageDetails)
                         {
                             sortOrder++;
-                            var tDeatil = new TransactionDetail
+                            var tDeatil = new SaleDetail
                             {
-                                TransactionId = detail.TransactionId,
+                                SaleId = detail.SaleId,
                                 Quantity = pckDet.Quantity,
                                 Price = Cons.Zero,
                                 Commission = Cons.Zero,
@@ -662,7 +662,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             };
 
                             db.StockMovements.Add(detSm);
-                            db.TransactionDetails.Add(tDeatil);
+                            db.SaleDetails.Add(tDeatil);
 
                             db.Entry(detBP).State = EntityState.Modified;
                         }
@@ -686,7 +686,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 //ajusto el monto total y agrego el folio
-                sale.TotalAmount = sale.TransactionDetails.Sum(td => td.Amount);
+                sale.TotalAmount = sale.SaleDetails.Sum(td => td.Amount);
                 sale.Folio = folio;
 
                 //coloco el porcentaje de comision del empleado
@@ -695,7 +695,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //si tiene comision por venta, coloco la cantidad de esta
                 if (sale.ComPer > Cons.Zero)
                 {
-                    var comTot = sale.TransactionDetails.Sum(td => td.Commission);
+                    var comTot = sale.SaleDetails.Sum(td => td.Commission);
                     if (comTot > Cons.Zero)
                         sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Two);
                 }
@@ -732,11 +732,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db = new ApplicationDbContext();
 
 
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
-                                     Include(s => s.TransactionDetails.Select(td => td.Product)).
-                                     Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                                     Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
-                                     FirstOrDefault(s => s.TransactionId == id);
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).
+                                     Include(s => s.SaleDetails.Select(td => td.Product)).
+                                     Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                                     Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
+                                     FirstOrDefault(s => s.SaleId == id);
 
             SaleViewModel model = new SaleViewModel(sale);
             model.Categories = db.Categories.ToSelectList();

@@ -9,7 +9,7 @@
 
 
 
-@Html.HiddenFor(m => m.TransactionId)
+@Html.HiddenFor(m => m.SaleId)
 
 <h3 class="alert alert-success col-md-4">
     <span class="fa fa-building"></span>
@@ -140,7 +140,7 @@
                         <u>B</u>úsqueda
                     </button>
 
-                    @if (Model.Status != TranStatus.Canceled)
+                    @if (Model.Status != TranStatus.Canceled && Model.Status != TranStatus.InProcess)
                     {
                         <button type="button" class="btn btn-danger" title="cancelar venta"
                                 onclick="$('#ModalCancel').modal('show');" id="btnCancel">
@@ -181,7 +181,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.TransactionDetails)
+                    @foreach (var item in Model.SaleDetails)
                     {
                         <tr>
                             <td class="col-md-1" align="center">
@@ -223,8 +223,7 @@
 
 
 <script>
-    var modalOpen = false;
-
+   
     $(document).ready(function ()
     {
         Paginate("#tbDetails", 5);
@@ -235,7 +234,7 @@
         $("#ModalCancel").modal("hide");
         ShowLoading();
 
-        var param = { transactionId: $("#TransactionId").val(), comment: $("#txtComment").val() }
+        var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
 
         ExecuteAjax('@Url.Action("Cancel")', param, function (j) {
             if (j.Result = 'OK')

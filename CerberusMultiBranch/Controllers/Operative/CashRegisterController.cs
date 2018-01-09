@@ -81,15 +81,15 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var brachId = User.Identity.GetBranchId();
 
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
+            //using (ApplicationDbContext db = new ApplicationDbContext())
+            //{
                 var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
                     FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
 
                 if (cash != null && cash.CashDetails != null)
                     cash.CashDetails.OrderBy(d => d.InsDate);
                 return cash;
-            }
+            //}
         }
 
         // GET: CashRegister
@@ -262,7 +262,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
 
             //busco las ventas de la sucursal que esten reservadas o completadas (ya pagadas)
-            var sales = db.Sales.Include(s => s.Client).Include(s => s.TransactionDetails).
+            var sales = db.Sales.Include(s => s.Client).Include(s => s.SaleDetails).
                 Include(s => s.User).Where(s => s.BranchId == branchId &&
             (begin == null || s.TransactionDate >= begin) &&
             (end == null || s.TransactionDate <= end) &&
@@ -279,17 +279,17 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var branchId = User.Identity.GetBranchId();
             // busco la venta con el id provisto validando que ya tenga status compleated (pagada)
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).Include(s => s.User).
-             Include(s => s.TransactionDetails.Select(td => td.Product)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-             Include(s => s.TransactionDetails.Select(td => td.Product.BranchProducts)).
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
+             Include(s => s.SaleDetails.Select(td => td.Product)).
+             Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
              Include(s => s.Branch).
-             FirstOrDefault(s => s.TransactionId == id && s.Status == TranStatus.Compleated && s.BranchId == branchId);
+             FirstOrDefault(s => s.SaleId == id && s.Status == TranStatus.Compleated && s.BranchId == branchId);
 
             if (sale == null)
                 return RedirectToAction("Index");
 
-            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
+            sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
             return View(sale);
         }
@@ -300,17 +300,17 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
 
             //obtengo la venta con el id dado verificando que este en status Reserved
-            var sale = db.Sales.Include(s => s.TransactionDetails).Include(s => s.Client).
-                       Include(s => s.TransactionDetails.Select(td => td.Product)).
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).
+                       Include(s => s.SaleDetails.Select(td => td.Product)).
                        Include(s => s.User).
-                       Include(s => s.TransactionDetails.Select(td => td.Product.Images)).
-                       FirstOrDefault(s => s.TransactionId == id &&
+                       Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                       FirstOrDefault(s => s.SaleId == id &&
                        s.Status == TranStatus.Reserved && s.BranchId == branchId);
 
             if (sale == null)
                 return RedirectToAction("Index");
 
-            sale.TransactionDetails = sale.TransactionDetails.OrderBy(td => td.SortOrder).ToList();
+            sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
             return View(sale);
         }
@@ -322,8 +322,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a pagar
-                var sale = db.Sales.Include(s => s.TransactionDetails).
-                    FirstOrDefault(s => s.TransactionId == transactionId);
+                var sale = db.Sales.Include(s => s.SaleDetails).
+                    FirstOrDefault(s => s.SaleId == transactionId);
 
                 //marco la venta como pagada y coloco el tipo de pago
                 sale.LastStatus = sale.Status;
@@ -340,7 +340,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var p = new Payment
                     {
-                        TransactionId = sale.TransactionId,
+                        SaleId = sale.SaleId,
                         Amount = sale.TotalAmount,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentType = sale.PaymentType,
@@ -353,7 +353,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var pm = new Payment
                     {
-                        TransactionId = sale.TransactionId,
+                        SaleId = sale.SaleId,
                         Amount = cash.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentType = PaymentType.Efectivo
@@ -361,7 +361,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     var pc = new Payment
                     {
-                        TransactionId = sale.TransactionId,
+                        SaleId = sale.SaleId,
                         Amount = card.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentType = PaymentType.Tarjeta
@@ -407,7 +407,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = sale.TransactionId.ToString() });
+                return Json(new { Result = "OK", Message = sale.SaleId.ToString() });
             }
             catch (Exception ex)
             {

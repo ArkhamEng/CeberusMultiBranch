@@ -7,7 +7,7 @@
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
             <th class="col-md-4">@Html.DisplayName("Proveedor")</th>
     
-            <th class="col-md-1">@Html.DisplayName("Tipo")</th>
+            @*<th class="col-md-1">@Html.DisplayName("Tipo")</th>*@
             <th class="col-md-1">@Html.DisplayName("Fecha")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
          
@@ -23,7 +23,7 @@
                 <td>@Html.DisplayFor(m => item.Bill)</td>
                 <td>@Html.DisplayFor(m => item.Provider.Name)</td>
    
-                <td align="center">@item.PaymentType.ToString()</td>
+                @*<td align="center">@item.PaymentType.ToString()</td>*@
                 <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 
@@ -48,7 +48,7 @@
                         break;
                 }
                 <td align="center">
-                    <button class="btn btn-primary  btn-xs" onclick="Detail(@item.TransactionId)" title="Ver detalle de compra">
+                    <button class="btn btn-primary  btn-xs" onclick="Detail(@item.PurchaseId)" title="Ver detalle de compra">
                         <span class="glyphicon glyphicon-eye-open" />
                     </button>
                 </td>
@@ -57,7 +57,7 @@
     </tbody>
 </table>
 @{
-    var totalQuantity = Model.Sum(purchase => purchase.TransactionDetails.Sum(s => s.Quantity));
+    var totalQuantity = Model.Sum(purchase => purchase.PurchaseDetails.Sum(s => s.Quantity));
     var totalAmount = Model.Sum(purchase => purchase.TotalAmount);
 }
 <script>

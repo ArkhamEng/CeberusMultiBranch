@@ -20,7 +20,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Ubicación")]
         public string Location { get; set; }
 
-        public ICollection<Transaction> Transactions { get; set; }
+        public ICollection<Sale> Sales { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
@@ -28,12 +28,12 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<UserBranch> UserBranches { get; set; }
 
-        [NotMapped]
-        public ICollection<Sale> Sales { get { return this.Transactions.OfType<Sale>().ToList(); } }
+        //[NotMapped]
+        //public ICollection<Operation> Sales { get { return this.Transactions.OfType<Operation>().ToList(); } }
 
 
-        [NotMapped]
-        public ICollection<Purchase> Purchases { get { return this.Transactions.OfType<Purchase>().ToList(); } }
+        //[NotMapped]
+        //public ICollection<Purchase> Purchases { get { return this.Transactions.OfType<Purchase>().ToList(); } }
 
         [NotMapped]
         public int Id { get { return this.BranchId; } }
@@ -44,7 +44,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public Branch()
         {
-            this.Transactions = new List<Transaction>();
+            this.Sales = new List<Sale>();
         }
     }
 

@@ -14,7 +14,7 @@
 </h3>
 
 
-@Html.HiddenFor(m=> m.TransactionId)
+@Html.HiddenFor(m=> m.PurchaseId)
 <div class="panel-group">
     <div class="panel panel-danger">
         <div class="panel-body">
@@ -33,10 +33,10 @@
                     <label class="control-label">
                         Tipo de compra
                     </label>
-                    <div class="input-group">
+                    @*<div class="input-group">
                         <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
                         <input class="form-control" value="@Model.PaymentType.ToString()" readonly />
-                    </div>
+                    </div>*@
                 </div>
 
                 <div class="form-group col-md-2 col-md-offset-1">
@@ -195,7 +195,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.TransactionDetails)
+                    @foreach (var item in Model.PurchaseDetails)
                     {
                         <tr>
                             <td class="col-md-1">

@@ -1,4 +1,4 @@
-﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.TransactionDetail>
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.PurchaseDetail>
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 <table class="table table-striped">
@@ -64,7 +64,7 @@
                 </td>
                 <td  class="Compleated">
                     <div class="btn-group">
-                        <button class="btn btn-danger btn-xs" type="button" onclick="RemoveDetail(@item.TransactionId,@item.ProductId)">
+                        <button class="btn btn-danger btn-xs" type="button" onclick="RemoveDetail(@item.PurchaseId,@item.ProductId)">
                             <span class="glyphicon glyphicon-trash"></span> 
                         </button>
                     </div>

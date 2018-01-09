@@ -8,8 +8,11 @@ using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
+    [Table("Purchase", Schema = "Operative")]
     public class Purchase : Transaction
     {
+        public int PurchaseId { get; set; }
+
         public int ProviderId { get; set; }
 
         [Display(Name = "Factura")]
@@ -23,10 +26,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public DateTime Expiration { get; set; }
 
 
+        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
+
         public virtual Provider Provider { get; set; }
 
-        public Purchase() : base()
-        {
+        public Purchase() 
+        {  
             this.Expiration = DateTime.Now;
         }
 

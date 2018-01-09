@@ -519,7 +519,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         Include(p => p.BranchProducts).
                         FirstOrDefault(p => p.ProductId == id);
 
-            model.TransactionId = (trans == null) ? Cons.Zero : trans.TransactionId;
+            model.TransactionId = (trans == null) ? Cons.Zero : trans.SaleId;
 
 
             var bProd = model.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
@@ -1586,7 +1586,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     //reviso si el producto ya se encuentra en alguna transacción,
                     //si es asi solo se desactiva
-                    var detail = db.TransactionDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
+                    var detail = db.SaleDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
 
                     if (detail != null)
                     {

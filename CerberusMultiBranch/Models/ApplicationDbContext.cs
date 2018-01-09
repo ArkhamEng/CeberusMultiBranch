@@ -67,13 +67,17 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<Purchase> Purchases { get; set; }
 
+        public DbSet<PurchaseDetail> PurchaseDetails { get; set; }
+
         public DbSet<Sale> Sales { get; set; }
+
+        public DbSet<SaleDetail> SaleDetails { get; set; }
 
         public DbSet<CashRegister> CashRegisters { get; set; }
 
         public DbSet<CashDetail> CashDetails { get; set; }
 
-        public DbSet<TransactionDetail> TransactionDetails { get; set; }
+        
 
         public DbSet<BranchProduct> BranchProducts { get; set; }
 

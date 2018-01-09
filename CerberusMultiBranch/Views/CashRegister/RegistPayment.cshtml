@@ -95,7 +95,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.TransactionDetails)
+                    @foreach (var item in Model.SaleDetails)
                     {
                         <tr>
                             <td class="col-md-1" align="center">
@@ -159,7 +159,7 @@
 
 @Html.Partial("_ChoosePayment",Model.TotalAmount)
 
-@Html.HiddenFor(m => m.TransactionId)
+@Html.HiddenFor(m => m.SaleId)
 
 <script>
     $(document).ready(function ()
@@ -172,7 +172,7 @@
         $("#ModalCancel").modal("hide");
         ShowLoading();
 
-        var param = { transactionId: $("#TransactionId").val(), comment: $("#txtComment").val() }
+        var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
 
         ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
         {
