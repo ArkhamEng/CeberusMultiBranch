@@ -30,11 +30,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int SendingType { get; set; }
 
-        public PaymentType PaymentType { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+       
 
         public ICollection<SaleDetail> SaleDetails { get; set; }
 
-        public ICollection<Payment> Payments { get; set; }
+        public ICollection<SalePayment> Payments { get; set; }
 
         public virtual Client Client { get; set; }
 
@@ -47,12 +48,5 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         }
     }
 
-    public enum TranStatus:int
-    {
-        Canceled      = -1, //Cancelado en venta y compra
-        InProcess     = 0, //Abierto-venta, En proceso -compra
-        Reserved      = 1,
-        Revision      = 2, 
-        Compleated    = 3, //Pagado-Venta, Inventariado-Compra
-    }
+   
 }

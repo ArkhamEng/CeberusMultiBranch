@@ -40,7 +40,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.LastStatus = sale.LastStatus;
             this.Status = sale.Status;
             this.Payments = sale.Payments;
-            this.PaymentType = sale.PaymentType;
+            this.PaymentMethod = sale.PaymentMethod;
             this.TotalAmount = sale.TotalAmount;
             this.TransactionDate = sale.TransactionDate;
             this.SaleDetails = sale.SaleDetails;

@@ -28,7 +28,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name = "Hora")]
         public DateTime InsDate { get; set; }
 
-        public PaymentType Type { get; set; }
+        public PaymentMethod Type { get; set; }
 
         public string SaleFolio { get; set; }
 

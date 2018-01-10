@@ -7,7 +7,7 @@
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
             <th class="col-md-4">@Html.DisplayName("Proveedor")</th>
     
-            @*<th class="col-md-1">@Html.DisplayName("Tipo")</th>*@
+            <th class="col-md-1">@Html.DisplayName("Tipo")</th>
             <th class="col-md-1">@Html.DisplayName("Fecha")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
          
@@ -23,7 +23,7 @@
                 <td>@Html.DisplayFor(m => item.Bill)</td>
                 <td>@Html.DisplayFor(m => item.Provider.Name)</td>
    
-                @*<td align="center">@item.PaymentType.ToString()</td>*@
+                <td align="center">@item.PaymentMethod.ToString()</td>
                 <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
                 

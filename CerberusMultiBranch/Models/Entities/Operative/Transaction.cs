@@ -25,10 +25,22 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
+        [Display(Name = "Monto Pagado")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double PaidAmount { get; set; }
+
+        [Display(Name = "Monto en Deuda")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double DebtAmount { get; set; }
+
         [Index("IDX_Status", IsUnique = false)]
         public TranStatus Status { get; set; }
 
         public TranStatus LastStatus { get; set; }
+
+        public bool IsCredit { get; set; }
 
         [MaxLength(100)]
         public string Comment { get; set; }

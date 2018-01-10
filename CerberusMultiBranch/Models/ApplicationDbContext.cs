@@ -81,7 +81,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<BranchProduct> BranchProducts { get; set; }
 
-        public DbSet<Payment> Payments { get; set; }
+        public DbSet<SalePayment> Payments { get; set; }
         #endregion
 
 

@@ -104,8 +104,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
 
             var incomes = cr.Incomes.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
-            var cash = cr.Incomes.Where(cd => cd.Type == PaymentType.Efectivo).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
-            var card = cr.Incomes.Where(cd => cd.Type == PaymentType.Tarjeta).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
+            var cash = cr.Incomes.Where(cd => cd.Type == PaymentMethod.Efectivo).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
+            var card = cr.Incomes.Where(cd => cd.Type == PaymentMethod.Tarjeta).GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
             var Withdrawals = cr.Withdrawals.GroupBy(cd => cd.InsDate.Hour).Select(cd => new { Total = cd.Sum(c => c.Amount).ToString("c"), Key = cd.Key }).ToList();
 
             var accum = new List<double>();
@@ -199,7 +199,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 CashRegisterId = cr.CashRegisterId,
                 WithdrawalCauseId = causeId,
                 DetailType = Cons.Zero,
-                Type = PaymentType.Efectivo
+                Type = PaymentMethod.Efectivo
             };
 
             db.CashDetails.Add(wd);
@@ -330,20 +330,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.Status = TranStatus.Compleated;
                 sale.UpdDate = DateTime.Now.ToLocal();
                 sale.UpdUser = User.Identity.Name;
-                sale.PaymentType = (PaymentType)Enum.Parse(typeof(PaymentType), payment);
-                sale.Payments = new List<Payment>();
+                sale.PaymentMethod = (PaymentMethod)Enum.Parse(typeof(PaymentMethod), payment);
+                sale.Payments = new List<SalePayment>();
 
                 #region Registros de pago
                 //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
                 //de la venta
-                if (payment != PaymentType.Mixto.ToString())
+                if (payment != PaymentMethod.Mixto.ToString())
                 {
-                    var p = new Payment
+                    var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
                         Amount = sale.TotalAmount,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentType = sale.PaymentType,
+                        PaymentMethod = sale.PaymentMethod,
                     };
                     sale.Payments.Add(p);
                 }
@@ -351,20 +351,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //y otro de tarjeta con los parametros de entrada correspondientes
                 else
                 {
-                    var pm = new Payment
+                    var pm = new SalePayment
                     {
                         SaleId = sale.SaleId,
                         Amount = cash.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentType = PaymentType.Efectivo
+                        PaymentMethod = PaymentMethod.Efectivo
                     };
 
-                    var pc = new Payment
+                    var pc = new SalePayment
                     {
                         SaleId = sale.SaleId,
                         Amount = card.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentType = PaymentType.Tarjeta
+                        PaymentMethod = PaymentMethod.Tarjeta
                     };
 
                     sale.Payments.Add(pm);
@@ -396,7 +396,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     dt.Amount = pay.Amount;
                     dt.InsDate = DateTime.Now.ToLocal();
                     dt.User = User.Identity.Name;
-                    dt.Type = pay.PaymentType;
+                    dt.Type = pay.PaymentMethod;
                     dt.SaleFolio = sale.Folio;
                     dt.DetailType = Cons.One;
                     dt.Comment = "VENTA CON FOLIO " + sale.Folio;

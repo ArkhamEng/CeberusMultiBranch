@@ -201,121 +201,17 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201711040904068_Initial.cs" />
-    <Compile Include="Migrations\201711040904068_Initial.Designer.cs">
-      <DependentUpon>201711040904068_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\201801100306027_Initial.cs" />
+    <Compile Include="Migrations\201801100306027_Initial.Designer.cs">
+      <DependentUpon>201801100306027_Initial.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201711051640073_CommissionPerCategory.cs" />
-    <Compile Include="Migrations\201711051640073_CommissionPerCategory.Designer.cs">
-      <DependentUpon>201711051640073_CommissionPerCategory.cs</DependentUpon>
+    <Compile Include="Migrations\201801100533578_Sale_Payment.cs" />
+    <Compile Include="Migrations\201801100533578_Sale_Payment.Designer.cs">
+      <DependentUpon>201801100533578_Sale_Payment.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201711051751014_CommissionPerCategory1.cs" />
-    <Compile Include="Migrations\201711051751014_CommissionPerCategory1.Designer.cs">
-      <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711100553391_packageSortOrder.cs" />
-    <Compile Include="Migrations\201711100553391_packageSortOrder.Designer.cs">
-      <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711110013399_correctioPackage.cs" />
-    <Compile Include="Migrations\201711110013399_correctioPackage.Designer.cs">
-      <DependentUpon>201711110013399_correctioPackage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711150438086_Employee-User.cs" />
-    <Compile Include="Migrations\201711150438086_Employee-User.Designer.cs">
-      <DependentUpon>201711150438086_Employee-User.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711150448347_EmployeeEmail.cs" />
-    <Compile Include="Migrations\201711150448347_EmployeeEmail.Designer.cs">
-      <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711200425098_saleSending.cs" />
-    <Compile Include="Migrations\201711200425098_saleSending.Designer.cs">
-      <DependentUpon>201711200425098_saleSending.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711230504167_RequiredProdName.cs" />
-    <Compile Include="Migrations\201711230504167_RequiredProdName.Designer.cs">
-      <DependentUpon>201711230504167_RequiredProdName.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201711300331160_Providerchanges.cs" />
-    <Compile Include="Migrations\201711300331160_Providerchanges.Designer.cs">
-      <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712020155118_BranchProductChanges.cs" />
-    <Compile Include="Migrations\201712020155118_BranchProductChanges.Designer.cs">
-      <DependentUpon>201712020155118_BranchProductChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712020305555_BranchProductChanges1.cs" />
-    <Compile Include="Migrations\201712020305555_BranchProductChanges1.Designer.cs">
-      <DependentUpon>201712020305555_BranchProductChanges1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712020430151_ProductChanges.cs" />
-    <Compile Include="Migrations\201712020430151_ProductChanges.Designer.cs">
-      <DependentUpon>201712020430151_ProductChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712020509359_ProductChanges1.cs" />
-    <Compile Include="Migrations\201712020509359_ProductChanges1.Designer.cs">
-      <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712080523368_emailLength.cs" />
-    <Compile Include="Migrations\201712080523368_emailLength.Designer.cs">
-      <DependentUpon>201712080523368_emailLength.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712120636173_FTRchanges.cs" />
-    <Compile Include="Migrations\201712120636173_FTRchanges.Designer.cs">
-      <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712131808572_SystemCategoryRelation.cs" />
-    <Compile Include="Migrations\201712131808572_SystemCategoryRelation.Designer.cs">
-      <DependentUpon>201712131808572_SystemCategoryRelation.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712132351308_CategoryChanges.cs" />
-    <Compile Include="Migrations\201712132351308_CategoryChanges.Designer.cs">
-      <DependentUpon>201712132351308_CategoryChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712140435152_PartSystemChanges.cs" />
-    <Compile Include="Migrations\201712140435152_PartSystemChanges.Designer.cs">
-      <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712280219324_reservedProduct.cs" />
-    <Compile Include="Migrations\201712280219324_reservedProduct.Designer.cs">
-      <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712290213497_ProvidereProperties.cs" />
-    <Compile Include="Migrations\201712290213497_ProvidereProperties.Designer.cs">
-      <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201712292250081_CashRegisterDetailChanges.cs" />
-    <Compile Include="Migrations\201712292250081_CashRegisterDetailChanges.Designer.cs">
-      <DependentUpon>201712292250081_CashRegisterDetailChanges.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090311051_TransToSale.cs" />
-    <Compile Include="Migrations\201801090311051_TransToSale.Designer.cs">
-      <DependentUpon>201801090311051_TransToSale.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090331554_TransToSale1.cs" />
-    <Compile Include="Migrations\201801090331554_TransToSale1.Designer.cs">
-      <DependentUpon>201801090331554_TransToSale1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090340311_TransToSale2.cs" />
-    <Compile Include="Migrations\201801090340311_TransToSale2.Designer.cs">
-      <DependentUpon>201801090340311_TransToSale2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090442372_TransToSale4.cs" />
-    <Compile Include="Migrations\201801090442372_TransToSale4.Designer.cs">
-      <DependentUpon>201801090442372_TransToSale4.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090513430_TransToSale5.cs" />
-    <Compile Include="Migrations\201801090513430_TransToSale5.Designer.cs">
-      <DependentUpon>201801090513430_TransToSale5.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090648350_purchase.cs" />
-    <Compile Include="Migrations\201801090648350_purchase.Designer.cs">
-      <DependentUpon>201801090648350_purchase.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201801090714119_purchase1.cs" />
-    <Compile Include="Migrations\201801090714119_purchase1.Designer.cs">
-      <DependentUpon>201801090714119_purchase1.cs</DependentUpon>
+    <Compile Include="Migrations\201801100539458_Sale_PaymentRename.cs" />
+    <Compile Include="Migrations\201801100539458_Sale_PaymentRename.Designer.cs">
+      <DependentUpon>201801100539458_Sale_PaymentRename.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -344,7 +240,8 @@
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
     <Compile Include="Models\Entities\Operative\Debt.cs" />
-    <Compile Include="Models\Entities\Operative\Payment.cs" />
+    <Compile Include="Models\Entities\Operative\OperativeEnum.cs" />
+    <Compile Include="Models\Entities\Operative\SalePayment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Purchase.cs" />
     <Compile Include="Models\Entities\Operative\PurchaseDetail.cs" />
@@ -596,96 +493,18 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201711040904068_Initial.resx">
-      <DependentUpon>201711040904068_Initial.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711051640073_CommissionPerCategory.resx">
-      <DependentUpon>201711051640073_CommissionPerCategory.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711051751014_CommissionPerCategory1.resx">
-      <DependentUpon>201711051751014_CommissionPerCategory1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711100553391_packageSortOrder.resx">
-      <DependentUpon>201711100553391_packageSortOrder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711110013399_correctioPackage.resx">
-      <DependentUpon>201711110013399_correctioPackage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711150438086_Employee-User.resx">
-      <DependentUpon>201711150438086_Employee-User.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711150448347_EmployeeEmail.resx">
-      <DependentUpon>201711150448347_EmployeeEmail.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711200425098_saleSending.resx">
-      <DependentUpon>201711200425098_saleSending.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711230504167_RequiredProdName.resx">
-      <DependentUpon>201711230504167_RequiredProdName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201711300331160_Providerchanges.resx">
-      <DependentUpon>201711300331160_Providerchanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712020155118_BranchProductChanges.resx">
-      <DependentUpon>201712020155118_BranchProductChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712020305555_BranchProductChanges1.resx">
-      <DependentUpon>201712020305555_BranchProductChanges1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712020430151_ProductChanges.resx">
-      <DependentUpon>201712020430151_ProductChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712020509359_ProductChanges1.resx">
-      <DependentUpon>201712020509359_ProductChanges1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712080523368_emailLength.resx">
-      <DependentUpon>201712080523368_emailLength.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712120636173_FTRchanges.resx">
-      <DependentUpon>201712120636173_FTRchanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712131808572_SystemCategoryRelation.resx">
-      <DependentUpon>201712131808572_SystemCategoryRelation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712132351308_CategoryChanges.resx">
-      <DependentUpon>201712132351308_CategoryChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712140435152_PartSystemChanges.resx">
-      <DependentUpon>201712140435152_PartSystemChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712280219324_reservedProduct.resx">
-      <DependentUpon>201712280219324_reservedProduct.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712290213497_ProvidereProperties.resx">
-      <DependentUpon>201712290213497_ProvidereProperties.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201712292250081_CashRegisterDetailChanges.resx">
-      <DependentUpon>201712292250081_CashRegisterDetailChanges.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090311051_TransToSale.resx">
-      <DependentUpon>201801090311051_TransToSale.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090331554_TransToSale1.resx">
-      <DependentUpon>201801090331554_TransToSale1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090340311_TransToSale2.resx">
-      <DependentUpon>201801090340311_TransToSale2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090442372_TransToSale4.resx">
-      <DependentUpon>201801090442372_TransToSale4.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090513430_TransToSale5.resx">
-      <DependentUpon>201801090513430_TransToSale5.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090648350_purchase.resx">
-      <DependentUpon>201801090648350_purchase.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201801090714119_purchase1.resx">
-      <DependentUpon>201801090714119_purchase1.cs</DependentUpon>
-    </EmbeddedResource>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
+    <EmbeddedResource Include="Migrations\201801100306027_Initial.resx">
+      <DependentUpon>201801100306027_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801100533578_Sale_Payment.resx">
+      <DependentUpon>201801100533578_Sale_Payment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801100539458_Sale_PaymentRename.resx">
+      <DependentUpon>201801100539458_Sale_PaymentRename.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
