@@ -1,29 +1,30 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.ApplicationUser>
 
 @{
-    ViewBag.Title = "UserList";
+    ViewBag.Title = "Cuentas de usuario";
+    ViewBag.Class = "fa fa-users";
 }
 
-<h3>
-    <span class="fa fa-users" style="float:left"></span>
-    &nbsp;&nbsp;Cuentas de usuario
-</h3>
+<hr />
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-7">
+            <div class="input-group ">
 
-<div class="col-md-7">
-    <div class="input-group ">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button  type="button" class="btn btn-success" 
-                    onclick="ShowLoading(); window.location='@Url.Action("Register")'" 
-                    title="Registrar nuevo usuario">
-                <span class="glyphicon  glyphicon-file"></span>
-            </button>
-        </span>
+                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control", placeholder = "Filtro de búsqueda" })
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-success"
+                            onclick="ShowLoading(); window.location='@Url.Action("Register")'"
+                            title="Registrar nuevo usuario">
+                        <span class="glyphicon  glyphicon-file"></span>
+                        Nuevo
+                    </button>
+                </span>
+            </div>
+        </div>
     </div>
 </div>
 
-<br /><br /><br />
 
 <table id="tbUsers" class="table  table-striped">
     <thead>
@@ -48,9 +49,7 @@
             <th>
                 @Html.DisplayName("Sucursales")
             </th>
-            <th>
-                @Html.DisplayName("Fallos")
-            </th>
+
             <th></th>
         </tr>
     </thead>
@@ -81,7 +80,7 @@
                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                 </td>
                 <td class="text-center">
-                    @{ var com = ( item.ComissionForSale /100d).ToString("p1"); }
+                    @{ var com = (item.ComissionForSale / 100d).ToString("p1"); }
                     @com
                 </td>
                 <td class="text-center">
@@ -90,24 +89,41 @@
                 <td class="text-center">
                     @item.UserBranches.Count.ToString()
                 </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.AccessFailedCount)
-                </td>
 
                 <td class="col-md-1 btn-group text-right">
-                   <button class="btn btn-warning btn-xs" title="Roles de usuario" 
-                           onclick="ShowLoading(); window.location='@Url.Action("UserConfig",new {id=item.Id })'">
-                       <span class="fa fa-edit"></span>
-                   </button>
+                    <button class="btn btn-warning btn-xs" title="Roles de usuario"
+                            onclick="ShowLoading(); window.location='@Url.Action("UserConfig",new {id=item.Id })'">
+                        <span class="fa fa-edit"></span>
+                    </button>
+                    <button class="btn btn-danger btn-xs" title="Restaurar contraseña"
+                            onclick="BeginReset('@item.Id')">
+                        <span class="fa fa-refresh"></span>
+                    </button>
                 </td>
             </tr>
-        }
+          }
     </tbody>
 </table>
+<input hidden id="userId" />
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetDataTable("#tbUsers", "#txtName")
     });
+
+    function BeginReset(id) {
+        $("#userId").val(id);
+        ShowConfirm("Restaurar contraseña!",
+        "Esta acción restaurara la contraseña a su valor por defecto, ¿deseas continuar?", true, Reset);
+    }
+
+    function Reset() {
+        ExecuteAjax('@Url.Action("ResetPassword")', { userId: $("#userId").val() }, function (response)
+        {
+            if (response.Result != "OK")
+                ShowMessage(response.Result, response.Message, 'warning');
+            else
+                ShowMessage(response.Result, response.Message, 'success');
+        });
+    }
 </script>

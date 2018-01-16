@@ -104,7 +104,7 @@ namespace CerberusMultiBranch.Controllers
 
             // This doesn't count login failures towards account lockout
             // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: false);
+            var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: true);
 
         
             switch (result)
@@ -118,7 +118,7 @@ namespace CerberusMultiBranch.Controllers
                     return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 case SignInStatus.Failure:
                 default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
+                    ModelState.AddModelError("", "Datos Incorrectos! verifique e intente de nuevo");
                     return View(model);
             }
         }
@@ -312,6 +312,30 @@ namespace CerberusMultiBranch.Controllers
             }
         }
 
+        [Authorize(Roles = "Administrador")]
+        [HttpPost]
+        public ActionResult ResetPassword(string userId)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var user = db.Users.Find(userId);
+
+                if(user != null)
+                {
+                    user.PasswordHash =Cons.DefaultPassword;
+                    db.Entry(user).State = EntityState.Modified;
+
+                    db.SaveChanges();
+                    
+                    return Json(new { Result = "OK", Message = "La contraseña fue cambiada, por seguridad inicie sesión cuanto antes y establesca una nueva" });
+                }
+                else
+                {
+                    return Json(new { Result = "Error de datos", Message = "El Usuario no existe" });
+                }
+            }
+        }
+        
 
         [Authorize(Roles = "Administrador")]
         public ActionResult Register()
@@ -413,6 +437,7 @@ namespace CerberusMultiBranch.Controllers
             return View();
         }
 
+        /*
         //
         // GET: /Account/ResetPassword
         [AllowAnonymous]
@@ -454,7 +479,7 @@ namespace CerberusMultiBranch.Controllers
         {
             return View();
         }
-
+       */
         //
         // POST: /Account/ExternalLogin
         [HttpPost]

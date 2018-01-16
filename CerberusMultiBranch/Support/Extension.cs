@@ -99,33 +99,6 @@ namespace CerberusMultiBranch.Support
         }
 
 
-        public static Shift GetShift(this DateTime date)
-        {
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                Shift shift = new Shift();
-                var variables = db.Variables.ToList();
-
-                var first = Array.ConvertAll(variables.FirstOrDefault(v => v.Name == Cons.FirstShift).Value.Split('-'), int.Parse);
-                var second = Array.ConvertAll(variables.FirstOrDefault(v => v.Name == Cons.SecondShift).Value.Split('-'), int.Parse);
-
-                if (date.Hour >= first[Cons.Zero] && date.Hour < first[Cons.One])
-                {
-                    shift.Number = Cons.One;
-                    shift.BeginDate = new DateTime(date.Year, date.Month, date.Day, first[Cons.Zero], Cons.Zero, Cons.Zero);
-                    shift.EndDate = new DateTime(date.Year, date.Month, date.Day, first[Cons.One], Cons.Zero, Cons.Zero);
-                }
-                else
-                {
-                    shift.Number = Cons.Two;
-                    shift.BeginDate = new DateTime(date.Year, date.Month, date.Day, second[Cons.Zero], Cons.Zero, Cons.Zero);
-                    shift.EndDate = new DateTime(date.Year, date.Month, date.Day, second[Cons.One], Cons.Zero, Cons.Zero);
-                }
-
-                return shift;
-            }
-        }
-
         public static int GetBranchId(this IIdentity user)
         {
             return user.GetBranchSession().Id;

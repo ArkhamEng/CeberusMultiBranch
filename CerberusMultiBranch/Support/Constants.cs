@@ -29,10 +29,7 @@ namespace CerberusMultiBranch.Support
 
         public const string ResponseOK = "OK";
 
-        //Variables de configuración
-        public const string FirstShift = "FirstShift";
-
-        public const string SecondShift = "SecondShift";
+        public const string DefaultPassword = "ADn9JXAPolz3R1QmEjw7chz42neVTLn426+eRtgaG2TvE2mR03Ri7TtoKH8iWJyuVw==";
 
     }
 
