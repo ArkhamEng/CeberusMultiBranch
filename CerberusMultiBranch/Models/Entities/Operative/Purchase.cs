@@ -1,10 +1,9 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Finances;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -25,13 +24,19 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Expiration { get; set; }
 
-
-        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
-
+        #region Navigation Properties
         public virtual Provider Provider { get; set; }
 
-        public Purchase() 
-        {  
+        public ICollection<Payable> Payables { get; set; }
+
+        public ICollection<PurchasePayment> PurchasePayments { get; set; }
+
+        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
+        #endregion
+
+
+        public Purchase()
+        {
             this.Expiration = DateTime.Now;
         }
 

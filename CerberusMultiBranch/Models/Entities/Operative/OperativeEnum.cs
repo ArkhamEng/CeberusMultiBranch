@@ -24,4 +24,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         Transferencia = 5
     }
 
+    public enum MovementType
+    {
+        Entry = 1,
+        Exit = 2,
+        Reservation = 3,
+        Release = 4
+    }
 }

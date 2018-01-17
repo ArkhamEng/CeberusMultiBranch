@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Finances;
 using CerberusMultiBranch.Models.Entities.Operative;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
@@ -39,7 +40,6 @@ namespace CerberusMultiBranch.Models
         public DbSet<City> Cities { get; set; }
         #endregion
 
-
         #region Catalogs
 
         public DbSet<Product> Products { get; set; }
@@ -76,13 +76,20 @@ namespace CerberusMultiBranch.Models
         public DbSet<CashRegister> CashRegisters { get; set; }
 
         public DbSet<CashDetail> CashDetails { get; set; }
-
         
         public DbSet<BranchProduct> BranchProducts { get; set; }
-
-        public DbSet<SalePayment> SalePayments { get; set; }
         #endregion
 
+        #region Finances
+        public DbSet<Receivable> Receivables { get; set; }
+
+        public DbSet<Payable> Payables { get; set; }
+
+        public DbSet<SalePayment> SalePayments { get; set; }
+
+        public DbSet<PurchasePayment> PurchasePayments { get; set; }
+
+        #endregion
 
 
         public ApplicationDbContext() : base("DefaultConnection", throwIfV1Schema: false)

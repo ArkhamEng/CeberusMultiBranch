@@ -10,7 +10,7 @@
 
 <div id="pnlFilters" class="panel panel-danger top">
     <div class="panel-body">
-        <div class="col-md-12">
+        <div class="col-md-12 col-lg-12">
             <div class="input-group">
                 @Html.DropDownList("SystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
                 @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
@@ -46,7 +46,7 @@
 
         <br /><br />
         <br /><br />
-        <div class="col-md-10 hidden-xs hidden-sm">
+        <div class="col-md-10 col-lg-10 hidden-xs hidden-sm">
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-registered"></i></span>
                 @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
@@ -66,7 +66,7 @@
 </div>
 <input id="IsGrid" type="hidden" value="false" />
 
-<div id="divProducts" class="col-md-12 container">
+<div id="divProducts" class="col-md-12 col-lg-12 container">
     @Html.Partial("_List", Model.Products)
 </div>
 <button type="button" hidden id="btnTest" onclick='$("#ModalQuickAddProduct").modal("show");'></button>

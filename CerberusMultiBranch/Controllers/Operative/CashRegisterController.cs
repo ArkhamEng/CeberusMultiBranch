@@ -10,6 +10,7 @@ using System.Data.Entity;
 using System.Security.Principal;
 using System.Web.Helpers;
 using Microsoft.AspNet.Identity;
+using CerberusMultiBranch.Models.Entities.Finances;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -344,6 +345,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Amount = sale.TotalAmount,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentMethod = sale.PaymentMethod,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "PAGO DE CONTADO"
                     };
                     sale.Payments.Add(p);
                 }
@@ -356,7 +360,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                         SaleId = sale.SaleId,
                         Amount = cash.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Efectivo
+                        PaymentMethod = PaymentMethod.Efectivo,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "PAGO DE CONTADO"
                     };
 
                     var pc = new SalePayment
@@ -364,7 +371,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                         SaleId = sale.SaleId,
                         Amount = card.Value,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Tarjeta
+                        PaymentMethod = PaymentMethod.Tarjeta,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "PAGO DE CONTADO"
                     };
 
                     sale.Payments.Add(pm);
