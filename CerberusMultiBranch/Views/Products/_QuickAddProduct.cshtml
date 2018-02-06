@@ -152,17 +152,19 @@
         }
     });
 
-    function SetPrice() {
+    function SetPrice()
+    {
         var sp = (1 + $("#StorePercentage").val() / 100);
-        var dp = (1 + $("#WholesalerPercentage").val() / 100);
-        var wp = (1 + $("#DealerPercentage").val() / 100);
+        var wp = (1 + $("#WholesalerPercentage").val() / 100);
+        var dp = (1 + $("#DealerPercentage").val() / 100);
 
         $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(0));
-        $("#WholesalerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
-        $("#DealerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
+        $("#WholesalerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
+        $("#DealerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
     }
 
-    function Send() {
+    function Send()
+    {
         $("lblQuickAddError").text("");
         var form = $("#mForm");
 
@@ -175,8 +177,8 @@
             Code: $("#Code").val().toUpperCase(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val().toUpperCase(), Name: $("#Name").val().toUpperCase(), PartSystemId: $("#PartSystemId").val(),
             WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
             StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val().toUpperCase(), DealerPercentage: $("#DealerPercentage").val(),
-            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(),
-            ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val(), ProductType: $("#ProductType").val()
+            WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(),Row: $("#Row").val(),Ledge: $("#Ledge").val(),
+            ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val(), ProductType: $("#ProductType").val(), 
         };
 
         //si el ProviderId tiene valor, quiere decir que es una copia de producto del proveedor
@@ -190,15 +192,16 @@
             ExecuteAjax('@Url.Action("Copy","Products")', param, function (response) {
                 HideLoading();
                 if ($.isPlainObject(response)) {
-                    if (response.Result != "OK") {
+                    if (response.Result != "OK")
+                    {
                         ShowMessage(response.Result, response.Message, 'warning');
                     }
                 }
                 else {
                     $("#ModalQuickAddProduct").modal("hide");
                     $("#ModalQuickAddProduct").on("hidden.bs.modal", function () {
+                        $("#divQuickAdd").html(response);
                         LookFor();
-                        $("#divQuickAdd").html(response)
                     });
                 }
             });

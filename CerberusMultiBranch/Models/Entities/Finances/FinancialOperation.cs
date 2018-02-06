@@ -11,6 +11,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
 
         public PaymentMethod PaymentMethod { get; set; }
 
+        [Required]
         public DateTime PaymentDate { get; set; }
 
         [MaxLength(100)]

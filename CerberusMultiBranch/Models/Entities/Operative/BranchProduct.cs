@@ -66,7 +66,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime UpdDate { get; set; }
 
-        public DateTime UpdUser { get; set; }
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
 
         #region Navigation Properties
         public virtual Branch Branch { get; set; }

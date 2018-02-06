@@ -25,5 +25,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
       
         public virtual Product Product { get; set; }
+
+        [NotMapped]
+        public  ExternalProduct ExternalProduct { get; set; }
     }
 }

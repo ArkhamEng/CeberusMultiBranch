@@ -50,6 +50,8 @@
         $("#imgLoading").attr("class", "img-responsive");
         var filter = { filter: $("#ProductName").val(), providerId: $("#ProviderId").val() }
 
+        console.log(filter);
+
         ExecuteAjax('@Url.Action("SearchExternalProducts")', filter, function (view)
         {
             $("#imgLoading").attr("class", "img-responsive hide");

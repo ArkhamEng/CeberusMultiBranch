@@ -80,7 +80,8 @@
 
         $("#ModalDetails").modal("show");
 
-        $("#btnAdd").click(function () {
+        $("#btnAdd").off('click').click(function ()
+        {
             var data = { amount: $("#txtAmount").val(), comment: $("#txtComment").val(), causeId: $("#CauseId").val() };
 
             ExecuteAjax('@Url.Action("AddWithdrawal","CashRegister")', data, function (data) {

@@ -31,6 +31,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
+        public ActionResult AutoCompleate(string filter)
+        {
+            var model = db.Providers.Where(p => p.Name.Contains(filter)).Take(20).
+                Select(p => new { Id = p.ProviderId, Label = p.Name, Value = p.FTR });
+
+            return Json(model);
+        }
+
+        [HttpPost]
         public ActionResult Search(int? stateId, int? cityId, string name, string ftr)
         {
             string[] arr = new List<string>().ToArray();

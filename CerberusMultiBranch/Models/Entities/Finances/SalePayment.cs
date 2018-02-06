@@ -17,6 +17,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
 
         public int? ReceivableId { get; set; }
 
+
         #region Navigation Properties
         public virtual Sale Sale { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Operative;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,22 +34,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
-        //[Display(Name = "Monto Pagado")]
-        //[DataType(DataType.Currency)]
-        //[Required]
-        //public double PaidAmount { get; set; }
-
-        //[Display(Name = "Monto en Deuda")]
-        //[DataType(DataType.Currency)]
-        //[Required]
-        //public double DebtAmount { get; set; }
-
         [Index("IDX_Status", IsUnique = false)]
         public TranStatus Status { get; set; }
 
         public TranStatus LastStatus { get; set; }
 
-        public bool IsCredit { get; set; }
+        public TransactionType TransactionType { get; set; }
 
         [MaxLength(100)]
         public string Comment { get; set; }
@@ -65,8 +56,5 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ApplicationUser User { get; set; }
 
         public virtual Branch Branch { get; set; }
-
-
-
     }
 }

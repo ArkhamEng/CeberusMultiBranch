@@ -23,11 +23,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.First().Amount)
             </th>
-            <th class="Compleated">
-                <button id="btnShowQuick" class="btn btn-warning btn-xs" type="button">
-                    <span  class="glyphicon glyphicon-plus-sign" ></span>
-                </button>
-            </th>
+           
         </tr>
     </thead>
     <tbody>
@@ -92,8 +88,8 @@
             $("#ModalExternalProduct").modal('show');
         });
 
-        $("#TotalAmount").val('@Model.Sum(d => d.Amount)');
-        $("#lblTotalAmount").text('@Model.Sum(d => d.Amount).ToString("c")');
+        
+        $("#Amount").text('@Model.Sum(d => d.Amount).ToString("c")');
     });
 
     function RemoveDetail(tid, pid)
@@ -108,5 +104,9 @@
         });
     }
 
+    function LookFor()
+    {
+        //este metodo es llamado por default cuando se termina el copiado
+    }
    
 </script>

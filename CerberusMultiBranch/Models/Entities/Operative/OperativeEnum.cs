@@ -24,6 +24,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         Transferencia = 5
     }
 
+    public enum TransactionType
+    {
+        Contado = 0,
+        Credito = 1
+    }
+
     public enum MovementType
     {
         Entry = 1,

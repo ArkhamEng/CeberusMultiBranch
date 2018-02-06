@@ -24,8 +24,6 @@ namespace CerberusMultiBranch.Models
 
         public  ICollection<UserBranch> UserBranches { get; set; }
 
-        public ICollection<Sale> Transactions { get; set; }
-
         public ICollection<Employee> Employees { get; set; }
 
        

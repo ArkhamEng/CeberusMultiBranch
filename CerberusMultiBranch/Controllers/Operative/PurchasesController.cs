@@ -45,8 +45,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var purchase = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.User).
                    Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
-                   FirstOrDefault(p => p.PurchaseId == id && brancheIds.Contains(p.BranchId) 
-                   && (userId == null || p.UserId == userId) );
+                   FirstOrDefault(p => p.PurchaseId == id && brancheIds.Contains(p.BranchId)
+                   && (userId == null || p.UserId == userId));
 
             if (purchase == null)
                 return RedirectToAction("History");
@@ -148,139 +148,153 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
+        [HttpPost]
         [Authorize(Roles = "Capturista")]
-        public ActionResult Create(int? id)
+        public ActionResult Create(BeginPurchaseViewModel model)
         {
-            Purchase model = null;
-
-            if (id != null)
+            try
             {
-                model = db.Purchases.Include(p => p.PurchaseDetails.Select(d => d.Product.Images)).
-                    FirstOrDefault(p => p.PurchaseId == id);
-            }
+                var purchase = new Purchase
+                {
+                    Bill = model.Bill,
+                    BranchId = User.Identity.GetBranchId(),
+                    UserId = User.Identity.GetUserId(),
+                    TransactionDate = model.PurchaseDate,
+                    Expiration = model.ExpirationDate,
+                    TransactionType = model.TransactionType,
+                    ProviderId = model.ProviderId,
+                    Status = TranStatus.InProcess,
+                    UpdUser = User.Identity.Name,
+                    UpdDate = DateTime.Now.ToLocal()
+                };
 
-            if (model == null)
+                db.Purchases.Add(purchase);
+                db.SaveChanges();
+
+                return Json(new { Result = "OK", Id = purchase.PurchaseId });
+
+            }
+            catch (Exception ex)
             {
-                model = new Purchase();
-                model.UserId = User.Identity.GetUserId<string>();
-                model.BranchId = User.Identity.GetBranchSession().Id;
-                model.UpdUser = User.Identity.Name;
+                return Json(new { Result = "Error al registrar venta", Message = "Ocurrio un error al crear la compra detalle " + ex.Message });
             }
-
-            return View("Create", model);
         }
-
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Capturista")]
-        public ActionResult Create([Bind(Exclude = "User,Provider")] Purchase purchase)
+        public ActionResult Compleate(int purchaseId, DateTime purchaseDate, DateTime expirationDate, TransactionType purchaseType)
         {
-            if (ModelState.IsValid)
+            try
             {
-                purchase.UpdDate = DateTime.Now;
-                purchase.UpdUser = User.Identity.Name;
+                var branchId = User.Identity.GetBranchId();
 
-                if (purchase.PurchaseId == Cons.Zero)
-                    db.Purchases.Add(purchase);
-                else
+                var model = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.PurchaseDetails.Select(pd => pd.Product.BranchProducts)).
+                    FirstOrDefault(p => p.PurchaseId == purchaseId);
+
+                model.TotalAmount = model.PurchaseDetails.Sum(pd => pd.Amount);
+                model.UpdDate = DateTime.Now.ToLocal();
+                model.UpdUser = User.Identity.Name;
+                model.TransactionDate = purchaseDate;
+                model.Expiration = expirationDate;
+                model.TransactionType = purchaseType;
+                model.Status = TranStatus.Compleated;
+
+                foreach (var detail in model.PurchaseDetails)
                 {
-                    purchase.UserId = User.Identity.GetUserId();
-                    purchase.BranchId = User.Identity.GetBranchId();
-                    
-                    db.Entry(purchase).State = EntityState.Modified;
-                }
+                    var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
 
-                if (purchase.Status == TranStatus.Compleated)
-                {
-                    var detailes = db.PurchaseDetails.Where(td => td.PurchaseId == purchase.PurchaseId).ToList();
-
-                    //if (purchase.PaymentType == PaymentType.Contado)
-                    //{
-                    //    Payment p = new Payment();
-                    //    p.Amount = purchase.TotalAmount;
-                    //    p.PaymentDate = purchase.TransactionDate;
-                    //    p.TransactionId = purchase.PurchaseId;
-                    //    p.PaymentType = PaymentType.Contado;
-
-                    //    db.Payments.Add(p);
-                    //}
-
-                    foreach (var det in detailes)
+                    if(brp != null)
                     {
-                        var prod = db.Products.Include(p => p.BranchProducts).
-                            FirstOrDefault(p => p.ProductId == det.ProductId);
+                        brp.LastStock = brp.Stock;
+                        brp.Stock += detail.Quantity;
 
-                        var bProd = prod.BranchProducts.FirstOrDefault(bp => bp.BranchId == purchase.BranchId);
+                        brp.UpdDate = DateTime.Now.ToLocal();
+                        brp.UpdUser = User.Identity.Name;
 
-                        //if the new price is biger than the old one, just update it
-                        if (det.Price > prod.BuyPrice)
-                        {
-                            prod.BuyPrice = det.Price;
-                            prod.DealerPrice = det.Price.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice = det.Price.GetPrice(prod.StorePercentage);
-                            prod.WholesalerPrice = det.Price.GetPrice(prod.WholesalerPercentage);
-                            db.Entry(prod).State = EntityState.Modified;
-                        }
-                        else if (det.Price < prod.BuyPrice)
-                        {
-                            var oldAmount = bProd.Stock * prod.BuyPrice;
-                            var newAmount = det.Quantity * det.Price;
-                            var totQuantity = det.Quantity + prod.BranchProducts.Sum(bp => bp.Stock);
-
-                            var newPrice = Math.Round(((oldAmount + newAmount) / totQuantity), Cons.Two);
-
-                            prod.BuyPrice = newPrice;
-                            prod.DealerPrice = newPrice.GetPrice(prod.DealerPercentage);
-                            prod.StorePrice = newPrice.GetPrice(prod.StorePercentage);
-                            prod.WholesalerPrice = newPrice.GetPrice(prod.WholesalerPercentage);
-                            db.Entry(prod).State = EntityState.Modified;
-                        }
-
-
-                        if (bProd == null)
-                        {
-                            bProd = new BranchProduct
-                            {
-                                ProductId = det.ProductId,
-                                BranchId = purchase.BranchId,
-                                LastStock = Cons.Zero,
-                                Stock = det.Quantity,
-                                UpdDate = DateTime.Now
-                            };
-
-                            db.BranchProducts.Add(bProd);
-                        }
-                        else
-                        {
-                            bProd.LastStock = bProd.Stock;
-                            bProd.Stock += det.Quantity;
-                            bProd.UpdDate = DateTime.Now;
-
-                            db.Entry(bProd).State = EntityState.Modified;
-                        }
-
-                        StockMovement sm = new StockMovement
-                        {
-                            ProductId = bProd.ProductId,
-                            BranchId = bProd.BranchId,
-                            User = User.Identity.Name,
-                            MovementDate = DateTime.Now,
-                            Comment = string.Format("Ingreso por compra en factura {0}", purchase.Bill),
-                            MovementType = MovementType.Entry,
-                            Quantity = det.Quantity
-                        };
-
-                        db.StockMovements.Add(sm);
+                        db.Entry(brp).State = EntityState.Modified;
                     }
+                    else
+                    {
+                        //si no existe una realcion de producto sucursal
+                        //obtengo los porcentajes configurados en base de datos y calculo los precios
+                        var variables = db.Variables;
+                        brp = new BranchProduct();
+                        brp.BranchId  = branchId;
+                        brp.ProductId = detail.ProductId;
+                        brp.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                        brp.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                        brp.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+
+                        brp.DealerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+
+                        brp.LastStock = Cons.Zero;
+                        brp.Stock += detail.Quantity;
+
+                        brp.UpdDate = DateTime.Now.ToLocal();
+                        brp.UpdUser = User.Identity.Name;
+
+                        db.BranchProducts.Add(brp);
+                    }
+
+                    var stkM = new StockMovement
+                    {
+                        BranchId = branchId,
+                        Comment ="COMPRA CON FOLIO "+model.Bill,
+                        MovementDate = DateTime.Now.ToLocal(),
+                        ProductId = detail.ProductId,
+                        MovementType = MovementType.Entry,
+                        User = User.Identity.Name,
+                        Quantity = detail.Quantity,
+                    };
+
+                    db.StockMovements.Add(stkM);
                 }
 
+                db.Entry(model);
                 db.SaveChanges();
-                return RedirectToAction("Create", new { id = purchase.PurchaseId });
+
+                return Json(new { Result = "OK" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error",
+                    Header = "Error al inventariar",
+                    Message = "Ocurrio un error al finalizar la compra detalle " + ex.Message
+                });
             }
 
-            return View(purchase);
+
         }
+
+        public ActionResult Edit(int id)
+        {
+            var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
+
+            var model = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.PurchasePayments).Include(p => p.User).
+                FirstOrDefault(p => p.PurchaseId == id && branchIds.Contains(p.BranchId));
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult BeginPurchase()
+        {
+            BeginPurchaseViewModel model = new BeginPurchaseViewModel();
+
+            model.TransactionTypes = new List<TransactionType>();
+            model.TransactionTypes.Add(TransactionType.Contado);
+            model.TransactionTypes.Add(TransactionType.Credito);
+
+            model.TransactionType = model.TransactionTypes.First();
+            model.PurchaseDate = DateTime.Today.ToLocal();
+            model.ExpirationDate = model.PurchaseDate.AddDays(30);
+
+            return PartialView("_BeginPurchase", model);
+        }
+
 
         [HttpPost]
         public ActionResult SearchExternalProducts(string filter, int providerId)
@@ -370,77 +384,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        [HttpPost]
-        public ActionResult BeginCopy(int providerId, string code)
-        {
-            var variables = db.Variables;
-            var ep = db.ExternalProducts.Find(providerId, code);
-
-            ProductViewModel vm = new ProductViewModel();
-            vm.Categories = db.Categories.ToSelectList();
-            vm.Name = ep.Description;
-            vm.TradeMark = ep.TradeMark;
-            vm.Unit = ep.Unit;
-            vm.BuyPrice = ep.Price;
-            vm.MinQuantity = Cons.One;
-            vm.Code = Regex.Replace(ep.Code, @"[^A-Za-z0-9]+$", "");
-            vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
-            vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
-            vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
-
-            return PartialView("_CloneProduct", vm);
-        }
 
         [HttpPost]
-        public JsonResult Copy(Product product, int providerId, string code)
-        {
-            if (db.Products.FirstOrDefault(p => p.Code == product.Code) != null)
-            {
-                return Json(new { Result = "Codigo invalido", Message = "Ya existe un producto con este código" });
-            }
-            else
-            {
-                try
-                {
-                    product.Code = Regex.Replace(product.Code, @"[^A-Za-z0-9]+", "");
-                    product.UpdUser = User.Identity.Name;
-                    product.UpdDate = DateTime.Now;
-                    product.MinQuantity = Cons.One;
-                    product.StorePrice = Math.Round(product.BuyPrice * (Cons.One + (product.StorePercentage / Cons.OneHundred)), Cons.Zero);
-                    product.DealerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.DealerPercentage / Cons.OneHundred)), Cons.Zero);
-                    product.WholesalerPrice = Math.Round(product.BuyPrice * (Cons.One + (product.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
-                    product.IsActive = true;
-
-                    db.Products.Add(product);
-                    db.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { Result = "Error al guardar el producto", Message = ex.Message });
-                }
-
-                try
-                {
-                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
-                    db.Equivalences.Add(eq);
-                    db.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-                    return Json(new { Result = "Error al asociar el producto", Message = ex.Message });
-                }
-
-                return Json(new { Result = "OK" });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult AddDetail(int productId, int transactionId, double price, double quantity)
+        public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity)
         {
             try
             {
                 var detail = db.PurchaseDetails.
-                    FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == transactionId);
+                    FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
 
                 if (detail != null)
                 {
@@ -454,7 +405,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     detail = new PurchaseDetail
                     {
                         ProductId = productId,
-                        PurchaseId = transactionId,
+                        PurchaseId = purchaseId,
                         Quantity = quantity,
                         Price = price,
                         Amount = price * quantity
@@ -471,7 +422,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
 
             var model = db.PurchaseDetails.Include(d => d.Product.Images).
-                Where(d => d.PurchaseId == transactionId).ToList();
+                Where(d => d.PurchaseId == purchaseId).ToList();
 
 
             return PartialView("_Details", model);
@@ -498,7 +449,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
 
-    
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)

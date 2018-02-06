@@ -10,15 +10,15 @@
     <div class="panel-body">
         <div class="col-md-11">
             <div class="input-group ">
-            @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:20% !important" })
-            @Html.TextBox("Bill", "", htmlAttributes: new
+            @Html.DropDownList("FBranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:20% !important" })
+            @Html.TextBox("FBill", "", htmlAttributes: new
            {
                @class = "form-control",
                placeholder = "Factura",
                style = "width:20% !important"
            })
 
-            @Html.TextBox("Provider", "", htmlAttributes: new
+            @Html.TextBox("FProvider", "", htmlAttributes: new
            {
                @class = "form-control",
                placeholder = "Nombre del proveedor",
@@ -49,13 +49,13 @@
             <div class="input-group">
                 @if (User.IsInRole("Supervisor"))
                 {
-                    @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de usuario" })
+                    @Html.TextBox("FUser", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de usuario" })
                 }
                 <span class="input-group-addon"><a>Fecha Inicial</a></span>
-                @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.TextBox("FBeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
 
                 <span class="input-group-addon"><a>Fecha final</a></span>
-                @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.TextBox("FEndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
                 <span class="input-group-btn">
                     <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear">
                         <span class="glyphicon glyphicon-refresh"></span>
@@ -67,18 +67,7 @@
     </div>
 </div>
 
-@*<div class="col-md-3">
-    <h5>
-        <label class="text-danger" id="lblTotalAmount"></label>
-    </h5>
-</div>
-<div class="col-md-2">
-    <h5>
-        <label class="text-danger" id="lblTotalQuantity"></label>
-    </h5>
-</div>*@
-
-
+<div id="divNewPurchase"></div>
 
 <div id="divPurchases">
     @Html.Partial("_PurchaseList",Model.Purchases)
@@ -88,17 +77,18 @@
     {
         SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
 
+        
         $("#btnSearch").click(function ()
         {
             ShowLoading();
 
             var data = {
-                branchId: $("#BranchId").val(),
-                beginDate: $("#BeginDate").val(),
-                endDate: $("#EndDate").val(),
-                bill: $("#Bill").val(),
-                user: $("#User").val(),
-                provider: $("#Provider").val(),
+                branchId: $("#FBranchId").val(),
+                beginDate: $("#FBeginDate").val(),
+                endDate: $("#FEndDate").val(),
+                bill: $("#FBill").val(),
+                user: $("#FUser").val(),
+                provider: $("#FProvider").val(),
             };
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
@@ -107,8 +97,15 @@
             });
         });
 
-        $("#btnCreate").click(function () { window.location ='@Url.Action("Create")' });
-    }).keydown(function (e) {
+        $("#btnCreate").click(function ()
+        {
+            ExecuteAjax('@Url.Action("BeginPurchase")', {}, function (response)
+            {
+                $("#divNewPurchase").html(response);
+            });
+        });
+    }).keydown(function (e)
+    {
         if (e.which == 13 || (e.altKey && e.which == 66)) {
             $("#btnSearch").click();
         }

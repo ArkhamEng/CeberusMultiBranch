@@ -1,0 +1,124 @@
+﻿
+@model CerberusMultiBranch.Models.ViewModels.Operative.BeginPurchaseViewModel
+
+
+
+<div id="ModalBeginPurchase" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel-danger">
+            <div class="modal-header panel-heading">
+                <h4 class="modal-title">
+                    <span class="fa fa-shopping-basket"></span>
+                    Registro de nueva compra
+                </h4>
+            </div>
+            <div class="modal-body panel-body">
+
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-file-o"></i></span>
+                        @Html.EditorFor(model => model.Bill, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
+                </div>
+
+                
+                    <div class="col-md-6  form-group">
+                        <label >Tipo de compra </label>
+                        <div class="col-md-12  form-control">
+                            @{
+                                foreach (var type in Model.TransactionTypes)
+                                {
+                                    <div class="form-group col-md-6">
+                                        <Label>
+                                            @type.ToString()
+                                    @Html.RadioButtonFor(model => model.TransactionType, type)
+                                </Label>
+                            </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                
+
+
+                <div class="form-group col-md-12">
+                    @Html.LabelFor(model => model.ProviderName, htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
+                        @Html.EditorFor(model => model.ProviderName, new { htmlAttributes = new { @class = "form-control", list = "Providers" } })
+                        <datalist id="Providers"></datalist>
+                    </div>
+                    @Html.ValidationMessageFor(model => model.ProviderName, "", new { @class = "text-danger" })
+                </div>
+
+
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.PurchaseDate, htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
+                        @Html.EditorFor(model => model.PurchaseDate, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.PurchaseDate, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group col-md-6">
+                    @Html.LabelFor(model => model.ExpirationDate, htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+                        @Html.EditorFor(model => model.ExpirationDate, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                    @Html.ValidationMessageFor(model => model.ExpirationDate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="AcceptCreate()">
+                        <span class="fa fa-check"></span>
+                        Aceptar
+                    </button>
+                    <button class="btn btn-danger">
+                        <span class="fa fa-times"></span>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.HiddenFor(model => model.ProviderId)
+
+<script>
+   
+    $(document).ready(function () {
+        $("#ModalBeginPurchase").modal({ backdrop: 'static' });
+
+        Compleate("#ProviderName", "#Providers", '@Url.Action("AutoCompleate","Providers")', function (id, value) {
+            $("#ProviderId").val(id);
+            console.log("On Selected Id    " + id);
+            console.log("On Selected value " + value);
+        });
+    });
+
+    function AcceptCreate()
+    {
+        console.log("Entrando en accept");
+        var purchase =
+            {
+                ProviderId: $("#ProviderId").val(),
+                PurchaseDate: $("#PurchaseDate").val(),
+                ExpirationDate: $("#ExpirationDate").val(),
+                PurchaseType: $("#PurchaseType").val(),
+                Bill: $("#Bill").val()
+            };
+        console.log(purchase);
+
+        ExecuteAjax('@Url.Action("Create","Purchases")', { model: purchase }, function (response)
+        {
+            window.location = '@Url.Action("Edit")/'+response.Id;
+        });
+    }
+</script>
+

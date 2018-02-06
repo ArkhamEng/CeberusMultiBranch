@@ -13,7 +13,7 @@ using System.Web.Mvc;
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
     [Table("Sale", Schema = "Operative")]
-    public class Sale:Transaction
+    public class Sale : Transaction
     {
         [Key]
         public int SaleId { get; set; }
@@ -32,14 +32,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public int SendingType { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
-       
 
         public ICollection<SaleDetail> SaleDetails { get; set; }
 
         public ICollection<SalePayment> Payments { get; set; }
 
         public virtual Client Client { get; set; }
-
 
         public Sale()
         {

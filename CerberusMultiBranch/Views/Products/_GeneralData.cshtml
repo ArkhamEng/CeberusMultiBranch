@@ -112,6 +112,24 @@
 
 </div>
 
+<div class="col-md-2 col-md-offset-1 form-group">
+    @Html.Label("Fila", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-bars"></i></span>
+        @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+    </div>
+    @Html.ValidationMessageFor(model => model.Row, "", new { @class = "text-danger" })
+</div>
+
+<div class="col-md-2  form-group">
+    @Html.Label("Anaquel", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-archive"></i></span>
+        @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+    </div>
+    @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
+</div>
+
 
 <label class="text-danger" id="lblQuickAddError"></label>
 @Html.HiddenFor(model => model.ProductId)

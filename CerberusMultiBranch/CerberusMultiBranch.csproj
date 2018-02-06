@@ -217,6 +217,22 @@
     <Compile Include="Migrations\201801160327289_Idontknow.Designer.cs">
       <DependentUpon>201801160327289_Idontknow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201801300356267_Sale_Payemt.cs" />
+    <Compile Include="Migrations\201801300356267_Sale_Payemt.Designer.cs">
+      <DependentUpon>201801300356267_Sale_Payemt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801300612505_branch_p.cs" />
+    <Compile Include="Migrations\201801300612505_branch_p.Designer.cs">
+      <DependentUpon>201801300612505_branch_p.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201801300614152_branch_p1.cs" />
+    <Compile Include="Migrations\201801300614152_branch_p1.Designer.cs">
+      <DependentUpon>201801300614152_branch_p1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802060040113_TransactionTypeChange.cs" />
+    <Compile Include="Migrations\201802060040113_TransactionTypeChange.Designer.cs">
+      <DependentUpon>201802060040113_TransactionTypeChange.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -273,6 +289,7 @@
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
+    <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
@@ -287,6 +304,7 @@
     <Compile Include="Support\Shift.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AppScripts\Global.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -305,6 +323,47 @@
     <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
     <Content Include="Content\bootstrap-slider.min.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\fontawesome-webfont.svg" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -339,6 +398,8 @@
     <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.1.1.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\_jquery-ui-1.12.1.js" />
+    <Content Include="Scripts\_jquery-ui-1.12.1.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -415,7 +476,7 @@
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
     <Content Include="Views\Shared\_QuickUser.cshtml" />
-    <Content Include="Views\Purchases\Create.cshtml" />
+    <Content Include="Views\Purchases\Edit.cshtml" />
     <Content Include="Views\Purchases\History.cshtml" />
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
@@ -459,7 +520,6 @@
     <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
     <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
     <Content Include="Views\Purchases\_InternalProductList.cshtml" />
-    <Content Include="Views\Purchases\_CloneProduct.cshtml" />
     <Content Include="Views\Providers\UpdateCatalog.cshtml" />
     <Content Include="Views\Shared\MainLayout.cshtml" />
     <Content Include="Views\Shared\_Layout - Copy.cshtml" />
@@ -467,7 +527,6 @@
     <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
-    <Content Include="Views\Purchases\MyDetail.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
     <Content Include="Views\Shared\_Cancelation.cshtml" />
     <Content Include="Views\Products\_Movement.cshtml" />
@@ -489,6 +548,7 @@
     <Content Include="Views\Configuration\_SystemCategory.cshtml" />
     <Content Include="Views\Products\_GeneralData.cshtml" />
     <Content Include="Views\Clients\_ClientEdition.cshtml" />
+    <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -516,6 +576,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201801160327289_Idontknow.resx">
       <DependentUpon>201801160327289_Idontknow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801300356267_Sale_Payemt.resx">
+      <DependentUpon>201801300356267_Sale_Payemt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801300612505_branch_p.resx">
+      <DependentUpon>201801300612505_branch_p.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201801300614152_branch_p1.resx">
+      <DependentUpon>201801300614152_branch_p1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802060040113_TransactionTypeChange.resx">
+      <DependentUpon>201802060040113_TransactionTypeChange.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

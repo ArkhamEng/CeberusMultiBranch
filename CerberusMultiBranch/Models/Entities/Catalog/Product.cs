@@ -94,6 +94,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         [Display(Name = "Precio de Compra")]
         [DataType(DataType.Currency)]
+        [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
         public double BuyPrice { get; set; }
 
         [NotMapped]

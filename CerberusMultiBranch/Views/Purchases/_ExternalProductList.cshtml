@@ -100,14 +100,26 @@
     function BeginCopy(code)
     {
         $("#ExCode").val(code);
-        $("#ModalExternalProduct").modal("hide");
-        ShowLoading();
 
-        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: $("#ProviderId").val(), code: code }, function (view)
+        //me suscribo al cierre de la modal de busqueda de productos externos
+        $("#ModalExternalProduct").off('hidden.bs.modal').on('hidden.bs.modal', function ()
         {
-            HideLoading();
-            $("#divClone").html(view);
+            console.log("Beggin copy");
+            ShowLoading();
+
+            ExecuteAjax('@Url.Action("BeginCopy","Products")', { providerId: $("#ProviderId").val(), code: code }, function (view)
+            {
+                HideLoading();
+                $("#divClone").html(view);
+
+                $("ModalQuickAddProduct").on('hidden.bs.modal', function ()
+                {
+                   
+                });
+            });
         });
+
+        $("#ModalExternalProduct").modal("hide");
     }
 
     function AddDetail(element)
@@ -122,7 +134,7 @@
             price: row.find("#txtBuyPrice").val(),
             productId: row.find("#ProductId").val(),
             quantity: row.find("#Quantity").val(),
-            transactionId: $("#TransactionId").val()
+            purchaseId: $("#PurchaseId").val()
         };
 
         console.log(param);

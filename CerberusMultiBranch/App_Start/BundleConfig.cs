@@ -9,13 +9,16 @@ namespace CerberusMultiBranch
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
+                "~/Scripts/_jquery-ui-1.12.1.min.js",
                         "~/Scripts/jquery-3.1.1.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/common").Include(
-                    "~/Scripts/Common.js"));
+                    "~/Scripts/Common.js",
+                    "~/AppScripts/Global.js"));
+
 
           // Use the development version of Modernizr to develop with and learn from. Then, when you're
           // ready for production, use the build tool at http://modernizr.com to pick only the tests you need.
@@ -29,7 +32,8 @@ namespace CerberusMultiBranch
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css",
-                      "~/Content/font-awesome.css")); 
+                      "~/Content/font-awesome.css"));
+
         }
     }
 }

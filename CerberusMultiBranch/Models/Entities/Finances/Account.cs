@@ -8,7 +8,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
 {
     public abstract class Account
     {
-        [DataType(DataType.Date)]
+        [DataType(DataType.Date)] 
         public double InitialAmount { get; set; }
 
         [DataType(DataType.Date)]

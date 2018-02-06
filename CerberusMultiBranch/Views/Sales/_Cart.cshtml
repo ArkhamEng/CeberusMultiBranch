@@ -40,16 +40,18 @@
             </div>
 
             <div class="panel panel-primary panel-body">
-                <div class="input-group col-md-6 col-md-offset-6">
-                    <select class="form-control"  id="CartSending">
-                        <option value="0">Mostrador</option>
-                        <option value="1">Envío a domicilo</option>
-                    </select>
-                    <select class="form-control" style="width:50%"  id="CartPayment">
-                        <option value="2">Efectivo</option>
-                        <option value="1">Tarjeta</option>
-                        <option value="4">Mixto</option>
-                    </select>
+                <div class="input-group col-md-12 row">
+                    <div class="col-md-6">
+                        <select class="form-control" style="width:50%" id="CartSending">
+                            <option value="0">Mostrador</option>
+                            <option value="1">Envío a domicilo</option>
+                        </select>
+                        <select class="form-control" style="width:50%" id="CartPayment">
+                            <option value="2">Efectivo</option>
+                            <option value="1">Tarjeta</option>
+                            <option value="4">Mixto</option>
+                        </select>
+                    </div>
                     <div class="input-group-btn">
                             <button id="btnShowClients" class="btn btn-success" type="button">
                                 <span class="fa fa-user-plus"></span>
@@ -73,8 +75,12 @@
     {
         $("#btnShowClients").click(function ()
         {
+            $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+            {
+                $("#ModalQuickClient").modal('show');
+            });
+
             $("#ModalCart").modal('hide');
-            $("#ModalQuickClient").modal('show');
         });
 
         $("#lblTotalAmount").val('@Html.DisplayFor(model => model.TotalAmount)');
