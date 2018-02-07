@@ -78,7 +78,7 @@
                         <span class="fa fa-check"></span>
                         Aceptar
                     </button>
-                    <button class="btn btn-danger">
+                    <button class="btn btn-danger" onclick="Close()">
                         <span class="fa fa-times"></span>
                         Cancelar
                     </button>
@@ -87,6 +87,8 @@
         </div>
     </div>
 </div>
+
+
 
 @Html.HiddenFor(model => model.ProviderId)
 
@@ -110,7 +112,7 @@
                 ProviderId: $("#ProviderId").val(),
                 PurchaseDate: $("#PurchaseDate").val(),
                 ExpirationDate: $("#ExpirationDate").val(),
-                PurchaseType: $("#PurchaseType").val(),
+                TransactionType: $("input[name=TransactionType]:checked").val(),
                 Bill: $("#Bill").val()
             };
         console.log(purchase);
@@ -119,6 +121,11 @@
         {
             window.location = '@Url.Action("Edit")/'+response.Id;
         });
+    }
+
+    function Close()
+    {
+        $("#ModalBeginPurchase").modal('hide');
     }
 </script>
 

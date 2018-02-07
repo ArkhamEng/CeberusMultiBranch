@@ -3,80 +3,105 @@
 <table id="tbPurchases" class="table table-striped">
     <thead>
         <tr>
-            <th class="col-md-2">@Html.DisplayName("Sucursal")</th>
+            <th class="col-md-1">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().Bill)</th>
-            <th class="col-md-4">@Html.DisplayName("Proveedor")</th>
-    
-            
-            <th class="col-md-1">@Html.DisplayName("Fecha")</th>
+            <th class="col-md-3">@Html.DisplayName("Proveedor")</th>
+
+
+            <th class="col-md-2">@Html.DisplayName("Fecha Compra")</th>
+            <th class="col-md-2">@Html.DisplayName("Fecha Expira")</th>
             <th class="col-md-1">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-         
+
             <th class="col-md-1">@Html.DisplayName("Estado")</th>
-            <th class="col-md-1"/>
+            <th class="col-md-1"></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Branch.Name)</td>
-                <td>@Html.DisplayFor(m => item.Bill)</td>
-                <td>@Html.DisplayFor(m => item.Provider.Name)</td>
-   
-             
-                <td align="center">@Html.DisplayFor(m => item.TransactionDate)</td>
-                <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
-                
-             
+                <td>
+                    @Html.DisplayFor(m => item.Branch.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Bill)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Provider.Name)
+                </td>
+                <td>
+                    @item.TransactionDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @item.Expiration.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.TotalAmount)
+                </td>
 
-                @switch (item.Status)
-                {
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
-                        <td align="center" class="alert alert-danger">
-                            Cancelado
-                        </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
-                        <td align="center" class="alert alert-success">
-                            Inventariado
-                        </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                        <td align="center" class="alert alert-info">
-                            En Proceso
-                        </td>
-                        break;
-                }
-                <td align="center">
-                    <button class="btn btn-primary  btn-xs" onclick="Detail(@item.PurchaseId)" title="Ver detalle de compra">
-                        <span class="glyphicon glyphicon-eye-open" />
+                <td class="input-group">
+                    @switch (item.TransactionType)
+                    {
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Contado:
+                            <div class="form-control alert-success">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
+                            <div class="form-control alert-danger">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
+                    }
+                    @switch (item.Status)
+                    {
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                            <div class="form-control alert-warning">
+                               Procesando
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                            <div class="form-control alert-info">
+                                Inventariado
+                            </div>
+                            break;
+                      
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                            <div class="form-control alert-success">
+                                Pagado
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
+                            <div class="form-control alert-danger">
+                                Cancelado
+                            </div>
+                            break;
+                    }
+                </td>
+                <td>
+                    <button class="btn btn-warning" onclick="window.location = '@Url.Action("Edit",new { id= item.PurchaseId})'" title="Editar compra">
+                        <span class="fa fa-edit" />
                     </button>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
 @{
-    var totalQuantity = Model.Sum(purchase => purchase.PurchaseDetails.Sum(s => s.Quantity));
+
     var totalAmount = Model.Sum(purchase => purchase.TotalAmount);
 }
 <script>
-    $(document).ready(function ()
-    {
-        SetDataTable("#tbPurchases", "#txtFilter");
+    $(document).ready(function () {
+        Paginate("#tbPurchases", 8);
 
-        var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
+        var tAmount = GetCurrency(parseFloat('@totalAmount'));
 
-        var tQuantity = "Articulos: " + '@totalQuantity';
-
-        $("#lblTotalAmount").text(tAmount);
-        $("#lblTotalQuantity").text(tQuantity);
+        $("#Total").text(tAmount);
 
     });
 
-    function Detail(id)
-    {
-        ShowLoading();
-        window.location = '@Url.Action("Detail")' + '/' + id;
-    }
+
+
 </script> 

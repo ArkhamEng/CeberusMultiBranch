@@ -16,6 +16,7 @@ using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using System.Text.RegularExpressions;
+using CerberusMultiBranch.Models.Entities.Finances;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -56,12 +57,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
-            string bill, string provider, string user)
+            string bill, string provider, string user, TranStatus? status)
         {
             //si el usuario no es un supervisor, busco solo las comprar registradas por el 
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId);
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId,status);
             return PartialView("_PurchaseList", model);
         }
 
@@ -128,7 +129,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, string userId)
+        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, string userId, TranStatus? status)
         {
             //si el filtro de sucursal viene nulo
             //Busco las compras hechas en las sucursales asignadas del usuario
@@ -142,12 +143,31 @@ namespace CerberusMultiBranch.Controllers.Operative
                              && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
                              && (userId == null || p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
+                             &&(status == null || p.Status == status )
                              select p).ToList();
 
             return purchases;
         }
 
+        //this method is call when a new purchase is going to be registered
+        [HttpPost]
+        public ActionResult BeginPurchase()
+        {
+            BeginPurchaseViewModel model = new BeginPurchaseViewModel();
 
+            model.TransactionTypes = new List<TransactionType>();
+            model.TransactionTypes.Add(TransactionType.Contado);
+            model.TransactionTypes.Add(TransactionType.Credito);
+
+            model.TransactionType = model.TransactionTypes.First();
+            model.PurchaseDate = DateTime.Today.ToLocal();
+            model.ExpirationDate = model.PurchaseDate.AddDays(30);
+
+            return PartialView("_BeginPurchase", model);
+        }
+
+
+        //this method is call when a new purchase is going to be saved
         [HttpPost]
         [Authorize(Roles = "Capturista")]
         public ActionResult Create(BeginPurchaseViewModel model)
@@ -180,6 +200,70 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+
+
+        [HttpPost]
+        public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity)
+        {
+            try
+            {
+                var detail = db.PurchaseDetails.
+                    FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
+
+                if (detail != null)
+                {
+                    detail.Quantity += quantity;
+                    detail.Amount = detail.Quantity * detail.Price;
+
+                    db.Entry(detail).State = EntityState.Modified;
+                }
+                else
+                {
+                    detail = new PurchaseDetail
+                    {
+                        ProductId = productId,
+                        PurchaseId = purchaseId,
+                        Quantity = quantity,
+                        Price = price,
+                        Amount = price * quantity
+                    };
+
+                    db.PurchaseDetails.Add(detail);
+                }
+
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("AddDetail", ex);
+            }
+
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).
+                Where(d => d.PurchaseId == purchaseId).ToList();
+
+
+            return PartialView("_Details", model);
+        }
+
+        [HttpPost]
+        public ActionResult RemoveDetail(int transactionId, int productId)
+        {
+            var detail = db.PurchaseDetails.FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == transactionId);
+
+            if (detail != null)
+            {
+                db.PurchaseDetails.Remove(detail);
+                db.SaveChanges();
+            }
+
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).
+              Where(d => d.PurchaseId == transactionId).ToList();
+
+
+            return PartialView("_Details", model);
+        }
+
+        //this method is call when the purchase is finishes and inventoried
         [HttpPost]
         public ActionResult Compleate(int purchaseId, DateTime purchaseDate, DateTime expirationDate, TransactionType purchaseType)
         {
@@ -196,14 +280,36 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.TransactionDate = purchaseDate;
                 model.Expiration = expirationDate;
                 model.TransactionType = purchaseType;
-                model.Status = TranStatus.Compleated;
+                model.Status = TranStatus.Reserved;
 
                 foreach (var detail in model.PurchaseDetails)
                 {
                     var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
 
-                    if(brp != null)
+                    //obtengo los porcentajes configurados en base de datos y calculo los precios
+                    var variables = db.Variables;
+
+                    if (brp != null)
                     {
+                        //si ya existe una relacion de producto sucursal verifico los precios
+
+                        //si el precio de compra en sucursal es mayor al precio del detalle
+                        //se promedian las cantidades y se genera un nuevo precio
+                        if (brp.BuyPrice > detail.Price)
+                        {
+                            var oldAmount = (brp.Stock + brp.Reserved) * brp.BuyPrice;
+
+                            brp.BuyPrice = (oldAmount + detail.Amount) / (brp.Stock + brp.Reserved + detail.Quantity);
+                        }
+                        //si el nuevo precio de compra es mayor o igual se actualiza y recalculan los precios (para eliminar errores previos en la captura del precio)
+                        else
+                            brp.BuyPrice = detail.Price;
+
+                        //se recalculan los precios
+                        brp.DealerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+
                         brp.LastStock = brp.Stock;
                         brp.Stock += detail.Quantity;
 
@@ -215,11 +321,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     else
                     {
                         //si no existe una realcion de producto sucursal
-                        //obtengo los porcentajes configurados en base de datos y calculo los precios
-                        var variables = db.Variables;
+
                         brp = new BranchProduct();
-                        brp.BranchId  = branchId;
+                        brp.BranchId = branchId;
                         brp.ProductId = detail.ProductId;
+                        brp.BuyPrice = detail.Price;
                         brp.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
                         brp.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
                         brp.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -240,7 +346,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var stkM = new StockMovement
                     {
                         BranchId = branchId,
-                        Comment ="COMPRA CON FOLIO "+model.Bill,
+                        Comment = "COMPRA CON FOLIO " + model.Bill,
                         MovementDate = DateTime.Now.ToLocal(),
                         ProductId = detail.ProductId,
                         MovementType = MovementType.Entry,
@@ -261,14 +367,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new
                 {
                     Result = "Error",
-                    Header = "Error al inventariar",
+                    Header = "Error al inventariar!!",
                     Message = "Ocurrio un error al finalizar la compra detalle " + ex.Message
                 });
             }
-
-
         }
 
+        //this method is call for edit purchases
         public ActionResult Edit(int id)
         {
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
@@ -280,22 +385,95 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult BeginPurchase()
+        public ActionResult AddPayment(PurchasePayment payment)
         {
-            BeginPurchaseViewModel model = new BeginPurchaseViewModel();
+            try
+            {
+                payment.UpdDate = DateTime.Now.ToLocal();
+                payment.UpdUser = User.Identity.Name;
 
-            model.TransactionTypes = new List<TransactionType>();
-            model.TransactionTypes.Add(TransactionType.Contado);
-            model.TransactionTypes.Add(TransactionType.Credito);
+                var purchase = db.Purchases.Include(p => p.PurchasePayments).
+                    FirstOrDefault(p => p.PurchaseId == payment.PurchaseId);
 
-            model.TransactionType = model.TransactionTypes.First();
-            model.PurchaseDate = DateTime.Today.ToLocal();
-            model.ExpirationDate = model.PurchaseDate.AddDays(30);
+                var total = purchase.PurchasePayments.Sum(p => p.Amount);
 
-            return PartialView("_BeginPurchase", model);
+                total += payment.Amount;
+                if (purchase.TotalAmount >= total)
+                {
+                    db.PurchasePayments.Add(payment);
+                    if (total == purchase.TotalAmount)
+                    {
+                        purchase.Status = TranStatus.Compleated;
+                        purchase.UpdDate = DateTime.Now.ToLocal();
+                        purchase.UpdUser = User.Identity.Name;
+
+                        db.Entry(purchase).State = EntityState.Modified;
+                    }
+
+                    db.SaveChanges();
+
+                    purchase.PurchasePayments.Add(payment);
+                    purchase.PurchasePayments.OrderByDescending(p => p.PaymentDate);
+
+                    return PartialView("_PurchasePayments", purchase.PurchasePayments);
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        Result = "warning",
+                        Header = "Error al registrar el pago!!",
+                        Message = "La cantidad que intenta registrar supera lo permitido para esta cuenta"
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error",
+                    Header = "Error al registrar el pago!!",
+                    Message = "Ocurrio un error inesperado detalle " + ex.Message
+                });
+            }
         }
 
+        [HttpPost]
+        public ActionResult RemovePayment(int id)
+        {
+            try
+            {
+                var payment = db.PurchasePayments.Find(id);
 
+                var purchaseId = payment.PurchaseId;
+
+                if(payment.Purchase.Status == TranStatus.Compleated)
+                {
+                    payment.Purchase.Status = TranStatus.Reserved;
+                    payment.Purchase.UpdDate = DateTime.Now.ToLocal();
+                    payment.Purchase.UpdUser = User.Identity.Name;
+
+                    db.Entry(payment.Purchase).State = EntityState.Modified;
+                }
+
+                db.PurchasePayments.Remove(payment);
+                db.SaveChanges();
+
+                var model = db.PurchasePayments.Where(p => p.PurchaseId == purchaseId).ToList();
+                return PartialView("_PurchasePayments", model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error",
+                    Header = "Error al remover el pago!!",
+                    Message = "Ocurrio un error inesperado al eliminar el pago detalle: " + ex.Message
+                });
+            }
+        }
+
+        //this method looks for providers products to be registered in a purchase
         [HttpPost]
         public ActionResult SearchExternalProducts(string filter, int providerId)
         {
@@ -383,72 +561,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "Error al crear realción", Message = ex.Message });
             }
         }
-
-
-        [HttpPost]
-        public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity)
-        {
-            try
-            {
-                var detail = db.PurchaseDetails.
-                    FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
-
-                if (detail != null)
-                {
-                    detail.Quantity += quantity;
-                    detail.Amount = detail.Quantity * detail.Price;
-
-                    db.Entry(detail).State = EntityState.Modified;
-                }
-                else
-                {
-                    detail = new PurchaseDetail
-                    {
-                        ProductId = productId,
-                        PurchaseId = purchaseId,
-                        Quantity = quantity,
-                        Price = price,
-                        Amount = price * quantity
-                    };
-
-                    db.PurchaseDetails.Add(detail);
-                }
-
-                db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("AddDetail", ex);
-            }
-
-            var model = db.PurchaseDetails.Include(d => d.Product.Images).
-                Where(d => d.PurchaseId == purchaseId).ToList();
-
-
-            return PartialView("_Details", model);
-        }
-
-        [HttpPost]
-        public ActionResult RemoveDetail(int transactionId, int productId)
-        {
-            var detail = db.PurchaseDetails.FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == transactionId);
-
-            if (detail != null)
-            {
-                db.PurchaseDetails.Remove(detail);
-                db.SaveChanges();
-            }
-
-            var model = db.PurchaseDetails.Include(d => d.Product.Images).
-              Where(d => d.PurchaseId == transactionId).ToList();
-
-
-            return PartialView("_Details", model);
-        }
-
-
-
-
 
         protected override void Dispose(bool disposing)
         {

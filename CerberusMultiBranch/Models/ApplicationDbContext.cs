@@ -81,10 +81,7 @@ namespace CerberusMultiBranch.Models
         #endregion
 
         #region Finances
-        public DbSet<Receivable> Receivables { get; set; }
-
-        public DbSet<Payable> Payables { get; set; }
-
+       
         public DbSet<SalePayment> SalePayments { get; set; }
 
         public DbSet<PurchasePayment> PurchasePayments { get; set; }

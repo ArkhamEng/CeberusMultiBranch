@@ -27,8 +27,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         #region Navigation Properties
         public virtual Provider Provider { get; set; }
 
-        public ICollection<Payable> Payables { get; set; }
-
         public ICollection<PurchasePayment> PurchasePayments { get; set; }
 
         public ICollection<PurchaseDetail> PurchaseDetails { get; set; }

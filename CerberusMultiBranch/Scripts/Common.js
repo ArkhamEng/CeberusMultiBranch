@@ -13,10 +13,9 @@ function ShowConfirm(header, text, backdrop, action)
     $("#cnfText").text(text);
     $("#ModalConfirm").modal({backdrop:backdrop});
 
-    $("#btnConfirm").click(function ()
+    $("#btnConfirm").off('click').click(function ()
     {
         $("#ModalConfirm").modal("hide");
-        $("#btnConfirm").off("click");
         action();
     });
 }
@@ -152,30 +151,7 @@ function Search(url, data, target)
     });
 }
 
-function Paginate(table, records)
-{
-    console.log("pagining");
-    var oTable = $(table).DataTable(
-       {
-           destroy: true,
-           "lengthChange": false,
-           "searching": true,
-           "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
-           "pageLength": records,
-           "language": {
-               "search": "filtrar resultados",
-               "lengthMenu": "mostrar  _MENU_ ",
-               "zeroRecords": "no hay datos disponibles",
-               "info": "página _PAGE_ de _PAGES_",
-               "infoEmpty": "",
-               "infoFiltered": "(filtrado de _MAX_ total registros)",
-               "paginate": {
-                   "previous": "Anterior",
-                   "next": "Siguiente"
-               }
-           }
-       });
-}
+
 
 function SetDataTable(table, filter) {
     var oTable = $(table).DataTable(

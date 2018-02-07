@@ -91,10 +91,17 @@
 
     function BeginAddRelation(description,code)
     {
+        $("#ModalExternalProduct").off('hidden.bs.modal').on('hidden.bs.modal', function ()
+        {
+            $("#ExCode").val(code);
+            $("#lblExternalProduct").text(code + " => " + description)
+            $("#ModalInternalProduct").modal("show");
+
+            $("#ModalExternalProduct").off('hidden.bs.modal');
+        });
+
         $("#ModalExternalProduct").modal("hide");
-        $("#ExCode").val(code);
-        $("#lblExternalProduct").text(code + " => " + description)
-        $("#ModalInternalProduct").modal("show");
+      
     }
 
     function BeginCopy(code)
@@ -111,12 +118,9 @@
             {
                 HideLoading();
                 $("#divClone").html(view);
-
-                $("ModalQuickAddProduct").on('hidden.bs.modal', function ()
-                {
-                   
-                });
             });
+
+            $("#ModalExternalProduct").off('hidden.bs.modal')();
         });
 
         $("#ModalExternalProduct").modal("hide");

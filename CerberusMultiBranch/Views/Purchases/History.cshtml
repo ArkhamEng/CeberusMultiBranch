@@ -1,10 +1,15 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
+@using CerberusMultiBranch.Models.Entities.Operative;
 
 @{
     ViewBag.Title = "Compras";
     ViewBag.Class = "fa fa-shopping-basket";
 }
+<br />
 
+<div class="well well-sm col-md-offset-10 col-md-2 text-right">
+    <h4>Total  <a id="Total">@Model.Purchases.Sum(p=> p.TotalAmount).ToString("c")</a></h4>
+</div>
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
@@ -27,9 +32,10 @@
 
                 <select id="Status" class="form-control" style="width:20% !important">
                     <option value="">Status</option>
-                    <option value="0">En Proceso</option>
-                    <option value="3">Inventariado</option>
-                    <option value="-1">Cancelado</option>
+                    <option value="@TranStatus.InProcess">Procesando</option>
+                    <option value="@TranStatus.Reserved">Inventariado</option>
+                    <option value="@TranStatus.Compleated">Pagado</option>
+                    <option value="@TranStatus.Canceled">Cancelado</option>
                 </select>
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
@@ -44,7 +50,7 @@
             </div>
         </div>
 
-        <br /><br /><br />
+        <br /><br /><br /><br />
         <div class="col-md-10">
             <div class="input-group">
                 @if (User.IsInRole("Supervisor"))
@@ -68,10 +74,12 @@
 </div>
 
 <div id="divNewPurchase"></div>
-
-<div id="divPurchases">
-    @Html.Partial("_PurchaseList",Model.Purchases)
+<div class="panel panel-default">
+    <div id="divPurchases" class="panel-body">
+        @Html.Partial("_PurchaseList", Model.Purchases)
+    </div>
 </div>
+
 <script>
     $(document).ready(function ()
     {
@@ -89,7 +97,10 @@
                 bill: $("#FBill").val(),
                 user: $("#FUser").val(),
                 provider: $("#FProvider").val(),
+                status: $("#Status").val()
             };
+            console.log(data);
+
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
                 $("#divPurchases").html(view);

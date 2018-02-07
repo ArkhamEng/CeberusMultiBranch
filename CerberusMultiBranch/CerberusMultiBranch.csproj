@@ -233,6 +233,10 @@
     <Compile Include="Migrations\201802060040113_TransactionTypeChange.Designer.cs">
       <DependentUpon>201802060040113_TransactionTypeChange.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802070342421_PurchasePaymentsFix.cs" />
+    <Compile Include="Migrations\201802070342421_PurchasePaymentsFix.Designer.cs">
+      <DependentUpon>201802070342421_PurchasePaymentsFix.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -263,7 +267,6 @@
     <Compile Include="Models\Entities\Finances\Receivable.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
-    <Compile Include="Models\Entities\Finances\Payable.cs" />
     <Compile Include="Models\Entities\Operative\OperativeEnum.cs" />
     <Compile Include="Models\Entities\Finances\SalePayment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
@@ -549,6 +552,8 @@
     <Content Include="Views\Products\_GeneralData.cshtml" />
     <Content Include="Views\Clients\_ClientEdition.cshtml" />
     <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
+    <Content Include="Views\Shared\_ConfirmPopOver.cshtml" />
+    <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -588,6 +593,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802060040113_TransactionTypeChange.resx">
       <DependentUpon>201802060040113_TransactionTypeChange.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802070342421_PurchasePaymentsFix.resx">
+      <DependentUpon>201802070342421_PurchasePaymentsFix.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

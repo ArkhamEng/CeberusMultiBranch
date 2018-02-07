@@ -9,9 +9,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     {
         Canceled = -1, //Cancelado en venta y compra
         InProcess = 0, //Abierto-venta, En proceso -compra
-        Reserved = 1,
+        Reserved = 1, // compra / venta concluida pero no pagada | (compra inventariada, venta con producto reservado)
         Revision = 2,
-        Compleated = 3, //Pagado-Venta, Inventariado-Compra
+        Compleated = 3, //Compra-Venta pagada en su totalidad
     }
 
     public enum PaymentMethod

@@ -8,12 +8,10 @@ namespace CerberusMultiBranch.Models.Entities.Finances
     {
         public int PurchasePaymentId { get; set; }
 
-        public int? PurchaseId { get; set; }
+        public int PurchaseId { get; set; }
 
-        public int? PayableId { get; set; }
 
         public virtual Purchase Purchase { get; set; }
 
-        public virtual Payable Payable { get; set; }
     }
 }
