@@ -10,7 +10,7 @@ using CerberusMultiBranch.Models.ViewModels.Config;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador,Capturista")]
     public class ConfigurationController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -20,13 +20,12 @@ namespace CerberusMultiBranch.Controllers.Config
             return View();
         }
 
-        public ActionResult SystemCategory()
-        {
-            return View();
-        }
+       
+     
 
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public ActionResult GetCauses()
         {
             var causes = db.WithdrawalCauses.OrderBy(c => c.WithdrawalCauseId).ToList();
@@ -34,6 +33,7 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrador")]
         public ActionResult SaveCause(string name)
         {
             db.WithdrawalCauses.Add(new Models.Entities.Operative.WithdrawalCause { Name = name, UserAdd = User.Identity.Name, InsDate = DateTime.Now });
@@ -45,7 +45,7 @@ namespace CerberusMultiBranch.Controllers.Config
         }
 
         [HttpPost]
-
+        [Authorize(Roles = "Administrador")]
         public ActionResult SaveConfigVariable(Variable variable)
         {
             if (ModelState.IsValid)
@@ -62,9 +62,14 @@ namespace CerberusMultiBranch.Controllers.Config
             return PartialView("_CategoryList", variables);
         }
 
-   
+
 
         #region Systems
+        public ActionResult SystemCategory()
+        {
+            return View();
+        }
+
         [HttpPost]
         public ActionResult NewSystem()
         {

@@ -1,0 +1,107 @@
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.SaleDetail>
+
+@Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-1"></th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Product.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Product.Category.SatCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Product.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Product.Unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Amount)
+            </th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @if (item.Product.Images != null && item.Product.Images.Count > 0)
+                    {
+                        <img src="@item.Product.Images.First().Path" class="img-responsive" style="max-height:80px" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" style="max-height:80px" />
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.Code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.Category.SatCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.Unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td  class="Compleated">
+                    <div class="btn-group">
+                        <button class="btn btn-danger" type="button" onclick="RemoveDetail(@item.SaleId,@item.ProductId)">
+                            <span class="glyphicon glyphicon-trash"></span> 
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<script>
+    $(document).ready(function ()
+    {
+        if ('@Model.Count' > 0)
+            $("#btnCompleate").show();
+        else
+            $("#btnCompleate").hide();
+
+
+        $("#Amount").text('@Model.Sum(d => d.Amount).ToString("c")');
+
+
+    });
+
+    function RemoveDetail(tid, pid)
+    {
+        ShowLoading();
+        var param = { saleId: tid, productId: saleId };
+
+        ExecuteAjax('@Url.Action("RemoveDetail", "Sales")', param, function (view)
+        {
+            $("#divDetails").html(view);
+            HideLoading();
+        });
+    }
+   
+</script>

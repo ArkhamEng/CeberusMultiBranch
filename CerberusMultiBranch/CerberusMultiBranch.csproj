@@ -237,6 +237,30 @@
     <Compile Include="Migrations\201802070342421_PurchasePaymentsFix.Designer.cs">
       <DependentUpon>201802070342421_PurchasePaymentsFix.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201802091624412_SaleChangesExpiration.cs" />
+    <Compile Include="Migrations\201802091624412_SaleChangesExpiration.Designer.cs">
+      <DependentUpon>201802091624412_SaleChangesExpiration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802091921297_SaleChangesRemoveMethod.cs" />
+    <Compile Include="Migrations\201802091921297_SaleChangesRemoveMethod.Designer.cs">
+      <DependentUpon>201802091921297_SaleChangesRemoveMethod.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802120035272_ClientChanges.cs" />
+    <Compile Include="Migrations\201802120035272_ClientChanges.Designer.cs">
+      <DependentUpon>201802120035272_ClientChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802120109024_ClientChanges1.cs" />
+    <Compile Include="Migrations\201802120109024_ClientChanges1.Designer.cs">
+      <DependentUpon>201802120109024_ClientChanges1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802120255305_CreditComment.cs" />
+    <Compile Include="Migrations\201802120255305_CreditComment.Designer.cs">
+      <DependentUpon>201802120255305_CreditComment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201802280331425_descriptionLength.cs" />
+    <Compile Include="Migrations\201802280331425_descriptionLength.Designer.cs">
+      <DependentUpon>201802280331425_descriptionLength.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -293,6 +317,8 @@
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
@@ -479,7 +505,7 @@
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
     <Content Include="Views\Shared\_QuickUser.cshtml" />
-    <Content Include="Views\Purchases\Edit.cshtml" />
+    <Content Include="Views\Purchases\Detail.cshtml" />
     <Content Include="Views\Purchases\History.cshtml" />
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
@@ -503,9 +529,9 @@
     <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
     <Content Include="Views\CashRegister\_CloseCash.cshtml" />
     <Content Include="Views\Sales\_AddProduct.cshtml" />
-    <Content Include="Views\Products\_ListForSale.cshtml" />
+    <Content Include="Views\Products\_ListForSaleNotUsed.cshtml" />
     <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
-    <Content Include="Views\CashRegister\PrintNote.cshtml" />
+    <Content Include="Views\CashRegister\_PrintNote.cshtml" />
     <Content Include="Views\Account\UserConfig.cshtml" />
     <Content Include="Views\Account\UserList.cshtml" />
     <Content Include="Views\Configuration\_WithdrawalCause.cshtml" />
@@ -529,8 +555,6 @@
     <Content Include="Views\Shared\PageLayout.cshtml" />
     <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
-    <Content Include="Views\Sales\Detail.cshtml" />
-    <Content Include="Views\Purchases\Detail.cshtml" />
     <Content Include="Views\Shared\_Cancelation.cshtml" />
     <Content Include="Views\Products\_Movement.cshtml" />
     <Content Include="Views\Products\_SearchInternalProduct.cshtml" />
@@ -554,6 +578,13 @@
     <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
     <Content Include="Views\Shared\_ConfirmPopOver.cshtml" />
     <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
+    <Content Include="Views\CashRegister\_PrintTicket.cshtml" />
+    <Content Include="Views\Sales\_BeginSale.cshtml" />
+    <Content Include="Views\Sales\Detail.cshtml" />
+    <Content Include="Views\Sales\_Details.cshtml" />
+    <Content Include="Views\Sales\_SalePayments.cshtml" />
+    <Content Include="Views\Sales\_ProductResult.cshtml" />
+    <Content Include="Views\Sales\_SearchProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -596,6 +627,24 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802070342421_PurchasePaymentsFix.resx">
       <DependentUpon>201802070342421_PurchasePaymentsFix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802091624412_SaleChangesExpiration.resx">
+      <DependentUpon>201802091624412_SaleChangesExpiration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802091921297_SaleChangesRemoveMethod.resx">
+      <DependentUpon>201802091921297_SaleChangesRemoveMethod.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802120035272_ClientChanges.resx">
+      <DependentUpon>201802120035272_ClientChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802120109024_ClientChanges1.resx">
+      <DependentUpon>201802120109024_ClientChanges1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802120255305_CreditComment.resx">
+      <DependentUpon>201802120255305_CreditComment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201802280331425_descriptionLength.resx">
+      <DependentUpon>201802280331425_descriptionLength.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

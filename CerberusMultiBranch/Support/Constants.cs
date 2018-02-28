@@ -31,6 +31,11 @@ namespace CerberusMultiBranch.Support
 
         public const string DefaultPassword = "ADn9JXAPolz3R1QmEjw7chz42neVTLn426+eRtgaG2TvE2mR03Ri7TtoKH8iWJyuVw==";
 
+        public const int DaysToCancel = 30;
+
+        public const int DaysToModify = 30;
+
+        public const int DescriptionLength = 300;
     }
 
     public struct FileStruct

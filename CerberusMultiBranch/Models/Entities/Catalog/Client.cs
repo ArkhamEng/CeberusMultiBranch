@@ -31,22 +31,15 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(100)]
         public string Name { get; set; }
 
+
         [Display(Name = "Razón Social")]
         [MaxLength(100)]
         public string BusinessName { get; set; }
-
-        [Display(Name = "Representante Legal")]
-        [MaxLength(100)]
-        public string LegalRepresentative { get; set; }
 
         //Federal Taxpayer register
         [Display(Name = "R.F.C.")]
         [MaxLength(15)]
         public string FTR { get; set; }
-
-        [Display(Name = "Dirección Fiscal")]
-        [DataType(DataType.MultilineText)]
-        public string TaxAddress { get; set; }
 
         [Display(Name = "Dirección")]
         [MaxLength(150)]
@@ -87,6 +80,30 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Sale> Sale { get; set; }
 
+        [Display(Name="Credito Limite")]
+        [DataType(DataType.Currency)]
+        public double CreditLimit { get; set; }
+
+        [Display(Name = "Credito Usado")]
+        [DataType(DataType.Currency)]
+        public double UsedAmount { get; set; }
+
+        [Display(Name = "Dias de Crédito")]
+        [Range(0, 60, ErrorMessage = "El crédito no puede ser por mas de 60 días")]
+        public int CreditDays { get; set; }
+
+        [NotMapped]
+        [Display(Name = "Credito Disponible")]
+        [DataType(DataType.Currency)]
+        public  double CreditAvailable { get { return CreditLimit - UsedAmount; } }
+
+        [Display(Name="Comentario Sobre Crédito")]
+        public string CreditComment { get; set; }
+
+        
+      
+
+
         public Client()
         {
             this.IsActive  = true;
@@ -95,26 +112,16 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.Code      = Cons.CodeMask;
         }
 
-        public Client Copy()
+        public override string ToString()
         {
-            return new Client
-            {
-                ClientId  = this.ClientId,
-                Address   = this.Address,
-                BusinessName = this.BusinessName,
-                CityId   = this.CityId,
-                Code = this.Code,
-                Email = this.Email,
-                Entrance = this.Entrance,
-                FTR = this.FTR,
-                IsActive = this.IsActive,
-                UpdDate = this.UpdDate,
-                LegalRepresentative = this.LegalRepresentative,
-                Name = this.Name,
-                Phone = this.Phone,
-                TaxAddress = this.TaxAddress,
-                ZipCode = this.ZipCode
-            };
+            var a = string.Empty;
+
+            if (this.City != null && this.City.State != null)
+                a= string.Format("{0} CP {1} {2}, {3} ", this.Address, this.ZipCode, this.City.State.Name, this.City.Name);
+            else
+               a= this.Address + " CP " + ZipCode;
+
+            return a;
         }
     }
 

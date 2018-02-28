@@ -1,0 +1,188 @@
+﻿
+@model CerberusMultiBranch.Models.ViewModels.Operative.BeginSaleViewModel
+@using CerberusMultiBranch.Models.Entities.Operative
+
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+<form id="frmBeginSale">
+    <div id="ModalBeginSale" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel-danger">
+                <div class="modal-header panel-heading">
+                    <h4 class="modal-title">
+                        <span class="fa fa-shopping-bag"></span>
+                        Registro de nueva venta
+                    </h4>
+                </div>
+                <div class="modal-body panel-body">
+                    <div class="col-md-12  form-group">
+                        @Html.LabelFor(model => model.TransactionType, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            @{
+                                foreach (var type in Model.TransactionTypes)
+                                {
+                                    <div class="input-group-addon">
+                                        <Label class="control-label">
+                                            @type.ToString()
+                                            @Html.RadioButtonFor(model => model.TransactionType, type)
+                                        </Label>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+
+
+
+                    <div class="form-group col-md-12">
+                        @Html.LabelFor(model => model.ClientName, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
+                            @Html.EditorFor(model => model.ClientName, new { htmlAttributes = new { @class = "form-control", list = "Clients" } })
+                            <datalist id="Clients"></datalist>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.ClientName, "", new { @class = "text-danger" })
+                    </div>
+
+
+                    <div class="form-group col-md-6">
+                        @Html.LabelFor(model => model.SaleDate, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
+                            @Html.EditorFor(model => model.SaleDate, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.SaleDate, "", new { @class = "text-danger" })
+                    </div>
+
+                    <div id="divDays" class="form-group col-md-6">
+                        @Html.LabelFor(model => model.Days, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+                            @Html.EditorFor(model => model.Days, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Days, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-md-12">
+                        <label id="lblMessage" class="control-label"></label>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <div class="btn-group">
+                        <button id="btnAccept" class="btn btn-primary" onclick="AcceptCreate()" type="button" disabled>
+                            <span class="fa fa-check"></span>
+                            Aceptar
+                        </button>
+                        <button class="btn btn-danger" onclick="Close()" type="button">
+                            <span class="fa fa-times"></span>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+@Html.HiddenFor(model => model.ClientId)
+
+@Html.Hidden("CreditDays")
+
+<script>
+
+    $(document).ready(function ()
+    {
+        var form = $("#frmBeginSale");
+        form.validate();
+
+        $("#ModalBeginSale").modal({ backdrop: 'static' });
+
+        Compleate("#ClientName", "#Clients", '@Url.Action("AutoCompleate","Clients")', function (id, value)
+        {
+            $("#ClientId").val(id);
+
+            ExecuteAjax('@Url.Action("GetClientCreditData","Clients")',{id:id},function(response)
+            {
+                $("#lblMessage").text(response.Message);
+                if(response.Result!="OK")
+                {
+                    $("#Days").val(0);
+                    $("#CreditDays").val(0);
+                    $("#btnAccept").attr('disabled', true);
+                    $("#lblMessage").removeClass("text-info");
+                    $("#lblMessage").addClass("text-danger");
+                }
+                else
+                {
+                    $("#btnAccept").attr('disabled', false);
+                    $("#Days").val(response.Days);
+                    $("#CreditDays").val(response.Days);
+                    $("#lblMessage").removeClass("text-danger");
+                    $("#lblMessage").addClass("text-info");
+                }
+            });
+    });
+
+    $("input[name=TransactionType]").click(function ()
+    {
+        if (this.value == '@TransactionType.Credito' || this.value == '@TransactionType.Preventa')
+        {
+            $("#divDays").removeClass("hidden");
+        }
+        else
+        {
+            $("#divDays").val(0);
+            $("#divDays").addClass("hidden");
+        }
+    });
+
+        $("#Days").off("keyup").keyup(function ()
+        {
+            if (parseInt($("#Days").val()) > parseInt($("#CreditDays").val()))
+                $("#btnAccept").attr('disabled', true);
+            else
+                $("#btnAccept").attr('disabled', false);
+        });
+    });
+
+    function AcceptCreate()
+    {
+        var form = $("#frmBeginSale");
+
+        if (!form.valid())
+            return;
+
+        $("#ModalBeginSale").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+            var sale =
+                {
+                    ClientId: $("#ClientId").val(),
+                    SaleDate: $("#SaleDate").val(),
+                    Days: $("#Days").val(),
+                    TransactionType: $("input[name=TransactionType]:checked").val()
+                };
+
+            ExecuteAjax('@Url.Action("Create","Sales")', { model: sale }, function (response)
+            {
+                if (response.Result != "OK")
+                {
+                    HideLoading();
+                    ShowMessage(response.Header, response.Message, 'warning');
+                }
+
+                window.location = '@Url.Action("Detail")/' + response.Id;
+            });
+        });
+
+        $("#ModalBeginSale").modal('hide');
+
+    }
+
+    function Close()
+    {
+        $("#ModalBeginSale").modal('hide');
+    }
+</script>
+

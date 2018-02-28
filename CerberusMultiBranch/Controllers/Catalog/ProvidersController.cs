@@ -152,33 +152,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     Stream myStr = file.InputStream;
                     records = (RecordSet)xml.Deserialize(file.InputStream);
 
-                    if (records != null)
+                    records.Records.ForEach(r => 
                     {
-                        for(int i=0;i<records.Records.Count;i++)
+                        var description = r.Description.Trim();
+
+                        if (description.Length > Cons.DescriptionLength)
+                            description = description.Substring(0, Cons.DescriptionLength);
+
+                        ExternalProduct ex = new ExternalProduct
                         {
-                            if(toInsert.FirstOrDefault(ti=> ti.Code == records.Records[i].Code.Trim()) == null)
-                            {
-                                var description = records.Records[i].Description;
+                            Code = r.Code.Trim().Length > 30 ? r.Code.Trim().Substring(0, 30) : r.Code,
+                            ProviderId = providerId,
+                            Description = description,
+                            TradeMark = r.TradeMark.Trim() ?? "N/A",
+                            Unit = r.Unit.Trim() ?? "N/A",
+                            Category = r.Category.Trim() ?? "N/A",
+                            Price = r.Price
+                        };
+                        toInsert.Add(ex);
+                    });
 
-                                if (description.Length > 200)
-                                    description = description.Substring(0, 199);
-
-                                ExternalProduct ex = new ExternalProduct
-                                {
-                                    Code = records.Records[i].Code.Trim(),
-                                    ProviderId = providerId,
-                                    Description = description,
-                                    TradeMark = records.Records[i].TradeMark ?? "N/A",
-                                    Unit = records.Records[i].Unit ?? "N/A",
-                                    Category = records.Records[i].Category ?? "N/A",
-                                    Price = records.Records[i].Price
-                                };
-                                toInsert.Add(ex);
-                            }
-                               
-                        }
-                    }
-                       
+            
                     xml = null;
                 }
                 catch (Exception ex)
@@ -193,6 +187,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         DBHelper.DeleteExternal(providerId);
                         //agrego el rango de productos nuevos al data context
+
+                      
+
                         DBHelper.BulkInsertBulkCopy(toInsert);
 
                         var provider = db.Providers.Find(providerId);
@@ -205,7 +202,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Error al agregar nuevos registros", ex);
+                        throw new Exception("Error al agregar nuevos registros "+ex.Message, ex);
                     }
                 }
 

@@ -1,14 +1,9 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Finances;
-using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -31,13 +26,16 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int SendingType { get; set; }
 
-        public PaymentMethod PaymentMethod { get; set; }
+      
 
+
+        #region Navigation Properties
         public ICollection<SaleDetail> SaleDetails { get; set; }
 
-        public ICollection<SalePayment> Payments { get; set; }
+        public ICollection<SalePayment> SalePayments { get; set; }
 
         public virtual Client Client { get; set; }
+        #endregion
 
         public Sale()
         {

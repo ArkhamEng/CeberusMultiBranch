@@ -5,25 +5,24 @@
     ViewBag.Title = "Compras";
     ViewBag.Class = "fa fa-shopping-basket";
 }
-<br />
 
-<div class="well well-sm col-md-offset-10 col-md-2 text-right">
-    <h4>Total  <a id="Total">@Model.Purchases.Sum(p=> p.TotalAmount).ToString("c")</a></h4>
-</div>
+
+<h4 id="Total"class="alert alert-danger col-md-offset-9 col-md-3">
+</h4>
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
         <div class="col-md-11">
             <div class="input-group ">
-            @Html.DropDownList("FBranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:20% !important" })
-            @Html.TextBox("FBill", "", htmlAttributes: new
+            @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:20% !important" })
+            @Html.TextBox("BillF", "", htmlAttributes: new
            {
                @class = "form-control",
                placeholder = "Factura",
                style = "width:20% !important"
            })
 
-            @Html.TextBox("FProvider", "", htmlAttributes: new
+            @Html.TextBox("Provider", "", htmlAttributes: new
            {
                @class = "form-control",
                placeholder = "Nombre del proveedor",
@@ -55,13 +54,13 @@
             <div class="input-group">
                 @if (User.IsInRole("Supervisor"))
                 {
-                    @Html.TextBox("FUser", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de usuario" })
+                    @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de usuario" })
                 }
                 <span class="input-group-addon"><a>Fecha Inicial</a></span>
-                @Html.TextBox("FBeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
 
                 <span class="input-group-addon"><a>Fecha final</a></span>
-                @Html.TextBox("FEndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
                 <span class="input-group-btn">
                     <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear">
                         <span class="glyphicon glyphicon-refresh"></span>
@@ -91,16 +90,15 @@
             ShowLoading();
 
             var data = {
-                branchId: $("#FBranchId").val(),
-                beginDate: $("#FBeginDate").val(),
-                endDate: $("#FEndDate").val(),
-                bill: $("#FBill").val(),
-                user: $("#FUser").val(),
-                provider: $("#FProvider").val(),
+                branchId: $("#BranchId").val(),
+                beginDate: $("#BeginDate").val(),
+                endDate: $("#EndDate").val(),
+                bill: $("#BillF").val(),
+                user: $("#User").val(),
+                provider: $("#Provider").val(),
                 status: $("#Status").val()
             };
-            console.log(data);
-
+          
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
                 $("#divPurchases").html(view);

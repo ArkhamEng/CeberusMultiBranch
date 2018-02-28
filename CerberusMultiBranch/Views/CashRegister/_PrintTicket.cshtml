@@ -1,0 +1,178 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+@using CerberusMultiBranch.Support;
+@using CerberusMultiBranch.Models.Entities.Operative
+
+<script src="~/Scripts/printThis.js"></script>
+
+<div hidden>
+    <div id="divTicket" style="width:270px;">
+        <table class="Ticket" style="width:100%;">
+            <tr>
+                <td align="center" colspan="2">
+                    <div style="width:200px">
+                        <img src="~/Content/Images/logo2.png" class="img-responsive" />
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center" colspan="2">
+                    Sucursal @Model.Branch.Name
+                </td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                    @Model.Branch.Address
+                </td>
+            </tr>
+            <tr>
+                <td style="height:20px" colspan="2"></td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Folio</label><br />
+                </td>
+                <td>
+                    @Model.Folio
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>Fecha y Hora</label><br />
+                </td>
+                <td>
+                    @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label>
+                        Agente
+                    </label>
+                </td>
+                <td>
+                    @Model.User.UserName
+                </td>
+            </tr>
+           
+            <tr>
+                <td>
+                    <label>
+                        Tipo de pago
+                    </label>
+                </td>
+                <td>
+                  
+                    @if (Model.SalePayments.Count > Cons.One)
+                    {
+                        <a>@PaymentMethod.Mixto.ToString()</a>
+                    }
+                    else
+                    {
+                        <a>@Model.SalePayments.First().PaymentMethod.ToString()</a>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td style="height:20px" colspan="2"></td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                    <table style="width:100%; border-top:dotted 1px gray">
+                        @foreach (var tI in Model.SaleDetails)
+                        {
+                            var i = tI.Product.Code.Length - 4;
+                            var sCode = tI.Product.Code.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
+                            var sName = tI.Product.Name.Length <= 12 ? tI.Product.Name : tI.Product.Name.Substring(0, 12);
+                            <tr style="border-bottom:solid 1px gray; ">
+                                <td class="text-left">
+                                    @if (tI.ParentId == null)
+                                    {
+                                        @sCode
+                                    }
+
+                                </td>
+                                <td class="text-left">
+                                    @if (tI.ParentId != null)
+                                    {
+                                        sName = (sCode + " " + sName).ToString();
+                                    }
+                                    @sName
+                                </td>
+                                <td class="text-center">
+                                    @tI.Quantity
+                                </td>
+                                <td class="text-right">
+                                    @if (tI.ParentId == null)
+                                    {
+                                        @tI.Amount.ToString("c")
+                                    }
+
+                                </td>
+                            </tr>
+
+                            <tr><td colspan="4" style="height:10px"></td></tr>
+                            @*if (tI.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
+                                {
+                                    <tr style="border-bottom:solid 1px gray;">
+                                        <td colspan="4" class="text-uppercase text-center" style="height:10px">
+                                        ===Contenido del paquete==</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr><td colspan="4" style="height:10px"></td></tr>
+                                }*@
+                        }
+                        <tr>
+                            <td colspan="4" style="height:20px"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" />
+                            <td>Total</td>
+                            <td align="right">
+                                @Model.TotalAmount.ToString("c")
+                            </td>
+                        </tr>
+                        <tr style="height:60px">
+                            <td colspan="4" />
+                        </tr>
+                        <tr style="height:30px">
+                            <td colspan="4" align="center">
+                             NO VALIDO COMO COMPROBANTE FISCAL
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <label>
+                                    Solo se acepta mercancía en
+                                    devolución   si  cumple con
+                                    las  siguientes  políticas:
+                                </label>
+                                <br />
+                                1. Mercancía sin daño
+                                o retrabajo<br />
+                                2. Mercancía   con
+                                empaque original<br />
+                                3. Máximo treita días a
+                                la fecha de la nota<br />
+                                4.Autorización de su ejecutivo de venta
+                            </td>
+                        </tr>
+                        <tr style="height:30px">
+                            <td colspan="4" align="center">
+                               ====GRACIAS POR SU COMPRA====
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    function PrintNote() {
+        $("#divTicket").printThis();
+    }
+</script>

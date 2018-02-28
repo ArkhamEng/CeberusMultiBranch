@@ -7,10 +7,10 @@
         <tr>
             <th class="col-md-1 text-center">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Fecha")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Cliente")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Usuario")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Comision")</th>
+            <th class="col-md-3 text-center">@Html.DisplayName("Cliente")</th>
+            <th class="col-md-1 text-center">@Html.DisplayName("Fecha Venta")</th>
+            <th class="col-md-1">@Html.DisplayName("Fecha Expira")</th>
+            <th class="col-md-2 text-center">@Html.DisplayName("Usuario | Comision")</th>
             <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
             <th class="col-md-1 text-right" />
@@ -20,49 +20,66 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Branch.Name)</td>
+                <td class="text-uppercase">@Html.DisplayFor(m => item.Branch.Name)</td>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
-                <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
-                <td>@Html.DisplayFor(m => item.Client.Name)</td>
-                <td>@Html.DisplayFor(m => item.User.UserName)</td>
-                <td>@Html.DisplayFor(m => item.ComAmount)</td>
+                <td class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
+                <td >@item.TransactionDate.ToString("dd/MM/yyyy")</td>
+                <td >@item.Expiration.ToString("dd/MM/yyyy")</td>
+                
+                <td class="text-uppercase">@Html.DisplayFor(m => item.User.UserName)<br />
+                @item.ComAmount.ToString("c")
+                </td>
 
                 <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
-                @{ var quantity = item.SaleDetails.Sum(td => td.Quantity);  }
+               
+                <td class="input-group text-uppercase">
+                    @switch (item.TransactionType)
+                    {
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Contado:
+                            <div class="form-control alert-success">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
+                            <div class="form-control alert-danger">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
+                    }
+                    @switch (item.Status)
+                    {
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
+                            <div class="form-control alert-warning">
+                                Procesando
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
+                            <div class="form-control alert-info">
+                                Reservado
+                            </div>
+                            break;
 
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
+                            <div class="form-control alert-success">
+                                Pagado
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
+                            <div class="form-control alert-danger">
+                                Cancelado
+                            </div>
+                            break;
+                    }
+                </td>
 
-                @switch (item.Status)
-                {
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
-                        <td align="center" class="alert alert-danger">
-                            Cancelado
-                        </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
-                        <td align="center" class="alert alert-success">
-                            Pagado <br />
-                            @item.PaymentMethod.ToString()
-                        </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                        <td align="center" class="alert alert-warning">
-                            Abierto
-                        </td>
-                        break;
-                    case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
-                        <td align="center" class="alert alert-info">
-                            Rerservado
-                        </td>
-                        break;
-                }
                 <td align="center">
-                    <button class="btn btn-primary  btn-xs" title="Ver detalle"
+                    <button class="btn btn-primary" title="Ver detalle y editar"
                             onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.SaleId })'">
-                        <span class="fa fa-eye" />
+                        <span class="fa fa-edit" />
                     </button>
                 </td>
             </tr>
-                    }
+           }
     </tbody>
     @{
         var totalCommision = Model.Sum(sale => sale.ComAmount);

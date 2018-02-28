@@ -37,7 +37,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(model);
         }
 
-        public ActionResult Detail(int id)
+        public ActionResult DetailOld(int id)
         {
             //obtengo las sucursales configuradas para el empleado
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
@@ -136,7 +136,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.PurchaseDetails)
-                             where (branchId == null || branchIds.Contains(p.BranchId) || p.BranchId == branchId)
+                             where ( branchId == null && branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
@@ -155,14 +155,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             BeginPurchaseViewModel model = new BeginPurchaseViewModel();
 
-            model.TransactionTypes = new List<TransactionType>();
-            model.TransactionTypes.Add(TransactionType.Contado);
-            model.TransactionTypes.Add(TransactionType.Credito);
-
-            model.TransactionType = model.TransactionTypes.First();
-            model.PurchaseDate = DateTime.Today.ToLocal();
-            model.ExpirationDate = model.PurchaseDate.AddDays(30);
-
             return PartialView("_BeginPurchase", model);
         }
 
@@ -180,7 +172,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     BranchId = User.Identity.GetBranchId(),
                     UserId = User.Identity.GetUserId(),
                     TransactionDate = model.PurchaseDate,
-                    Expiration = model.ExpirationDate,
+                    Expiration = model.PurchaseDate.AddDays(model.Days),
                     TransactionType = model.TransactionType,
                     ProviderId = model.ProviderId,
                     Status = TranStatus.InProcess,
@@ -196,7 +188,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al registrar venta", Message = "Ocurrio un error al crear la compra detalle " + ex.Message });
+                return Json(new { Result = "Error al registrar la compra", Message = "Ocurrio un error al crear la compra detalle " + ex.Message });
             }
         }
 
@@ -265,7 +257,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         //this method is call when the purchase is finishes and inventoried
         [HttpPost]
-        public ActionResult Compleate(int purchaseId, DateTime purchaseDate, DateTime expirationDate, TransactionType purchaseType)
+        public ActionResult Compleate(int purchaseId)
         {
             try
             {
@@ -277,9 +269,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.TotalAmount = model.PurchaseDetails.Sum(pd => pd.Amount);
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
-                model.TransactionDate = purchaseDate;
-                model.Expiration = expirationDate;
-                model.TransactionType = purchaseType;
                 model.Status = TranStatus.Reserved;
 
                 foreach (var detail in model.PurchaseDetails)
@@ -374,12 +363,15 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         //this method is call for edit purchases
-        public ActionResult Edit(int id)
+        public ActionResult Detail(int id)
         {
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var model = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.PurchasePayments).Include(p => p.User).
-                FirstOrDefault(p => p.PurchaseId == id && branchIds.Contains(p.BranchId));
+            var model = db.Purchases.
+                Where(p => p.PurchaseId == id && branchIds.Contains(p.BranchId)).
+                Include(p => p.PurchaseDetails).Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
+                Include(p => p.PurchasePayments).Include(p => p.User).
+                FirstOrDefault();
 
             return View(model);
         }
@@ -477,11 +469,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult SearchExternalProducts(string filter, int providerId)
         {
+            string code = string.Empty;
             string[] arr = new List<string>().ToArray();
 
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
+         
             var products = (from ep in db.ExternalProducts
                             join eq in db.Equivalences.Include(e => e.Product)
                             on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj

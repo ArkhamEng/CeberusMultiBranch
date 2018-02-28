@@ -344,7 +344,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
                             from x in gj.DefaultIfEmpty()
 
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description).Contains(s)))
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description+""
+                            +ep.Provider.Name+""+ep.TradeMark).Contains(s)))
                             select new
                             {
                                 ProviderId = ep.ProviderId,
@@ -398,7 +399,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (name != null && name != string.Empty)
             {
                 arr = name.Trim().Split(' ');
-                code = arr.FirstOrDefault();
+
+                if (arr.Length == Cons.One)
+                    code = arr.FirstOrDefault();
             }
 
             List<Product> products = new List<Product>();
@@ -417,12 +420,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                                .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
                             && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s => (p.Code+" "+p.Name + " " + p.TradeMark).Contains(s)))
+                            && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
 
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
                             && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
-                            && (p.IsActive)
                             select p).OrderBy(s => s.Name).Take(400).ToList();
             }
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
@@ -512,16 +514,16 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchId();
             var userId = User.Identity.GetUserId();
 
-          
-          /*  var sale = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
-            && s.Status == TranStatus.InProcess);*/
+
+            /*  var sale = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
+              && s.Status == TranStatus.InProcess);*/
 
             //obtengo el producto con imagenes, compatibilidades (modelos de auto), y equivalencias (productos de proveedor
             var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
-                        Include(p => p.BranchProducts).Include(p=> p.Equivalences).
+                        Include(p => p.BranchProducts).Include(p => p.Equivalences).
                         FirstOrDefault(p => p.ProductId == id);
 
-          //  product.TransactionId = (sale == null) ? Cons.Zero : sale.SaleId;
+            //  product.TransactionId = (sale == null) ? Cons.Zero : sale.SaleId;
 
             //reviso si el producto ya cuenta con una relación en la sucursal
             var bProd = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
@@ -551,10 +553,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
 
-            foreach(var eq in product.Equivalences)
+            foreach (var eq in product.Equivalences)
             {
-                eq.ExternalProduct = db.ExternalProducts.Include(ep=> ep.Provider).
-                    FirstOrDefault(ep=> ep.ProviderId == eq.ProviderId && ep.Code == eq.Code);
+                eq.ExternalProduct = db.ExternalProducts.Include(ep => ep.Provider).
+                    FirstOrDefault(ep => ep.ProviderId == eq.ProviderId && ep.Code == eq.Code);
             }
 
             return PartialView("Detail", product);
@@ -1006,7 +1008,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.Entry(branchP).State = EntityState.Modified;
                     db.SaveChanges();
                 }
-                    
+
 
                 //si hay diferencia
                 else
@@ -1048,7 +1050,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             else
                                 throw new Exception("No hay cantidad suficiente de producto para agregar el paquete, revise la configuración");
                         }
-                       
+
                         branchP.LastStock = branchP.Stock;
                         branchP.Stock = package.Quantity;
 
@@ -1099,7 +1101,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             }
                         }
 
-                      
+
                         branchP.LastStock = branchP.Stock;
                         branchP.Stock = package.Quantity;
 
@@ -1446,14 +1448,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
             products = (from ep in db.Products.Include(p => p.Category)
                         where (ep.Code == code) && (ep.ProductType == ProductType.Single) && (ep.IsActive)
                         select ep).Take((int)Cons.OneHundred).ToList();
-            if(products.Count == Cons.Zero)
+            if (products.Count == Cons.Zero)
             {
                 products = (from ep in db.Products.Include(p => p.Category)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
                             && (ep.ProductType == ProductType.Single) && (ep.IsActive)
                             select ep).Take((int)Cons.OneHundred).ToList();
             }
-            
+
 
             return PartialView("_ListForPackage", products);
         }
@@ -1494,34 +1496,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             return PartialView("_ImagesLoaded", model);
         }
-
-        [HttpPost]
-        public ActionResult SearchForSale(int? categoryId, int? carYear, string name)
-        {
-            var branchId = User.Identity.GetBranchSession().Id;
-
-            string[] arr = new List<string>().ToArray();
-
-            if (name != null && name != string.Empty)
-                arr = name.Trim().Split(' ');
-
-            var products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
-                                     Include(p => p.BranchProducts)
-
-                            where (categoryId == null || p.CategoryId == categoryId)
-                               && (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
-                               && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            select p).Take(1000).ToList();
-
-            foreach (var prod in products)
-            {
-                var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
-            }
-
-            return PartialView("_ListForSale", products);
-        }
-
 
         [HttpPost]
         [Authorize(Roles = "Capturista")]
@@ -1587,6 +1561,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         Message = "El producto seleccionado ya no esta disponible"
                     });
                 }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al eliminar el producto", Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult Activate(int id, bool isGrid)
+        {
+            try
+            {
+                var product = db.Products.Find(id);
+
+                product.IsActive = true;
+                db.Entry(product).State = EntityState.Modified;
+
+                db.SaveChanges();
+
+                return Json(new { Result = "OK" });
             }
             catch (Exception ex)
             {

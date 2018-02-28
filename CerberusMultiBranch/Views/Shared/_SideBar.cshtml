@@ -39,6 +39,13 @@
                 {
                     <li><a href="/Providers/" onclick="ShowLoading()">&nbsp;Proveedores<span class="fa fa-address-book-o" style="float:left" /></a></li>
                     <li><a href="/Employees/" onclick="ShowLoading()">&nbsp;Empleados<span class="fa fa-address-card" style="float:left" /></a></li>
+
+                    if (User.IsInRole("Capturista"))
+                    {
+                        <li><a href="/Configuration/SystemCategory" onclick="ShowLoading()">&nbsp;Sistemas y Categorías<span class="fa fa-list-alt" style="float:left" /></a></li>
+                        <li><a href="/CarMakes/" onclick="ShowLoading()">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
+                        <li><a href="/CarModels/" onclick="ShowLoading()">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
+                    }
                 }
             </ul>
         </li>
@@ -68,10 +75,8 @@
                 </a>
                 <ul class="collapse list-unstyled" id="configurationSubMenu">
                     <li><a href="/Configuration/" onclick="ShowLoading()">&nbsp;Conf. de aplicación<span class="fa fa-cog" style="float:left" /></a></li>
-                    <li><a href="/Configuration/SystemCategory" onclick="ShowLoading()">&nbsp;Sistemas y Categorías<span class="fa fa-list-alt" style="float:left" /></a></li>
+                   
                     <li><a href="/Account/UserList" onclick="ShowLoading()">&nbsp;Cuentas de usuario<span class="fa fa-users" style="float:left" /></a></li>
-                    <li><a href="/CarMakes/" onclick="ShowLoading()">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
-                    <li><a href="/CarModels/" onclick="ShowLoading()">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
                 </ul>
             </li>
         }

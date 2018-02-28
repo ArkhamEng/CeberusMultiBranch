@@ -1,73 +1,112 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 @using CerberusMultiBranch.Models.Entities.Operative;
 
+
 @{
     ViewBag.Title = "Registro de pago";
     ViewBag.Class = "fa fa-money";
 }
 
 
-@*<h3 class="alert alert-danger col-md-3 col-md-offset-1">
-        Comisión @Model.ComAmount.ToString("c")
-    </h3>*@
-
-<h4 class="alert alert-info col-md-4">
-    <span class="fa fa-briefcase"></span>
-    @Model.User.UserName
+<h4 class="alert alert-info col-md-6">
+    <span class="fa fa-user"></span>
+    @Model.Client.Name
 </h4>
 
-<h4 class="alert alert-success col-md-3  col-md-offset-5" >
+<h4 class="alert alert-success col-md-3  col-md-offset-3">
     Total
-    <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label> 
+    <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label>
 </h4>
 <hr />
 
 <div class="panel-group">
     <div class="panel panel-danger">
         <div class="panel-body">
-            <div class="row">
-                <div class="form-group col-md-5">
-                    <label class="control-label">
-                        Nombre del cliente
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                        <input class="form-control" value="@Model.Client.Name" readonly />
-                    </div>
-                </div>
 
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Tipo de pago
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
-                        <input class="form-control" value="@Model.PaymentMethod.ToString()" readonly />
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2 col-md-offset-1">
-                    <label class="control-label">
-                        Fecha
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                        <input class="form-control" value="@Model.TransactionDate.ToString("dd/MM/yyyy")" readonly />
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Folio
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                        <input class="form-control" value="@Model.Folio" readonly />
+            <div class="form-group col-md-3">
+                <label class="control-label">Folio de venta</label>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fa fa-tag"></i>
+                    </span>
+                    <div class="form-control">
+                        @Model.Folio
                     </div>
                 </div>
             </div>
+
+            <div class="form-group col-md-3">
+                <label class="control-label">Envio de Mercancia</label>
+                <div class="input-group">
+                    @if (Model.SendingType == 0)
+                    {
+                        <span class="input-group-addon">
+                            <i class="fa fa-building"></i>
+                        </span>
+                        <div class="form-control">
+                            En Sucursal
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="input-group-addon">
+                            <i class="fa fa-truck"></i>
+                        </span>
+                        <div class="form-control">
+                            Envío a domicilio
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <label class="control-label">Fecha de venta</label>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                    <div class="form-control">
+                        @Model.TransactionDate.ToString("dd/MM/yyyy")
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-3">
+                <label class="control-label">Vendido por</label>
+                <div class="input-group">
+                    <span class="input-group-addon">
+                        <i class="fa fa-black-tie"></i>
+                    </span>
+                    <div class="form-control">
+                        @Model.User.UserName
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group col-md-12">
+                <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
+                        onclick="ShowLoading(); window.location='@Url.Action("Index")'">
+                    <span class="fa fa-backward"></span>
+                    <u>V</u>olver a cája
+                </button>
+                @if (User.IsInRole("Supervisor"))
+                    {
+                    <button type="button" class="btn btn-danger" title="cancelar venta"
+                            onclick="$('#ModalCancel').modal('show');" id="btnCancel">
+                        <span class="fa fa-times"></span>
+                        <u>C</u>ancelar
+                    </button>
+                    }
+                <button class="btn btn-success" type="button" id="btnPayment"
+                        onclick="BeginPayment(@Model.TotalAmount)" title="Seleccionar forma de pago">
+                    <span class="fa fa-dollar"></span>
+                    Recibir <u>P</u>ago
+                </button>
+            </div>
+
         </div>
     </div>
+
     <div class="panel panel-danger">
         <div class="panel-body">
             <table id="tbDetails" class="table table-striped">
@@ -130,52 +169,49 @@
                     }
                 </tbody>
             </table>
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
-                        onclick="ShowLoading(); window.location='@Url.Action("Index")'">
-                    <span class="fa fa-backward"></span>
-                    <u>V</u>olver a cája
-                </button>
-                @if (User.IsInRole("Supervisor"))
-                {
-                    <button type="button" class="btn btn-danger" title="cancelar venta"
-                            onclick="$('#ModalCancel').modal('show');" id="btnCancel">
-                        <span class="fa fa-times"></span>
-                        <u>C</u>ancelar
-                    </button>
-                }
-                <button class="btn btn-success" type="button" id="btnPayment"
-                        onclick="$('#ModalPayment').modal('show')" title="Seleccionar forma de pago">
-                    <span class="fa fa-dollar"></span>
-                    Recibir <u>P</u>ago
-                </button>
-            </div>
+
+
 
         </div>
     </div>
 </div>
 
-@Html.Partial("_Cancelation")
 
-@Html.Partial("_ChoosePayment",Model.TotalAmount)
 
 @Html.HiddenFor(m => m.SaleId)
 
+<div id="divModals"></div>
+
+<div id="divPrinter"></div>
+
+@Html.Partial("_Cancelation")
+
+
 <script>
-    $(document).ready(function ()
-    {
-       // Paginate("#tbDetails", 5)
+    $(document).ready(function () {
+        Paginate("#tbDetails", 5);
+
+    }).keydown(function (e) {
+        if (e.which == 13 || e.altKey && e.keyCode == 80) {
+            $("#btnPayment").click();
+        }
+
+        if (e.altKey && e.keyCode == 67) {
+            $("#btnCancel").click();
+        }
+
+        if (e.altKey && e.keyCode == 86) {
+            $("#btnSearch").click();
+        }
     });
 
-    function Cancel()
-    {
+    function Cancel() {
         $("#ModalCancel").modal("hide");
         ShowLoading();
 
         var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
 
-        ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
-        {
+        ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
             if (j.Result = 'OK')
                 window.location = '@Url.Action("Index")';
             else
@@ -183,8 +219,7 @@
         });
     }
 
-    function Calculate(val)
-    {
+    function Calculate(val) {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
 
         var result = (total - parseFloat(val));
@@ -194,28 +229,17 @@
         return result;
     }
 
-    $(document).keydown(function (e)
-    {
-        if (e.which == 13 || e.altKey && e.keyCode == 80)
-        {
-            $("#btnPayment").click();
-        }
 
-        if (e.altKey && e.keyCode == 67)
-        {
-            $("#btnCancel").click();
-        }
-
-        if (e.altKey && e.keyCode == 86)
-        {
-            $("#btnSearch").click();
-        }
-    });
-
-    function GetChange(val)
-    {
+    function GetChange(val) {
         var total = $("#lblTotalAmount").text().replace(/[$,]+/g, "");
         return (parseFloat(val) - total);
     }
 
+    function BeginPayment(amount) {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("BeginPayment")', { amount: amount }, function (response) {
+            HideLoading();
+            $("#divModals").html(response);
+        });
+    }
 </script>

@@ -1,4 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
+@using CerberusMultiBranch.Models.Entities.Operative;
 
 @{
     ViewBag.Title = "Ventas";
@@ -22,16 +23,25 @@
 
                 <select id="Status" class="form-control" style="width:20% !important">
                     <option value="">Status</option>
-                    <option value="0">Abierto</option>
-                    <option value="1">Apartado</option>
-                    <option value="3">Pagado</option>
-                    <option value="-1">Cancelado</option>
+                    <option value="@TranStatus.InProcess">Procesando</option>
+                    <option value="@TranStatus.Reserved">Reservado</option>
+                    <option value="@TranStatus.Compleated">Pagado</option>
+                    <option value="@TranStatus.Canceled">Cancelado</option>
                 </select>
+
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
                         <span class="glyphicon glyphicon-search"></span>
                         <u>B</u>uscar
                     </button>
+                    @if (User.IsInRole("Vendedor"))
+                    {
+                        <button type="button" class="btn btn-success" id="btnCreate">
+                            <span class="glyphicon  glyphicon-file"></span>
+                            <u>N</u>uevo
+                        </button>
+                    }
+                   
                 </span>
             </div>
         </div>
@@ -58,7 +68,7 @@
         </div>
     </div>
 </div>
-
+<div id="divNewSale"></div>
 
 <div id="divSales">
     @Html.Partial("_SaleList", Model.Sales)
@@ -84,6 +94,12 @@
                 HideLoading();
             });
 
+        });
+
+        $("#btnCreate").click(function () {
+            ExecuteAjax('@Url.Action("BeginSale")', {}, function (response) {
+                $("#divNewSale").html(response);
+            });
         });
     });
 

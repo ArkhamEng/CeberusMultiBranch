@@ -39,8 +39,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.Folio = sale.Folio;
             this.LastStatus = sale.LastStatus;
             this.Status = sale.Status;
-            this.Payments = sale.Payments;
-            this.PaymentMethod = sale.PaymentMethod;
+            this.SalePayments = sale.SalePayments;
             this.TotalAmount = sale.TotalAmount;
             this.TransactionDate = sale.TransactionDate;
             this.SaleDetails = sale.SaleDetails;

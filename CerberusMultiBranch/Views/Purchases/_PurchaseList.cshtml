@@ -79,7 +79,8 @@
                     }
                 </td>
                 <td>
-                    <button class="btn btn-warning" onclick="window.location = '@Url.Action("Edit",new { id= item.PurchaseId})'" title="Editar compra">
+                    <button class="btn btn-primary" 
+                            onclick="window.location = '@Url.Action("Detail",new { id= item.PurchaseId})'" title="Ver detalle y editar">
                         <span class="fa fa-edit" />
                     </button>
                 </td>
@@ -96,7 +97,7 @@
     $(document).ready(function () {
         Paginate("#tbPurchases", 8);
 
-        var tAmount = GetCurrency(parseFloat('@totalAmount'));
+        var tAmount = "Total " + GetCurrency(parseFloat('@totalAmount'));
 
         $("#Total").text(tAmount);
 

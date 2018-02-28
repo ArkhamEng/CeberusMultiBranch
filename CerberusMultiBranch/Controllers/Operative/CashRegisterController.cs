@@ -11,6 +11,7 @@ using System.Security.Principal;
 using System.Web.Helpers;
 using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Models.Entities.Finances;
+using CerberusMultiBranch.Models.ViewModels.Operative;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -84,12 +85,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             //using (ApplicationDbContext db = new ApplicationDbContext())
             //{
-                var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
-                    FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
+            var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
+                FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
 
-                if (cash != null && cash.CashDetails != null)
-                    cash.CashDetails.OrderBy(d => d.InsDate);
-                return cash;
+            if (cash != null && cash.CashDetails != null)
+                cash.CashDetails.OrderBy(d => d.InsDate);
+            return cash;
             //}
         }
 
@@ -230,7 +231,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult CheckPending()
         {
             var branchId = User.Identity.GetBranchId();
-            var count = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved).ToList().Count();
+            var count = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved 
+            && s.TransactionType == TransactionType.Contado).ToList().Count();
             return Json(new { Result = "OK", Count = count });
         }
 
@@ -239,7 +241,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var branchId = User.Identity.GetBranchId();
 
-            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
+            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved
+                 && s.TransactionType == TransactionType.Contado)
                 .Include(s => s.User).Include(s => s.Client).ToList();
 
             return PartialView("_PendingPayment", model);
@@ -316,40 +319,61 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(sale);
         }
 
+        public ActionResult BeginPayment(double amount)
+        {
+            var cPayment = new ChoosePaymentViewModel
+            {  AmountToPay = amount, Payment= amount, PaymentMethod = PaymentMethod.Efectivo};
+
+            return PartialView("_ChoosePayment", cPayment);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult RegisterPayment(int transactionId, string payment, double? cash, double? card)
+        public ActionResult RegisterPayment(int saleId, PaymentMethod paymentMethod, double payment, double aditional,string reference, int printType)
         {
             try
             {
                 //busco la venta a pagar
-                var sale = db.Sales.Include(s => s.SaleDetails).
-                    FirstOrDefault(s => s.SaleId == transactionId);
+                var sale = db.Sales.Where(s => s.SaleId == saleId).
+                            Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
+                            Include(s=> s.Client.City).Include(s=> s.Client.City.State).
+                            Include(s => s.SaleDetails.Select(td => td.Product)).
+                            Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                            Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
+                            Include(s => s.Branch).
+                            FirstOrDefault();
+
+              
+                sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
+
+                if (sale.TotalAmount != (payment + aditional))
+                    return Json(new { Result = "Error", Message = "El monto del pago no coincide con el total de la venta" });
 
                 //marco la venta como pagada y coloco el tipo de pago
                 sale.LastStatus = sale.Status;
                 sale.Status = TranStatus.Compleated;
                 sale.UpdDate = DateTime.Now.ToLocal();
                 sale.UpdUser = User.Identity.Name;
-                sale.PaymentMethod = (PaymentMethod)Enum.Parse(typeof(PaymentMethod), payment);
-                sale.Payments = new List<SalePayment>();
+                sale.SalePayments = new List<SalePayment>();
 
                 #region Registros de pago
                 //si el pago es con efectivo o tarjeta agrego un registro de pago por el monto total
                 //de la venta
-                if (payment != PaymentMethod.Mixto.ToString())
+                if (paymentMethod != PaymentMethod.Mixto)
                 {
                     var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
                         Amount = sale.TotalAmount,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = sale.PaymentMethod,
+                        PaymentMethod = paymentMethod,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "PAGO DE CONTADO"
+                        Reference = reference,
+                        Comment = "COBRO AUTOMATICO EN CAJA"
                     };
-                    sale.Payments.Add(p);
+
+                    sale.SalePayments.Add(p);
                 }
                 //si el pago es Mixto (Efectivo y Tarjeta) agrego un registro de pago con efectivo
                 //y otro de tarjeta con los parametros de entrada correspondientes
@@ -358,27 +382,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var pm = new SalePayment
                     {
                         SaleId = sale.SaleId,
-                        Amount = cash.Value,
+                        Amount = payment,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentMethod = PaymentMethod.Efectivo,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "PAGO DE CONTADO"
+                        Comment = "COBRO AUTOMATICO EN CAJA"
                     };
 
                     var pc = new SalePayment
                     {
                         SaleId = sale.SaleId,
-                        Amount = card.Value,
+                        Amount = aditional,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentMethod = PaymentMethod.Tarjeta,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "PAGO DE CONTADO"
+                        Comment = "COBRO AUTOMATICO EN CAJA",
+                        Reference = reference
                     };
 
-                    sale.Payments.Add(pm);
-                    sale.Payments.Add(pc);
+                    sale.SalePayments.Add(pm);
+                    sale.SalePayments.Add(pc);
                 }
                 #endregion
 
@@ -399,7 +424,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
                 //por cada registro de pago agrego una registro de entrada a la caja
-                foreach (var pay in sale.Payments)
+                foreach (var pay in sale.SalePayments)
                 {
                     var dt = new CashDetail();
                     dt.CashRegisterId = cr.CashRegisterId;
@@ -409,7 +434,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     dt.Type = pay.PaymentMethod;
                     dt.SaleFolio = sale.Folio;
                     dt.DetailType = Cons.One;
-                    dt.Comment = "VENTA CON FOLIO " + sale.Folio;
+                    dt.Comment = "VENTA MOSTRADOR";
 
                     db.CashDetails.Add(dt);
                 }
@@ -417,7 +442,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = sale.SaleId.ToString() });
+
+                if (printType == Cons.One)
+                    return PartialView("_PrintTicket", sale);
+                else
+                    return PartialView("_PrintNote", sale);
             }
             catch (Exception ex)
             {
@@ -430,5 +459,24 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+        [HttpPost]
+        public ActionResult PrintDocument(int saleId, int printType)
+        {
+            var sale = db.Sales.Where(s => s.SaleId == saleId).
+                           Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
+                           Include(s => s.SaleDetails.Select(td => td.Product)).
+                           Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                           Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
+                           Include(s => s.Branch).Include(s=> s.SalePayments).
+                           FirstOrDefault();
+
+            sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
+
+
+            if (printType == Cons.One)
+                return PartialView("_PrintTicket", sale);
+            else
+                return PartialView("_PrintNote", sale);
+        }
     }
 }

@@ -32,7 +32,7 @@
             <tr>
                 <td>
                     @if (item.Product.Images != null && item.Product.Images.Count > 0)
-                    { 
+                    {
                         <img src="@item.Product.Images.First().Path" class="img-responsive" />
                     }
                     else
@@ -90,6 +90,8 @@
 
         
         $("#Amount").text('@Model.Sum(d => d.Amount).ToString("c")');
+
+
     });
 
     function RemoveDetail(tid, pid)

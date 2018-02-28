@@ -50,14 +50,15 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Entrance     = client.Entrance;
             this.FTR          = client.FTR;
             this.IsActive     = client.IsActive;
-            this.LegalRepresentative = client.LegalRepresentative;
+            this.CreditLimit = client.CreditLimit;
             this.Name         = client.Name;
             this.Phone        = client.Phone;
-            this.TaxAddress   = client.TaxAddress;
+            this.UsedAmount = client.UsedAmount;
             this.UpdDate      = client.UpdDate;
             this.ZipCode      = client.ZipCode;
             this.Type         = client.Type;
-
+            this.CreditDays   = client.CreditDays;
+            this.CreditComment = client.CreditComment;
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
             FillTypes();

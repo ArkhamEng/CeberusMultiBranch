@@ -1,50 +1,116 @@
-﻿
+﻿@model CerberusMultiBranch.Models.Entities.Catalog.Product
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Catalog
 
-<div id="ModalProduct" class="modal" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content panel panel-danger panel-group">
+<div id="ModalAddProduct" class="modal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-primary">
             <div class="modal-header panel-heading">
-                <h4 class="modal-title">Búsqueda de Productos</h4>
+                <h4 class="modal-title"><span class="fa fa-cube"></span> Agregar el producto a la venta</h4>
             </div>
-            <div class="panel panel-danger">
-                <div class="panel-body">
-                    <div class="col-md-12">
-                        @Html.Label("Nombre o Clave", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
-                            <span class="input-group-btn">
-                                <button id="btnQuickProduct" type="button" class="btn btn-default">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                                <button id="btnAddProduct" type="button" class="btn btn-warning" onclick="window.open('@Url.Action("Create","Products")','blank')">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </button>
-                            </span>
+
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-md-3">
+                            @if (Model.Images.Count > Cons.Zero)
+                            {
+                                <img src="@Model.Images.First().Path" class="img-responsive" style="max-height:150px" />
+                            }
+                            else
+                            {
+                                <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" style="max-height:150px" />
+                            }
                         </div>
-                    </div>
-                    <div class="col-md-12">
-                        @Html.Label("Nombre o Clave", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                            @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control" })
-                            <span class="input-group-btn">
-                                <button id="btnQuickProduct" type="button" class="btn btn-default" title="Buscar productos">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                                <button id="btnAddProduct" type="button" class="btn btn-warning"  title="Agregar producto al catálogo"
-                                        onclick="window.open('@Url.Action("Create","Products")','blank')">
-                                    <span class="glyphicon glyphicon-plus"></span>
-                                </button>
+                        <div class="col-md-9">
+                            <label>
+                                @Model.Code
+                            </label><br />
+                            @Model.Name<br />
+                            Por @Model.TradeMark <span class="fa fa-registered"></span><br />
+                            <span class="badge bg-info">
+                                @Model.Quantity
                             </span>
+                            disponibles
+                            <span class="fa fa-cubes"></span>
+                            Unidad: @Model.Unit
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="panel panel-danger">
-                <div id="divProductList" class="panel-body">
+
+
+                <div class="panel panel-danger">
+                    <div class="panel-body">
+                    
+                        <div class="form-group col-md-7 col-md-offset-3">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                                <input class="form-control input-lg" type="number" max="@Model.Quantity" min="@Cons.One" value="1" id="txtQuantity"
+                                       onkeyup="ValidQuantity(@Model.Quantity)" />
+                                <div class="input-group-btn">
+                                    <button class="btn btn-primary btn-lg" type="button" title="Agregar producto" onclick="CompleateAdd()" id="btnCompleateAdd">
+                                        <span class="fa fa-plus-circle"></span>
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <label class="control-label text-danger" id="lblQuantity"></label>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
 </div>
+
+@Html.HiddenFor(m => m.ProductId)
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#ModalAddProduct").modal("show");
+    });
+
+
+    function ValidQuantity(quantity)
+    {
+        if($("#txtQuantity").val() == '')
+        {
+            $("#lblQuantity").text("La cantidad no puede ser vacía ");
+            $("#btnCompleateAdd").attr("disabled",true);
+            return;
+        }
+        if(parseInt($("#txtQuantity").val()) > quantity)
+        {
+            $("#lblQuantity").text("La cantidad no puede ser mayor  a la disponible "+quantity);
+            $("#btnCompleateAdd").attr("disabled",true);
+            return;
+        }
+
+        $("#lblQuantity").text("");
+        $("#btnCompleateAdd").attr("disabled",false);
+    }
+
+    function CompleateAdd() 
+    {
+        $("#ModalAddProduct").off('hidden.bs.modal').on('hidden.bs.modal', function ()
+        {
+            ShowLoading();
+
+            var param =  { productId: $("#ProductId").val(), saleId: $("#SaleId").val(), quantity: $("#txtQuantity").val() };
+
+            ExecuteAjax('@Url.Action("CompleateAdd")', param, function (response)
+            {
+                HideLoading();
+
+                if ($.isPlainObject(response))
+                    ShowMessage(response.Header, response.Message, 'warning');
+                else
+                    $("#divDetails").html(response);
+            });
+        });
+        $("#ModalAddProduct").modal("hide");
+    }
+</script>

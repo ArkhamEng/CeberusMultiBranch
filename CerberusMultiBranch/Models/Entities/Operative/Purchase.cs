@@ -19,10 +19,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
-        [Display(Name = "Vencimiento")]
-        [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
-        public DateTime Expiration { get; set; }
+       
 
         #region Navigation Properties
         public virtual Provider Provider { get; set; }
@@ -33,11 +30,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         #endregion
 
 
-        public Purchase()
-        {
-            this.Expiration = DateTime.Now;
-        }
-
+      
     }
 
 

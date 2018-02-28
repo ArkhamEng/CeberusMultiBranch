@@ -72,24 +72,23 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         Paginate("#tbProviderProducts", 5);
 
         $("#ModalProviderProducts").modal('show');
 
-       
+
     });
 
     function BeginCopy(provId, code)
     {
-        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: provId, code: code }, function (view) 
+        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: provId, code: code }, function (view)
         {
-            $("#divQuickAdd").html(view);
-            $("#exCode").val(code);
-            $("#ProviderId").val(provId);
-
-            $("#ModalProviderProducts").on('hidden.bs.modal', function () {
+            $("#ModalProviderProducts").on('hidden.bs.modal', function ()
+            {
+                $("#divModals").html(view);
+                $("#exCode").val(code);
+                $("#ProviderId").val(provId);
 
                 $("#ModalQuickAddProduct").modal("show");
             });

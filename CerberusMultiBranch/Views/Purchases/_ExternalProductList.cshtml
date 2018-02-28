@@ -6,17 +6,12 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayName("Codigo")
-                    </th>
-                    <th>
-                        @Html.DisplayName("Equiv")
+                        @Html.DisplayName("Codigos")
                     </th>
                     <th>
                         @Html.DisplayName("Descripción")
                     </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.TradeMark)
-                    </th>
+                   
                     <th>
                         @Html.DisplayNameFor(model => model.Price)
                     </th>
@@ -29,27 +24,25 @@
                 @foreach (var item in Model)
             {
                     <tr>
-                        <td class="col-md-1">
-                            @Html.DisplayFor(modelItem => item.Code)
-                        </td>
-                        <td class="col-md-1">
-                            @if (item.InternalCode !=null)
+                        <td class="col-md-2">
+                            <label>Proveedor</label> <br />
+                            @Html.DisplayFor(modelItem => item.Code)<br />
+                     
+                            @if (item.InternalCode != null)
                             {
+                                <label>Autobien</label><br />
                                 @Html.DisplayFor(modelItem => item.InternalCode)
                             }
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Description)
+                            @Html.DisplayFor(modelItem => item.Description)<br />
+                            <span class="fa fa-registered"></span>@Html.DisplayFor(modelItem => item.TradeMark)
                         </td>
+
+                      
 
                         <td class="col-md-2">
-                            @Html.DisplayFor(modelItem => item.TradeMark)
-                        </td>
-
-                        <td class="col-md-1">
-                          
-                                @Html.DisplayFor(modelItem => item.Price)
-                            @Html.Hidden("txtBuyPrice",item.Price)
+                            @Html.TextBoxFor(modelItem => item.Price, htmlAttributes: new { @class = "form-control", type = "number",id="txtBuyPrice" })
                         </td>
 
                         <td class="col-md-1">
@@ -57,20 +50,20 @@
                             @Html.TextBox("Quantity", "1", htmlAttributes: new { @class = "form-control", type = "number" })
                         </td>
                         <td class="col-md-1">
-                            <div class="btn-group">
-                                <button class="btn btn-primary btn-xs" title="Crear / Cambiar asociación con producto interno" 
+                            <div class="btn-group-vertical">
+                                <button class="btn btn-primary" title="Crear / Cambiar asociación con producto interno" 
                                         onclick="BeginAddRelation('@item.Description','@item.Code')">
                                     <span class="glyphicon glyphicon-link"></span>
                                 </button>
                                 @if (item.InternalCode != null)
                                 {
-                                    <button class="btn btn-success btn-xs" onclick="AddDetail(this)" title="Agregar a la compra">
+                                    <button class="btn btn-success" onclick="AddDetail(this)" title="Agregar a la compra">
                                         <span class="fa fa-shopping-basket"></span>
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-success btn-xs" onclick="BeginCopy('@item.Code')" title="copiar producto a catálogo interno">
+                                    <button class="btn btn-success" onclick="BeginCopy('@item.Code')" title="copiar producto a catálogo interno">
                                         <span class="fa fa-clone"></span>
                                     </button>
                                 }

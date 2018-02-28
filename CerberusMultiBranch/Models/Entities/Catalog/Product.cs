@@ -37,9 +37,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         
         [Display(Name="Cantidad Minima")]
         [Required]
+        [Range(1, Int32.MaxValue, ErrorMessage = "La cantidad minima debe ser mayor a cero")]
         public double MinQuantity { get; set; }
 
         [Required]
+        [Range(1, Int32.MaxValue, ErrorMessage = "La cantidad máxima debe ser mayor a cero")]
         public double MaxQuantity { get; set; }
 
 
@@ -140,7 +142,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(30)]
         public string Ledge { get; set; }
 
-
+     
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 

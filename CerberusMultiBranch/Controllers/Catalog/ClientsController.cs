@@ -26,6 +26,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
+        [HttpPost]
+        public ActionResult AutoCompleate(string filter)
+        {
+            var model = db.Clients.Where(p => p.Name.Contains(filter) && p.IsActive).Take(20).
+                Select(p => new { Id = p.ClientId, Label = p.Name.ToUpper(), Value = p.FTR.ToUpper() });
+
+            return Json(model);
+        }
+
 
         [HttpPost]
         public ActionResult Search(int? stateId, int? cityId, string name, string ftr)
@@ -105,7 +114,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.Clients.Add(client);
                 }
                 else
+                {
                     db.Entry(client).State = EntityState.Modified;
+                    db.Entry(client).Property(c => c.UsedAmount).IsModified = false;
+                    db.Entry(client).Property(c => c.Code).IsModified = false;
+                }
+                    
 
                 db.SaveChanges();
             }
@@ -124,7 +138,20 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return RedirectToAction("Create", new { id = client.ClientId });
         }
 
-      
+        [HttpPost]
+        public ActionResult GetClientCreditData(int id)
+        {
+            var client = db.Clients.Find(id);
+
+            if(client.CreditDays == Cons.Zero)
+                return Json(new { Result = "Error", Message = client.CreditComment ?? "No se han configurado los días de credito  para este cliente"});
+            if (client.CreditAvailable <= Cons.Zero)
+                return Json(new {Result = "Error", Message = "El cliente no tiene suficiente crédito" });
+
+            return Json(new { Result = "OK", Days=client.CreditDays,
+                Message = string.Format("Credito dispoible {0} con {1} días para pagar",client.CreditAvailable.ToString("c"),client.CreditDays) });
+        }
+
 
         protected override void Dispose(bool disposing)
         {

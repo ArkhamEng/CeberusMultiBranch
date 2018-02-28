@@ -1,0 +1,66 @@
+﻿
+
+<div id="ModalProduct" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-primary panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title"><i class="fa fa-cubes"></i> Productos para venta</h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                @Html.DropDownList("SystemId", (SelectList)ViewBag.Systems, "Sistema", new { @class = "form-control text-uppercase",
+                               style = "width:18% !important" })
+                                @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control text-uppercase",
+                                placeholder = "Búsqueda por código o descripción", style = "width:82% !important", autocomplete = "off" })
+                                <span class="input-group-btn">
+                                    <button id="btnQuickProduct" type="button" class="btn btn-primary">
+                                        <span class="glyphicon glyphicon-search"></span>
+                                        Buscar
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-md-offset-3">
+                    <img id="imgLoading" src="~/Content/Images/loading.gif" class="img-responsive hide" />
+                </div>
+                <div id="divProductList">
+                 
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#btnQuickProduct").click(function ()
+        {
+            SearchProd();
+
+        });
+    });
+
+    function SearchProd()
+    {
+        $("#divProductList").html('');
+        $("#imgLoading").attr("class", "img-responsive");
+        var filter = { filter: $("#ProductName").val() }
+
+        console.log(filter);
+
+        ExecuteAjax('@Url.Action("SearchProducts")', filter, function (view)
+        {
+            $("#imgLoading").attr("class", "img-responsive hide");
+            $("#divProductList").html(view);
+        });
+    }
+
+</script>

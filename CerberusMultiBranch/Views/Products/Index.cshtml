@@ -8,12 +8,13 @@
 
 <hr />
 
-<div id="pnlFilters" class="panel panel-danger top">
-    <div class="panel-body">
-        <div class="col-md-12 col-lg-12">
+<div class="col-lg-12">
+
+    <div id="pnlFilters" class="panel panel-danger panel top">
+        <div class="panel-body">
             <div class="input-group">
-                @Html.DropDownList("SystemId", Model.Systems, "todo sistema", new { @class = "form-control text-uppercase input-lg", style = "width:30% !important" })
-                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:70% !important" })
+                @Html.DropDownList("SystemId", Model.Systems, "Sistema", new { @class = "form-control text-uppercase input-lg", style = "width:18% !important" })
+                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:82% !important" })
                 <div class="input-group-btn">
                     <button class="btn btn-default btn-lg hidden-xs hidden-sm" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
                         <span class="fa fa-binoculars"></span>
@@ -25,29 +26,18 @@
 
                     @if (User.IsInRole("Capturista"))
                     {
-                        <button type="button" class="btn btn-success btn-lg hidden-xs hidden-sm" id="btnCreate" title="Crear nuevo registro">
-                            <span class="glyphicon  glyphicon-file"></span>
-                            <u>N</u>uevo
-                        </button>
+                    <button type="button" class="btn btn-success btn-lg hidden-xs hidden-sm" id="btnCreate" title="Crear nuevo registro">
+                        <span class="glyphicon  glyphicon-file"></span>
+                        <u>N</u>uevo
+                    </button>
                     }
                 </div>
-
             </div>
-        </div>
 
 
+            <br />
 
-        @*<button id="btnSwitch" type="button" class="btn btn-default hidden-xs hidden-sm" title="Ver como tabla">
-                <span id="spSwitch" class="fa fa-th-large"></span>
-            </button>
-            <button class="btn btn-default  hidden-xs hidden-sm" type="button" id="btnClear" title="Recargar">
-                <span class="glyphicon glyphicon-refresh" />
-            </button>*@
-
-        <br /><br />
-        <br /><br />
-        <div class="col-md-10 col-lg-10 hidden-xs hidden-sm">
-            <div class="input-group">
+            <div class="input-group col-md-10 hidden-sm hidden-xs">
                 <span class="input-group-addon"><i class="fa fa-registered"></i></span>
                 @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
                 <span class="input-group-addon"><i class="fa fa-car"></i></span>
@@ -55,6 +45,9 @@
                 <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
                 @Html.DropDownList("CarYearId", Model.Years, "Año", new { @class = "form-control text-uppercase " })
                 <span class="input-group-btn">
+                    <button id="btnSwitch" type="button" class="btn btn-default" title="Ver como tabla">
+                        <span id="spSwitch" class="fa fa-th-large"></span>
+                    </button>
                     <button class="btn btn-info" type="button" id="btnClear" title="Recargar">
                         <span class="glyphicon glyphicon-refresh"></span>
                         <u>L</u>impiar
@@ -63,35 +56,26 @@
             </div>
         </div>
     </div>
+    <input id="IsGrid" type="hidden" value="false" />
+
+    <div id="divProducts" >
+        @Html.Partial("_List", Model.Products)
+    </div>
+
+    <div id="divModals">
+    </div>
 </div>
-<input id="IsGrid" type="hidden" value="false" />
-
-<div id="divProducts" class="col-md-12 col-lg-12 container">
-    @Html.Partial("_List", Model.Products)
-</div>
-<button type="button" hidden id="btnTest" onclick='$("#ModalQuickAddProduct").modal("show");'></button>
-
-<div id="divProviderProducts">
-</div>
-
-
-<div id="divProductDetail">
-</div>
-
-<div id="divTransference">
-</div>
-
-<div id="divQuickAdd">
-</div>
-
 <script>
 
-    $(document).ready(function () {
-        $("#CarMakeId").change(function () {
+    $(document).ready(function ()
+    {
+        $("#CarMakeId").change(function ()
+        {
             CascadeMake();
         });
 
-        $("#CarModelId").change(function () {
+        $("#CarModelId").change(function ()
+        {
             CascadeModel();
         });
 
@@ -102,22 +86,13 @@
             {
                 HideLoading();
                 if ($.isPlainObject(response))
-                {
-                    console.log("response plain object");
-                    console.log(response);
                     ShowMessage(response.Result, response.Message, "warning");
-                }
-                else
-                {
-                    console.log("response partial");
-                    console.log(response);
-                    $("#divQuickAdd").html(response)
-                }
+                else 
+                    $("#divModals").html(response)
             });
         });
 
-        $("#btnSearch").click(function ()
-        {
+        $("#btnSearch").click(function () {
             LookFor();
         });
 
@@ -137,7 +112,7 @@
                     ShowMessage(response.Result, response.Message, "warning");
                 }
                 else {
-                    $("#divProviderProducts").html(response);
+                    $("#divModals").html(response);
                 }
             });
         });

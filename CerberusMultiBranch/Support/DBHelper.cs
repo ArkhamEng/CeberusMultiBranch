@@ -40,7 +40,7 @@ namespace CerberusMultiBranch.Support
 
                 using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.CheckConstraints | SqlBulkCopyOptions.FireTriggers, null))
                 {
-                    bulkCopy.BatchSize = 1000;
+                    bulkCopy.BatchSize = 100000;
                     bulkCopy.ColumnMappings.Add("[ProviderId]", "[ProviderId]");
                     bulkCopy.ColumnMappings.Add("[Code]", "[Code]");
                     bulkCopy.ColumnMappings.Add("[Category]", "[Category]");

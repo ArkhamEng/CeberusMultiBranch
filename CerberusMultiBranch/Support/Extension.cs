@@ -30,6 +30,16 @@ namespace CerberusMultiBranch.Support
             return localTime;
         }
 
+        public static DateTime TodayLocal(this DateTime serverDate)
+        {
+            DateTime localTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(serverDate,
+                TimeZoneInfo.Local.Id, "Central Standard Time (Mexico)");
+
+            var today = new DateTime(localTime.Year, localTime.Month, localTime.Day);
+
+            return today;
+        }
+
         public static double GetPrice(this double buyPrice, int percentage)
         {
             return Math.Round( buyPrice * (Cons.One + (percentage / Cons.OneHundred)),Cons.Zero);

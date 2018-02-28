@@ -49,9 +49,9 @@
 
                         @if (User.IsInRole("Capturista") || User.IsInRole("Vendedor"))
                         {
-                            <button class="btn btn-warning  btn-xs" title="Editar"
+                            <button class="btn btn-primary" title="Ver detalle y editar"
                                     onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ClientId})'">
-                                <span class="glyphicon glyphicon-pencil" />
+                                <span class="fa fa-edit" />
                             </button>
                         }
                      

@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -44,7 +45,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [MaxLength(100)]
         public string Comment { get; set; }
 
-     
+        [Display(Name = "Vencimiento")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime Expiration { get; set; }
+
+
         [Required]
         public DateTime UpdDate { get; set; }
 
@@ -56,5 +62,17 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ApplicationUser User { get; set; }
 
         public virtual Branch Branch { get; set; }
+
+        public Transaction()
+        {
+            this.Expiration = DateTime.Now;
+        }
+
+        [NotMapped]
+        public virtual bool CanCancel
+        {
+            get { return DateTime.Now.ToLocalTime() < this.TransactionDate.AddDays(Cons.DaysToCancel) && this.Status != TranStatus.Canceled; }
+        }
+
     }
 }

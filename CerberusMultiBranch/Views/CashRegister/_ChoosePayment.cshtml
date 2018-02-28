@@ -1,197 +1,203 @@
-﻿@model double
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.ChoosePaymentViewModel
+@using CerberusMultiBranch.Models.Entities.Operative;
 
 <div id="ModalPayment" class="modal" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Total a Pagar @Model.ToString("c")</h4>
+                <h4 class="modal-title">Total a Pagar @Model.AmountToPay.ToString("c")</h4>
             </div>
+
             <div class="modal-body panel-body">
-                <div class="radio">
-                    <h4>
-                        <span class="fa fa-credit-card"></span>
-                        &nbsp;
-                        <label>
-                            <input type="radio" id="rdCard" name="payment" value="Tarjeta">
-                            Crédito / Débito
-                        </label>
-
-                    </h4>
-                </div>
+                <h3>
+                    <span class="fa fa-credit-card col-md-2"></span>
+                    <label>
+                        @Html.RadioButtonFor(model => model.PaymentMethod, PaymentMethod.Tarjeta)
+                        @PaymentMethod.Tarjeta.ToString()
+                    </label>
+                </h3>
                 <hr />
-                <div class="radio">
-                    <h4>
-                        <span class="fa fa-money"></span>
-                        &nbsp;
-                        <label>
-                            <input type="radio" id="rdCash" name="payment" value="Efectivo" checked>
-                            Efectivo
-                        </label>
-                    </h4>
-                </div>
+                <h3>
+                    <span class="fa fa-money col-md-2"></span>
+                    <label>
+                        @Html.RadioButtonFor(model => model.PaymentMethod, PaymentMethod.Efectivo)
+                        @PaymentMethod.Efectivo.ToString()
+                    </label>
+                </h3>
+                <hr />
+                <h3>
 
-                <div id="divCash">
-                    <div class="input-group col-md-10">
-                        <span class="input-group-addon">Recibido</span>
-                        <input type="number" hidden id="txtPayment" class="form-control" value="0" />
-                        <span class="input-group-addon">Cambio</span>
-                        <input type="number" hidden id="txtChange" class="form-control" value="0" readonly="readonly" />
+                    <span class="fa fa-dollar col-md-2"></span>
+                    <label>
+                        @Html.RadioButtonFor(model => model.PaymentMethod, PaymentMethod.Mixto)
+                        @PaymentMethod.Mixto.ToString()
+                    </label>
+                </h3>
+
+                <div id="Mix" class="hidden">
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Monto Efectivo</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-money"></i>
+                            </span>
+                            @Html.EditorFor(model => model.Payment, new { htmlAttributes = new { @class = "form-control",type= "number" } })
+                        </div>
+                    </div>
+                    
+                    <div class="form-group col-md-4">
+                        <label class="control-label">Monto Tarjeta</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-credit-card-alt"></i>
+                            </span>
+                            @Html.EditorFor(model => model.AditionalPayment, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                        </div>
                     </div>
                 </div>
-                <hr />
-                <div class="radio">
-                    <h4>
-                        <span class="fa fa-dollar"></span>
-                        &nbsp;&nbsp;&nbsp;
-                        <label>
-                            <input type="radio" id="rdMix" name="payment" value="Mixto">
-                            Pago míxto
-                        </label>
-                    </h4>
-                </div>
 
-                <div id="divMix" hidden>
-                    <div class="input-group col-md-12">
-                        <span class="input-group-addon">Efectivo</span>
-                        <input type="number" hidden id="txtCash" class="form-control" name="Cash" value="0" />
-                        <span class="input-group-addon">Tarjeta</span>
-                        <input type="number" hidden id="txtCard" class="form-control" name="Card" value="0" />
+                <div id="Ref" class="hidden">
+                    <div class="form-group">
+                        <label class="control-label">Referencia</label>
+                        <div class="input-group">
+                            <span class="input-group-addon">
+                                <i class="fa fa-bookmark"></i>
+                            </span>
+                            @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @class = "form-control" } })
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <div class="btn-group">
-                    <button class="btn btn-primary" type="button" onclick="RegisterPayment()">
-                        <span class="glyphicon glyphicon-ok"></span>
-                        Aceptar
-                    </button>
 
-                    <button class="btn btn-danger" type="button" id="btnCancel">
+                    @*<button class="btn btn-primary dropdown dropdown-toggle" type="button" data-toggle="dropdown">
+                        <span class="fa fa-check"></span>
+                        Aceptar
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-header">Tipo de comprobante</li>
+                        <li><a onclick="RegisterPayment(1)">Ticket</a></li>
+                        <li class="divider"></li>
+                        <li><a onclick="RegisterPayment(2)">Nota</a></li>
+                    </ul>*@
+                    <button class="btn btn-success" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
+                        <span class="fa fa-ticket"></span>
+                        Ticket
+                    </button>
+                    <button class="btn btn-primary" title="Imprimir Nota" onclick="RegisterPayment(2)">
+                        <span class="fa fa-file"></span>
+                        Nota
+                    </button>
+                    <button class="btn btn-danger" type="button" onclick="ClosePayment()">
                         <span class="fa fa-times"></span>
                         Cancelar
                     </button>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@Html.HiddenFor(model => model.AmountToPay)
 <script>
-    $(document).ready(function () {
-        $('#ModalPayment').on('hidden.bs.modal', function () {
+    $(document).ready(function ()
+    {
 
-        });
+        $("input[name=PaymentMethod]").click(function ()
+        {
+            var amount = $("#AmountToPay").val();
+            $("#Payment").val(amount);
+            $("#AditionalPayment").val(0);
+            $("#Reference").val('');
 
 
-        $("#btnCancel").click(function () {
-            $("#txtCard").val("");
-            $("#txtCash").val("");
-            $("#divMix").hide();
-            $("#divCash").hide();
-            $("#txtPayment").val("");
-            $("#txtChange").val("");
+            if (this.value == 'Efectivo' || this.value == 'Tarjeta')
+            {
+                $("#Mix").addClass("hidden");
 
-            $("#payment").val("cash");
-            $("#ModalPayment").modal("hide");
-        });
-
-        $("#rdCash").change(function () {
-            if (this.checked) {
-                $("#txtCard").val("");
-                $("#txtCash").val("");
-                $("#divMix").hide();
-                $("#divCash").show();
+                if (this.value == 'Tarjeta')
+                    $("#Ref").removeClass("hidden");
+                else
+                    $("#Ref").addClass("hidden");
+            }
+            else
+            {
+                $("#Mix").removeClass("hidden");
+                $("#Ref").removeClass("hidden");
             }
         });
 
-        $("#rdCard").change(function () {
-            if (this.checked) {
-                $("#txtCard").val("");
-                $("#txtCash").val("");
-                $("#divMix").hide();
-                $("#divCash").hide();
-                $("#txtPayment").val("");
-                $("#txtChange").val("");
-            }
-        });
-
-        $("#rdMix").change(function () {
-            if (this.checked) {
-                $("#divMix").show();
-                $("#divCash").hide();
-                $("#txtPayment").val("");
-                $("#txtChange").val("");
-            }
-        });
-
-        $("#txtCash").keyup(function () {
-            var val = $("#txtCash").val();
+        $("#Payment").keyup(function ()
+        {
+            var val = $("#Payment").val();
             var result = Calculate(val);
 
             result = parseFloat(result).toFixed(2);
 
-            $("#txtCard").val(result);
+            $("#AditionalPayment").val(result);
         });
 
-        $("#txtCard").keyup(function () {
-            var val = $("#txtCard").val();
+        $("#AditionalPayment").keyup(function () {
+            var val = $("#AditionalPayment").val();
             var result = Calculate(val);
 
             result = parseFloat(result).toFixed(2);
 
-            $("#txtCash").val(result);
+            $("#Payment").val(result);
         });
 
-        $("#txtPayment").keyup(function () {
-            var val = $("#txtPayment").val();
-            var result = GetChange(val);
-
-            result = parseFloat(result).toFixed(2);
-
-            $("#txtChange").val(result);
-        });
+        $("#ModalPayment").modal({ backdrop: 'static' });
     });
 
-    function RegisterPayment() {
+    function ClosePayment()
+    {
+        console.log("Cerrar modal");
         $("#ModalPayment").modal('hide');
-
-        var param;
-
-        if ($("#rdCash").is(":checked")) {
-            param = {
-                transactionId: $("#SaleId").val(),
-                payment: $("#rdCash").val(),
-                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
-            };
-        }
-
-        else if ($("#rdCard").is(":checked")) {
-            param = {
-                transactionId: $("#SaleId").val(),
-                payment: $("#rdCard").val(),
-                cash: $("#lblTotalAmount").text().replace(/[$,]+/g, "")
-            };
-        }
-        else {
-            param = {
-                transactionId: $("#SaleId").val(),
-                payment: $("#rdMix").val(),
-                cash: $("#txtCash").val(),
-                card: $("#txtCard").val()
-            };
-        }
-
-        ExecuteAjax('@Url.Action("RegisterPayment")', param, function (j) { Response(j) });
     }
 
-    function Response(j) {
-        if (j.Result != 'OK') {
-            ShowMessage(j.Result, j.Message, 'warning');
-        }
-        else {
-            window.location = '@Url.Action("PrintNote")' + "/" + j.Message;
-        }
+    function RegisterPayment(printType)
+    {
+        $("#ModalPayment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+
+            var param = {
+                saleId: $("#SaleId").val(),
+                paymentMethod: $("input[name=PaymentMethod]:checked").val(),
+                payment: $("#Payment").val(),
+                aditional: $("#AditionalPayment").val(),
+                reference: $("#Reference").val(),
+                printType: printType
+            };
+
+            ExecuteAjax('@Url.Action("RegisterPayment")', param, function (response)
+            {
+                HideLoading();
+
+                if ($.isPlainObject(response))
+                    ShowMessage(response.Result, response.Message, 'warning');
+                else
+                {
+                    $("#divPrinter").html(response);
+                 
+                    PrintNote();
+                    //espero 2 segundos para dar tiempo a que salga la ventana de impresion antes de redireccionar
+                    setTimeout("closePrintView()", 2000);
+                }
+            });
+        });
+
+        $("#ModalPayment").modal('hide');
     }
+
+    function closePrintView()
+    {
+        window.location.href = '@Url.Action("Index")';
+    }
+
 
 </script>

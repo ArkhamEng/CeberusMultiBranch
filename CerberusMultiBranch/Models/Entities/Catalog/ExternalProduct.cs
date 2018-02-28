@@ -29,7 +29,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Category { get; set; }
 
         [Display(Name = "Descripción")]
-        [MaxLength(200)]
+        [MaxLength(300)]
         [Index("IDX_Descripction", IsUnique = false)]
         public string Description { get; set; }
 

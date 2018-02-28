@@ -10,6 +10,7 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/common")
+    
 
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
     <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
@@ -28,7 +29,8 @@
             <div class="col-xs-6 col-sm-4 col-md-12">
                 @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
                 {
-                    <img src="~/Content/Images/logoAb.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" style="max-height:60px" />
+                    <img src="~/Content/Images/logoAb.png" class="img-responsive" id="sidebarCollapse" 
+                         onmouseover="SetPointer(this)" style="max-height:60px" />
                 }
                 else
                 {

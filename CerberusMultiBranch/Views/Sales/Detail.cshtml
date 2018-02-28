@@ -1,260 +1,250 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 @using CerberusMultiBranch.Models.Entities.Operative;
-
+@using CerberusMultiBranch.Models.ViewModels.Operative;
 @{
-    ViewBag.Title = "Detalle de venta";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "Registro de venta";
+    ViewBag.Class = "fa fa-shopping-bag";
 }
 
+@Scripts.Render("~/bundles/jqueryval")
 
 
+@Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-@Html.HiddenFor(m => m.SaleId)
+@Html.HiddenFor(model => model.ClientId)
+@Html.HiddenFor(model => model.SaleId)
 
-<h3 class="alert alert-success col-md-4">
-    <span class="fa fa-building"></span>
-    Sucursal @Model.Branch.Name
-</h3>
 
-<h3 class="alert alert-danger col-md-3 col-md-offset-1">
-    Comisión @Model.ComAmount.ToString("c")
-</h3>
+<h5 class="alert alert-success col-md-6">
+    <span class="fa fa-user"></span>
+    @Model.Client.Name
+</h5>
 
-<h3 class="alert alert-info col-md-3  col-md-offset-1">
-    Total @Model.TotalAmount.ToString("c")
-</h3>
-<hr />
-<div class="panel-group">
-    <div class="panel panel-danger">
-        <div class="panel-body">
-            <div class="row">
-                <div class="form-group col-md-5">
-                    <label class="control-label">
-                        Nombre del cliente
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                        <input class="form-control" value="@Model.Client.Name" readonly />
+<h5 class="alert alert-danger col-md-2 col-md-offset-1 text-right">
+    Deuda
+    <a id="Debt">$ 0.00</a>
+</h5>
+
+<h5 class="alert alert-info col-md-2 col-md-offset-1 text-right">
+   Total 
+    <a id="Amount">
+      
+    </a>
+</h5>
+<br />
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3 form-group">
+                @Html.LabelFor(model => model.Folio, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                    <div class="form-control">
+                        @Model.Folio
                     </div>
                 </div>
+                @Html.ValidationMessageFor(model => model.Folio, "", new { @class = "text-danger" })
+            </div>
 
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Tipo de pago
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-credit-card"></i></span>
-                        <input class="form-control" value="@Model.PaymentMethod.ToString()" readonly />
+            <div class="col-md-3 form-group">
+                @Html.Label("Tipo venta", htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-shopping-bag"></i></span>
+                    <div class="form-control">
+                        @Model.TransactionType.ToString()
                     </div>
+                
                 </div>
-
-                <div class="form-group col-md-2 col-md-offset-1">
-                    <label class="control-label">
-                        Fecha
-                    </label>
+            </div>
+            <div class="col-md-5  pull-right">
+                    <div class="col-md-6">
+                        @Html.Label("Fecha de Venta", htmlAttributes: new { @class = "control-label" })
+                    </div>
+                    <div class="col-md-6">
+                        @Html.Label("Fecha de Expiración", htmlAttributes: new { @class = "control-label" })
+                    </div>
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                        <input class="form-control" value="@Model.TransactionDate.ToString("dd/MM/yyyy")" readonly />
+                        <div class="form-control">
+                            @Model.TransactionDate.ToString("dd/MM/yyyy")
+                        </div>
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        <div class="form-control">
+                            @Model.Expiration.ToString("dd/MM/yyyy")
+                        </div>
                     </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Folio
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                        <input class="form-control" value="@Model.Folio" readonly />
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group col-md-3">
-                    <label class="control-label">
-                        Agente
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-briefcase"></i></span>
-                        <input class="form-control" value="@Model.User.UserName" readonly />
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Estado Anterior
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
-                        @switch (Model.LastStatus)
-                        {
-                            case TranStatus.Revision:
-                                <label class="form-control alert alert-warning">Revisión</label>
-                                break;
-                            case TranStatus.Canceled:
-                                <label class="form-control alert alert-warning">Cancelado</label>
-                                break;
-                            case TranStatus.InProcess:
-                                <label class="form-control alert alert-danger">En Proceso</label>
-                                break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
-                            case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
-                                break;
-                        }
-                    </div>
-                </div>
-
-                <div class="form-group col-md-2">
-                    <label class="control-label">
-                        Estado Actual
-                    </label>
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-adjust"></i></span>
-                        @switch (Model.Status)
-                        {
-                            case TranStatus.Revision:
-                                <label class="form-control alert alert-warning">Revisión</label>
-                                break;
-                            case TranStatus.Canceled:
-                                <label class="form-control alert alert-warning">Cancelado</label>
-                                break;
-                            case TranStatus.InProcess:
-                                <label class="form-control alert alert-danger">En Proceso</label>
-                                break;
-                            case TranStatus.Reserved:
-                                <label class="form-control alert alert-info">Reservado</label>
-                                break;
-                            case TranStatus.Compleated:
-                                <label class="form-control alert alert-success">Pagado</label>
-                                break;
-                        }
-                    </div>
-                </div>
-                <div class="btn-group right col-md-offset-1 col-md-4" style="padding-top:25px !important;">
-                    <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
-                            onclick="ShowLoading(); window.location='@Url.Action("History")'">
-                        <span class="fa fa-search-plus"></span>
-                        <u>B</u>úsqueda
-                    </button>
-
-                    @if (Model.Status != TranStatus.Canceled && Model.Status != TranStatus.InProcess)
-                    {
-                        <button type="button" class="btn btn-danger" title="cancelar venta"
-                                onclick="$('#ModalCancel').modal('show');" id="btnCancel">
-                            <span class="fa fa-times"></span>
-                            <u>C</u>ancelar
-                        </button>
-
-                        @Html.Partial("_Cancelation")
-                    }
-                </div>
             </div>
         </div>
-    </div>
-    <div class="panel panel-danger">
-        <div class="panel-body">
-            <table id="tbDetails" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>
-                            @Html.DisplayName("Código")
-                        </th>
-                        <th>
-                            @Html.DisplayName("SAT")
-                        </th>
-                        <th>
-                            @Html.DisplayName("Descripción")
-                        </th>
-                        <th>
-                            @Html.DisplayName("Precio")
-                        </th>
-                        <th>
-                            @Html.DisplayName("Cantidad")
-                        </th>
-                        <th>
-                            @Html.DisplayName("Total")
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.SaleDetails)
+        <div class="row">
+            <div class="form-group col-md-3">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-hourglass-half"></i></span>
+                    @switch (Model.Status)
+                {
+                    case TranStatus.InProcess:
+                            <div id="divStatus" class="form-control alert-warning">
+                                Procesando
+                            </div>
+                        break;
+                    case TranStatus.Reserved:
+                            <div id="divStatus" class="form-control alert-info">
+                                Reservado
+                            </div>
+                        break;
+                    case TranStatus.Compleated:
+                            <div id="divStatus" class="form-control alert-success">
+                                Pagado
+                            </div>
+                        break;
+                    case TranStatus.Canceled:
+                            <div id="divStatus" class="form-control alert-danger">
+                                Cancelado
+                            </div>
+                        break;
+                }
+
+                </div>
+            </div>
+            <div class="form-group col-md-3">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                    <div class="form-control">
+                        @Model.User.UserName
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                        <span class="fa fa-backward"></span>
+                        Volver
+                    </button>
+
+                    <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?" >
+                        <span class="fa fa-cubes"></span>
+                        Terminar
+                    </button>
+                    <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        Agregar
+                    </button>
+                    @if (Model.CanCancel)
                     {
-                        <tr>
-                            <td class="col-md-1" align="center">
-                                @if (item.Product.Images.Count > 0)
-                                {
-                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:40px" />
-                                }
-                                else
-                                {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:40px" />
-                                }
-                            </td>
-                            <td class="text-center">
-                                @Html.DisplayFor(m => item.Product.Code)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.Product.Category.SatCode)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.Product.Name)
-                            </td>
-                            <td class="text-right">
-                                @Html.DisplayFor(m => item.Price)
-                            </td>
-                            <td class="text-center">
-                                @Html.DisplayFor(m => item.Quantity)
-                            </td>
-                            <td class="text-right">
-                                @Html.DisplayFor(m => item.Amount)
-                            </td>
-                        </tr>
+                        <button id="btnCancel" class="btn btn-danger" type="button" onclick="Cancel()">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Cancelar
+                        </button>
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        <button id="btnCancel" class="btn btn-danger" type="button" disabled>
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Cancelar
+                        </button>
+                    }
+
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+@Html.HiddenFor(model=> model.TotalAmount)
+@Html.HiddenFor(model => model.TransactionType)
 
+
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#tabProducts">Productos</a></li>
+    @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
+    {
+        <li><a data-toggle="tab" href="#tabPayments">Pagos <span id="TotalPayments" class="badge"></span></a></li>
+    }
+</ul>
+
+<div class="tab-content">
+    <div id="tabProducts" class="tab-pane fade in active">
+        <div class="panel panel-danger">
+            <div id="divDetails" class="panel-body">
+                @Html.Partial("_Details", Model.SaleDetails)
+            </div>
+        </div>
+    </div>
+    @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
+    {
+        <div id="tabPayments" class="tab-pane fade">
+            <div class="panel panel-danger">
+                <div id="divSalePayments" class="panel-body">
+                    @Html.Partial("_SalePayments", Model.SalePayments)
+                </div>
+            </div>
+        </div>
+    }
+   
+</div>
+
+@Html.Partial("_Cancelation")
+
+<div id="divAdd"></div>
+@Html.Partial("_SearchProduct")
 
 <script>
-   
     $(document).ready(function ()
     {
-        Paginate("#tbDetails", 5);
+        $("#btnShowQuick").click(function ()
+        {
+            $("#ModalProduct").modal('show');
+        });
+
+        $("#btnCompleate").click(function () {
+            ShowConfirm("Terminar y Reservar?", "Deseas concluir la venta y retirar los productos del inventario?", 'static', SubmitCompleate);
+        });
+
+        if ('@Model.Status' == '@TranStatus.Reserved' || '@Model.Status' == '@TranStatus.Compleated' || '@Model.Status' == '@TranStatus.Canceled')
+        {
+            $(".Compleated").hide();
+        }
     });
 
-   
-    function Cancel() {
-        $("#ModalCancel").modal("hide");
+
+    function SubmitCompleate()
+    {
         ShowLoading();
 
-        var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
-
-        ExecuteAjax('@Url.Action("Cancel")', param, function (j) {
-            if (j.Result = 'OK')
-                window.location = window.location;
+        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response)
+        {
+            HideLoading();
+            if (response.Result != 'OK')
+                ShowMessage(response.Header, response.Message, 'warning', true);
             else
-                ShowMessage(j.Result, j.Message, 'warning');
+                window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
         });
     }
 
-    $(document).keydown(function (e)
+    function Cancel()
     {
-        if (e.which == 13 || (e.altKey && e.which == 66))
+        $('#ModalCancel').modal('show');
+    }
+
+    function BeginCancel()
+    {
+        $("#ModalCancel").off("hidden.bs.modal").on("hidden.bs.modal",function()
         {
-            $("#btnSearch").click();
-        }
+            ShowLoading();
 
-        if (e.altKey && e.keyCode == 67) {
-            $("#btnCancel").click();
-        }
-    });
+            var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
 
+            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
+                if (j.Result = 'OK')
+                    location.reload(true);
+                else
+                    ShowMessage(j.Result, j.Message, 'warning');
+            });
+        });
 
+        $("#ModalCancel").modal("hide");
+
+    }
 </script>
+

@@ -29,16 +29,26 @@ namespace CerberusMultiBranch.Controllers.Common
 
             FileContentResult picture = null;
 
-            if (user.PicturePath != null)
+            try
             {
-                byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath(user.PicturePath));
-                picture = new FileContentResult(imgdata, "img/jpg");
+                if (user.PicturePath != null)
+                {
+                    byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath(user.PicturePath));
+                    picture = new FileContentResult(imgdata, "img/jpg");
+                }
+                else
+                {
+                    byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath("/Content/images/sinimagen.jpg"));
+                    picture = new FileContentResult(imgdata, "img/jpg");
+                }
             }
-            else
+            catch (Exception)
             {
+
                 byte[] imgdata = System.IO.File.ReadAllBytes(System.Web.HttpContext.Current.Server.MapPath("/Content/images/sinimagen.jpg"));
                 picture = new FileContentResult(imgdata, "img/jpg");
             }
+           
 
             return picture;
         }

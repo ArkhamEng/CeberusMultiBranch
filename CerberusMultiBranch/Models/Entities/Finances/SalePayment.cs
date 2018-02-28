@@ -23,5 +23,14 @@ namespace CerberusMultiBranch.Models.Entities.Finances
 
         public virtual Receivable Receivable { get; set; }
         #endregion
+
+        //los pagos no se pueden eliminar de las ventas al contado
+        public override bool CanDelete
+        {
+            get
+            {
+                return (base.CanDelete && this.Sale.TransactionType != TransactionType.Contado);
+            }
+        }
     }
 }

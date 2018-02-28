@@ -22,10 +22,9 @@
                     string c = string.Format("col-md-{0}  col-xs-4 col-sm-4", (12 / i));
                     <td class='@c'>
 
-                        @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", (i * 2)); }
+                        @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", 2); }
 
-                        <div class='@imgC' style="vertical-align:central" onmouseover="SetPointer(this)"
-                             onclick="Detail('@prod.ProductId')">
+                        <div class='@imgC' style="vertical-align:central" >
                             @if (prod.Images.Count > 0)
                             {
                                 <img src="@prod.Images.First().Path" class="img-responsive img-rounded" style="max-height:150px" />
@@ -35,12 +34,13 @@
                                 <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
                             }
                         </div>
-                        @{ string txtC = string.Format("col-md-{0}", (11 - i * 2)); }
-                        <div class='@txtC' onmouseover="SetPointer(this)" onclick="Detail('@prod.ProductId')">
+                        @{ string txtC = string.Format("col-md-{0} {1}", ( i == 2 ? 8 :9 ),!prod.IsActive?"text-danger":string.Empty); }
+                        <div class='@txtC'  onclick="Detail(@prod.ProductId,@prod.IsActive)" onmouseover="SetPointer(this)">
                             <h4>
                                 <label>@prod.Code</label>
                             </h4>
-                            <h4>
+                           
+                            <h4 >
 
                                 @Html.DisplayFor(model => prod.Name)
 
@@ -58,6 +58,8 @@
                                     </span>
                                 }
                             </h4>
+                         
+
                             @if (prod.TradeMark != null)
                             {
                                 <h6>
@@ -105,21 +107,28 @@
 
                         @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor") || User.IsInRole("Vendedor"))
                         {
-                            <div class="col-md-1 btn-group-vertical" style="vertical-align:central">
+                            var btnC = string.Format("col-md-{0} btn-group-vertical hidden-xs hidden-sm", (i == 2 ? i : 1));
+
+                            <div class='@btnC' style="vertical-align:central">
                                
-                                @if (User.IsInRole("Capturista"))
+                                @if (User.IsInRole("Capturista") && prod.IsActive)
                                 {
-                                    <button class="btn btn-warning" title="Edición rápida"
+                                    <button class="btn btn-warning" title="Editar datos de producto"
                                             onclick="BeginEdit('@prod.ProductId')">
                                         <span class="glyphicon glyphicon-pencil"></span>
                                     </button>
-                                    @*<button class="btn btn-warning" title="Editar producto"
-                                            onclick="window.location = '@Url.Action("Create", new { id = prod.ProductId })'">
-                                        <span class="glyphicon glyphicon-pencil"></span>
-                                    </button>*@
+                                 
                                     <button class="btn btn-danger" title="Eliminar producto" 
                                             onclick="BeginDelete('@prod.ProductId')">
                                         <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                }
+
+                                @if (!prod.IsActive && User.IsInRole("Supervisor"))
+                                {
+                                    <button class="btn btn-success" title="Reactivar producto"
+                                            onclick="BeginActivate('@prod.ProductId')">
+                                        <span class="fa fa-recycle"></span>
                                     </button>
                                 }
                             </div>
@@ -131,8 +140,7 @@
                     <td class="col-md-6"></td>
                 }
             </tr>
-
-  }
+        }
     </tbody>
 </table>
 
@@ -146,14 +154,20 @@
         SetDataTable("#tbProducts", "#txtName");
     });
 
-    function Detail(id) {
-        ShowLoading();
-
-        ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view)
+    function Detail(id,isActive) 
+    {
+        if(!isActive)
+            ShowMessage("Producto Desactivado","Este producto ha sido desactivado, contacte a un supervisor para solicitar una activación",'warning');
+        else
         {
-            HideLoading();
-            $("#divProductDetail").html(view);
-        });
+            ShowLoading();
+
+            ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (view) {
+                HideLoading();
+                $("#divModals").html(view);
+            });
+        }
+       
     }
 
     function BeginDelete(id)
@@ -162,6 +176,26 @@
         $("#transId").val(id);
         ShowConfirm("¿Estas seguro de eliminar el producto?",
             "Al eliminar tambien se borraran las imagenes y el registro no se podra recuperar", true, Delete);
+    }
+
+    function BeginActivate(id)
+    {
+        $("#transId").val(id);
+        ShowConfirm("¿Estas seguro de la activación del producto?",
+            "Al activarlo, el producto estara disponible para venta y edición, ¿deseas continuar?", true, Activate);
+    }
+
+    function Activate() {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("Activate")', { id: $("#transId").val(), isGrid: $("#IsGrid").val() }, function (response)
+        {
+            HideLoading();
+
+            if (response.Result == "OK")
+                LookFor();
+            else
+                ShowMessage(response.Result, response.Message, 'warning');
+        });
     }
 
     function Delete()
@@ -184,7 +218,7 @@
 
         ExecuteAjax('@Url.Action("Edit", "Products")', { productId: id }, function (view) {
             HideLoading();
-            $("#divQuickAdd").html(view);
+            $("#divModals").html(view);
         });
     }
 
@@ -194,7 +228,7 @@
 
         ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view) {
             HideLoading();
-            $("#divMovement").html(view);
+            $("#divModals").html(view);
         });
     }
 

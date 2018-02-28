@@ -27,8 +27,9 @@
 
             <tbody class="small">
                 @foreach (var item in Model)
-            {
-                    <tr>
+                {
+                    var cls = item.IsActive ? string.Empty : "text-danger";
+                    <tr class="@cls">
                         <td class="col-md-1">
                             @Html.DisplayFor(modelItem => item.Code)
                         </td>
@@ -48,9 +49,12 @@
                         </td>
 
                         <td class="col-md-1 btn-group">
-                            <button class="btn btn-warning btn-xs" onclick="AddToPackage(this)" title="agregar a paquete" type="button">
-                                <span class="fa fa-plus"></span>
-                            </button>
+                            @if (item.IsActive)
+                            {
+                                <button class="btn btn-warning btn-xs" onclick="AddToPackage(this)" title="agregar a paquete" type="button">
+                                    <span class="fa fa-plus"></span>
+                                </button>
+                            }
                         </td>
                     </tr>
                 }
