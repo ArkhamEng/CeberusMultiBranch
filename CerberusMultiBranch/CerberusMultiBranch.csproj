@@ -197,6 +197,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
+    <Compile Include="Controllers\Operative\DailyBillController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -319,6 +320,7 @@
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
@@ -420,6 +422,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Common.js" />
+    <Content Include="Scripts\Table2Excel.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
@@ -585,6 +588,8 @@
     <Content Include="Views\Sales\_SalePayments.cshtml" />
     <Content Include="Views\Sales\_ProductResult.cshtml" />
     <Content Include="Views\Sales\_SearchProduct.cshtml" />
+    <Content Include="Views\Sales\DailyBill.cshtml" />
+    <Content Include="Views\Sales\_SoldItemsDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

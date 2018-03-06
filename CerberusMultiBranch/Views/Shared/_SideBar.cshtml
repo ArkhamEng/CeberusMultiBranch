@@ -54,6 +54,7 @@
 
         @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
         {
+            <li><a href="/Sales/DailyBill" onclick="ShowLoading()">&nbsp;Factura del día<span class="fa fa-file-excel-o" style="float:left" /></a></li>
             <li><a href="/CashRegister/" onclick="ShowLoading()">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
             <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-hourglass-o" style="float:left" /></a></li>
         }

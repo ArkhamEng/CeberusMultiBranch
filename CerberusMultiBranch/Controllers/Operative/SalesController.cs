@@ -20,7 +20,7 @@ using CerberusMultiBranch.Models.Entities.Finances;
 namespace CerberusMultiBranch.Controllers.Operative
 {
     [Authorize]
-    public class SalesController : Controller
+    public partial class SalesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 

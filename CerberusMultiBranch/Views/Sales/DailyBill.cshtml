@@ -1,0 +1,92 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.DailyBillViewModel
+@using CerberusMultiBranch.Models.Entities.Operative
+
+
+@{
+    ViewBag.Title = "Factura del día";
+    ViewBag.Class = "fa fa-file-excel-o";
+}
+
+
+<h4 id="hAmount" class="alert alert-danger col-md-3 col-md-offset-5">
+    Total $ 0.0
+</h4>
+
+<h4 id="hItems" class="alert alert-info col-md-3  col-md-offset-1">
+    Articulos 0
+</h4>
+<hr />
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-11">
+            <div class="input-group ">
+                @Html.DropDownListFor(model=> model.BranchId, Model.Branches,
+               new { @class = "form-control", style = "width:20% !important" })
+
+                @Html.EditorFor(model => model.Client, new { htmlAttributes = new { @class = "form-control",
+               placeholder = "Nombre del cliente", style = "width:60% !important", list = "Clients"} })
+
+                <datalist id="Clients"></datalist>
+
+                @Html.DropDownListFor(model => model.TransType, Model.TransTypes,
+               new { @class = "form-control", style = "width:20% !important" })
+
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" title="Buscar" onclick="Search()">
+                        <span class="glyphicon glyphicon-search"></span>
+                        <u>B</u>uscar
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <br /><br /><br /><br />
+        <div class="col-md-8">
+            <div class="input-group">
+                @Html.EditorFor(model => model.Folio, new { htmlAttributes = new { @class = "form-control" } })
+                <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control", list = "Clients" } })
+                <div class="input-group-btn">
+                    <button type="button" class="btn btn-success" onclick="ExportToExcel()">
+                        <span class="fa fa-file-excel-o"></span>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="divDetails">
+    @Html.Partial("_SoldItemsDetails",Model.SoldItems)
+
+</div>
+
+
+
+<script>
+    $(document).ready(function()
+    {
+        Compleate("#Client", "#Clients", '@Url.Action("AutoCompleate","Clients")', null)
+    });
+
+    function Search()
+    {
+        ShowLoading();
+
+        var model = {
+                BranchId: $("#BranchId").val(),
+                TransType: $("#TransType").val(),
+                Client: $("#Client").val(),
+                Date: $("#Date").val(),
+                Folio: $("#Folio").val() };
+
+        console.log(model);
+
+        ExecuteAjax('@Url.Action("SearchSoldItems", "Sales")', { model: model }, function (response)
+        {
+            $("#divDetails").html(response);
+            HideLoading();
+        });
+    }
+
+</script>
