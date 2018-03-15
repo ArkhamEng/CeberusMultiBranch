@@ -590,6 +590,9 @@
     <Content Include="Views\Sales\_SearchProduct.cshtml" />
     <Content Include="Views\Sales\DailyBill.cshtml" />
     <Content Include="Views\Sales\_SoldItemsDetails.cshtml" />
+    <Content Include="Views\Purchases\_SearchProduct.cshtml" />
+    <Content Include="Views\Purchases\_ProductResult.cshtml" />
+    <Content Include="Views\Purchases\_AddProduct.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

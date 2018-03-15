@@ -18,5 +18,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public double WPrice { get; set; }
 
         public double CPrice { get; set; }
+
+        public bool IsCart { get; set; }
     }
 }

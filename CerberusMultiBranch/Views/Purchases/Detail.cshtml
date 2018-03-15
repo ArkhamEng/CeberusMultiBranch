@@ -171,18 +171,12 @@
    
 </div>
 
+@Html.Partial("_Cancelation")
 
-<div id="divClone"></div>
+<div id="divAdd"></div>
 
+@Html.Partial("_SearchProduct")
 
-
-@Html.Partial("_SearchExternalProduct")
-
-@Html.Partial("_SearchInternalProduct")
-
-
-
-@Html.Partial("_QuickProvider")
 
 @Html.Hidden("ExCode")
 
@@ -205,13 +199,21 @@
             $(".Compleated").hide();
         }
 
-        $("input[name=TransactionType]").click(function () {
+        $("input[name=TransactionType]").click(function ()
+        {
             if (this.value != 'Credito') {
                 var date = $("#TransactionDate").val();
                 $("#Expiration").val(date);
             }
         });
+
+        $("#btnShowQuick").click(function () {
+            $("#ModalProduct").modal('show');
+        });
+
     });
+
+   
 
     function ProviderSelected(id, name) {
         $("#ProviderId").val(id);

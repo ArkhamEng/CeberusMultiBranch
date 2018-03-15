@@ -13,7 +13,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ProductId { get; set; }
 
-        [Display(Name="Categoría")]
+        [Display(Name = "Categoría")]
         [Index("IDX_CategoryId", IsUnique = false)]
         public int CategoryId { get; set; }
 
@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Código")]
         [Required]
         [MaxLength(30)]
-        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage ="El código solo admite letras y numeros (sin espacios en blanco)")]
+        [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "El código solo admite letras y numeros (sin espacios en blanco)")]
         [Index("IDX_Code", IsUnique = true)]
         public string Code { get; set; }
 
@@ -34,8 +34,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         public string Name { get; set; }
 
-        
-        [Display(Name="Cantidad Minima")]
+
+        [Display(Name = "Cantidad Minima")]
         [Required]
         [Range(1, Int32.MaxValue, ErrorMessage = "La cantidad minima debe ser mayor a cero")]
         public double MinQuantity { get; set; }
@@ -61,7 +61,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(20)]
         public string Unit { get; set; }
 
-      
+
         public bool IsActive { get; set; }
 
         [Required]
@@ -142,7 +142,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(30)]
         public string Ledge { get; set; }
 
-     
+
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }
 
@@ -161,6 +161,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         public int TransactionId { get; set; }
 
+        [NotMapped]
+        public string ProviderCode { get; set; }
+
         public Product()
         {
             this.NewCompatibilities = new List<string>();
@@ -169,10 +172,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         #endregion
     }
 
-    public enum ProductType:int
+    public enum ProductType : int
     {
-        Single=0,
-        Package=1
+        Single = 0,
+        Package = 1
     }
 
 }

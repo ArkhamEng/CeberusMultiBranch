@@ -50,7 +50,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a la que se le cambiara el status
-                var sale = db.Sales.Include(s => s.SaleDetails).Include(s=> s.SalePayments).
+                var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SalePayments).
                     FirstOrDefault(s => s.SaleId == transactionId);
 
                 //regreso los productos al stock
@@ -167,23 +167,24 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
-        public ActionResult OpenChangePrice(int productId, int transactionId)
+        public ActionResult OpenChangePrice(int productId, int saleId, bool isCart)
         {
             var branchId = User.Identity.GetBranchId();
 
             var transDet = db.SaleDetails.Include(td => td.Product).Include(td => td.Product.BranchProducts).
-                FirstOrDefault(td => td.ProductId == productId && td.SaleId == transactionId);
+                FirstOrDefault(td => td.ProductId == productId && td.SaleId == saleId);
 
             var bp = transDet.Product.BranchProducts.FirstOrDefault(p => p.BranchId == branchId);
 
             var model = new PriceSelectorViewModel
             {
                 PsProductId = productId,
-                PsTransactionId = transactionId,
+                PsTransactionId = saleId,
                 CPrice = transDet.Price,
                 SPrice = bp != null ? bp.StorePrice : Cons.Zero,
                 DPrice = bp != null ? bp.DealerPrice : Cons.Zero,
                 WPrice = bp != null ? bp.WholesalerPrice : Cons.Zero,
+                IsCart = isCart
             };
 
             return PartialView("_PriceSelector", model);
@@ -267,7 +268,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
-        public ActionResult SetNewPrice(int productId, int transactionId, double price)
+        public ActionResult SetNewPrice(int productId, int transactionId, double price, bool isCart)
         {
             try
             {
@@ -289,8 +290,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //sumo la diferencia del total de la venta
                 else
                 {
-                    var f = det.Amount - newAmount;
-                    det.Sale.TotalAmount += newAmount;
+                    var f = newAmount - det.Amount;
+                    det.Sale.TotalAmount += f;
                 }
 
                 det.Amount = newAmount;
@@ -302,7 +303,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var model = db.SaleDetails.Include(s => s.Product).
                     Include(s => s.Product.Images).Where(s => s.SaleId == transactionId).ToList();
 
-                return PartialView("_CartDetails", model);
+                if (isCart)
+                    return PartialView("_CartDetails", model);
+                else
+                    return PartialView("_Details", model);
             }
             catch (Exception ex)
             {
@@ -646,7 +650,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult SearchProducts(string filter)
+        public ActionResult SearchProducts(string filter, int? systemId)
         {
             string[] arr = new List<string>().ToArray();
             string code = string.Empty;
@@ -662,14 +666,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             List<Product> products = new List<Product>();
 
             products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
-                        where (p.Code == code) && (p.ProductType == ProductType.Single)
+                        where (p.Code == code) && (p.ProductType == ProductType.Single) 
                         select p).Take((int)Cons.OneHundred).ToList();
 
             if (products.Count == Cons.Zero)
             {
                 products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
-                            && (ep.ProductType == ProductType.Single) 
+                            && (systemId == null || ep.PartSystemId == systemId)
                             select ep).Take((int)Cons.OneHundred).ToList();
             }
 
@@ -720,43 +724,33 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var existance = bp != null ? bp.Stock : Cons.Zero;
 
-            if (existance < quantity)
-            {
-                var j = new
-                {
-                    Result = "EROR",
-                    Header = "Sin producto en almacen",
-                    Message = "Estas intentando vender mas productos de los disponibles, revisa existencia en sucursal"
-                };
-                return Json(j);
-            }
-
-
             //consulto si el usuario tiene una venta activa
-            var sale = db.Sales.Include(s => s.Client).FirstOrDefault(s => s.SaleId == saleId);
+            var sale = db.Sales.Include(s=> s.SaleDetails).Include(s => s.Client).FirstOrDefault(s => s.SaleId == saleId);
 
 
             var price = 0.0;
             var amount = 0.0;
-
+            var totQuantity = quantity;
 
             //checo si el producto ya esta en la venta
-            var detail = db.SaleDetails.
+            var detail = sale.SaleDetails.
                 FirstOrDefault(td => td.ProductId == productId && td.SaleId == sale.SaleId);
 
             //si lo esta, sumo la cantidad
             if (detail != null)
             {
-                price = detail.Price;
+                //sumo la cantidad a la cantidad existente
+                totQuantity += detail.Quantity;
+
                 //utilizo el precio seteado (ya que pudo haber sido modificado manualmente)
                 price = detail.Price;
 
                 detail.Quantity += quantity;
-                detail.Amount += (price * detail.Quantity);
+                detail.Amount = (price * detail.Quantity);
 
 
                 //verifico el stock y valido si es posible agregar mas producto a la venta
-                if (existance < detail.Quantity)
+                if (existance < totQuantity)
                 {
                     var j = new
                     {
@@ -767,10 +761,22 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(j);
                 }
 
-                db.Entry(detail).State = EntityState.Modified;
+                 db.Entry(detail).State = EntityState.Modified;
             }
             else
             {
+                //verifico el stock y valido si es posible agregar mas producto a la venta
+                if (existance < totQuantity)
+                {
+                    var j = new
+                    {
+                        Result = "Cantidad insuficiente",
+                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias"
+                    };
+
+                    return Json(j);
+                }
+
                 //obtengo el precio por el tipo de cliente
                 switch (sale.Client.Type)
                 {
@@ -794,15 +800,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Amount = (price * quantity)
                 };
 
-                db.SaleDetails.Add(detail);
+                sale.SaleDetails.Add(detail);
             }
 
+            amount = sale.SaleDetails.Sum(s => s.Amount);
 
             if (sale.TransactionType == TransactionType.Credito)
             {
-                var cAmount = sale.SaleDetails.Sum(s => s.Amount);
-
-                if (cAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
+              
+                if (amount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
                         Result = "Error",
@@ -812,7 +818,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
             }
 
-            sale.TotalAmount += amount;
+            sale.TotalAmount = amount;
 
             try
             {
@@ -824,7 +830,30 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "Error", Header = "Error desconocido", Message = ex.Message });
             }
 
-            var model = db.SaleDetails.Where(sd => sd.SaleId == saleId).Include(sd => sd.Product.Images).ToList();
+            var model = sale.SaleDetails;//db.SaleDetails.Where(sd => sd.SaleId == saleId).Include(sd => sd.Product.Images).ToList();
+            return PartialView("_Details", model);
+        }
+
+        [HttpPost]
+        public ActionResult RemoveDetail(int saleId, int productId)
+        {
+            var sale = db.Sales.Include(s => s.SaleDetails).FirstOrDefault(s => s.SaleId == saleId);
+
+            var detail = sale.SaleDetails.FirstOrDefault(d => d.ProductId == productId);
+
+            if (detail != null)
+            {
+                sale.SaleDetails.Remove(detail);
+
+                sale.TotalAmount = sale.SaleDetails.Sum(sd => sd.Amount);
+                db.Entry(sale).State = EntityState.Modified;
+                db.SaveChanges();
+            }
+
+            var model = db.SaleDetails.Include(d => d.Product.Images).
+              Where(d => d.SaleId == saleId).ToList();
+
+
             return PartialView("_Details", model);
         }
 
@@ -1095,9 +1124,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                
+
                 return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + folio });
-           
+
             }
             catch (Exception ex)
             {

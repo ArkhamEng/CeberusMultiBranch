@@ -104,13 +104,14 @@ else
 
     });
 
-    function ChangePrice(prodId, transId) {
-        var param = { productId: prodId, transactionId: transId }
+    function ChangePrice(prodId, transId)
+    {
+        var param = { productId: prodId, saleId: transId, isCart: true }
 
         ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {
 
-            if ($.isPlainObject(response)) {
-                console.log("error");
+            if ($.isPlainObject(response))
+            {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
             else
@@ -118,7 +119,8 @@ else
         });
     }
 
-    function QuantityChanged(input) {
+    function QuantityChanged(input)
+    {
         quantity = parseFloat($(input).val());
 
         var row = $(input).parent().parent();
@@ -143,7 +145,8 @@ else
     }
 
 
-    function RemoveFromCart(productId, transactionId) {
+    function RemoveFromCart(productId, transactionId)
+    {
         var data = {
             transactionId: transactionId,
             productId: productId
@@ -151,7 +154,8 @@ else
 
         ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response) {
             console.log("Ejecución exitosa");
-            if ($.isPlainObject(response)) {
+            if ($.isPlainObject(response))
+            {
                 $("#ModalCart").modal("hide");
                 ShowMessage(response.Result, response.Message, "warning");
             }

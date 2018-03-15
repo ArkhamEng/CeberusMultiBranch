@@ -55,9 +55,27 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Product.Unit)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Price)
-                </td>
+
+                @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                {
+                    <td>
+                        <h5  class="text-info" onmouseover="SetPointer(this)"
+                            onclick="ChangePriceDetail(@item.ProductId,@item.SaleId)">
+                            <u>
+                                @Html.DisplayFor(modelItem => item.Price)
+                            </u>
+                        </h5>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <h5 id="txtPrice" class="text-info">
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </h5>
+                    </td>
+                }
+             
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
                 </td>
@@ -89,10 +107,23 @@
         $("#Amount").text('@Model.Sum(d => d.Amount).ToString("c")');
     });
 
+    function ChangePriceDetail(prodId, transId) {
+        var param = { productId: prodId, saleId: transId, isCart:false }
+
+        ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {
+
+            if ($.isPlainObject(response)) {
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+                $("#divPriceSelector").html(response);
+        });
+    }
+
     function RemoveDetail(tid, pid)
     {
         ShowLoading();
-        var param = { saleId: tid, productId: saleId };
+        var param = { saleId: tid, productId: pid };
 
         ExecuteAjax('@Url.Action("RemoveDetail", "Sales")', param, function (view)
         {

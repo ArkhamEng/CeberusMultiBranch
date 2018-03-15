@@ -193,6 +193,82 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
+        [HttpPost]
+        public ActionResult SearchProducts(string filter, int providerId)
+        {
+            string[] arr = new List<string>().ToArray();
+            string code = string.Empty;
+
+            if (filter != null && filter != string.Empty)
+            {
+                arr = filter.Trim().Split(' ');
+
+                if (arr.Length == Cons.One)
+                    code = arr.FirstOrDefault();
+            }
+
+            List<Product> products = new List<Product>();
+
+            products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
+                        where (p.Code == code) && (p.ProductType == ProductType.Single)
+                        select p).Take((int)Cons.OneHundred).ToList();
+
+            if (products.Count == Cons.Zero)
+            {
+                products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
+                            && (ep.ProductType == ProductType.Single)
+                            select ep).Take((int)Cons.OneHundred).ToList();
+            }
+
+            //obtengo el código del proveedor si es que tiene
+            products.ForEach(p =>
+            {
+                var eq = p.Equivalences.FirstOrDefault(e => e.ProviderId == providerId);
+                p.ProviderCode = eq == null ? string.Empty : eq.Code;
+            });
+
+            //esto lo dejo pq lo puedo usar para solo permitir compras de productos
+            //que su existencia esta por debajo del máximo
+            /*  var branchId = User.Identity.GetBranchId();
+
+              foreach (var prod in products)
+              {
+                  var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                  prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                  prod.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                  prod.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                  prod.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+                  prod.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                  prod.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                  prod.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+              }*/
+
+
+            return PartialView("_ProductResult", products);
+        }
+
+
+        [HttpPost]
+        public ActionResult BeginAdd(int productId, int providerId)
+        {
+
+            var product = db.Products.Include(p => p.Images).Include(p => p.Equivalences).
+                FirstOrDefault(p => p.ProductId == productId);
+
+            //si el producto esta relacionado con un producto del proveedor
+            var eq = product.Equivalences.FirstOrDefault(e => e.ProviderId == providerId);
+
+            if (eq != null)
+            {
+                var exProd = db.ExternalProducts.FirstOrDefault(e => e.ProviderId == providerId && e.Code == eq.Code);
+
+                if (exProd != null)
+                    product.BuyPrice = exProd.Price;
+            }
+
+            return PartialView("_AddProduct", product);
+        }
 
         [HttpPost]
         public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity)
@@ -367,6 +443,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
+            ViewBag.Systems = db.Systems.ToSelectList();
+
             var model = db.Purchases.
                 Where(p => p.PurchaseId == id && branchIds.Contains(p.BranchId)).
                 Include(p => p.PurchaseDetails).Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
@@ -465,6 +543,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+ 
+        #region Metodos Descontinuados
         //this method looks for providers products to be registered in a purchase
         [HttpPost]
         public ActionResult SearchExternalProducts(string filter, int providerId)
@@ -475,7 +555,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-         
+
             var products = (from ep in db.ExternalProducts
                             join eq in db.Equivalences.Include(e => e.Product)
                             on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
@@ -555,6 +635,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "Error al crear realción", Message = ex.Message });
             }
         }
+
+        #endregion
 
         protected override void Dispose(bool disposing)
         {

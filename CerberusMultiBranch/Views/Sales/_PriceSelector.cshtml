@@ -17,21 +17,21 @@
             </div>
             <div class="modal-body panel-body">
 
-                @Html.HiddenFor(m=> Model.PsProductId)
+                @Html.HiddenFor(m => Model.PsProductId)
                 @Html.HiddenFor(m => Model.PsTransactionId)
 
                 <div class="col-xs-12">
-                    <input id="txtPriceSelector" type="text"  />
+                    <input id="txtPriceSelector" type="text" />
                     <hr />
                 </div>
                 <div class="row">
-                    <input id="txtPriceSelected" class="col-xs-6 col-xs-offset-3 input-lg" type="number" 
+                    <input id="txtPriceSelected" class="col-xs-6 col-xs-offset-3 input-lg" type="number"
                            max="@Model.SPrice" min="@Model.WPrice" />
                 </div>
                 <label class="text-danger" id="lblPsError"></label>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" type="button" onclick="SetNewPrice()">
+                <button id="txtChangePrice" class="btn btn-primary" type="button" onclick="SetNewPrice()">
                     <span class="glyphicon glyphicon-ok"></span>
                     Aplicar
                 </button>
@@ -40,24 +40,32 @@
     </div>
 </div>
 
-@Html.HiddenFor(m=> Model.CPrice)
+@Html.HiddenFor(m => Model.CPrice)
 @Html.HiddenFor(m => Model.SPrice)
 @Html.HiddenFor(m => Model.DPrice)
 @Html.HiddenFor(m => Model.WPrice)
+@Html.HiddenFor(m => Model.IsCart)
 
 <script>
     $(document).ready(function ()
     {
+        $("#txtChangePrice").off("click");
+
         $("#ModalPrice").on("shown.bs.modal", function ()
         {
             SetValues();
         });
 
+        $("#ModalPrice").on("hide.bs.modal", function ()
+        {
+            $("#divPriceSelector").html("")
+        });
+
+        
         $("#ModalPrice").modal({ backdrop: false });
     });
 
-    function SetValues()
-    {
+    function SetValues() {
         var cPrice = parseFloat($("#CPrice").val());
         var sPrice = parseFloat($("#SPrice").val());
         var dPrice = parseFloat($("#DPrice").val());
@@ -66,7 +74,7 @@
         $("#txtPriceSelected").val(cPrice);
 
         $('#txtPriceSelector').bootstrapSlider({
-            value:cPrice,
+            value: cPrice,
             ticks: [wPrice, dPrice, sPrice],
             ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
 
@@ -83,27 +91,26 @@
         });
     }
 
-    function SetNewPrice()
-    {
+    function SetNewPrice() {
         var value = parseFloat($("#txtPriceSelected").val());
         var sPrice = parseFloat($("#SPrice").val());
         var wPrice = parseFloat($("#WPrice").val());
 
         if (value > sPrice || value < wPrice) {
-            $("#lblPsError").text("El precio de venta debe estar entre $" + wPrice + " y $" + sPrice +" pesos");
+            $("#lblPsError").text("El precio de venta debe estar entre $" + wPrice + " y $" + sPrice + " pesos");
             return;
         }
         else
             $("lblPsError").text("");
 
-
-        $("#ModalPrice").modal("hide");
+       
 
         var param =
             {
                 productId: $("#PsProductId").val(),
                 transactionId: $("#PsTransactionId").val(),
-                price: $("#txtPriceSelected").val()
+                price: $("#txtPriceSelected").val(),
+                IsCart: $("#IsCart").val()
             }
 
         ExecuteAjax('@Url.Action("SetNewPrice","Sales")', param, function (response)
@@ -112,13 +119,26 @@
                 ShowMessage(response.Result, response.Message, 'warning');
             else
             {
-                $("#divCartDetails").html(response);
+                console.log(param);
+                console.log("Es vista parcial");
+                if (param.IsCart == 'true')
+                {
+                    console.log("es carrito")
+                    $("#divCartDetails").html(response);
+                }
+                else
+                {
+                    console.log("Es venta tradicional");
+                    $("#divDetails").html(response);
+                }
+                    
             }
         });
+
+        $("#ModalPrice").modal("hide");
     }
 
-    function SetCheck(cb, idPrice)
-    {
+    function SetCheck(cb, idPrice) {
         $("#txtPrice").val($(idPrice).val());
         $('.checkbox').not(cb).prop('checked', false);
     }

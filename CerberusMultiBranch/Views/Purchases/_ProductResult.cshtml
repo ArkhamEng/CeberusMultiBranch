@@ -1,0 +1,89 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Product>
+@using CerberusMultiBranch.Support
+
+<div class="panel panel-primary">
+    <div class="panel-body">
+        <table id="tbProducts" class="table table-striped">
+            <thead>
+                <tr class="hidden">
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var cls = item.IsActive ? string.Empty : "text-danger";
+                    <tr class="@cls">
+                        <td class="col-md-2">
+                            @if (item.Images != null && item.Images.Count > 0)
+                            {
+                                <img src="@item.Images.First().Path" class="img-responsive" style="max-height:100px" />
+                            }
+                            else
+                            {
+                                <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                            }
+                        </td>
+
+                        <td class="col-md-9">
+                            <label>
+                                Código Interno :
+                                @Html.DisplayFor(modelItem => item.Code) 
+                            @if (item.ProviderCode != null && item.ProviderCode != string.Empty)
+                            {
+                                <a>| Código Proveedor: </a> <a>@item.ProviderCode</a>
+                            }
+                            </label><br />
+                           
+
+                            @Html.DisplayFor(modelItem => item.Name)<br />
+                            Por @Html.DisplayFor(modelItem => item.TradeMark)<span class="fa fa-registered"></span><br />
+
+
+                            <span class="fa fa-cubes"></span>
+                            Unidad: @item.Unit
+
+                        </td>
+
+                        <td class="col-md-1">
+                            <button class="btn btn-success" onclick="BeginAdd(@item.ProductId)" title="Agregar a la compra">
+                                <span class="fa fa-shopping-basket"></span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbProducts", 6);
+    });
+
+    function BeginAdd(productId)
+    {
+        var provideId = $("#ProviderId").val();
+
+        $("#ModalProduct").off('hidden.bs.modal').on('hidden.bs.modal', function ()
+        {
+            ShowLoading();
+            ExecuteAjax('@Url.Action("BeginAdd")', { productId: productId, provideId: provideId }, function (response) {
+                $("#divProductList").empty();
+                HideLoading();
+
+                $("#divAdd").html(response);
+
+            });
+            $("#ModalProduct").off('hidden.bs.modal');
+        });
+
+        $("#ModalProduct").modal("hide");
+    }
+</script>

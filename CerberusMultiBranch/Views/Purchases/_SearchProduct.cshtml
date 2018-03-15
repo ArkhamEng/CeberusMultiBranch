@@ -5,19 +5,19 @@
         <div class="modal-content panel panel-primary panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><i class="fa fa-cubes"></i> Productos para venta</h4>
+                <h4 class="modal-title"><i class="fa fa-cubes"></i> Productos para compra</h4>
             </div>
             <div class="modal-body panel-body">
                 <div class="panel panel-primary">
                     <div class="panel-body">
-                        <div class="col-md-10">
+                        <div class="col-md-12">
                             <div class="input-group">
                                 @Html.DropDownList("SystemId", (SelectList)ViewBag.Systems, "Sistema", new { @class = "form-control text-uppercase",
                                style = "width:18% !important" })
                                 @Html.TextBox("ProductName", "", htmlAttributes: new { @class = "form-control text-uppercase",
                                 placeholder = "Búsqueda por código o descripción", style = "width:82% !important", autocomplete = "off" })
                                 <span class="input-group-btn">
-                                    <button id="btnQuickProduct" type="button" class="btn btn-primary">
+                                    <button id="btnQuickProduct" type="button" class="btn btn-primary" onclick="SearchProd()">
                                         <span class="glyphicon glyphicon-search"></span>
                                         Buscar
                                     </button>
@@ -39,22 +39,14 @@
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
-        $("#btnQuickProduct").click(function ()
-        {
-            SearchProd();
-
-        });
-    });
-
+   
     function SearchProd()
     {
+        var provideId = $("#ProviderId").val();
+
         $("#divProductList").html('');
         $("#imgLoading").attr("class", "img-responsive");
-        var filter = { filter: $("#ProductName").val(), systemId:$("#SystemId").val() }
-
-        console.log(filter);
+        var filter = { filter: $("#ProductName").val(), providerId : provideId }
 
         ExecuteAjax('@Url.Action("SearchProducts")', filter, function (view)
         {
