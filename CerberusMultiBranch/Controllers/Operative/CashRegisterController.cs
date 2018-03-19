@@ -333,6 +333,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
+
                 //busco la venta a pagar
                 var sale = db.Sales.Where(s => s.SaleId == saleId).
                             Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).

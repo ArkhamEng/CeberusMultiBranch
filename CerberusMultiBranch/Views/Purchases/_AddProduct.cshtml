@@ -6,10 +6,11 @@
     <div class="modal-dialog">
         <div class="modal-content panel panel-primary">
             <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title"><span class="fa fa-cube"></span> Agregar el producto a la compra</h4>
             </div>
 
-            <div class="panel-body">
+            <div class="panel-body panel-group">
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="col-md-3">
@@ -24,13 +25,38 @@
                         </div>
                         <div class="col-md-9">
                             <label>
-                                @Model.Code
+                              Código Interno:  @Model.Code
                             </label><br />
+                           
+                           
                             @Model.Name<br />
                             Por @Model.TradeMark <span class="fa fa-registered"></span><br />
                           
                             <span class="fa fa-cubes"></span>
                             Unidad: @Model.Unit
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-group col-md-7">
+                            <label>Código de venta</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-tags"></i></span>
+                                <input class="form-control input-sm" id="txtExternalCode" value="@Model.ProviderCode" list="ExtProduct"
+                                       onkeyup="Validate()" />
+                                <datalist id="ExtProduct"></datalist>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4 col-md-offset-1">
+                            <label>Precio de compra</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                <input class="form-control input-sm" id="txtBuyPrice" value="@Model.BuyPrice" type="number" onclick="Validate()"
+                                       onkeyup="Validate()" />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -38,12 +64,12 @@
 
                 <div class="panel panel-danger">
                     <div class="panel-body">
-                    
                         <div class="form-group col-md-7 col-md-offset-3">
+                          
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
                                 <input class="form-control input-lg" type="number" min="@Cons.One" value="1" id="txtQuantity"
-                                       onkeyup="ValidQuantity(@Model.Quantity)" />
+                                       onkeyup="Validate()" />
                                 <div class="input-group-btn">
                                     <button class="btn btn-primary btn-lg" type="button" title="Agregar producto" onclick="CompleateAdd()" id="btnCompleateAdd">
                                         <span class="fa fa-plus-circle"></span>
@@ -51,6 +77,7 @@
                                     </button>
                                 </div>
                             </div>
+                          
                         </div>
                         <label class="control-label text-danger" id="lblQuantity"></label>
                     </div>
@@ -67,11 +94,16 @@
 <script>
     $(document).ready(function ()
     {
+
+        Validate();
+
+        Compleate("#txtExternalCode", "#ExtProduct",'@Url.Action("AutoCompleateExternal","Purchases")', null,$("#ProviderId").val());
+
         $("#ModalAddProduct").modal("show");
     });
 
    
-    function ValidQuantity(quantity)
+    function Validate()
     {
         if($("#txtQuantity").val() == '' || parseInt($("#txtQuantity").val()) <= 0)
         {
@@ -79,12 +111,19 @@
             $("#btnCompleateAdd").attr("disabled",true);
             return;
         }
-      /*  if(parseInt($("#txtQuantity").val()) > quantity)
+        if ($("#txtBuyPrice").val() == '' || parseFloat($("#txtBuyPrice").val()) <= 0)
         {
-            $("#lblQuantity").text("La cantidad no puede ser mayor  a la disponible "+quantity);
+            $("#lblQuantity").text("El precio de compra debe ser mayor a cero");
             $("#btnCompleateAdd").attr("disabled",true);
             return;
-        }*/
+        }
+
+        if ($("#txtExternalCode").val() == '' || $("#txtExternalCode").val().length <= 3)
+        {
+            $("#lblQuantity").text("El codigo externo debe ser mayor de 4 caracteres");
+            $("#btnCompleateAdd").attr("disabled", true);
+            return;
+        }
 
         $("#lblQuantity").text("");
         $("#btnCompleateAdd").attr("disabled",false);

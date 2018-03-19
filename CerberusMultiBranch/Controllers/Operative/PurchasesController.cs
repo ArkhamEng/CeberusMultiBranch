@@ -252,22 +252,47 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult BeginAdd(int productId, int providerId)
         {
+            var branchId = User.Identity.GetBranchId();
 
             var product = db.Products.Include(p => p.Images).Include(p => p.Equivalences).
+                Include(p => p.BranchProducts).
                 FirstOrDefault(p => p.ProductId == productId);
+
+            //obtengo el precio de compra seteado en la sucursal
+            var branP = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
+
+            //si no existe configuración de sucursal, envío un precio en cero
+            product.BuyPrice = (branP == null) ? (double)Decimal.Zero : branP.BuyPrice;
+
+            //si la cantidad máxima de producto no ha sido configurada, permito la compra de 100 articulos
+            product.MaxQuantity = product.MaxQuantity == Cons.Zero ? Cons.OneHundred : product.MaxQuantity;
 
             //si el producto esta relacionado con un producto del proveedor
             var eq = product.Equivalences.FirstOrDefault(e => e.ProviderId == providerId);
 
             if (eq != null)
             {
+                //si hay una realción con producto del proveedor
                 var exProd = db.ExternalProducts.FirstOrDefault(e => e.ProviderId == providerId && e.Code == eq.Code);
 
                 if (exProd != null)
+                {
                     product.BuyPrice = exProd.Price;
+                    product.ProviderCode = exProd.Code;
+                }
             }
-
+         
             return PartialView("_AddProduct", product);
+        }
+
+
+        [HttpPost]
+        public ActionResult AutoCompleateExternal(string filter, int entityId)
+            {
+            var model = db.ExternalProducts.Where(p => p.Code.Contains(filter) && p.ProviderId == entityId).Take(20).
+                Select(p => new { Id = p.Code.ToUpper(), Label = p.Code.ToUpper(), Value = p.Description.ToUpper() });
+
+            return Json(model);
         }
 
         [HttpPost]

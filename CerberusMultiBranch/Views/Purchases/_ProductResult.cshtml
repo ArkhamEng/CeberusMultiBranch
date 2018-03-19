@@ -74,7 +74,7 @@
         $("#ModalProduct").off('hidden.bs.modal').on('hidden.bs.modal', function ()
         {
             ShowLoading();
-            ExecuteAjax('@Url.Action("BeginAdd")', { productId: productId, provideId: provideId }, function (response) {
+            ExecuteAjax('@Url.Action("BeginAdd")', { productId: productId, providerId: provideId }, function (response) {
                 $("#divProductList").empty();
                 HideLoading();
 

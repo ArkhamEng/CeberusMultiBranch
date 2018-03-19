@@ -3,18 +3,32 @@
 /***************************************************
 ************AUTOCOMPLEATE USING JQUERY UI***********
 ***************************************************/
-function Compleate(textbox, list, url, onSelected) {
+function Compleate(textbox, list, url, onSelected,entityId) {
     $(textbox).off('autocomplete').autocomplete(
       {
-          source: function (request, response) {
-              ExecuteAjax(url, { filter: request.term }, function (json) {
-                  $(list).empty();
-                  for (var i = 0; i < json.length; i++) {
-                      $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
-                  }
-              });
+          source: function (request, response)
+          {
+              if(entityId == null)
+              {
+                  ExecuteAjax(url, { filter: request.term }, function (json) {
+                      $(list).empty();
+                      for (var i = 0; i < json.length; i++) {
+                          $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
+                      }
+                  });
+              }
+              else
+              {
+                  ExecuteAjax(url, { filter: request.term, entityId:entityId }, function (json) {
+                      $(list).empty();
+                      for (var i = 0; i < json.length; i++) {
+                          $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
+                      }
+                  });
+              }
+            
           },
-          minLength: 4
+          minLength: 3
       });
 
     //this is executed when an option from DataList is selected
@@ -68,7 +82,6 @@ function LoadPopOver(button,callback)
 /**************************************************
 ************PAGINATION USING DATA TABLE************
 ***************************************************/
-
 function Paginate(table, records)
 {
     var oTable = $(table).DataTable(
