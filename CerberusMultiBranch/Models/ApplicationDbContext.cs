@@ -48,6 +48,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<ExternalProduct> ExternalProducts { get; set; }
 
+        public DbSet<TempExternalProduct> TempExternalProducts { get; set; }
+
         public DbSet<Equivalence> Equivalences { get; set; }
 
         public DbSet<Compatibility> Compatibilites { get; set; }

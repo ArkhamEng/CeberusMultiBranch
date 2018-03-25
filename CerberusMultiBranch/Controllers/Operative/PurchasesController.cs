@@ -296,12 +296,52 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity)
+        public ActionResult AddDetail(int productId, int purchaseId, double price, double quantity, string externalCode, int providerId)
         {
             try
             {
                 var detail = db.PurchaseDetails.
                     FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
+
+                //compruebo si existe el código entre los productos del proveedor
+                var extProd = db.ExternalProducts.
+                    FirstOrDefault(ex => ex.ProviderId == providerId && ex.Code == externalCode);
+
+                var product = db.Products.Include(p=> p.Equivalences).
+                                FirstOrDefault(p=> p.ProductId == productId);
+
+                //si el código no existe lo registro como nuevo
+                if (extProd == null)
+                {
+                    extProd = new ExternalProduct
+                    {
+                        ProviderId = providerId,
+                        Code = externalCode,
+                        Price = price,
+                        Description = product.Name,
+                        TradeMark = product.TradeMark,
+                        Unit = product.Unit
+                    };
+                    //agrego el producto a la lista
+                    db.ExternalProducts.Add(extProd);
+                }
+               
+                
+                var equivalence = product.Equivalences.FirstOrDefault(e => e.ProviderId == productId);
+
+                if(equivalence == null)
+                {
+                    equivalence = new Equivalence
+                    { ProviderId = providerId, Code = externalCode, ProductId = productId };
+
+                    db.Equivalences.Add(equivalence);
+                }
+                else if(equivalence.Code != externalCode)
+                {
+                    equivalence.Code = externalCode;
+                    db.Entry(equivalence).State = EntityState.Modified;
+                }
+               
 
                 if (detail != null)
                 {
@@ -325,6 +365,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 db.SaveChanges();
+
+
+                var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s=> s.PurchaseId == purchaseId);
+
+                purchase.TotalAmount = purchase.PurchaseDetails.Sum(d => d.Amount);
+                purchase.UpdDate = DateTime.Now.ToLocal();
+                purchase.UpdUser = User.Identity.Name;
+
+                db.Entry(purchase).Property(p=> p.TotalAmount).IsModified = true;
+                db.Entry(purchase).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(purchase).Property(p => p.UpdUser).IsModified = true;
+
+                db.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -333,6 +386,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var model = db.PurchaseDetails.Include(d => d.Product.Images).
                 Where(d => d.PurchaseId == purchaseId).ToList();
+
+            model.ForEach(p =>
+            {
+                p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId && e.ProviderId == providerId).ToList();
+            });
 
 
             return PartialView("_Details", model);
@@ -349,9 +407,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.SaveChanges();
             }
 
-            var model = db.PurchaseDetails.Include(d => d.Product.Images).
+            var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s => s.PurchaseId == transactionId);
+
+            purchase.TotalAmount = purchase.PurchaseDetails.Sum(d => d.Amount);
+            purchase.UpdDate = DateTime.Now.ToLocal();
+            purchase.UpdUser = User.Identity.Name;
+
+            db.Entry(purchase).Property(p => p.TotalAmount).IsModified = true;
+            db.Entry(purchase).Property(p => p.UpdDate).IsModified = true;
+            db.Entry(purchase).Property(p => p.UpdUser).IsModified = true;
+
+            db.SaveChanges();
+
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).Include(d=> d.Purchase).
               Where(d => d.PurchaseId == transactionId).ToList();
 
+
+
+            model.ForEach(p =>
+            {
+                p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId 
+                && e.ProviderId == p.Purchase.ProviderId).ToList();
+            });
 
             return PartialView("_Details", model);
         }
@@ -370,7 +447,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.TotalAmount = model.PurchaseDetails.Sum(pd => pd.Amount);
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
-                model.Status = TranStatus.Reserved;
+                model.Status  = TranStatus.Reserved;
 
                 foreach (var detail in model.PurchaseDetails)
                 {
@@ -410,7 +487,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }
                     else
                     {
-                        //si no existe una realcion de producto sucursal
+                        //si no existe una relacion de producto sucursal
 
                         brp = new BranchProduct();
                         brp.BranchId = branchId;
@@ -475,6 +552,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(p => p.PurchaseDetails).Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
                 Include(p => p.PurchasePayments).Include(p => p.User).
                 FirstOrDefault();
+
+            model.PurchaseDetails.ToList().ForEach(p =>
+            {
+                p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId
+                && e.ProviderId == p.Purchase.ProviderId).ToList();
+            });
 
             return View(model);
         }

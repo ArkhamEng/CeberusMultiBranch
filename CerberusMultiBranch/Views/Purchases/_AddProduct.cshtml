@@ -135,8 +135,10 @@
         {
             ShowLoading();
 
-            var param =  { productId: $("#ProductId").val(), saleId: $("#PurchaseId").val(), 
-                quantity: $("#txtQuantity").val(), providerId:$("#ProviderId").val() };
+            var param =  { productId: $("#ProductId").val(), purchaseId: $("#PurchaseId").val(), price:$("#txtBuyPrice").val(),
+                quantity: $("#txtQuantity").val(), providerId: $("#ProviderId").val(), externalCode: $("#txtExternalCode").val(),
+                providerId: $("#ProviderId").val()
+            };
 
             ExecuteAjax('@Url.Action("AddDetail")', param, function (response)
             {

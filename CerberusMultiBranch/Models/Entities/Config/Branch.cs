@@ -20,6 +20,9 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Ubicación")]
         public string Location { get; set; }
 
+        [MaxLength(4)]
+        public string Code { get; set; }
+
         public ICollection<Sale> Sales { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }

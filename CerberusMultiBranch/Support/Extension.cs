@@ -61,9 +61,9 @@ namespace CerberusMultiBranch.Support
         public static string ToCode(this string code)
         {
             if (code != null && code != string.Empty)
-                return (Convert.ToInt32(code) + Cons.One).ToString(Cons.CodeMask);
+                return (Convert.ToInt32(code) + Cons.One).ToString(Cons.CodeSeqFormat);
             else
-                return (decimal.Zero + Cons.One).ToString(Cons.CodeMask);
+                return (decimal.Zero + Cons.One).ToString(Cons.CodeSeqFormat);
         }
 
         public static SelectList ToSelectList(this IEnumerable data)
@@ -113,6 +113,21 @@ namespace CerberusMultiBranch.Support
         {
             return user.GetBranchSession().Id;
         }
+
+        public static string GetFolio(this IIdentity user,int sequential)
+        {
+            var id =  user.GetBranchSession().Id;
+            string code = string.Empty;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                code =  db.Branches.Find(id).Code;
+            }
+
+            var yearPart = DateTime.Now.TodayLocal().Year.ToString().Substring(2,2);
+
+            return string.Format(Cons.CodeMask, code, yearPart, sequential.ToString(Cons.CodeSeqFormat));
+        }
+
 
         public static int GetSalePercentage(this IIdentity user)
         {

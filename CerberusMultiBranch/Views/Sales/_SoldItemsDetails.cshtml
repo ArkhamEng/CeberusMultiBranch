@@ -13,10 +13,7 @@
                         @Html.DisplayNameFor(model => model.First().Sale.Folio)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.First().Product.Code)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.First().Product.Category.SatCode)
+                        @Html.DisplayName("Códigos")
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.First().Product.Name)
@@ -28,54 +25,60 @@
                         @Html.DisplayNameFor(model => model.First().Price)
                     </th>
                     <th>
+                        @Html.DisplayName("IVA")
+                    </th>
+                    <th>
                         @Html.DisplayNameFor(model => model.First().Quantity)
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.First().Amount)
                     </th>
-
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
-        {
-        <tr>
-            <td>
-                @if (item.Product.Images != null && item.Product.Images.Count > 0)
-                    {
-                    <img src="@item.Product.Images.First().Path" class="img-responsive" style="max-height:80px" />
-                    }
-                    else
-                    {
-                    <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" style="max-height:80px" />
-                    }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Sale.Folio)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.Category.SatCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.Unit)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Amount)
-            </td>
-        </tr>
-        }
+                {
+                    <tr>
+                        <td>
+                            @if (item.Product.Images != null && item.Product.Images.Count > 0)
+                            {
+                                <img src="@item.Product.Images.First().Path" class="img-responsive" style="max-height:80px" />
+                            }
+                            else
+                            {
+                                <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" style="max-height:80px" />
+                            }
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Sale.Folio)
+                        </td>
+                        <td>
+                            <label>Código</label>
+                            @Html.DisplayFor(modelItem => item.Product.Code)<br />
+                            <label>Clave Sat</label>
+                            @Html.DisplayFor(modelItem => item.Product.Category.SatCode)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Product.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Product.Unit)
+                        </td>
+                        <td>
+                            @{ var iva = (item.Price / 1.16); var priceBI = item.Price - iva; }
+                            @priceBI.ToString("c")
+                        </td>
+                        <td>
+                            @iva.ToString("c")
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Quantity)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
@@ -88,7 +91,7 @@
                 @Html.DisplayName("Folio venta")
             </th>
             <th>
-                @Html.DisplayName("Codigo")
+                @Html.DisplayName("Código")
             </th>
             <th>
                 @Html.DisplayName("Clave SAT")
@@ -101,6 +104,9 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.First().Price)
+            </th>
+            <th>
+                @Html.DisplayName("IVA")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.First().Quantity)
@@ -121,6 +127,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.Product.Code)
                 </td>
+
                 <td>
                     @Html.DisplayFor(modelItem => item.Product.Category.SatCode)
                 </td>
@@ -131,7 +138,12 @@
                     @Html.DisplayFor(modelItem => item.Product.Unit)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Price)
+                    @{ var iva = (item.Price / 1.16); var priceBI = item.Price - iva; }
+
+                    @priceBI.ToString("c")
+                </td>
+                <td>
+                    @iva.ToString("c")
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
@@ -147,31 +159,27 @@
 <iframe id="txtArea1" style="display:none"></iframe>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         Paginate("#tbSoldItemsShown", 20);
 
         $("#hAmount").text("Total " + '@Model.Sum(d=> d.Amount).ToString("c")')
 
         $("#hItems").text("Articulos " + '@Model.Sum(d=> d.Quantity)')
     });
-    function ExportToExcel()
-    {
+    function ExportToExcel() {
         $("#tbSoldItems").table2excel({
             name: "Articulos",
             filename: "VentaDia-" + $("#Date").val() //do not include extension
         });
     }
 
-    function ExportToExcel1()
-    {
+    function ExportToExcel1() {
         var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
         var textRange; var j = 0;
         tab = document.getElementById('tbSoldItems'); // id of table
         txtArea1 = document.getElementById('txtArea1');
 
-        for (j = 0 ; j < tab.rows.length ; j++)
-        {
+        for (j = 0 ; j < tab.rows.length ; j++) {
             tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
             //tab_text=tab_text+"</tr>";
         }

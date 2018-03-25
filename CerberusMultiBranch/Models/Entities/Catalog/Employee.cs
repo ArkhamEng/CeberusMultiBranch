@@ -109,7 +109,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.IsActive = true;
             this.Entrance = DateTime.Now;
             this.UpdDate = DateTime.Now;
-            this.Code    = Cons.CodeMask;
+            this.Code    = Cons.CodeSeqFormat;
         }
     }
 }

@@ -4,10 +4,6 @@
     ViewBag.Class = "fa fa-cloud-upload";
 }
 
-@*<h3>
-    <span class="fa fa-cloud-upload" style="float:left"></span>
-    &nbsp;&nbsp;Carga de Catálogo
-</h3>*@
 
 <hr />
 @using (Html.BeginForm("UpdateCatalog","Providers", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -22,18 +18,26 @@
             <h3 class="text-center text-danger">
                 Productos en catálogo:&nbsp;&nbsp;@ViewBag.Products
             </h3>
+            <h3 class="text-center text-danger">
+                Productos a procesar:&nbsp;&nbsp;@ViewBag.Pending
+            </h3>
+
             <input type="hidden" value='@ViewBag.ProviderId' name="providerId" />
             <input type="hidden" value='@ViewBag.Name' name="name" />
 
             <div class="btn-group">
-                <label class="btn btn-primary btn-file ">
+                <label id="upload" class="btn btn-primary btn-file" hidden>
                     <span class="fa fa-file-excel-o"></span>
                     Seleccionar Archivo
-                    <input type="file" name="file" style="display: none;" accept="text/xml" onchange="FileLoaded(this)">
+                    <input type="file" name="file"  style="display: none;" accept="text/xml" onchange="FileLoaded(this)">
                 </label>
-                <button id="btnSubmit" type="submit" class="btn btn-danger" disabled onclick="ShowLoading()">
+                <button id="btnSubmit" type="submit" class="btn btn-warning" disabled onclick="ShowLoading()">
                     <span class="fa fa-cloud-upload"></span>
                     Subir Archivo
+                </button>
+                <button id="btnProcess" type="button" class="btn btn-success" disabled onclick="Process()">
+                    <span class="fa fa-cogs"></span>
+                    Procesar registros
                 </button>
             </div>
 
@@ -46,8 +50,7 @@
 
     $(document).ready(function ()
     {
-        console.log('@ViewBag.Result')
-        if('@ViewBag.Result'!='')
+        if ('@ViewBag.Result' != '')
         {
             if ('@ViewBag.Result' != 'OK')
             {
@@ -57,9 +60,29 @@
             {
                 ShowMessage('@ViewBag.Result', '@ViewBag.Message', 'success');
             }
+        }
 
+        
+
+        if(parseInt('@ViewBag.Pending') > 0)
+        {
+            $("#btnProcess").prop("disabled", false);
+            $("#upload").hide();
+        }
+        else
+        {
+            $("#upload").show();
         }
     });
+
+    function Process()
+    {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("ProcessCatalog","Providers")', {providerId : @ViewBag.ProviderId},function(response)
+        {
+            location.reload();
+        });
+    }
 
     function FileLoaded(input)
     {

@@ -42,10 +42,10 @@
                             <span class="input-group-addon">
                                 <i class="fa fa-money"></i>
                             </span>
-                            @Html.EditorFor(model => model.Payment, new { htmlAttributes = new { @class = "form-control",type= "number" } })
+                            @Html.EditorFor(model => model.Payment, new { htmlAttributes = new { @class = "form-control", type = "number" } })
                         </div>
                     </div>
-                    
+
                     <div class="form-group col-md-4">
                         <label class="control-label">Monto Tarjeta</label>
                         <div class="input-group">
@@ -68,23 +68,26 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <div class="btn-group">
-                    <button class="btn btn-success" type="button"  title="Imprimir ticket" onclick="RegisterPayment(1)">
-                        <span class="fa fa-ticket"></span>
-                        Ticket
-                    </button>
-                    <button class="btn btn-primary" title="Imprimir Nota" onclick="RegisterPayment(2)">
-                        <span class="fa fa-file"></span>
-                        Nota
-                    </button>
-                    <button class="btn btn-danger" type="button" onclick="ClosePayment()">
+
+                <div class="col-md-10">
+                    <div class="btn-group">
+                        <button class="btn btn-success" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
+                            <span class="fa fa-ticket"></span>
+                            Ticket
+                        </button>
+                        <button class="btn btn-primary" title="Imprimir Nota" onclick="RegisterPayment(2)">
+                            <span class="fa fa-file"></span>
+                            Nota
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-danger pull-right" type="button" onclick="ClosePayment()">
                         <span class="fa fa-times"></span>
                         Cancelar
                     </button>
-
                 </div>
+
             </div>
         </div>
     </div>
@@ -92,19 +95,16 @@
 
 @Html.HiddenFor(model => model.AmountToPay)
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
-        $("input[name=PaymentMethod]").click(function ()
-        {
+        $("input[name=PaymentMethod]").click(function () {
             var amount = $("#AmountToPay").val();
             $("#Payment").val(amount);
             $("#AditionalPayment").val(0);
             $("#Reference").val('');
 
 
-            if (this.value == 'Efectivo' || this.value == 'Tarjeta')
-            {
+            if (this.value == 'Efectivo' || this.value == 'Tarjeta') {
                 $("#Mix").addClass("hidden");
 
                 if (this.value == 'Tarjeta')
@@ -112,15 +112,13 @@
                 else
                     $("#Ref").addClass("hidden");
             }
-            else
-            {
+            else {
                 $("#Mix").removeClass("hidden");
                 $("#Ref").removeClass("hidden");
             }
         });
 
-        $("#Payment").keyup(function ()
-        {
+        $("#Payment").keyup(function () {
             var val = $("#Payment").val();
             var result = Calculate(val);
 
@@ -141,16 +139,13 @@
         $("#ModalPayment").modal({ backdrop: 'static' });
     });
 
-    function ClosePayment()
-    {
+    function ClosePayment() {
         console.log("Cerrar modal");
         $("#ModalPayment").modal('hide');
     }
 
-    function RegisterPayment(printType)
-    {
-        $("#ModalPayment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-        {
+    function RegisterPayment(printType) {
+        $("#ModalPayment").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
 
             var param = {
@@ -162,16 +157,14 @@
                 printType: printType
             };
 
-            ExecuteAjax('@Url.Action("RegisterPayment")', param, function (response)
-            {
+            ExecuteAjax('@Url.Action("RegisterPayment")', param, function (response) {
                 HideLoading();
 
                 if ($.isPlainObject(response))
                     ShowMessage(response.Result, response.Message, 'warning');
-                else
-                {
+                else {
                     $("#divPrinter").html(response);
-                 
+
                     PrintNote();
                     //espero 2 segundos para dar tiempo a que salga la ventana de impresion antes de redireccionar
                     setTimeout("closePrintView()", 2000);
@@ -182,8 +175,7 @@
         $("#ModalPayment").modal('hide');
     }
 
-    function closePrintView()
-    {
+    function closePrintView() {
         window.location.href = '@Url.Action("Index")';
     }
 

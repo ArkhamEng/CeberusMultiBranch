@@ -66,6 +66,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime UpdDate { get; set; }
 
+        [Index("IDX_LockDate")]
+        public DateTime? LockDate { get; set; }
+
+        [Index("IDX_UserLock")]
+        [MaxLength(30)]
+        public string UserLock { get; set; }
+
         [MaxLength(100)]
         public string UpdUser { get; set; }
 

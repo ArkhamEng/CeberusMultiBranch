@@ -344,8 +344,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
                             from x in gj.DefaultIfEmpty()
 
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description+""
-                            +ep.Provider.Name+""+ep.TradeMark).Contains(s)))
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description + ""
+                            + ep.Provider.Name + "" + ep.TradeMark).Contains(s)))
                             select new
                             {
                                 ProviderId = ep.ProviderId,
@@ -514,16 +514,20 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var branchId = User.Identity.GetBranchId();
             var userId = User.Identity.GetUserId();
 
-
-            /*  var sale = db.Sales.FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
-              && s.Status == TranStatus.InProcess);*/
-
+         
             //obtengo el producto con imagenes, compatibilidades (modelos de auto), y equivalencias (productos de proveedor
             var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
                         Include(p => p.BranchProducts).Include(p => p.Equivalences).
                         FirstOrDefault(p => p.ProductId == id);
 
-            //  product.TransactionId = (sale == null) ? Cons.Zero : sale.SaleId;
+            if (product.IsLocked && User.Identity.Name != product.UserLock)
+                return Json(new
+                {
+                    Result = "Producto bloqueado",
+                    Message = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                    product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
+                });
+
 
             //reviso si el producto ya cuenta con una relación en la sucursal
             var bProd = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
@@ -662,6 +666,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     Include(p => p.Images).
                     Include(p => p.PackageDetails).FirstOrDefault();
 
+                if (product.IsLocked && User.Identity.Name != product.UserLock)
+                    return Json(new { Result = "Producto bloqueado",
+                        Message =string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                        product.LockDate.Value.ToString("dd/MM/yyyy HH:mm")) });
+
+                DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, true);
+
                 //busco los datos del stock en sucursal
                 var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
 
@@ -759,7 +770,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 db.SaveChanges();
             }
             else
+            {
+                //quito el bloqueo
+                product.LockDate = null;
+                product.UserLock = null;
                 db.Entry(product).State = EntityState.Modified;
+            }
+
 
             var branchP = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == product.ProductId
                                                             && bp.BranchId == branchId);
@@ -818,6 +835,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 branchP.WholesalerPrice = product.WholesalerPrice;
                 branchP.UpdDate = product.UpdDate;
                 branchP.UpdUser = product.UpdUser;
+                branchP.LockDate = null;
+                branchP.UserLock = null;
 
                 //si la cantidad indicada es diferente a la cantidad en stock agrego el movimiento requerido 
                 if (product.Quantity > branchP.Stock || product.Quantity < branchP.Stock)
@@ -1202,6 +1221,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_PackageDetails", model);
         }
 
+
+        [HttpPost]
+        public ActionResult UnLock(int? productId)
+        {
+            if (productId != null && productId.Value > Cons.Zero)
+            {
+                var branchId = User.Identity.GetBranchId();
+                DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, false);
+            }
+
+            return Json("OK");
+        }
 
 
         // POST: Products/Create

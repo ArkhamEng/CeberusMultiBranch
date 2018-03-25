@@ -113,12 +113,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             var accum = new List<double>();
             var accumN = new List<int>();
 
-            //incomes.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
-            //cash.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
-            //card.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
-            //Withdrawals.Insert(0,new { Total = (0.0).ToString("c"), Key = cr.OpeningDate.ToString("HH:mm:ss") });
-
-
             incomes = incomes.OrderBy(c => c.Key).ToList();
             cash = cash.OrderBy(c => c.Key).ToList();
             card = card.OrderBy(c => c.Key).ToList();
@@ -131,8 +125,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             balance.AddSeries("Efectivo", chartType: "Column", yValues: cash.Select(i => i.Total).ToList(), xValue: cash.Select(i => i.Key).ToList());
             balance.AddSeries("Tarjeta", chartType: "Column", yValues: card.Select(i => i.Total).ToList(), xValue: card.Select(i => i.Key).ToList());
             balance.AddSeries("Retiros", chartType: "Column", yValues: Withdrawals.Select(i => i.Total).ToList(), xValue: Withdrawals.Select(i => i.Key).ToList());
-            //balance.AddSeries("Acumulado", chartType: "Line", yValues: accum, xValue: accumN, yFields: "Cantidad", xField: "Hora");
-
+        
             balance.AddLegend("Movimiento de caja X Hora");
 
             var imgS = balance.GetBytes();
@@ -329,7 +322,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Cajero")]
-        public ActionResult RegisterPayment(int saleId, PaymentMethod paymentMethod, double payment, double aditional,string reference, int printType)
+        public ActionResult RegisterPayment(int saleId, PaymentMethod paymentMethod, double payment, 
+            double aditional,string reference, int printType)
         {
             try
             {
@@ -344,7 +338,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                             Include(s => s.Branch).
                             FirstOrDefault();
 
-              
+               if(sale.Status == TranStatus.Compleated)
+                    return Json(new { Result = "Error", Message = "Esta venta ya ha sido cobrada en su totalidad" });
+
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
                 if (sale.TotalAmount != (payment + aditional))

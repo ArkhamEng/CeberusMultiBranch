@@ -113,7 +113,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         {
             this.IsActive = true;
             this.UpdDate  = DateTime.Now;
-            this.Code     = Cons.CodeMask;
+            this.Code     = Cons.CodeSeqFormat;
         }
 
         public Provider Copy()

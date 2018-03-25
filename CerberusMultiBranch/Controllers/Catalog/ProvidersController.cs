@@ -127,19 +127,28 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var p = db.Providers.Include(d=> d.ExternalProducts).FirstOrDefault(d=> d.ProviderId == id);
 
-            ViewBag.Name = p.Name;
-            ViewBag.Code = p.Code;
-            ViewBag.ProviderId = id;
-            ViewBag.Products = p.ExternalProducts.Count;
+            var pending = db.TempExternalProducts.Count(te => te.ProviderId == id);
+
+            ViewBag.Name        = p.Name;
+            ViewBag.Code        = p.Code;
+            ViewBag.ProviderId  = id;
+            ViewBag.Products    = p.ExternalProducts.Count;
+            ViewBag.Pending     = pending;
             return View();
+        }
+
+        [HttpPost]
+        public ActionResult ProcessCatalog(int providerId)
+        {
+           var done = DBHelper.ProcessExternalProducts(providerId);
+            return Json("OK");
         }
 
         [HttpPost]
         public ActionResult UpdateCatalog(int providerId, string name, HttpPostedFileBase file)
         {
             RecordSet records = null;
-            List<ExternalProduct> extProds = new List<ExternalProduct>();
-            List<ExternalProduct> toInsert = new List<ExternalProduct>();
+            List<TempExternalProduct> toInsert = new List<TempExternalProduct>();
             DateTime begin = DateTime.Now;
             Record[] loadedProd = new List<Record>().ToArray();
 
@@ -159,16 +168,16 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         if (description.Length > Cons.DescriptionLength)
                             description = description.Substring(0, Cons.DescriptionLength);
 
-                        ExternalProduct ex = new ExternalProduct
+                        TempExternalProduct ex = new TempExternalProduct
                         {
                             Code = r.Code.Trim().Length > 30 ? r.Code.Trim().Substring(0, 30) : r.Code,
                             ProviderId = providerId,
                             Description = description,
                             TradeMark = r.TradeMark.Trim() ?? "N/A",
                             Unit = r.Unit.Trim() ?? "N/A",
-                            Category = r.Category.Trim() ?? "N/A",
                             Price = r.Price
                         };
+
                         toInsert.Add(ex);
                     });
 
@@ -185,20 +194,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
                     try
                     {
-                        DBHelper.DeleteExternal(providerId);
-                        //agrego el rango de productos nuevos al data context
-
-                      
-
                         DBHelper.BulkInsertBulkCopy(toInsert);
-
-                        var provider = db.Providers.Find(providerId);
-                        provider.Catalog = toInsert.Count();
-                        provider.UdpUser = User.Identity.Name;
-                        provider.UpdDate = DateTime.Now.ToLocal();
-
-                        db.Entry(provider).State = EntityState.Modified;
-                        db.SaveChanges();
                     }
                     catch (Exception ex)
                     {
@@ -208,10 +204,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 var time = (DateTime.Now - begin).TotalMinutes;
                 ViewBag.Result = "OK";
-                ViewBag.Message = string.Format("Operación concluida, se agregaron {0} ", toInsert.Count);
+                ViewBag.Message = string.Format("Operación concluida, se agregaron {0} tiempo total {1}", toInsert.Count, time.ToString("MM:ss"));
                 ViewBag.ProviderId = providerId;
                 ViewBag.Name = name;
-                ViewBag.Products = toInsert.Count;
+                ViewBag.Products = db.ExternalProducts.Count(ex => ex.ProviderId == providerId);
+                ViewBag.Pending = db.TempExternalProducts.Count(te => te.ProviderId == providerId);
                 return View();
 
             }

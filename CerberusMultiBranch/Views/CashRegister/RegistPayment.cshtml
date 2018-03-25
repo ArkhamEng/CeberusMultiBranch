@@ -83,26 +83,30 @@
                 </div>
             </div>
 
-            <div class="btn-group col-md-12">
+            <div class="btn-group col-md-10">
                 <button type="button" class="btn btn-primary" title="volver a la busqueda" id="btnSearch"
                         onclick="ShowLoading(); window.location='@Url.Action("Index")'">
                     <span class="fa fa-backward"></span>
                     <u>V</u>olver a cája
                 </button>
-                @if (User.IsInRole("Supervisor"))
-                    {
-                    <button type="button" class="btn btn-danger" title="cancelar venta"
-                            onclick="$('#ModalCancel').modal('show');" id="btnCancel">
-                        <span class="fa fa-times"></span>
-                        <u>C</u>ancelar
-                    </button>
-                    }
+
                 <button class="btn btn-success" type="button" id="btnPayment"
                         onclick="BeginPayment(@Model.TotalAmount)" title="Seleccionar forma de pago">
                     <span class="fa fa-dollar"></span>
                     Recibir <u>P</u>ago
                 </button>
             </div>
+
+            @if (User.IsInRole("Supervisor"))
+            {
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger pull-right" title="cancelar venta"
+                            onclick="$('#ModalCancel').modal('show');" id="btnCancel">
+                        <span class="fa fa-times"></span>
+                        <u>C</u>ancelar
+                    </button>
+                </div>
+            }
 
         </div>
     </div>

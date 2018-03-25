@@ -30,10 +30,10 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
+                <td align="center">
                     @if (item.Product.Images != null && item.Product.Images.Count > 0)
                     {
-                        <img src="@item.Product.Images.First().Path" class="img-responsive" />
+                        <img src="@item.Product.Images.First().Path" class="img-responsive" style="max-height:50px" />
                     }
                     else
                     {
@@ -41,7 +41,10 @@
                     }
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Product.Code)
+                  <label>Proveedor</label> @item.Product.Equivalences.First().Code<br />
+                  <label>Autobien</label>  @Html.DisplayFor(modelItem => item.Product.Code)
+
+                    
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Product.Name)
@@ -60,7 +63,7 @@
                 </td>
                 <td  class="Compleated">
                     <div class="btn-group">
-                        <button class="btn btn-danger btn-xs" type="button" onclick="RemoveDetail(@item.PurchaseId,@item.ProductId)">
+                        <button class="btn btn-danger" type="button" onclick="RemoveDetail(@item.PurchaseId,@item.ProductId)">
                             <span class="glyphicon glyphicon-trash"></span> 
                         </button>
                     </div>

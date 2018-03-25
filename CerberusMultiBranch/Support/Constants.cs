@@ -11,11 +11,15 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
         public const int Two = 2;
 
+        public const int LockTimeOut = 5;
+
         public const double OneHundred = 100;
 
         public const int QuickResults = 300;
 
-        public const string CodeMask = "000000";
+        public const string CodeSeqFormat = "000000";
+
+        public const string CodeMask = "{0}{1}{2}";
 
         public const string BranchSession = "BranchSession";
 

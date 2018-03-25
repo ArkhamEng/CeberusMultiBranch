@@ -217,13 +217,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 else
                 {
+                    var b = User.Identity.GetBranchSession();
+
                     sale = new Sale();
                     sale.BranchId = branchId;
                     sale.UpdUser = User.Identity.GetUserName();
                     sale.UpdDate = DateTime.Now.ToLocal();
                     sale.ClientId = clientId;
                     sale.UserId = User.Identity.GetUserId();
-                    sale.Folio = Cons.CodeMask;
+                    sale.Folio  = User.Identity.GetFolio(Cons.Zero);
 
                     db.Sales.Add(sale);
                     db.SaveChanges();
@@ -468,7 +470,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     TransactionDate = DateTime.Now.ToLocal(),
                     UpdDate = DateTime.Now.ToLocal(),
                     UpdUser = User.Identity.Name,
-                    Folio = Cons.CodeMask,
+                    Folio = User.Identity.GetFolio(Cons.Zero),
                     LastStatus = TranStatus.InProcess,
                     Status = TranStatus.InProcess,
                     TransactionType = TransactionType.Contado
@@ -617,7 +619,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Status = TranStatus.InProcess,
                     UpdUser = User.Identity.Name,
                     UpdDate = DateTime.Now.ToLocal(),
-                    Folio = Cons.CodeMask
+                    Folio = Cons.CodeSeqFormat
                 };
 
                 db.Sales.Add(sale);
@@ -970,19 +972,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var sale = db.Sales.Include(s => s.SaleDetails).
                            FirstOrDefault(s => s.SaleId == saleId);
 
-                var branchId = User.Identity.GetBranchId();
-
-                var folio = sale.Folio;
+                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().Year.ToString().Substring(Cons.Two));
 
                 if (addFolio)
                 {
-                    var lastSale = db.Sales.
-                    Where(s => s.Status != TranStatus.InProcess && s.BranchId == branchId).
-                    OrderByDescending(s => s.TransactionDate).FirstOrDefault();
+                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess && 
+                                                  s.BranchId == sale.BranchId && s.Year == sale.Year).
+                                                  OrderByDescending(s=>s.Sequential).FirstOrDefault();
+                    
+                    var seq = lastSale !=null ? lastSale.Sequential:Cons.Zero;
+                    sale.Sequential = (seq + Cons.One);
 
-                    var lastFolio = lastSale != null ? Convert.ToInt32(lastSale.Folio) : Cons.Zero;
-
-                    folio = (lastFolio + Cons.One).ToString(Cons.CodeMask);
+                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
                 }
 
 
@@ -1041,10 +1042,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                             //agrego el moviento al inventario
                             StockMovement detSm = new StockMovement
                             {
-                                BranchId = branchId,
+                                BranchId = sale.BranchId,
                                 ProductId = pckDet.DetailtId,
                                 MovementType = MovementType.Exit,
-                                Comment = "Salida en Paquete venta folio:" + folio,
+                                Comment = "Salida en Paquete venta folio:" + sale.Folio,
                                 User = User.Identity.Name,
                                 MovementDate = DateTime.Now.ToLocal(),
                                 Quantity = detail.Quantity
@@ -1063,7 +1064,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         BranchId = pb.BranchId,
                         ProductId = pb.ProductId,
                         MovementType = MovementType.Exit,
-                        Comment = "Venta folio:" + folio,
+                        Comment = "Venta folio:" + sale.Folio,
                         User = User.Identity.Name,
                         MovementDate = DateTime.Now.ToLocal(),
                         Quantity = detail.Quantity
@@ -1076,7 +1077,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //ajusto el monto total y agrego el folio
                 sale.TotalAmount = sale.SaleDetails.Sum(td => td.Amount);
-                sale.Folio = folio;
+                sale.Folio = sale.Folio;
 
                 //verifico que la venta no exceda el crédito del cliente
                 if (sale.TransactionType == TransactionType.Credito)
@@ -1118,14 +1119,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.LastStatus = TranStatus.InProcess;
                 sale.UpdUser = User.Identity.Name;
                 sale.UpdDate = DateTime.Now.ToLocal();
-                // sale.PaymentType     = (PaymentType)Enum.Parse(typeof(PaymentType), payment.ToString());
                 sale.SendingType = sending;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
 
-                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + folio });
+                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + sale.Folio });
 
             }
             catch (Exception ex)

@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System;
+using CerberusMultiBranch.Support;
+
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {
@@ -69,6 +71,14 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [MaxLength(100)]
         public string UpdUser { get; set; }
+
+        [Index("IDX_LockDate")]
+        public DateTime? LockDate { get; set; }
+
+        [Index("IDX_UserLock")]
+        [MaxLength(30)]
+        public string UserLock { get; set; }
+
 
         public virtual Category Category { get; set; }
 
@@ -141,6 +151,24 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Anaquel")]
         [MaxLength(30)]
         public string Ledge { get; set; }
+
+        [NotMapped]
+        public bool IsLocked
+        {
+            get
+            {
+                if (LockDate != null)
+                {
+                   var t = LockDate.Value.AddMinutes(Cons.LockTimeOut);
+                    if (DateTime.Now.ToLocal() <= t)
+                        return true;
+                    else
+                        return false;
+                }
+                else
+                    return false;
+            }
+        }
 
 
         [NotMapped]

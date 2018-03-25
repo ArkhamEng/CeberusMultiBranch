@@ -262,6 +262,14 @@
     <Compile Include="Migrations\201802280331425_descriptionLength.Designer.cs">
       <DependentUpon>201802280331425_descriptionLength.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803200510186_TempExtProd.cs" />
+    <Compile Include="Migrations\201803200510186_TempExtProd.Designer.cs">
+      <DependentUpon>201803200510186_TempExtProd.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803250037518_ChangesSaleLock.cs" />
+    <Compile Include="Migrations\201803250037518_ChangesSaleLock.Designer.cs">
+      <DependentUpon>201803250037518_ChangesSaleLock.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -272,6 +280,7 @@
     <Compile Include="Models\Entities\Catalog\ExternalProduct.cs" />
     <Compile Include="Models\Entities\Catalog\PackageDetail.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
+    <Compile Include="Models\Entities\Catalog\TempExternalProduct.cs" />
     <Compile Include="Models\Entities\Config\City.cs" />
     <Compile Include="Models\Entities\Config\ISelectable.cs" />
     <Compile Include="Models\Entities\Config\IUserAssignment.cs" />
@@ -653,6 +662,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201802280331425_descriptionLength.resx">
       <DependentUpon>201802280331425_descriptionLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803200510186_TempExtProd.resx">
+      <DependentUpon>201803200510186_TempExtProd.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803250037518_ChangesSaleLock.resx">
+      <DependentUpon>201803250037518_ChangesSaleLock.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -12,14 +12,15 @@ namespace CerberusMultiBranch.Support
 {
     public class DBHelper
     {
-        public static bool DeleteExternal(int providerId)
+        public static bool ProcessExternalProducts(int providerId)
         {
             var cs = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();
                 SqlCommand com = conn.CreateCommand();
-                com.CommandText = "[Catalog].[DelExternalProduct]";
+                com.CommandTimeout = 180000;
+                com.CommandText = "[Catalog].[ProcessExternalProducts]";
                 com.CommandType = CommandType.StoredProcedure;
 
                 com.Parameters.Add(new SqlParameter { Value = providerId, ParameterName = "@ProviderId" });
@@ -28,7 +29,32 @@ namespace CerberusMultiBranch.Support
             }
         }
 
-        public static void BulkInsertBulkCopy(List<ExternalProduct> list)
+        public static bool SetProductState(int productId, int branchId, string user, bool isLocked)
+        {
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                conn.Open();
+                SqlCommand com = conn.CreateCommand();
+                com.CommandText = "[Catalog].[LockProduct]";
+                com.CommandType = CommandType.StoredProcedure;
+
+                DateTime? dateLock = DateTime.Now.ToLocal();
+
+               
+                com.Parameters.Add(new SqlParameter { Value = productId, ParameterName = "@ProductId" });
+                com.Parameters.Add(new SqlParameter { Value = branchId, ParameterName  = "@BranchId" });
+                com.Parameters.Add(new SqlParameter { Value = dateLock, ParameterName  = "@DateLock" });
+                com.Parameters.Add(new SqlParameter { Value = user, ParameterName      = "@UserLock" });
+                com.Parameters.Add(new SqlParameter { Value = isLocked, ParameterName  = "@IsLocked" });
+
+                var done = com.ExecuteNonQuery() > 0 ? true : false;
+
+                return done;
+            }
+        }
+
+        public static void BulkInsertBulkCopy(List<TempExternalProduct> list)
         {
             var dt = ToDataTable(list);
 
@@ -40,15 +66,14 @@ namespace CerberusMultiBranch.Support
 
                 using (var bulkCopy = new SqlBulkCopy(connection, SqlBulkCopyOptions.CheckConstraints | SqlBulkCopyOptions.FireTriggers, null))
                 {
-                    bulkCopy.BatchSize = 100000;
+                    bulkCopy.BatchSize = 5000;
                     bulkCopy.ColumnMappings.Add("[ProviderId]", "[ProviderId]");
-                    bulkCopy.ColumnMappings.Add("[Code]", "[Code]");
-                    bulkCopy.ColumnMappings.Add("[Category]", "[Category]");
+                    bulkCopy.ColumnMappings.Add("[Code]", "[Code]");                    
                     bulkCopy.ColumnMappings.Add("[Description]", "[Description]");
                     bulkCopy.ColumnMappings.Add("[Price]", "[Price]");
                     bulkCopy.ColumnMappings.Add("[TradeMark]", "[TradeMark]");
                     bulkCopy.ColumnMappings.Add("[Unit]", "[Unit]");
-                    bulkCopy.DestinationTableName = "[Catalog].[ExternalProduct]";
+                    bulkCopy.DestinationTableName = "[Catalog].[TempExternalProduct]";
                     bulkCopy.WriteToServer(dt);
                 }
             }

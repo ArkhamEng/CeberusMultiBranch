@@ -26,12 +26,10 @@
                     </div>
 
 
-                    <div class="col-md-6  form-group">
-                        <label>Tipo de compra </label>
-                        <div class="col-md-12  form-control">
+                    <div class="col-md-6 form-group">
+                            <label>Tipo de compra </label>
                             <div class="input-group">
-                                @{
-                                    foreach (var type in Model.TransactionTypes)
+                                    @foreach (var type in Model.TransactionTypes)
                                     {
                                         <div class="input-group-addon">
                                             <Label class="control-label">
@@ -40,9 +38,7 @@
                                             </Label>
                                         </div>
                                     }
-                                }
                             </div>
-                        </div>
                     </div>
 
 

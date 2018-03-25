@@ -28,18 +28,47 @@
     </div>
 }
 else
-{
-    <div class="col-md-12 panel-success">
-        <h4 class="text-uppercase text-center panel-heading">
-            @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToString("c")
-        </h4>
+{ <br />
+    <div class="col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <h4 class="text-uppercase text-center panel-title">
+                    <a data-toggle="collapse" href="#collapse1">
+                    @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToString("c")</a>
+                </h4>
+            </div>
+            <div id="collapse1" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <div class="col-md-5  text-center  alert bg-primary">
+                        <h3>
+                            @{
+                                var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToString("c");
+                            }
+                            Ventas Efectivo<br />
+                            @cash
+                        </h3>
+                    </div>
+                    <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
+                        <h3>
+                            Ventas Tarjeta<br />
+                            @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToString("c")
+                        </h3>
+                    </div>
+
+                    <div class="col-md-11">
+                        <img class="img-responsive" src="@Model.ChartSource" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+     
     </div>
 
     <div class="col-md-3">
-        @Html.Partial("_PaymentOption")
-        <div class="col-md-12  text-center btn alert alert-info" onclick="OpenNotes()" title="Buscar notas">
+        <div class="col-md-12  btn btn-info alert text-center" onclick="OpenNotes()" title="Buscar notas">
             <h3>
-                Tickets y Notas
+                Tickets y notas
             </h3>
         </div>
 
@@ -74,47 +103,11 @@ else
             <h3>
                 <span class="fa fa-power-off"></span>
                 Cierre de Caja<br />
-                @*@totString*@
             </h3>
         </div>
     </div>
-    <div class="col-md-9">
-        <div class="panel-group">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <h4 class="panel-title">
-                        <a data-toggle="collapse" href="#collapse1">Resumen de Ingresos</a>
-                    </h4>
-                </div>
-                <div id="collapse1" class="panel-collapse collapse">
-                    <div class="panel-body">
-                        <div class="col-md-5  text-center  alert bg-primary">
-                            <h3>
-                                @{
-                                    var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToString("c");
-                                }
-                                Ventas Efectivo<br />
-                                @cash
-                            </h3>
-                        </div>
-                        <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
-                            <h3>
-                                Ventas Tarjeta<br />
-                                @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToString("c")
-                            </h3>
-                        </div>
-
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-11">
-            <img class="img-responsive" src="@Model.ChartSource" />
-        </div>
-
+    
+    <div id="divModalPending" class="col-md-9">
     </div>
 
     <div id="divDetails">
@@ -128,6 +121,9 @@ else
 <script>
     $(document).ready(function ()
     {
+        CheckPendingPayments();
+        setInterval(function () { CheckPendingPayments(); }, 10000);
+
         $("#btnTerminate").click(function ()
         {
             $("#ModalCloseCash").modal("show");
@@ -164,5 +160,15 @@ else
             else
                 ShowMessage("Error Inesperado", data, "warning");
         });
+    }
+
+    function CheckPendingPayments()
+    {
+        ExecuteAjax('@Url.Action("OpenPending","CashRegister")', {},
+           function (response)
+           {
+               if (!$.isPlainObject(response))
+                   $("#divModalPending").html(response);
+           });
     }
 </script>

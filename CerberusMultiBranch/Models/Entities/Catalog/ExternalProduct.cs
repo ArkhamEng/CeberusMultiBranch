@@ -22,12 +22,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Code { get; set; }
 
 
-        [Display(Name = "Categoría")]
-        [Required]
-        [MaxLength(60)]
-        [Index("IDX_Category", IsUnique = false)]
-        public string Category { get; set; }
-
         [Display(Name = "Descripción")]
         [MaxLength(300)]
         [Index("IDX_Descripction", IsUnique = false)]

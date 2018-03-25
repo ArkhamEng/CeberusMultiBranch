@@ -26,7 +26,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int SendingType { get; set; }
 
-      
+        [Index("IDX_Year")]
+        public int Year { get; set; }
+
+        [Index("IDX_Sequential")]
+        public int Sequential { get; set; }
 
 
         #region Navigation Properties
