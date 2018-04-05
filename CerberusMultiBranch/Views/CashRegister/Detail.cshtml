@@ -66,58 +66,60 @@
 
             </div>
         </div>
+
+        <div class="col-md-12">
+            <table id="tdDetails" class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
+                        <th>@Html.DisplayName("Movimiento")</th>
+                        <td></td>
+                        <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
+                        <th>@Html.DisplayName("Comentario")</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CashDetails)
+            {
+                        <tr>
+                            <td>@item.InsDate.ToString("HH:mm:ss")</td>
+
+                            <td>
+                                @if (item.DetailType == 0)
+                                {
+                                    <a>Retiro</a>
+                                }
+                                else
+                                {
+                                    <a>Ingreso</a>
+                                }
+                            </td>
+                            <td>
+                                @switch (item.Type)
+                                {
+                                    case PaymentMethod.Efectivo:
+                                        <span class="fa fa-money"></span>
+                                        break;
+                                    case PaymentMethod.Tarjeta:
+                                        <span class="fa fa-credit-card"></span>
+                                        break;
+                                }
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => item.Amount)
+                            </td>
+
+                            <td>@Html.DisplayFor(m => item.Comment)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<div class="col-md-12">
-    <table id="tdDetails" class="table table-condensed">
-        <thead>
-            <tr>
-                <th>@Html.DisplayNameFor(m => m.Incomes.First().InsDate)</th>
-                <th>@Html.DisplayName("Movimiento")</th>
-                <td></td>
-                <th>@Html.DisplayNameFor(m => m.Incomes.First().Amount)</th>
-                <th>@Html.DisplayName("Comentario")</th>
 
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.CashDetails)
-            {
-                <tr>
-                    <td>@item.InsDate.ToString("HH:mm:ss")</td>
-
-                    <td>
-                        @if (item.DetailType == 0)
-                        {
-                            <a>Retiro</a>
-                        }
-                        else
-                        {
-                            <a>Ingreso</a>
-                        }
-                    </td>
-                    <td>
-                        @switch (item.Type)
-                        {
-                            case PaymentMethod.Efectivo:
-                                <span class="fa fa-money"></span>
-                                break;
-                            case PaymentMethod.Tarjeta:
-                                <span class="fa fa-credit-card"></span>
-                                break;
-                        }
-                    </td>
-                    <td>
-                        @Html.DisplayFor(m => item.Amount)
-                    </td>
-
-                    <td>@Html.DisplayFor(m => item.Comment)</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
 <div class="btn-group">
     <button type="button" class="btn btn-primary" onclick="GoBack()">
         <span class="fa fa-backward"></span>Ir a Historial
@@ -233,7 +235,7 @@
 
 <script>
     $(document).ready(function () {
-        Paginate("#tdDetails", 6)
+        Paginate("#tdDetails", 10)
     });
 
     function GoBack() {

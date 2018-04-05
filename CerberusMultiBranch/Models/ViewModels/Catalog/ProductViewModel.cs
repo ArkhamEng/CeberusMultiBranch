@@ -37,6 +37,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.BranchProducts = new List<BranchProduct>();
             this.Systems = new List<PartSystem>().ToSelectList();
 
+            this.StockRequired = true;
             this.IsActive = true;
             this.PackageDetails = new  List<PackageDetail>();
             this.FillTypes();
@@ -67,6 +68,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Ledge = product.Ledge;
             this.MaxQuantity = product.MaxQuantity;
             this.ProductType = product.ProductType;
+            this.StockRequired = product.StockRequired;
             this.Categories = new List<Category>().ToSelectList();
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();
@@ -75,6 +77,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.PackageDetails = product.PackageDetails;
             this.Quantity = product.Quantity;
             this.IsActive = product.IsActive;
+            this.StockLocked = product.StockLocked;
             this.FillTypes();
         }
 

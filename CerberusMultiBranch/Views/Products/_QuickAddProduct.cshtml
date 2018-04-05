@@ -23,10 +23,10 @@
             <div class="@pnlClass">
                 <div class="modal-header panel-heading">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">
+                    <h5 class="modal-title">
                         <span class="fa fa-archive"></span>
                         Edición de Producto
-                    </h4>
+                    </h5>
                 </div>
                 <div class="modal-body panel-body panel-group row">
 
@@ -73,13 +73,13 @@
                     </ul>
 
                     <div class="tab-content">
-                        <div id="general" class="tab-pane fade in active">
+                        <div id="general" class="tab-pane fade in active small">
                             @Html.Partial("_GeneralData", Model)
                         </div>
                         
                         @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Package)
                         {
-                            <div id="detail" class="tab-pane fade">
+                            <div id="detail" class="tab-pane fade small">
                                 <div id="divPackageDetails">
                                     @Html.Partial("_PackageDetails", Model.PackageDetails)
                                 </div>
@@ -163,6 +163,7 @@
         }
     });
 
+   
     function SetPrice()
     {
         var sp = (1 + $("#StorePercentage").val() / 100);
@@ -190,7 +191,7 @@
             StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val().toUpperCase(), DealerPercentage: $("#DealerPercentage").val(),
             WholesalerPercentage: $("#WholesalerPercentage").val(), StorePercentage: $("#StorePercentage").val(),Row: $("#Row").val(),Ledge: $("#Ledge").val(),
             ProductId: $("#ProductId").val(), Quantity: $("#Quantity").val(), IsActive: $("#IsActive").val(), ProductType: $("#ProductType").val(),
-            MinQuantity: $("#MinQuantity").val(), MaxQuantity: $("#MaxQuantity").val(),
+            MinQuantity: $("#MinQuantity").val(), MaxQuantity: $("#MaxQuantity").val(), StockRequired: $("#StockRequired").is(':checked'), StockLocked: $("#StockLocked").is(':checked')
         };
 
         //si el ProviderId tiene valor, quiere decir que es una copia de producto del proveedor

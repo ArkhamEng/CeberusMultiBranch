@@ -220,8 +220,8 @@
                                 PESOS MEXICANOS
                             </td>
                             @{
-                            var bI = Math.Round(Model.TotalAmount / 1.16, 2);
-                            var iva = Math.Round(Model.TotalAmount - bI, 2);
+                            var bI = Math.Round(Model.TotalAmount / Cons.DeIVA, Cons.Two);
+                            var iva = Math.Round(Model.TotalAmount - bI, Cons.Two);
                             }
                             <td class="text-right" style="border:1px solid gray; width:10%">
                                 <label class="control-label">

@@ -159,6 +159,7 @@ function SetDataTable(table, filter) {
            destroy: true,
            "lengthChange": false,
            "searching": true,
+           "order": [],
            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
            "pageLength": 10,
            "language": {

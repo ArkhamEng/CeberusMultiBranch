@@ -92,14 +92,7 @@ else
             </div>
         }
 
-        <div class="text-center col-md-12  alert  btn-warning" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja">
-            @{
-
-                var total = (Model.Incomes.
-                    Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount) + Model.InitialAmount - Model.Withdrawals.Sum(w => w.Amount));
-
-                var totString = total.ToString("c");
-            }
+        <div class="text-center col-md-12  alert  btn-warning" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja" >
             <h3>
                 <span class="fa fa-power-off"></span>
                 Cierre de Caja<br />
@@ -112,7 +105,10 @@ else
 
     <div id="divDetails">
     </div>
-     @Html.Partial("_CloseCash", total)
+    <div id="Close">
+
+    </div>
+     
 
      <div id="divNotes">
      </div>
@@ -126,7 +122,15 @@ else
 
         $("#btnTerminate").click(function ()
         {
-            $("#ModalCloseCash").modal("show");
+            ShowLoading();
+            ExecuteAjax('@Url.Action("BeginClose")', {}, function (response)
+            {
+                HideLoading();
+
+                $("#Close").html(response);
+
+                $("#ModalCloseCash").modal("show");
+            });
         });
     });
 

@@ -56,7 +56,8 @@
                     @Html.DisplayFor(modelItem => item.Product.Unit)
                 </td>
 
-                @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single && 
+                    item.Sale.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess)
                 {
                     <td>
                         <h5  class="text-info" onmouseover="SetPointer(this)"

@@ -35,6 +35,16 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalAmount { get; set; }
 
+        [Display(Name = "Total con IVA")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double TotalTaxedAmount { get; set; }
+
+        [Display(Name = "Total de IVA")]
+        [DataType(DataType.Currency)]
+        [Required]
+        public double TotalTaxAmount { get; set; }
+
         [Index("IDX_Status", IsUnique = false)]
         public TranStatus Status { get; set; }
 

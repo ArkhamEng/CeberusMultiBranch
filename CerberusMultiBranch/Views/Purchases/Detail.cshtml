@@ -15,135 +15,10 @@
 @Html.HiddenFor(model => model.ProviderId)
 @Html.HiddenFor(model => model.PurchaseId)
 
-
-<h5 class="alert alert-success col-md-6">
-    <span class="fa fa-user"></span>
-    @Model.Provider.Name
-</h5>
-
-<h5 class="alert alert-danger col-md-2 col-md-offset-1 text-right">
-    Deuda
-    <a id="Debt">$ 0.00</a>
-</h5>
-
-<h5 class="alert alert-info col-md-2 col-md-offset-1 text-right">
-   Total 
-    <a id="Amount">
-      
-    </a>
-</h5>
 <br />
-<div class="panel panel-default">
-    <div class="panel-body">
-        <div class="row">
-            <div class="col-md-3 form-group">
-                @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
-                    <div class="form-control">
-                        @Model.Bill
-                    </div>
-                </div>
-                @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
-            </div>
-
-            <div class="col-md-3 form-group">
-                @Html.Label("Tipo Compra", htmlAttributes: new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-shopping-basket"></i></span>
-                    <div class="form-control">
-                        @Model.TransactionType.ToString()
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-md-5  pull-right">
-                <div class="col-md-6">
-                    @Html.Label("Fecha de Venta", htmlAttributes: new { @class = "control-label" })
-                </div>
-                <div class="col-md-6">
-                    @Html.Label("Fecha de Expiración", htmlAttributes: new { @class = "control-label" })
-                </div>
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <div class="form-control">
-                        @Model.TransactionDate.ToString("dd/MM/yyyy")
-                    </div>
-                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                    <div class="form-control">
-                        @Model.Expiration.ToString("dd/MM/yyyy")
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-group col-md-3">
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-hourglass-half"></i></span>
-                    @switch (Model.Status)
-                {
-                    case TranStatus.InProcess:
-                            <div id="divStatus" class="form-control alert-warning">
-                                Procesando
-                            </div>
-                        break;
-                    case TranStatus.Reserved:
-                            <div id="divStatus" class="form-control alert-info">
-                                Inventariado
-                            </div>
-                        break;
-                    case TranStatus.Compleated:
-                            <div id="divStatus" class="form-control alert-success">
-                                Pagado
-                            </div>
-                        break;
-                    case TranStatus.Canceled:
-                            <div id="divStatus" class="form-control alert-danger">
-                                Cancelado
-                            </div>
-                        break;
-                }
-
-                </div>
-            </div>
-            <div class="form-group col-md-3">
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                    <div class="form-control">
-                        @Model.User.UserName
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="btn-group pull-right">
-                    <button type="button" class="btn btn-primary" title="Nueva búsqueda" onclick="ShowLoading(); window.location='@Url.Action("History")'">
-                        <span class="fa fa-backward"></span>
-                        Volver
-                    </button>
-
-                    <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar e inventariar?" tooltip-title="Ingresar al Inventario">
-                        <span class="fa fa-cubes"></span>
-                        Terminar
-                    </button>
-                    <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
-                        <span class="glyphicon glyphicon-plus-sign"></span>
-                        Agregar
-                    </button>
-                    <button id="btnCancel" class="btn btn-danger" type="button">
-                        <span class="glyphicon glyphicon-remove"></span>
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-@Html.HiddenFor(model=> model.TotalAmount)
 
 <ul class="nav nav-tabs">
-    <li class="active"><a data-toggle="tab" href="#tabProducts">Productos</a></li>
+    <li class="active"><a data-toggle="tab" href="#tabProducts">Detalle de compra</a></li>
     @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
     {
         <li><a data-toggle="tab" href="#tabPayments">Pagos <span id="TotalPayments" class="badge"></span></a></li>
@@ -153,10 +28,117 @@
 <div class="tab-content">
     <div id="tabProducts" class="tab-pane fade in active">
         <div class="panel panel-danger">
-            <div id="divDetails" class="panel-body">
-                @Html.Partial("_Details", Model.PurchaseDetails)
+            <div class="panel-body">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.Provider.Name
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
+                            </div>
+                            <div class="col-md-5  pull-right">
+                                <div class="col-md-6">
+                                    @Html.Label("Fecha de Venta", htmlAttributes: new { @class = "control-label small" })
+                                </div>
+                                <div class="col-md-6">
+                                    @Html.Label("Fecha de Expiración", htmlAttributes: new { @class = "control-label small" })
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.TransactionDate.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.Expiration.ToString("dd/MM/yyyy")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 form-group">
+                                @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-file-text-o"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.Bill
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-3 form-group">
+                                @Html.Label("Tipo Compra", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-shopping-basket"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.TransactionType.ToString()
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-5 row pull-right">
+                                <div class="col-md-6 form-group">
+                                    @Html.Label("Sub-Total", htmlAttributes: new { @class = "control-label small" })
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                        <div class="form-control input-sm" id="divTotalAmount">
+                                            @Model.TotalAmount.ToString("c")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 form-group">
+                                    @Html.Label("Total", htmlAttributes: new { @class = "control-label small" })
+                                    <div class="input-group">
+                                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                        <div class="form-control input-sm" id="divTaxedAmount">
+                                            @Model.TotalTaxedAmount.ToString("c")
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                     
+                            <button type="button" class="btn btn-primary" title="Nueva búsqueda"
+                                    onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                                <span class="fa fa-backward"></span>
+                                Volver
+                            </button>
+
+                            <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar e inventariar?"
+                                    tooltip-title="Ingresar al Inventario">
+                                <span class="fa fa-cubes"></span>
+                                Terminar
+                            </button>
+                            <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
+                                <span class="glyphicon glyphicon-plus-sign"></span>
+                                Agregar
+                            </button>
+                       
+
+                        <button id="btnCancel" class="btn btn-danger pull-right" type="button">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+                @Html.HiddenFor(model => model.TotalAmount)
+                <div class="panel panel-default">
+                    <div id="divDetails" class="panel-body">
+                        @Html.Partial("_Details", Model.PurchaseDetails)
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
     @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
     {
@@ -168,7 +150,7 @@
             </div>
         </div>
     }
-   
+
 </div>
 
 @Html.Partial("_Cancelation")
@@ -207,31 +189,27 @@
             }
         });
 
-        $("#btnShowQuick").click(function () {
+        $("#btnShowQuick").click(function ()
+        {
             $("#ModalProduct").modal('show');
         });
 
     });
 
-   
 
-    function ProviderSelected(id, name) {
+    function ProviderSelected(id, name)
+    {
         $("#ProviderId").val(id);
         $("#Provider_Name").val(name);
 
         $("#ModalQuickProvider").modal('hide');
     }
 
-    function SubmitCompleate() {
+    function SubmitCompleate()
+    {
         ShowLoading();
 
-        var param =
-            {
-                purchaseId: $("#PurchaseId").val()
-            };
-        console.log(param);
-
-        ExecuteAjax('@Url.Action("Compleate")', param, function (response)
+        ExecuteAjax('@Url.Action("Compleate")', { purchaseId: $("#PurchaseId").val() }, function (response)
         {
             HideLoading();
             if (response.Result != 'OK')

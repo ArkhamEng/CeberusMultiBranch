@@ -11,6 +11,8 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
         public const int Two = 2;
 
+        public const double DeIVA = 1.16;
+
         public const int LockTimeOut = 5;
 
         public const double OneHundred = 100;
@@ -18,6 +20,8 @@ namespace CerberusMultiBranch.Support
         public const int QuickResults = 300;
 
         public const string CodeSeqFormat = "000000";
+
+        public const string VariableIVA = "IVA";
 
         public const string CodeMask = "{0}{1}{2}";
 

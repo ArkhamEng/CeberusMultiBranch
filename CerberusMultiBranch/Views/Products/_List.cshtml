@@ -106,43 +106,59 @@
                             </h6>
                         </div>
 
-                        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor") || User.IsInRole("Vendedor"))
+                        @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
                         {
                             var btnC = string.Format("col-md-{0} btn-group-vertical hidden-xs hidden-sm", (i == 2 ? i : 1));
 
                             <div class='@btnC' style="vertical-align:central">
 
-                                @if (User.IsInRole("Capturista") && prod.IsActive &&
-                    (!prod.IsLocked || (prod.IsLocked && prod.UserLock == User.Identity.Name)))
+                                @if (prod.IsActive && !prod.StockLocked)
                                 {
-                                    <button class="btn btn-warning" title="Editar datos de producto"
-                                            onclick="BeginEdit('@prod.ProductId')">
-                                        <span class="glyphicon glyphicon-pencil"></span>
-                                    </button>
+                                    if (!prod.IsLocked || (prod.IsLocked && prod.UserLock == User.Identity.Name))
+                                    {
+                                        <button class="btn btn-warning" title="Editar datos de producto"
+                                                onclick="BeginEdit('@prod.ProductId')">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
 
-                                    <button class="btn btn-danger" title="Eliminar producto"
-                                            onclick="BeginDelete('@prod.ProductId')">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </button>
+                                        <button class="btn btn-danger" title="Eliminar producto"
+                                                onclick="BeginDelete('@prod.ProductId')">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                    }
                                 }
-
-                                @if (!prod.IsActive && User.IsInRole("Supervisor"))
+                                else if (User.IsInRole("Supervisor") && (!prod.IsLocked || (prod.IsLocked && prod.UserLock == User.Identity.Name)))
                                 {
-                                    <button class="btn btn-success" title="Reactivar producto"
-                                            onclick="BeginActivate('@prod.ProductId')">
-                                        <span class="fa fa-recycle"></span>
-                                    </button>
+                                    if (prod.IsActive)
+                                    {
+                                        <button class="btn btn-warning" title="Editar datos de producto"
+                                                onclick="BeginEdit('@prod.ProductId')">
+                                            <span class="glyphicon glyphicon-pencil"></span>
+                                        </button>
+
+                                        <button class="btn btn-danger" title="Eliminar producto"
+                                                onclick="BeginDelete('@prod.ProductId')">
+                                            <span class="glyphicon glyphicon-trash"></span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-success" title="Reactivar producto"
+                                                onclick="BeginActivate('@prod.ProductId')">
+                                            <span class="fa fa-recycle"></span>
+                                        </button>
+                                    }
                                 }
                             </div>
                         }
                     </td>
-                            }
+                 }
                 @for (var g = item.Count; g < i; g++)
                 {
                     <td class="col-md-6"></td>
                 }
             </tr>
-                            }
+           }
     </tbody>
 </table>
 

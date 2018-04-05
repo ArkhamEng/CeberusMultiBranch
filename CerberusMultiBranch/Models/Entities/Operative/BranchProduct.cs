@@ -66,6 +66,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime UpdDate { get; set; }
 
+        public bool StockLocked { get; set; }
+
         [Index("IDX_LockDate")]
         public DateTime? LockDate { get; set; }
 

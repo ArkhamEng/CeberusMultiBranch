@@ -66,6 +66,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public bool IsActive { get; set; }
 
+
+        public bool StockRequired { get; set; }
+
         [Required]
         public DateTime UpdDate { get; set; }
 
@@ -170,6 +173,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             }
         }
 
+        [NotMapped]
+        public bool StockLocked { get; set; }
 
         [NotMapped]
         public IEnumerable<HttpPostedFileBase> Files { get; set; }

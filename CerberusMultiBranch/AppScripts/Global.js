@@ -89,6 +89,7 @@ function Paginate(table, records)
            destroy: true,
            "lengthChange": false,
            "searching": true,
+           "order": [],
            "lengthMenu": [[3, 5, 10, -1], [3, 5, 10, "All"]],
            "pageLength": records,
            "language": {

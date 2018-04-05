@@ -4,7 +4,7 @@
     @Html.Label("Codigo", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
-        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control text-uppercase" } })
+        @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm" } })
     </div>
     @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
 </div>
@@ -12,7 +12,7 @@
     @Html.Label("Sistema", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-        @Html.DropDownListFor(m => m.PartSystemId, Model.Systems, "", new { @class = "form-control text-uppercase", required = "true" })
+        @Html.DropDownListFor(m => m.PartSystemId, Model.Systems, "", new { @class = "form-control text-uppercase input-sm", required = "true" })
     </div>
     @Html.ValidationMessageFor(m => m.PartSystemId, "", new { @class = "text-danger" })
 </div>
@@ -20,7 +20,7 @@
     @Html.Label("Categoría", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-list-alt"></i></span>
-        @Html.DropDownListFor(m => m.CategoryId, Model.Categories, "", new { @class = "form-control text-uppercase" })
+        @Html.DropDownListFor(m => m.CategoryId, Model.Categories, "", new { @class = "form-control text-uppercase input-sm" })
     </div>
     @Html.ValidationMessageFor(m => m.CategoryId, "", new { @class = "text-danger" })
 </div>
@@ -29,7 +29,7 @@
     @Html.Label("Existencias", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-        @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+        @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.Quantity, "", new { @class = "text-danger" })
 </div>
@@ -38,7 +38,7 @@
     @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
-        @Html.TextAreaFor(model => model.Name, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase" })
+        @Html.TextAreaFor(model => model.Name, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
     </div>
     @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
 </div>
@@ -47,7 +47,7 @@
     @Html.Label("Marca", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="glyphicon glyphicon-registration-mark"></i></span>
-        @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control text-uppercase", required = "true" } })
+        @Html.EditorFor(model => model.TradeMark, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.TradeMark, "", new { @class = "text-danger" })
 </div>
@@ -56,7 +56,7 @@
     @Html.LabelFor(model => model.Unit, htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-balance-scale"></i></span>
-        @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control text-uppercase", required = "true" } })
+        @Html.EditorFor(model => model.Unit, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.Unit, "", new { @class = "text-danger" })
 </div>
@@ -65,7 +65,7 @@
     @Html.Label("Precio compra", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+        @Html.EditorFor(model => model.BuyPrice, new { htmlAttributes = new { @class = "form-control input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.BuyPrice, "", new { @class = "text-danger" })
 </div>
@@ -74,9 +74,9 @@
     @Html.LabelFor(model => model.StorePrice, htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-        @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.StorePercentage, new { htmlAttributes = new { @class = "form-control input-sm" } })
         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-        @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.StorePrice, new { htmlAttributes = new { @class = "form-control input-sm" } })
     </div>
     @Html.ValidationMessageFor(model => model.StorePrice, "", new { @class = "text-danger" })
     @Html.ValidationMessageFor(model => model.StorePercentage, "", new { @class = "text-danger" })
@@ -85,9 +85,9 @@
     @Html.LabelFor(model => model.DealerPrice, htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-        @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.DealerPercentage, new { htmlAttributes = new { @class = "form-control input-sm" } })
         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-        @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.DealerPrice, new { htmlAttributes = new { @class = "form-control input-sm" } })
     </div>
     @Html.ValidationMessageFor(model => model.DealerPrice, "", new { @class = "text-danger" })
     @Html.ValidationMessageFor(model => model.DealerPercentage, "", new { @class = "text-danger" })
@@ -97,9 +97,9 @@
     @Html.LabelFor(model => model.WholesalerPrice, htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-        @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.WholesalerPercentage, new { htmlAttributes = new { @class = "form-control input-sm" } })
         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-        @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control" } })
+        @Html.EditorFor(model => model.WholesalerPrice, new { htmlAttributes = new { @class = "form-control input-sm" } })
     </div>
     @Html.ValidationMessageFor(model => model.WholesalerPrice, "", new { @class = "text-danger" })
     @Html.ValidationMessageFor(model => model.WholesalerPercentage, "", new { @class = "text-danger" })
@@ -107,7 +107,7 @@
 
 <div class="col-md-3" id="divProductType">
     @Html.Label("Tipo de producto", htmlAttributes: new { @class = "control-label" })
-    @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase btnToHide" })
+    @Html.DropDownListFor(model => model.ProductType, Model.ProductTypes, new { @class = "form-control text-uppercase input-sm btnToHide" })
     @Html.HiddenFor(model => model.ProductType)
 
 </div>
@@ -116,7 +116,7 @@
     @Html.Label("Fila", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-bars"></i></span>
-        @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+        @Html.EditorFor(model => model.Row, new { htmlAttributes = new { @class = "form-control input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.Row, "", new { @class = "text-danger" })
 </div>
@@ -125,7 +125,7 @@
     @Html.Label("Anaquel", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-archive"></i></span>
-        @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control", required = "true" } })
+        @Html.EditorFor(model => model.Ledge, new { htmlAttributes = new { @class = "form-control input-sm", required = "true" } })
     </div>
     @Html.ValidationMessageFor(model => model.Ledge, "", new { @class = "text-danger" })
 </div>
@@ -134,14 +134,81 @@
     @Html.Label("Cantidad máxima y minima", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
         <span class="input-group-addon"><i class="fa fa-plus"></i></span>
-        @Html.EditorFor(model => model.MaxQuantity, new { htmlAttributes = new { @class = "form-control",type= "number" } })
+        @Html.EditorFor(model => model.MaxQuantity, new { htmlAttributes = new { @class = "form-control input-sm", type = "number" } })
         <span class="input-group-addon"><i class="fa fa-minus"></i></span>
-        @Html.EditorFor(model => model.MinQuantity, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+        @Html.EditorFor(model => model.MinQuantity, new { htmlAttributes = new { @class = "form-control input-sm", type = "number" } })
     </div>
     @Html.ValidationMessageFor(model => model.MaxQuantity, "", new { @class = "text-danger" })
     @Html.ValidationMessageFor(model => model.MinQuantity, "", new { @class = "text-danger" })
 </div>
+<div class="col-md-3">
+    <div class="checkbox form-control">
+        <label>
+            @Html.EditorFor(m => m.StockLocked)
+            Inventario Bloqueado
+        </label>
+    </div>
+</div>
+
+<div class="col-md-3">
+    <div class="checkbox form-control">
+        <label>
+            @Html.EditorFor(m => m.StockRequired)
+            Generar Inventario
+        </label>
+    </div>
+</div>
+
+
+
 
 <label class="text-danger" id="lblQuickAddError"></label>
 @Html.HiddenFor(model => model.ProductId)
 @Html.HiddenFor(model => model.IsActive)
+
+
+<script>
+    $(document).ready(function () {
+        ValidateStock();
+
+        $("#StockRequired").change(function (a)
+        {
+            ValidateStock();
+        });
+
+        var allowLock = false;
+
+        if ('@User.IsInRole("Administrador")' == 'True' && '@User.IsInRole("Supervisor")' == 'True')
+            allowLock = true;
+        
+
+        $("#StockLocked").attr("disabled", !allowLock);
+        $("#StockRequired").attr("disabled", !allowLock);
+
+        $("#StockLocked").change(function (a) {
+            ValidateStock();
+        });
+
+
+    });
+
+    function ValidateStock()
+    {
+        var isLocked = $("#StockLocked").is(':checked');
+
+        var checked = $("#StockRequired").is(':checked');
+
+        $("#Quantity").attr("disabled", isLocked);
+        $("#BuyPrice").attr("disabled", isLocked);
+
+        if (!isLocked)
+            $("#Quantity").attr("disabled", !checked);
+
+
+
+        $("#Ledge").attr("disabled", !checked);
+        $("#Row").attr("disabled", !checked);
+        $("#MaxQuantity").attr("disabled", !checked);
+        $("#MinQuantity").attr("disabled", !checked);
+    }
+</script>

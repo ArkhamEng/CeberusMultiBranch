@@ -10,6 +10,48 @@ namespace ExcelUploader
     public class Excel
     {
 
+        public static List<string> GetEstados()
+        {
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["Excel"].ToString();
+            List<string> categories = new List<string>();
+            using (OleDbConnection con = new OleDbConnection(cs))
+            {
+                con.Open();
+                OleDbCommand command = con.CreateCommand();
+                command.CommandText = "select Estado from[Códigos Postales$] group by Estado";
+
+                using (OleDbDataReader dr = command.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        categories.Add(dr["Estado"].ToString());
+                    }
+                }
+            }
+            return categories;
+        }
+
+        public static List<string> GetMunicipality()
+        {
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["Excel"].ToString();
+            List<string> categories = new List<string>();
+            using (OleDbConnection con = new OleDbConnection(cs))
+            {
+                con.Open();
+                OleDbCommand command = con.CreateCommand();
+                command.CommandText = "select Municipio, Estado from[Códigos Postales$] group by Municipio, Estado";
+
+                using (OleDbDataReader dr = command.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        categories.Add(dr["Municipio"].ToString()+"|"+dr["Estado"].ToString());
+                    }
+                }
+            }
+            return categories;
+        }
+
         // string con = @"Provider=Microsoft.ACE.OLEDB.12.0; Data Source = C:\Users\ArkhamEng\Documents\LISTA CIOSA MAYO 2017.xls; Extended Properties = 'Excel 12.0;HDR=Yes'";
 
         public static List<string> GetCategories()

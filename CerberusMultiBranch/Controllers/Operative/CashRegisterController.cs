@@ -32,8 +32,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         public ActionResult History()
         {
-            var model = LookForCashReg(null, DateTime.Today, null, null);
-            ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
+            var model = new TransactionViewModel();
+            model.CashRegisters = LookForCashReg(null, DateTime.Today, null, null);
+            model.Branches = User.Identity.GetBranches().ToSelectList();
 
             return View(model);
         }
@@ -201,6 +202,19 @@ namespace CerberusMultiBranch.Controllers.Operative
             db.SaveChanges();
 
             return Json("OK");
+        }
+
+        [HttpPost]
+        public ActionResult BeginClose()
+        {
+            var cr = GetCashRegister();
+
+            var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
+            var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
+
+            var total = cr.InitialAmount + i - o;
+
+            return PartialView("_CloseCash", total);
         }
 
         [HttpPost]

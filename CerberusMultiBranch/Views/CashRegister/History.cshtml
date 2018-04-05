@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.CashRegister>
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
 
 @{
     ViewBag.Title = "Historial de caja";
@@ -10,12 +10,12 @@
     <div class="panel-body">
         <div class="col-md-11">
             <div class="input-group ">
-                @Html.DropDownList("BranchId", (SelectList)ViewBag.Branches, "Sucursal", new { @class = "form-control" })
+                @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control" })
                 <span class="input-group-addon"><a>Fecha Inicial</a></span>
-                @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
 
                 <span class="input-group-addon"><a>Fecha final</a></span>
-                @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control", type = "date" })
+                @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
                         <span class="glyphicon glyphicon-search"></span>
@@ -33,7 +33,7 @@
 
 
 <div id="divCashRegisterList">
-    @Html.Partial("_CashRegisterList", Model)
+    @Html.Partial("_CashRegisterList", Model.CashRegisters)
 </div>
 
 <script>

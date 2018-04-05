@@ -270,6 +270,22 @@
     <Compile Include="Migrations\201803250037518_ChangesSaleLock.Designer.cs">
       <DependentUpon>201803250037518_ChangesSaleLock.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201803260214410_Taxes.cs" />
+    <Compile Include="Migrations\201803260214410_Taxes.Designer.cs">
+      <DependentUpon>201803260214410_Taxes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201803260245067_Taxes1.cs" />
+    <Compile Include="Migrations\201803260245067_Taxes1.Designer.cs">
+      <DependentUpon>201803260245067_Taxes1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804030324055_ProdChanges.cs" />
+    <Compile Include="Migrations\201804030324055_ProdChanges.Designer.cs">
+      <DependentUpon>201804030324055_ProdChanges.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804031647197_StockLocked.cs" />
+    <Compile Include="Migrations\201804031647197_StockLocked.Designer.cs">
+      <DependentUpon>201804031647197_StockLocked.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -331,7 +347,7 @@
     <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
-    <Compile Include="Models\ViewModels\Operative\PurchaseHistoryViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -668,6 +684,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201803250037518_ChangesSaleLock.resx">
       <DependentUpon>201803250037518_ChangesSaleLock.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803260214410_Taxes.resx">
+      <DependentUpon>201803260214410_Taxes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201803260245067_Taxes1.resx">
+      <DependentUpon>201803260245067_Taxes1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804030324055_ProdChanges.resx">
+      <DependentUpon>201804030324055_ProdChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804031647197_StockLocked.resx">
+      <DependentUpon>201804031647197_StockLocked.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

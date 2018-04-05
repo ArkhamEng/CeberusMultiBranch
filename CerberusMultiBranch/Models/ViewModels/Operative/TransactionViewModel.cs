@@ -1,5 +1,6 @@
 ﻿
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,5 +25,13 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public ICollection<Purchase> Purchases { get; set; }
 
         public ICollection<Sale> Sales { get; set; }
+
+        public ICollection<CashRegister> CashRegisters { get; set; }
+
+        public TransactionViewModel()
+        {
+            BeginDate = DateTime.Now.TodayLocal();
+            EndDate = BeginDate.Value.AddDays(Cons.One);
+        }
     }
 }

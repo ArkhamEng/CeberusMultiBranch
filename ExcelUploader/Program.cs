@@ -12,15 +12,8 @@ namespace ExcelUploader
     {
         static void Main(string[] args)
         {
-
-            //  DataManager.AddCatalogs();
-
-            foreach (TimeZoneInfo zoneID in TimeZoneInfo.GetSystemTimeZones())
-            {
-                Console.Write(zoneID.Id);
-            }
-            //DataManager.Begin();
-
+            var states = Excel.GetEstados();
+            var munici = Excel.GetMunicipality();
 
             Console.Write("Operación completa.. presiona cualquier tecla para cerrar!");
             Console.ReadLine();

@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.SaleDetail>
+@using CerberusMultiBranch.Support
 
 @*<script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>*@
 <script src="~/Scripts/Table2Excel.js"></script>
@@ -65,7 +66,7 @@
                             @Html.DisplayFor(modelItem => item.Product.Unit)
                         </td>
                         <td>
-                            @{ var iva = (item.Price / 1.16); var priceBI = item.Price - iva; }
+                            @{ var iva = (item.Price / Cons.DeIVA); var priceBI = item.Price - iva; }
                             @priceBI.ToString("c")
                         </td>
                         <td>
@@ -138,7 +139,7 @@
                     @Html.DisplayFor(modelItem => item.Product.Unit)
                 </td>
                 <td>
-                    @{ var iva = (item.Price / 1.16); var priceBI = item.Price - iva; }
+                    @{ var iva = (item.Price / Cons.DeIVA); var priceBI = item.Price - iva; }
 
                     @priceBI.ToString("c")
                 </td>

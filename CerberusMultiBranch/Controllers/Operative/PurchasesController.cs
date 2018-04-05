@@ -62,7 +62,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             //si el usuario no es un supervisor, busco solo las comprar registradas por el 
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId,status);
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId, status);
             return PartialView("_PurchaseList", model);
         }
 
@@ -136,14 +136,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.PurchaseDetails)
-                             where ( branchId == null && branchIds.Contains(p.BranchId) || p.BranchId == branchId)
+                             where (branchId == null && branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
                              && (bill == null || bill == string.Empty || p.Bill.Contains(bill))
                              && (provider == null || provider == string.Empty || p.Provider.Name.Contains(provider))
                              && (userId == null || p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
-                             &&(status == null || p.Status == status )
+                             && (status == null || p.Status == status)
                              select p).ToList();
 
             return purchases;
@@ -281,14 +281,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                     product.ProviderCode = exProd.Code;
                 }
             }
-         
+
             return PartialView("_AddProduct", product);
         }
 
 
         [HttpPost]
         public ActionResult AutoCompleateExternal(string filter, int entityId)
-            {
+        {
             var model = db.ExternalProducts.Where(p => p.Code.Contains(filter) && p.ProviderId == entityId).Take(20).
                 Select(p => new { Id = p.Code.ToUpper(), Label = p.Code.ToUpper(), Value = p.Description.ToUpper() });
 
@@ -303,14 +303,22 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var detail = db.PurchaseDetails.
                     FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
 
+                //obtengo el IVA configurado en base de datos
+                var taxPercentage = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
+
+                //Calculo el precio con IVA
+                var taxAmount = Math.Round((price * (taxPercentage / Cons.OneHundred)), Cons.Two);
+                var taxedPrice = Math.Round((price + taxAmount), Cons.Two);
+
+
                 //compruebo si existe el código entre los productos del proveedor
                 var extProd = db.ExternalProducts.
                     FirstOrDefault(ex => ex.ProviderId == providerId && ex.Code == externalCode);
 
-                var product = db.Products.Include(p=> p.Equivalences).
-                                FirstOrDefault(p=> p.ProductId == productId);
+                var product = db.Products.Include(p => p.Equivalences).
+                                FirstOrDefault(p => p.ProductId == productId);
 
-                //si el código no existe lo registro como nuevo
+                //si el producto no existe en la lista del proveedor, lo agrego con el precio SIN IVA
                 if (extProd == null)
                 {
                     extProd = new ExternalProduct
@@ -325,28 +333,40 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //agrego el producto a la lista
                     db.ExternalProducts.Add(extProd);
                 }
-               
-                
-                var equivalence = product.Equivalences.FirstOrDefault(e => e.ProviderId == productId);
+                else
+                {
+                    //modifico el precio en el listado de proveedor
+                    extProd.Price = price;
+                    db.Entry(extProd).Property(p => p.Price).IsModified = true;
+                }
 
-                if(equivalence == null)
+                var equivalence = product.Equivalences.FirstOrDefault(e => e.ProviderId == providerId && e.ProductId == productId);
+
+                if (equivalence == null)
                 {
                     equivalence = new Equivalence
                     { ProviderId = providerId, Code = externalCode, ProductId = productId };
 
                     db.Equivalences.Add(equivalence);
                 }
-                else if(equivalence.Code != externalCode)
+                else if (equivalence.Code != externalCode)
                 {
                     equivalence.Code = externalCode;
                     db.Entry(equivalence).State = EntityState.Modified;
                 }
-               
+
 
                 if (detail != null)
                 {
                     detail.Quantity += quantity;
+                    detail.Price = price;
+                    detail.Amount = price * detail.Quantity;
+                    detail.TaxAmount = taxAmount;
+                    detail.TaxedPrice = taxedPrice;
+                    detail.TaxPercentage = taxPercentage;
                     detail.Amount = detail.Quantity * detail.Price;
+                    detail.TaxAmount = detail.Quantity * detail.TaxedPrice;
+
 
                     db.Entry(detail).State = EntityState.Modified;
                 }
@@ -357,8 +377,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                         ProductId = productId,
                         PurchaseId = purchaseId,
                         Quantity = quantity,
-                        Price = price,
-                        Amount = price * quantity
+                        Price = price, //precio sin IVA
+                        Amount = price * quantity, // monto total sin IVA
+                        TaxedPrice = taxedPrice, //Precio con IVA
+                        TaxedAmount = taxedPrice * quantity, //monto total Con IVA
+                        TaxPercentage = taxPercentage, //Porcentaje e IVA
+                        TaxAmount = taxAmount //monto de IVA
                     };
 
                     db.PurchaseDetails.Add(detail);
@@ -366,16 +390,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-
-                var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s=> s.PurchaseId == purchaseId);
+                var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s => s.PurchaseId == purchaseId);
 
                 purchase.TotalAmount = purchase.PurchaseDetails.Sum(d => d.Amount);
+                purchase.TotalTaxedAmount = purchase.PurchaseDetails.Sum(d => d.TaxedAmount);
+                purchase.TotalTaxAmount = purchase.PurchaseDetails.Sum(d => d.TaxAmount);
                 purchase.UpdDate = DateTime.Now.ToLocal();
                 purchase.UpdUser = User.Identity.Name;
 
-                db.Entry(purchase).Property(p=> p.TotalAmount).IsModified = true;
-                db.Entry(purchase).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(purchase).Property(p => p.UpdUser).IsModified = true;
+                db.Entry(purchase).State = EntityState.Modified;
 
                 db.SaveChanges();
             }
@@ -410,23 +433,23 @@ namespace CerberusMultiBranch.Controllers.Operative
             var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s => s.PurchaseId == transactionId);
 
             purchase.TotalAmount = purchase.PurchaseDetails.Sum(d => d.Amount);
+            purchase.TotalTaxAmount = purchase.PurchaseDetails.Sum(d => d.TaxAmount);
+            purchase.TotalTaxedAmount = purchase.PurchaseDetails.Sum(d => d.TaxedAmount);
+
             purchase.UpdDate = DateTime.Now.ToLocal();
             purchase.UpdUser = User.Identity.Name;
 
-            db.Entry(purchase).Property(p => p.TotalAmount).IsModified = true;
-            db.Entry(purchase).Property(p => p.UpdDate).IsModified = true;
-            db.Entry(purchase).Property(p => p.UpdUser).IsModified = true;
+            db.Entry(purchase).State = EntityState.Modified;
 
             db.SaveChanges();
 
-            var model = db.PurchaseDetails.Include(d => d.Product.Images).Include(d=> d.Purchase).
+            var model = db.PurchaseDetails.Include(d => d.Product.Images).Include(d => d.Purchase).
               Where(d => d.PurchaseId == transactionId).ToList();
-
 
 
             model.ForEach(p =>
             {
-                p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId 
+                p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId
                 && e.ProviderId == p.Purchase.ProviderId).ToList();
             });
 
@@ -447,7 +470,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.TotalAmount = model.PurchaseDetails.Sum(pd => pd.Amount);
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
-                model.Status  = TranStatus.Reserved;
+                model.Status = TranStatus.Reserved;
 
                 foreach (var detail in model.PurchaseDetails)
                 {
@@ -477,8 +500,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                         brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
                         brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
 
-                        brp.LastStock = brp.Stock;
-                        brp.Stock += detail.Quantity;
+                        //si el producto esta configurado para generar stock, actualizo las cantidades
+                        if (detail.Product.StockRequired)
+                        {
+                            brp.LastStock = brp.Stock;
+                            brp.Stock += detail.Quantity;
+                        }
 
                         brp.UpdDate = DateTime.Now.ToLocal();
                         brp.UpdUser = User.Identity.Name;
@@ -510,20 +537,23 @@ namespace CerberusMultiBranch.Controllers.Operative
                         db.BranchProducts.Add(brp);
                     }
 
-                    var stkM = new StockMovement
+                    //si el producto esta configurado para generar stock, entonces registro el movimiento
+                    if (detail.Product.StockRequired)
                     {
-                        BranchId = branchId,
-                        Comment = "COMPRA CON FOLIO " + model.Bill,
-                        MovementDate = DateTime.Now.ToLocal(),
-                        ProductId = detail.ProductId,
-                        MovementType = MovementType.Entry,
-                        User = User.Identity.Name,
-                        Quantity = detail.Quantity,
-                    };
+                        var stkM = new StockMovement
+                        {
+                            BranchId = branchId,
+                            Comment = "COMPRA CON FOLIO " + model.Bill,
+                            MovementDate = DateTime.Now.ToLocal(),
+                            ProductId = detail.ProductId,
+                            MovementType = MovementType.Entry,
+                            User = User.Identity.Name,
+                            Quantity = detail.Quantity,
+                        };
 
-                    db.StockMovements.Add(stkM);
+                        db.StockMovements.Add(stkM);
+                    }
                 }
-
                 db.Entry(model);
                 db.SaveChanges();
 
@@ -625,7 +655,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var purchaseId = payment.PurchaseId;
 
-                if(payment.Purchase.Status == TranStatus.Compleated)
+                if (payment.Purchase.Status == TranStatus.Compleated)
                 {
                     payment.Purchase.Status = TranStatus.Reserved;
                     payment.Purchase.UpdDate = DateTime.Now.ToLocal();
@@ -651,7 +681,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
- 
+
         #region Metodos Descontinuados
         //this method looks for providers products to be registered in a purchase
         [HttpPost]
