@@ -467,7 +467,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var model = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.PurchaseDetails.Select(pd => pd.Product.BranchProducts)).
                     FirstOrDefault(p => p.PurchaseId == purchaseId);
 
-                model.TotalAmount = model.PurchaseDetails.Sum(pd => pd.Amount);
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
                 model.Status = TranStatus.Reserved;
@@ -528,8 +527,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                         brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
                         brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
 
-                        brp.LastStock = Cons.Zero;
-                        brp.Stock += detail.Quantity;
+                        //si se requiere inventario, agrego la cantidad al stock
+                        if (detail.Product.StockRequired)
+                            brp.Stock += detail.Quantity;
 
                         brp.UpdDate = DateTime.Now.ToLocal();
                         brp.UpdUser = User.Identity.Name;
@@ -543,7 +543,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         var stkM = new StockMovement
                         {
                             BranchId = branchId,
-                            Comment = "COMPRA CON FOLIO " + model.Bill,
+                            Comment = "ENTRADA AUTOMATICA-COMPRA CON FOLIO " + model.Bill,
                             MovementDate = DateTime.Now.ToLocal(),
                             ProductId = detail.ProductId,
                             MovementType = MovementType.Entry,

@@ -50,12 +50,10 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.UpdUser = sale.UpdUser;
             this.Comment = sale.Comment;
             
-
             this.CarMakes = new List<ISelectable>().ToSelectList();
             this.Categories = new List<ISelectable>().ToSelectList();
             this.CarModels = new List<ISelectable>().ToSelectList();
             this.CarYears = new List<ISelectable>().ToSelectList();
-
         }
     }
 }

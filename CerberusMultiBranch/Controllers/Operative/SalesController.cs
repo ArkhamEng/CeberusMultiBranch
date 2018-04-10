@@ -180,7 +180,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 PsProductId = productId,
                 PsTransactionId = saleId,
-                CPrice = transDet.Price,
+                CPrice = transDet.TaxedPrice,
                 SPrice = bp != null ? bp.StorePrice : Cons.Zero,
                 DPrice = bp != null ? bp.DealerPrice : Cons.Zero,
                 WPrice = bp != null ? bp.WholesalerPrice : Cons.Zero,
@@ -225,7 +225,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.UpdDate = DateTime.Now.ToLocal();
                     sale.ClientId = clientId;
                     sale.UserId = User.Identity.GetUserId();
-                    sale.Folio  = User.Identity.GetFolio(Cons.Zero);
+                    sale.Folio = User.Identity.GetFolio(Cons.Zero);
 
                     db.Sales.Add(sale);
                     db.SaveChanges();
@@ -274,32 +274,35 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var det = db.SaleDetails.Include(td => td.Product).Include(td => td.Product.Images)
-             .FirstOrDefault(td => td.SaleId == transactionId && td.ProductId == productId);
+                //obtengo el IVA configurado en base de datos
+                var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
 
-                det.Price = price;
-                var newAmount = det.Price * det.Quantity;
+                //obtengo toda la venta, con sus detalles
+                var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SaleDetails.Select(sd => sd.Product.Images)).
+                           FirstOrDefault(s => s.SaleId == transactionId);
 
-                //si la nueva cantidad es menor a la anterior
-                //resto la diferencia del total de la venta
-                if (det.Amount > newAmount)
-                {
-                    var f = det.Amount - newAmount;
-                    det.Sale.TotalAmount -= f;
-                }
+                //dentro de la venta, busco  el detalle a modificar
+                var det = sale.SaleDetails.FirstOrDefault(sd=> sd.ProductId == productId);
 
-                //si la nueva cantidad es mayor a la anterior
-                //sumo la diferencia del total de la venta
-                else
-                {
-                    var f = newAmount - det.Amount;
-                    det.Sale.TotalAmount += f;
-                }
+                //el precio seteado Incluye IVA
+                det.TaxedPrice = price;
+                det.TaxedAmount = det.TaxedPrice * det.Quantity;
+             
+                //Calculo el precio sin IVA y el monto Total sin IVA
+                det.Price      = Math.Round( det.TaxedPrice / (Cons.One + (iva / Cons.OneHundred)), Cons.Two);
+                det.Amount     = Math.Round((det.Price * det.Quantity), Cons.Two);
 
-                det.Amount = newAmount;
+                //canculo el monto de IVA
+                det.TaxAmount = Math.Round((det.TaxedPrice - det.Price) * det.Quantity, Cons.Two);
 
-                db.Entry(det).State = EntityState.Modified;
-                db.Entry(det.Sale).State = EntityState.Modified;
+                //actualizo los totales de la venta
+                sale.TotalAmount      = sale.SaleDetails.Sum(sd => sd.Amount);
+                sale.TotalTaxAmount   = sale.SaleDetails.Sum(sd => sd.TaxAmount);
+                sale.TotalTaxedAmount = sale.SaleDetails.Sum(sd => sd.TaxedAmount);
+
+              
+                db.Entry(sale).State = EntityState.Modified;
+            
                 db.SaveChanges();
 
                 var model = db.SaleDetails.Include(s => s.Product).
@@ -308,7 +311,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (isCart)
                     return PartialView("_CartDetails", model);
                 else
-                    return PartialView("_Details", model);
+                    return PartialView("_Details", sale.SaleDetails);
             }
             catch (Exception ex)
             {
@@ -668,7 +671,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             List<Product> products = new List<Product>();
 
             products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
-                        where (p.Code == code) && (p.ProductType == ProductType.Single) 
+                        where (p.Code == code) && (p.ProductType == ProductType.Single)
                         select p).Take((int)Cons.OneHundred).ToList();
 
             if (products.Count == Cons.Zero)
@@ -721,19 +724,21 @@ namespace CerberusMultiBranch.Controllers.Operative
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
+            //obtengo el IVA configurado en base de datos
+            var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
+
+
             var bp = db.BranchProducts.Include(brp => brp.Product).
                         FirstOrDefault(brp => brp.BranchId == branchId && brp.ProductId == productId);
 
             var existance = bp != null ? bp.Stock : Cons.Zero;
 
             //consulto si el usuario tiene una venta activa
-            var sale = db.Sales.Include(s=> s.SaleDetails).Include(s => s.Client).FirstOrDefault(s => s.SaleId == saleId);
+            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).
+                Include(s => s.SaleDetails.Select(sd => sd.Product.Images)).FirstOrDefault(s => s.SaleId == saleId);
 
-
-            var price = 0.0;
-            var amount = 0.0;
-            var totQuantity = quantity;
-
+            var taxedPrice = 0.0;
+           
             //checo si el producto ya esta en la venta
             var detail = sale.SaleDetails.
                 FirstOrDefault(td => td.ProductId == productId && td.SaleId == sale.SaleId);
@@ -741,18 +746,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             //si lo esta, sumo la cantidad
             if (detail != null)
             {
-                //sumo la cantidad a la cantidad existente
-                totQuantity += detail.Quantity;
-
-                //utilizo el precio seteado (ya que pudo haber sido modificado manualmente)
-                price = detail.Price;
-
+                //utilizo el precio seteado, ya que pudo haber sido modificado manualmente
                 detail.Quantity += quantity;
-                detail.Amount = (price * detail.Quantity);
 
+                detail.TaxAmount = Math.Round((detail.TaxAmount * detail.Quantity), Cons.Two);
+                detail.Amount = Math.Round((detail.Price * detail.Quantity), Cons.Two);
+                detail.TaxedAmount = detail.TaxedPrice * detail.Quantity;
 
                 //verifico el stock y valido si es posible agregar mas producto a la venta
-                if (existance < totQuantity)
+                if (existance < detail.Quantity)
                 {
                     var j = new
                     {
@@ -763,12 +765,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(j);
                 }
 
-                 db.Entry(detail).State = EntityState.Modified;
+                db.Entry(detail).State = EntityState.Modified;
             }
             else
             {
                 //verifico el stock y valido si es posible agregar mas producto a la venta
-                if (existance < totQuantity)
+                if (existance < quantity)
                 {
                     var j = new
                     {
@@ -779,38 +781,48 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(j);
                 }
 
-                //obtengo el precio por el tipo de cliente
+                //obtengo el precio por el tipo de cliente (Precio con IVA)
                 switch (sale.Client.Type)
                 {
                     case ClientType.Store:
-                        price = bp.StorePrice;
+                        taxedPrice = bp.StorePrice;
                         break;
                     case ClientType.Dealer:
-                        price = bp.DealerPrice;
+                        taxedPrice = bp.DealerPrice;
                         break;
                     case ClientType.Wholesaler:
-                        price = bp.WholesalerPrice;
+                        taxedPrice = bp.WholesalerPrice;
                         break;
                 }
+
+                //Calculo el precio sin IVA y el monto del IVA
+                var price = taxedPrice / (Cons.One + (iva / Cons.OneHundred));
+                var taxAmount = taxedPrice - price;
+
 
                 detail = new SaleDetail
                 {
                     ProductId = productId,
                     SaleId = sale.SaleId,
-                    Price = price,
                     Quantity = quantity,
-                    Amount = (price * quantity)
+                    Price = Math.Round(price, Cons.Two), //Precio Sin IVA
+                    TaxedPrice = taxedPrice, //Precio Con IVA
+                    TaxAmount = Math.Round((taxAmount * quantity), Cons.Two), //El monto total de IVA
+                    Amount = Math.Round((price * quantity), Cons.Two), //El total sin IVA
+                    TaxedAmount = taxedPrice * quantity //El total con IVA
                 };
 
                 sale.SaleDetails.Add(detail);
             }
 
-            amount = sale.SaleDetails.Sum(s => s.Amount);
+            sale.TotalAmount = sale.SaleDetails.Sum(s => s.Amount);
+            sale.TotalTaxedAmount = sale.SaleDetails.Sum(s => s.TaxedAmount);
+            sale.TotalTaxAmount = sale.SaleDetails.Sum(s => s.TaxAmount);
 
             if (sale.TransactionType == TransactionType.Credito)
             {
-              
-                if (amount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
+
+                if (sale.TotalTaxedAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
                         Result = "Error",
@@ -820,7 +832,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
             }
 
-            sale.TotalAmount = amount;
 
             try
             {
@@ -839,7 +850,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult RemoveDetail(int saleId, int productId)
         {
-            var sale = db.Sales.Include(s => s.SaleDetails).FirstOrDefault(s => s.SaleId == saleId);
+            //obtnego la venta con imagenes
+            var sale = db.Sales.Include(s => s.SaleDetails).
+                Include(s=> s.SaleDetails.Select(sd=> sd.Product.Images)).FirstOrDefault(s => s.SaleId == saleId);
 
             var detail = sale.SaleDetails.FirstOrDefault(d => d.ProductId == productId);
 
@@ -847,14 +860,16 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 sale.SaleDetails.Remove(detail);
 
-                sale.TotalAmount = sale.SaleDetails.Sum(sd => sd.Amount);
+                sale.TotalAmount      = sale.SaleDetails.Sum(sd => sd.Amount);
+                sale.TotalTaxAmount   = sale.SaleDetails.Sum(sd => sd.TaxAmount);
+                sale.TotalTaxedAmount = sale.SaleDetails.Sum(sd => sd.TaxedAmount);
+
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
             }
 
             var model = db.SaleDetails.Include(d => d.Product.Images).
               Where(d => d.SaleId == saleId).ToList();
-
 
             return PartialView("_Details", model);
         }
@@ -972,15 +987,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var sale = db.Sales.Include(s => s.SaleDetails).
                            FirstOrDefault(s => s.SaleId == saleId);
 
-                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().Year.ToString().Substring(Cons.Two));
+                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
 
                 if (addFolio)
                 {
-                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess && 
+                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
                                                   s.BranchId == sale.BranchId && s.Year == sale.Year).
-                                                  OrderByDescending(s=>s.Sequential).FirstOrDefault();
-                    
-                    var seq = lastSale !=null ? lastSale.Sequential:Cons.Zero;
+                                                  OrderByDescending(s => s.Sequential).FirstOrDefault();
+
+                    var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
                     sale.Sequential = (seq + Cons.One);
 
                     sale.Folio = User.Identity.GetFolio(sale.Sequential);
@@ -1002,8 +1017,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         throw new Exception("Un producto execede la cantidad en inventario");
 
                     //guardo dato del detalle incluyendo la comision de la venta del determinado producto
-                    detail.Amount = detail.Price * detail.Quantity;
-                    detail.Quantity = detail.Quantity;
+                  
                     detail.SortOrder = sortOrder;
 
                     if (pb.Product.Category.Commission > Cons.Zero)
@@ -1017,7 +1031,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     db.Entry(pb).State = EntityState.Modified;
 
-                    //si el producto que se esta agregando vendiendo es un paquete
+                    //si el producto que se esta vendiendo es un paquete
                     //agrego todos los productos q lo complementan a la venta con precio 0
                     if (pb.Product.ProductType == ProductType.Package)
                     {
@@ -1039,19 +1053,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                             detBP.LastStock = (detBP.Stock + detBP.Reserved);
                             detBP.Reserved -= pckDet.Quantity;
 
-                            //agrego el moviento al inventario
-                            StockMovement detSm = new StockMovement
-                            {
-                                BranchId = sale.BranchId,
-                                ProductId = pckDet.DetailtId,
-                                MovementType = MovementType.Exit,
-                                Comment = "Salida en Paquete venta folio:" + sale.Folio,
-                                User = User.Identity.Name,
-                                MovementDate = DateTime.Now.ToLocal(),
-                                Quantity = detail.Quantity
-                            };
-
-                            db.StockMovements.Add(detSm);
                             db.SaleDetails.Add(tDeatil);
 
                             db.Entry(detBP).State = EntityState.Modified;
@@ -1061,13 +1062,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //agrego el moviento al inventario
                     StockMovement sm = new StockMovement
                     {
-                        BranchId = pb.BranchId,
-                        ProductId = pb.ProductId,
-                        MovementType = MovementType.Exit,
-                        Comment = "Venta folio:" + sale.Folio,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now.ToLocal(),
-                        Quantity = detail.Quantity
+                        BranchId        = pb.BranchId,
+                        ProductId       = pb.ProductId,
+                        MovementType    = MovementType.Exit,
+                        Comment         = "SALIDA AUTOMATICA, VENTA FOLIO:" + sale.Folio,
+                        User            = User.Identity.Name,
+                        MovementDate    = DateTime.Now.ToLocal(),
+                        Quantity        = detail.Quantity
                     };
 
                     db.StockMovements.Add(sm);
@@ -1075,9 +1076,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sortOrder++;
                 }
 
-                //ajusto el monto total y agrego el folio
-                sale.TotalAmount = sale.SaleDetails.Sum(td => td.Amount);
-                sale.Folio = sale.Folio;
+                //agrego el folio
+                sale.Folio       = sale.Folio;
 
                 //verifico que la venta no exceda el crédito del cliente
                 if (sale.TransactionType == TransactionType.Credito)
