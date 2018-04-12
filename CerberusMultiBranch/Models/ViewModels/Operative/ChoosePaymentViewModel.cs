@@ -9,14 +9,16 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 {
     public class ChoosePaymentViewModel
     {
+        public int SaleId { get; set; }
+
         [DataType(DataType.Currency)]
-        public double Payment { get; set; }
+        public double CashAmount { get; set; }
 
         [DataType(DataType.Currency)]
         public double AmountToPay { get; set; }
 
         [DataType(DataType.Currency)]
-        public double AditionalPayment { get; set; }
+        public double CardAmount { get; set; }
 
         
         public string Reference { get; set; }
@@ -25,10 +27,13 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public List<PaymentMethod> PaymentMethods { get; set; }
 
+        public ICollection<SaleDetail> Details { get; set; }
+
         public ChoosePaymentViewModel()
         {
             this.PaymentMethod = PaymentMethod.Efectivo;
             this.PaymentMethods = new List<PaymentMethod>();
+            this.Details = new List<SaleDetail>();
         }
     }
 }

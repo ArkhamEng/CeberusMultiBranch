@@ -1,0 +1,240 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.ChoosePaymentViewModel
+@using CerberusMultiBranch.Models.Entities.Operative;
+
+
+
+<div id="ModalRegistPayment" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div id="RegistPaymentContent" class="modal-content panel-success">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <a class="col-xs-4">
+                        FOLIO  @Model.Details.First().Sale.Folio
+                    </a>
+                    <a class="col-xs-4">
+                        TOTAL VENDIDO
+                        @Model.Details.First().Sale.TotalTaxedAmount.ToString("c")
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body panel-group">
+
+                <div style="overflow-y:auto; max-height:320px">
+                    <table id="tbDetails" class="table table-striped small">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>
+                                    @Html.DisplayName("Código")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Descripción")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Precio")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Cantidad")
+                                </th>
+                                <th>
+                                    @Html.DisplayName("Total")
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Details)
+                            {
+                                <tr>
+                                    <td class="col-md-1" align="center">
+                                        @if (item.Product.Images.Count > 0)
+                                        {
+                                            <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
+                                        }
+                                        else
+                                        {
+                                            <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
+                                        }
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Product.Code)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Product.Name)<br />
+                                        <label>Por </label>  @Html.DisplayFor(m => item.Product.TradeMark)
+                                        <label>  Unidad </label>  @Html.DisplayFor(m => item.Product.Unit)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.TaxedPrice)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.Quantity)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(m => item.TaxedAmount)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        @if (Model.Details.First().Sale.TransactionType == TransactionType.Contado)
+                        {
+                            <label>Registre el pago exacto de la venta de contado</label>
+                        }
+                        else
+                        {
+                            <label>Registre el monto del anticipo (opcional) </label>
+                        }
+                    </div>
+                    <div class="panel-body">
+                        <div id="Mix">
+                            <div class="form-group col-md-3">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        Efectivo
+                                        @*<i class="fa fa-money"></i>*@
+                                    </span>
+                                    @Html.EditorFor(model => model.CashAmount, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-3">
+
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        Tarjeta
+                                        @*<i class="fa fa-credit-card-alt"></i>*@
+                                    </span>
+                                    @Html.EditorFor(model => model.CardAmount, new { htmlAttributes = new { @class = "form-control", type = "number" } })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="Ref">
+                            <div class="form-group col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">
+                                        Referencia
+                                        @*<i class="fa fa-bookmark"></i>*@
+                                    </span>
+                                    @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @class = "form-control", placeholder = "REFERENCÍA BANCARIA" } })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @Html.HiddenFor(model => model.AmountToPay)
+                @Html.HiddenFor(model => model.SaleId)
+            </div>
+            <div class="panel-footer clearfix">
+
+                <button class="btn btn-success" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
+                    <span class="fa fa-ticket"></span>
+                    Imprimir Ticket
+                </button>
+
+                <button class="btn btn-primary" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)">
+                    <span class="fa fa-file"></span>
+                    Imprimir Nota
+                </button>
+
+                <button class="btn btn-danger pull-right" type="button" onclick="ClosePayment()">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#ModalRegistPayment").modal('show');
+        /*
+            $("input[name=PaymentMethod]").click(function ()
+            {
+                var amount = $("#AmountToPay").val();
+                $("#Payment").val(amount);
+                $("#AditionalPayment").val(0);
+                $("#Reference").val('');
+
+
+                if (this.value == 'Efectivo' || this.value == 'Tarjeta')
+                {
+                    $("#Mix").addClass("hidden");
+
+                    if (this.value == 'Tarjeta')
+                        $("#Ref").removeClass("hidden");
+                    else
+                        $("#Ref").addClass("hidden");
+                }
+                else
+                {
+                    $("#Mix").removeClass("hidden");
+                    $("#Ref").removeClass("hidden");
+                }
+            });*/
+
+        if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
+            $("#CashAmount").off('keyup').keyup(function () {
+                var val = $("#CashAmount").val();
+                var result = Calculate(val);
+
+                result = parseFloat(result).toFixed(2);
+
+                $("#CardAmount").val(result);
+            });
+
+            $("#CardAmount").off('keyup').keyup(function () {
+                var val = $("#CardAmount").val();
+                var result = Calculate(val);
+
+                result = parseFloat(result).toFixed(2);
+
+                $("#CashAmount").val(result);
+            });
+        }
+    });
+
+    function Calculate(val) {
+        var total = $("#AmountToPay").val();
+
+        var result = (total - parseFloat(val));
+
+        return result;
+    }
+
+    function RegisterPayment(printType) {
+        $("#ModalRegistPayment").off("hidden.bs.modal").on("hidden.bs.modal", function () {
+            ShowLoading();
+            var param = {
+                saleId: $("#SaleId").val(),
+                //  paymentMethod: $("input[name=PaymentMethod]:checked").val(),
+                cash: $("#CashAmount").val(),
+                card: $("#CardAmount").val(),
+                reference: $("#Reference").val(),
+                printType: printType
+            };
+
+            ExecuteAjax('@Url.Action("RegistPayment")', param, function (response) {
+                HideLoading();
+
+                if ($.isPlainObject(response))
+                    ShowMessage(response.Result, response.Message, 'warning');
+                else {
+                    $("#divPrinter").html(response);
+                    PrintNote();
+                }
+            });
+        });
+
+        $("#ModalRegistPayment").modal('hide');
+    }
+</script>

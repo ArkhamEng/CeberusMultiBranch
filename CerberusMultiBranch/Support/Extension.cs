@@ -224,6 +224,11 @@ namespace CerberusMultiBranch.Support
             return quantity;
         }
 
+        public static double RoundMoney(this double amount)
+        {
+            return Math.Round(amount, Cons.Decimals);
+        }
+
         public static string enletras(string num)
         {
             string res, dec = "";

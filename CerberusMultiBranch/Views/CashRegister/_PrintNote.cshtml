@@ -1,6 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 @using CerberusMultiBranch.Support
-@using CerberusMultiBranch.Models.Entities.Operative 
+@using CerberusMultiBranch.Models.Entities.Operative
 
 
 <script src="~/Scripts/printThis.js"></script>
@@ -11,8 +11,8 @@
             <tr>
                 <td width="300px">
                     <table style="width:100%">
-                    @if (User.Identity.GetBranchId() != 2)
-                    {
+                        @if (User.Identity.GetBranchId() != 2)
+                        {
                             <tr>
                                 <td>
                                     <img src="~/Content/Images/logo2.png" style="width:150px">
@@ -28,9 +28,9 @@
                                     LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
                                 </td>
                             </tr>
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
                             <tr>
                                 <td>
                                     <img src="~/Content/Images/rebilogo2.png" style="width:180px; height:90px">
@@ -45,17 +45,17 @@
                                     COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
                                 </td>
                             </tr>
-                    }
+                        }
                     </table>
                 </td>
                 <td width="292px" align="center">
                     @if (User.Identity.GetBranchId() != 2)
-                {
+                    {
                         <div style="width:250px">
                             <label>Expedida en sucursal</label><br />
                             @Model.Branch.Address
                         </div>
-                }
+                    }
                 </td>
                 <td width="244px">
                     <table style="width:100%" class="table-bordered">
@@ -92,17 +92,35 @@
                         </tr>
                         <tr>
                             <td colspan="2" class="text-center">
-                                <label>Tipo de pago:</label>
-                                @if (Model.SalePayments.Count > Cons.One)
+                                @if (Model.Status == TranStatus.Revision)
                                 {
+                                    var debt = (Model.TotalTaxedAmount - Model.SalePayments.Sum(s => s.Amount));
+
+                                    <label>Monto pagado </label>   <a>@Model.SalePayments.Sum(s => s.Amount).ToString("c")</a><br />
+                                    
+                                    <label>Monto restante </label> <a>@debt.ToString("c")</a>
+                                }
+
+                                else if (Model.SalePayments.Count > Cons.One)
+                                {
+                                    <label>Tipo de pago:</label>
                                     <a>@PaymentMethod.Mixto.ToString()</a>
                                 }
                                 else
                                 {
+                                    <label>Tipo de pago:</label>
                                     <a>@Model.SalePayments.First().PaymentMethod.ToString()</a>
                                 }
                             </td>
                         </tr>
+                        @if (Model.Status == TranStatus.Revision)
+                        {
+                            <tr>
+                                <td colspan="2" class="text-center"> 
+                                    <label>Expira </label> @Model.Expiration.ToString("dd/MM/yyyy")
+                                </td>
+                            </tr>
+                        }
                     </table>
 
                 </td>
@@ -135,9 +153,8 @@
                             </td>
                             <td valign="top" class="text-uppercase">
                                 @Model.Client.ToString()<br />
-                               
                             </td>
-                            <td valign="top" class="text-center text-uppercase" >
+                            <td valign="top" class="text-center text-uppercase">
                                 @Model.Client.FTR
                             </td>
                         </tr>
@@ -176,34 +193,34 @@
                             </td>
                         </tr>
                         @foreach (var item in Model.SaleDetails)
-                    {
-                        string st = "height:20px";
-                        if (item.ParentId == null)
                         {
-                            st = "height:20px;";
-                        }
+                            string st = "height:20px";
+                            if (item.ParentId == null)
+                            {
+                                st = "height:20px;";
+                            }
 
-                        <tr style="@st">
-                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                @Html.DisplayFor(mItem => item.Product.Code)
-                            </td>
-                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                @Html.DisplayFor(mItem => item.Product.Category.SatCode)
-                            </td>
-                            <td style="border-right:1px solid gray; width:40%" valign="top">
-                                @item.Product.Name.Substring(0, item.Product.Name.Length <= 30 ? item.Product.Name.Length : 30)
-                            </td>
-                            <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
-                                @Html.DisplayFor(mItem => item.Price)
-                            </td>
-                            <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                @Html.DisplayFor(mItem => item.Quantity)
-                            </td>
-                            <td class="text-right" style="width:10%" valign="top">
-                                @Html.DisplayFor(mItem => item.Amount)
-                            </td>
-                        </tr>
-                    }
+                            <tr style="@st">
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Product.Code)
+                                </td>
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Product.Category.SatCode)
+                                </td>
+                                <td style="border-right:1px solid gray; width:40%" valign="top">
+                                    @item.Product.Name.Substring(0, item.Product.Name.Length <= 30 ? item.Product.Name.Length : 30)
+                                </td>
+                                <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Price)
+                                </td>
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Quantity)
+                                </td>
+                                <td class="text-right" style="width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Amount)
+                                </td>
+                            </tr>
+                        }
                         <tr>
                             <td style="border-right:1px solid gray;" />
                             <td style="border-right:1px solid gray;" />
@@ -219,17 +236,14 @@
                                 @Model.TotalAmount.toText()
                                 PESOS MEXICANOS
                             </td>
-                            @{
-                            var bI = Math.Round(Model.TotalAmount / Cons.DeIVA, Cons.Two);
-                            var iva = Math.Round(Model.TotalAmount - bI, Cons.Two);
-                            }
+
                             <td class="text-right" style="border:1px solid gray; width:10%">
                                 <label class="control-label">
                                     @Html.DisplayName("Sub-Total")
                                 </label>
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
-                                @bI.ToString("c")
+                                @Model.TotalAmount.ToString("c")
                             </td>
                         </tr>
                         <tr style="height:23px">
@@ -239,7 +253,7 @@
                                 </label>
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
-                                @iva.ToString("c")
+                                @Model.TotalTaxAmount.ToString("c")
                             </td>
                         </tr>
                         <tr style="height:23px">
@@ -251,7 +265,7 @@
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
                                 <label class="control-label text-danger">
-                                    @Model.TotalAmount.ToString("c")
+                                    @Model.TotalTaxedAmount.ToString("c")
                                 </label>
                             </td>
                         </tr>
@@ -278,8 +292,7 @@
 
 
 <script>
-    function PrintNote()
-    {
+    function PrintNote() {
         $("#divNote").printThis();
     }
 </script>

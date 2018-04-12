@@ -5,7 +5,6 @@
 <table id="tbSales" class="table table-striped small">
     <thead>
         <tr>
-            <th class="col-md-1 text-center">@Html.DisplayName("Sucursal")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
             <th class="col-md-3 text-center">@Html.DisplayName("Cliente")</th>
             <th class="col-md-1 text-center">@Html.DisplayName("Fecha Venta")</th>
@@ -20,7 +19,6 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td class="text-uppercase">@Html.DisplayFor(m => item.Branch.Name)</td>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
                 <td class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
                 <td >@item.TransactionDate.ToString("dd/MM/yyyy")</td>
@@ -30,18 +28,18 @@
                 @item.ComAmount.ToString("c")
                 </td>
 
-                <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
+                <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
                
                 <td class="input-group text-uppercase">
                     @switch (item.TransactionType)
                     {
                         case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Contado:
-                            <div class="form-control alert-success">
+                            <div class="form-control alert-success input-sm">
                                 @item.TransactionType.ToString()
                             </div>
                             break;
                         case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                            <div class="form-control alert-danger">
+                            <div class="form-control alert-danger input-sm">
                                 @item.TransactionType.ToString()
                             </div>
                             break;
@@ -49,23 +47,23 @@
                     @switch (item.Status)
                     {
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                            <div class="form-control alert-warning">
+                            <div class="form-control alert-warning input-sm">
                                 Procesando
                             </div>
                             break;
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
-                            <div class="form-control alert-info">
+                            <div class="form-control alert-info input-sm">
                                 Reservado
                             </div>
                             break;
 
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
-                            <div class="form-control alert-success">
+                            <div class="form-control alert-success input-sm">
                                 Pagado
                             </div>
                             break;
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
-                            <div class="form-control alert-danger">
+                            <div class="form-control alert-danger input-sm">
                                 Cancelado
                             </div>
                             break;
@@ -83,7 +81,7 @@
     </tbody>
     @{
         var totalCommision = Model.Sum(sale => sale.ComAmount);
-        var totalAmount = Model.Sum(sale => sale.TotalAmount);
+        var totalAmount = Model.Sum(sale => sale.TotalTaxedAmount);
     }
    
 </table>

@@ -87,7 +87,6 @@
                         Cancelar
                     </button>
                 </div>
-
             </div>
         </div>
     </div>
@@ -139,7 +138,8 @@
         $("#ModalPayment").modal({ backdrop: 'static' });
     });
 
-    function ClosePayment() {
+    function ClosePayment()
+    {
         console.log("Cerrar modal");
         $("#ModalPayment").modal('hide');
     }
@@ -166,7 +166,6 @@
                     $("#divPrinter").html(response);
 
                     PrintNote();
-                    //espero 2 segundos para dar tiempo a que salga la ventana de impresion antes de redireccionar
                     setTimeout("closePrintView()", 2000);
                 }
             });

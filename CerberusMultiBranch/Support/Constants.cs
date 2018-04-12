@@ -11,6 +11,8 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
         public const int Two = 2;
 
+        public const int Decimals = 4; //cantidad de decimales en redondeo de dinero
+
         public const double DeIVA = 1.16;
 
         public const int LockTimeOut = 5;

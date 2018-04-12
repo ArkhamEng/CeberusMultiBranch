@@ -37,14 +37,14 @@
                     <br />
                     @Html.DisplayFor(modelItem => item.Product.Name)
                 </td>
-
+               
                 @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
                     {
                     <td class="col-md-2 text-center">
                         <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)"
                             onclick="ChangePrice(@item.ProductId,@item.SaleId)">
                             <u>
-                                @Html.DisplayFor(modelItem => item.Price)
+                                @Html.DisplayFor(modelItem => item.TaxedPrice)
                             </u>
                         </h5>
                     </td>
@@ -53,7 +53,7 @@
                     {
                     <td class="col-md-2 text-center">
                         <h5 id="txtPrice" class="text-info">
-                            @Html.DisplayFor(modelItem => item.Price)
+                            @Html.DisplayFor(modelItem => item.TaxedPrice)
                         </h5>
                     </td>
                     }
@@ -62,7 +62,7 @@
                 </td>
                 <td class="text-right">
                     <h5 id="txtAmount" class="text-right">
-                        @Html.DisplayFor(modelItem => item.Amount)
+                        @Html.DisplayFor(modelItem => item.TaxedAmount)
                     </h5>
                 </td>
                 <td>
@@ -96,7 +96,7 @@ else
 <script>
     $(document).ready(function () {
 
-        $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.Amount).ToString("c")');
+        $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.TaxedAmount).ToString("c")');
 
         if (parseFloat('@Model.Count') > 0)
             $("#btnCompleate").attr("disabled", false);
@@ -105,7 +105,8 @@ else
 
     });
 
-    function ChangePrice(prodId, transId) {
+    function ChangePrice(prodId, transId)
+    {
         var param = { productId: prodId, saleId: transId, isCart: true }
 
         ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {

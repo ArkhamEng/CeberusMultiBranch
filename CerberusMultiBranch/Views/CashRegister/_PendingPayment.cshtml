@@ -20,13 +20,13 @@
                     <th class="col-md-1 text-center">@Html.DisplayName("Envío")</th>
                     <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
 
-                    <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
+                    <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
                     <th class="col-md-1 text-center" />
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
-                        {
+                {
                         <tr>
                             <td>@Html.DisplayFor(m => item.Folio)</td>
                             <td>@Html.DisplayFor(m => item.Client.Name)</td>
@@ -36,19 +36,34 @@
                                 @{ var sending = "Mostrador"; }
 
                                 @if (item.SendingType != 0)
-                                    {
-                                        sending = "Domicilio";
-                                    }
+                                {
+                                    sending = "Domicilio";
+                                }
 
                                 @Html.DisplayFor(m => sending)
                             </td>
-                            <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
+                            <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
 
-                            <td align="center" class="alert alert-info">
-                                Rerservado
+                            <td align="center">
+                                @{
+                                    var alr = "alert-success";
+
+                                    switch (item.TransactionType)
+                                    {
+                                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
+                                            alr = "alert-warning";
+                                            break;
+                                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
+                                            alr = "alert-info";
+                                            break;
+                                    }
+                                }
+                                <div class="form-control input-sm @alr">
+                                    @item.TransactionType.ToString()
+                                </div>
                             </td>
                             <td align="center">
-                                <button class="btn btn-danger" title="Recibir pago" onclick="window.location = '@Url.Action("RegistPayment", new { id = item.SaleId })'">
+                                <button class="btn btn-danger" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
                                     <span class="fa fa-money" />
                                 </button>
                             </td>
@@ -59,3 +74,18 @@
     </div>
 </div>
 
+<script>
+    function ShowPaymentModal(id)
+                                {
+                                    ShowLoading();
+                                    ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
+        {
+            HideLoading();
+
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning', true);
+            else
+                $("#divDetails").html(response);
+        });
+    }
+</script>
