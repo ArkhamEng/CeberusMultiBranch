@@ -39,6 +39,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ICollection<SalePayment> SalePayments { get; set; }
 
         public virtual Client Client { get; set; }
+
+        public virtual SaleCreditNote SaleCreditNote { get; set; }
         #endregion
 
         public Sale()

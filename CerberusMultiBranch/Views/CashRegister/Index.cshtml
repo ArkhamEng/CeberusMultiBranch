@@ -68,12 +68,13 @@ else
     <div class="col-md-3">
         <div class="col-md-12  btn btn-info alert text-center" onclick="OpenNotes()" title="Buscar notas">
             <h3>
-                Tickets y notas
+                Anticipos <br />
+                y comprobantes
             </h3>
         </div>
 
         @if (User.IsInRole("Cajero"))
-                {
+        {
             <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
                  onmouseover="SetPointer(this)" title="Ver y agregar retiros">
                 <h3>
@@ -99,8 +100,12 @@ else
             </h3>
         </div>
     </div>
-    
-    <div id="divModalPending" class="col-md-9">
+
+    @Html.Partial("_Cancelation")
+
+    <div id="divPending" class="col-md-9">
+    </div>
+    <div id="divRefunding" class="col-md-9">
     </div>
 
     <div id="divDetails">
@@ -116,10 +121,19 @@ else
 }
 
 <script>
+    var selectedId = 0;
     $(document).ready(function ()
     {
         CheckPendingPayments();
-        setInterval(function () { CheckPendingPayments(); }, 10000);
+        CheckRefunding();
+
+        setInterval(function ()
+        {
+            CheckPendingPayments();
+            CheckRefunding();
+        }, 10000);
+
+      
 
         $("#btnTerminate").click(function ()
         {
@@ -135,10 +149,40 @@ else
         });
     });
 
+
+    function ShowPaymentModal(id)
+    {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response) {
+            HideLoading();
+
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning', true);
+            else
+                $("#divDetails").html(response);
+        });
+    }
+
+    function ShowRefundmentModal(id)
+    {
+        ShowLoading();
+        ExecuteAjax('@Url.Action("BeginRefund")', { saleID: id }, function (response)
+        {
+            HideLoading();
+
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning', true);
+            else
+                $("#divDetails").html(response);
+        });
+    }
+
+
     function OpenNotes()
     {
         ShowLoading();
-        ExecuteAjax('@Url.Action("TicketsAndNotes")', {}, function (response) {
+        ExecuteAjax('@Url.Action("TicketsAndNotes")', {}, function (response)
+        {
             HideLoading();
             $("#divNotes").html(response);
         });
@@ -146,9 +190,12 @@ else
 
     function OpenWithdrawal()
     {
+        ShowLoading();
         $("#hTitle").text("Detalle de retiros");
 
-        ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view) {
+        ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view)
+        {
+            HideLoading();
             $("#divDetails").html(view);
         });
     }
@@ -173,7 +220,48 @@ else
            function (response)
            {
                if (!$.isPlainObject(response))
-                   $("#divModalPending").html(response);
+                   $("#divPending").html(response);
            });
+    }
+
+    function CheckRefunding() {
+        ExecuteAjax('@Url.Action("OpenRefunding", "CashRegister")', {},
+           function (response)
+           {
+               if (!$.isPlainObject(response))
+               {
+                   console.log("Muestro las devoluciones pendientes");
+                   $("#divRefunding").html(response);
+               }
+                   
+           });
+    }
+
+    function Cancel()
+    {
+        $("#ModalCancel").off('hidden.bs.modal').on('hidden.bs.modal', function ()
+        {
+            ShowLoading();
+
+            var param = { saleId: $("#TransId").val(), comment: $("#txtComment").val() }
+
+            $("#TransId").val("");
+            $("#txtComment").val("");
+
+            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
+            {
+                HideLoading();
+
+                if (j.Result == 'OK')
+                {
+                    CheckPendingPayments();
+                    ShowMessage("Cancelación exitosa", j.Message, 'success');
+                }
+                else
+                    ShowMessage(j.Result, j.Message, 'warning');
+            });
+        });
+
+        $("#ModalCancel").modal("hide");
     }
 </script>

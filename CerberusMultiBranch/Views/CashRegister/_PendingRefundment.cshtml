@@ -1,11 +1,13 @@
-﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
+﻿
+@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
+@using CerberusMultiBranch.Models.Entities.Operative
 
-<div class="panel panel-primary">
+<div class="panel panel-danger">
     <div class="panel-heading">
         <h4 class="panel-title text-uppercase">
-            <span class="fa fa-credit-card" style="float:left">
+            <span class="fa fa-eye-slash" style="float:left">
             </span>
-            &nbsp;Cobros pendientes
+            &nbsp;Devoluciones pendientes
         </h4>
     </div>
     <div class="panel-body">
@@ -15,10 +17,9 @@
                     <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
                     <th class="col-md-5 text-center">@Html.DisplayName("Cliente")</th>
 
-                    <th class="col-md-2 text-center">@Html.DisplayName("Fecha venta")</th>
-                    <th class="col-md-1 text-center">@Html.DisplayName("Envío")</th>
-                    <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-
+                    <th class="col-md-2 text-center">@Html.DisplayName("En efectivo")</th>
+                    <th class="col-md-2 text-center">@Html.DisplayName("En vale")</th>
+                    <th class="col-md-2 text-center">@Html.DisplayName("Cancelo")</th>
                     <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
                     <th class="col-md-1 text-center" />
                 </tr>
@@ -30,18 +31,17 @@
                         <td>@Html.DisplayFor(m => item.Folio)</td>
                         <td>@Html.DisplayFor(m => item.Client.Name)</td>
 
-                        <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                      
+                       
                         <td align="center">
-                            @{ var sending = "Mostrador"; }
-
-                            @if (item.SendingType != 0)
-                            {
-                                sending = "Domicilio";
-                            }
-
-                            @Html.DisplayFor(m => sending)
+                        @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToString("c") 
                         </td>
-                        <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
+
+                        <td align="center">
+                        @item.SalePayments.Where(s => s.PaymentMethod != PaymentMethod.Efectivo).Sum(s => s.Amount).ToString("c")  
+                        </td>
+
+                        <td align="center">@Html.DisplayFor(m => item.UpdUser)</td>
 
                         <td align="center">
                             @{
@@ -62,14 +62,13 @@
                             </div>
                         </td>
                         <td align="center">
-                            <button class="btn btn-success" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
+                            <button class="btn btn-danger" title="Generar devoluciones" onclick="ShowRefundmentModal('@item.SaleId')">
                                 <span class="fa fa-dollar" />
                             </button>
                         </td>
                     </tr>
-                   }
+               }
             </tbody>
         </table>
     </div>
 </div>
-

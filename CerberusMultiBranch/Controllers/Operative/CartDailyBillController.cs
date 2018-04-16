@@ -240,7 +240,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var j = new
                 {
                     Result = "Cantidad insuficiente",
-                    Message = "Estas intentando vender mas productos de los disponibles, revisa el carrito de venta"
+                    Message = "Estas intentando vender mas productos de los disponibles, revisa el carrito de venta, solo puedes vender productos sin existencia "+
+                    "Iniciando una preventa desde el modulo de ventas"
                 };
 
                 return Json(j);

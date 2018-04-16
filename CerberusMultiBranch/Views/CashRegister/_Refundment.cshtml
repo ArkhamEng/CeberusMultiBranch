@@ -1,0 +1,79 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.RefundViewModel
+
+<div id="ModalRefundment" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel panel-danger panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    Rembolso por cancelación de venta
+                </h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="col-md-12 text-center">
+                  <h4 class="text-uppercase">
+                      Se aplicara la devolucíon por cancelación para el cliente @Model.RefundClient, ¿deseas continuar?
+                  </h4>
+                </div>
+                <hr />
+                <div class="col-md-12">
+                    <div class="form-group col-md-4">
+                        <label>En efectivo</label>
+                        @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control input-lg", disabled = true } })
+                    </div>
+                    <div class="form-group col-md-offset-2 col-md-4">
+                        <label>En vale</label>
+                        @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control input-lg", disabled=true } })
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer panel-footer">
+                <button class="btn btn-success pull-left" type="button" onclick="ApplyRefund()">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    Aplicar devolución
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.HiddenFor(m=> m.RefundClientId)
+@Html.HiddenFor(m => m.RefundSaleId)
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#ModalRefundment").modal('show');
+    });
+
+    function ApplyRefund()
+    {
+       
+        $("#ModalRefundment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+
+            var ref = {
+                RefundClientId: $("#RefundClientId").val(),
+                RefundSaleId: $("#RefundSaleId").val(),
+                RefundCash: $("#RefundCash").val(),
+                RefundCredit: $("#RefundCredit").val()
+            }
+
+            ExecuteAjax('@Url.Action("CreateRefund")', { refund: ref }, function (response)
+            {
+                HideLoading();
+
+                if(response.Result!="OK")
+                    ShowMessage("Error al generar el rembolso", response.Message, 'warning');
+                else
+                {
+                    ShowMessage("Rembolso generado", response.Message, 'success');
+                    CheckRefunding();
+                }
+            });
+        });
+
+        $("#ModalRefundment").modal("hide");
+
+    }
+</script>

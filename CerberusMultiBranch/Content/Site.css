@@ -329,3 +329,11 @@ ul ul a {
         -webkit-print-color-adjust: exact;
     }
 }
+
+
+.tab-content > .tab-pane:not(.active),
+.pill-content > .pill-pane:not(.active) {
+    display: block;
+    height: 0;
+    overflow-y: hidden;
+} 

@@ -26,10 +26,10 @@
                         @Html.DisplayNameFor(model => model.First().Price)
                     </th>
                     <th>
-                        @Html.DisplayName("IVA")
+                        @Html.DisplayNameFor(model => model.First().Quantity)
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.First().Quantity)
+                        @Html.DisplayName("IVA")
                     </th>
                     <th>
                         @Html.DisplayNameFor(model => model.First().Amount)
@@ -66,20 +66,21 @@
                             @Html.DisplayFor(modelItem => item.Product.Unit)
                         </td>
                         <td>
-                            @{ var iva = (item.Price / Cons.DeIVA); var priceBI = item.Price - iva; }
-                            @priceBI.ToString("c")
+                            @item.Price.ToString("c")
                         </td>
-                        <td>
-                            @iva.ToString("c")
-                        </td>
-                        <td>
+
+                        <td align="center">
                             @Html.DisplayFor(modelItem => item.Quantity)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.Amount)
+                          @item.TaxAmount.ToString("c")
+                        </td>
+                        >
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TaxedAmount)
                         </td>
                     </tr>
-                }
+                                }
             </tbody>
         </table>
     </div>
@@ -153,7 +154,7 @@
                     @Html.DisplayFor(modelItem => item.Amount)
                 </td>
             </tr>
-        }
+                        }
     </tbody>
 </table>
 

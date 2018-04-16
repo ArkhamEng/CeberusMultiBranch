@@ -54,7 +54,7 @@
                         </td>
 
                         <td class="col-md-1">
-                            @if (item.Quantity > Cons.Zero && item.IsActive)
+                            @if (item.CanSell)
                             {
                                 <button class="btn btn-success" onclick="BeginAdd(@item.ProductId)" title="Agregar a a venta">
                                     <span class="fa fa-shopping-bag"></span>

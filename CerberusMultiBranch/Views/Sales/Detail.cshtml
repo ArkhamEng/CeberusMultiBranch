@@ -14,21 +14,22 @@
 
 @Html.HiddenFor(model => model.ClientId)
 @Html.HiddenFor(model => model.SaleId)
+@Html.HiddenFor(model => model.TransactionType)
 
 
 <br />
 
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#tabProducts">Detalle de Venta</a></li>
-    @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
-    {
-        <li><a data-toggle="tab" href="#tabPayments">Pagos <span id="TotalPayments" class="badge"></span></a></li>
-    }
+
+    <li><a data-toggle="tab" href="#tabPayments">
+        Pagos <span id="TotalPayments" class="badge"></span>
+    </a></li>
 </ul>
 
 <div class="tab-content">
     <div id="tabProducts" class="tab-pane fade in active">
-        <div class="panel panel-danger">
+        <div class="panel panel-default">
             <div class="panel-body">
                 <div class="panel panel-default">
                     <div class="panel-body">
@@ -114,28 +115,31 @@
                             <span class="fa fa-backward"></span>
                             Volver
                         </button>
-
-                        <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?">
-                            <span class="fa fa-cubes"></span>
-                            Terminar
-                        </button>
-                        <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
-                            <span class="glyphicon glyphicon-plus-sign"></span>
-                            Agregar
-                        </button>
+                        @*@if (!(Model.TransactionType == TransactionType.Contado && Model.Status == TranStatus.InProcess))
+                        {*@
+                            <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?">
+                                <span class="fa fa-cubes"></span>
+                                Terminar
+                            </button>
+                            <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
+                                <span class="glyphicon glyphicon-plus-sign"></span>
+                                Agregar
+                            </button>
+                        @*}*@
+                       
                         @if (Model.CanCancel)
                         {
-                        <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
-                            <span class="glyphicon glyphicon-remove"></span>
-                            Cancelar
-                        </button>
+                            <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
+                                <span class="glyphicon glyphicon-remove"></span>
+                                Cancelar
+                            </button>
                         }
                         else
                         {
-                        <button id="btnCancel" class="btn btn-danger  pull-right" type="button" disabled>
-                            <span class="glyphicon glyphicon-remove"></span>
-                            Cancelar
-                        </button>
+                            <button id="btnCancel" class="btn btn-danger  pull-right" type="button" disabled>
+                                <span class="glyphicon glyphicon-remove"></span>
+                                Cancelar
+                            </button>
                         }
                     </div>
                 </div>
@@ -148,57 +152,49 @@
             </div>
         </div>
     </div>
-    @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
-    {
-        <div id="tabPayments" class="tab-pane fade">
-            <div class="panel panel-danger">
-                <div id="divSalePayments" class="panel-body">
-                    @Html.Partial("_SalePayments", Model.SalePayments)
-                </div>
+
+    <div id="tabPayments" class="tab-pane">
+        <div class="panel panel-default">
+            <div id="divSalePayments" class="panel-body">
+                @Html.Partial("_SalePayments", Model.SalePayments)
             </div>
         </div>
-    }
+    </div>
 </div>
-
 
 
 @Html.HiddenFor(model => model.TotalAmount)
 @Html.HiddenFor(model => model.TransactionType)
 
 
-
-
 @Html.Partial("_Cancelation")
 
 <div id="divAdd"></div>
 
-
 @Html.Partial("_SearchProduct")
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#btnShowQuick").click(function ()
         {
             $("#ModalProduct").modal('show');
         });
 
-        $("#btnCompleate").click(function ()
-        {
+        $("#btnCompleate").click(function () {
             ShowConfirm("Terminar y Reservar?", "Deseas concluir la venta y retirar los productos del inventario?", 'static', SubmitCompleate);
         });
 
-        if ('@Model.Status' == '@TranStatus.Reserved' || '@Model.Status' == '@TranStatus.Compleated' || '@Model.Status' == '@TranStatus.Canceled') {
+        if ('@Model.Status' != '@TranStatus.InProcess') {
             $(".Compleated").hide();
         }
     });
 
 
-    function SubmitCompleate()
-    {
+    function SubmitCompleate() {
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response) {
+        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response)
+        {
             HideLoading();
             if (response.Result != 'OK')
                 ShowMessage(response.Header, response.Message, 'warning', true);
@@ -207,17 +203,15 @@
         });
     }
 
-    function Cancel()
-    {
+    function Cancel() {
         $('#ModalCancel').modal('show');
     }
 
-    function BeginCancel()
-    {
+    function BeginCancel() {
         $("#ModalCancel").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
 
-            var param = { transactionId: $("#SaleId").val(), comment: $("#txtComment").val() }
+            var param = { SaleId: $("#SaleId").val(), comment: $("#txtComment").val() }
 
             ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
                 if (j.Result = 'OK')

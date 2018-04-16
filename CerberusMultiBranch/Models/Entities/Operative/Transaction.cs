@@ -81,7 +81,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [NotMapped]
         public virtual bool CanCancel
         {
-            get { return DateTime.Now.ToLocalTime() < this.TransactionDate.AddDays(Cons.DaysToCancel) && this.Status != TranStatus.Canceled; }
+            get { return DateTime.Now.ToLocalTime() < 
+                    this.TransactionDate.AddDays(Cons.DaysToCancel) && 
+                    this.Status != TranStatus.Canceled && this.Status != TranStatus.PreCancel; }
         }
 
     }

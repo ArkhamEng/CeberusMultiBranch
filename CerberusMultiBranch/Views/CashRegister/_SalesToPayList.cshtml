@@ -3,13 +3,13 @@
 <table id="tbSales" class="table table-striped small">
     <thead>
         <tr>
-            <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
-            <th class="col-md-4 text-center">@Html.DisplayName("Cliente")</th>
-            
-            <th class="col-md-3 text-center">@Html.DisplayName("Fecha venta")</th>
-  
-            <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="col-md-1 text-center" />
+            <th class="text-center">@Html.DisplayName("Folio")</th>
+            <th class="text-center">@Html.DisplayName("Cliente")</th>
+
+            <th class="text-center">@Html.DisplayName("Fecha venta")</th>
+
+            <th class="text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+            <th />
         </tr>
     </thead>
     <tbody>
@@ -18,40 +18,54 @@
             <tr>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
                 <td>@Html.DisplayFor(m => item.Client.Name)</td>
-                
-                <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
-               
-                <td align="center">@Html.DisplayFor(m => item.TotalAmount)</td>
 
-                <td align="center">
-                    <div class="dropdown">
-                        <button class="btn btn-primary  dropdown-toggle" type="button" data-toggle="dropdown" title="Imprimir comprobante">
-                            <span class="fa fa-print"></span>
-                            <span class="caret"></span>
+                <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+
+                <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
+
+                <td class="col-xs-2" align="right">
+                    <div class="btn-group">
+                        @if (item.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.Revision)
+                        {
+                            <button class="btn btn-success" type="button" title="Registrar pago" onclick="RegistPayment(@item.SaleId)">
+                                <span class="fa fa-dollar"></span>
+                            </button>
+                        }
+                        <button class="btn btn-warning" type="button" title="Imprimir ticket" onclick="PrintDocument(@item.SaleId,1)">
+                            <span class="fa fa-ticket"></span>
                         </button>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-header">Tipo de comprobante</li>
-                            <li><a onclick="PrintDocument(@item.SaleId,1)">Ticket</a></li>
-                            <li class="divider"></li>
-                            <li><a onclick="PrintDocument(@item.SaleId,2)">Nota</a></li>
-                        </ul>
+                        <button class="btn btn-primary" type="button" title="Imprimir nota" onclick="PrintDocument(@item.SaleId,2)">
+                            <span class="fa fa-file"></span>
+                        </button>
                     </div>
+
+                    @*<div class="dropdown">
+                            <button class="btn btn-primary  dropdown-toggle" type="button" data-toggle="dropdown" title="Imprimir comprobante">
+                                <span class="fa fa-print"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-header">Tipo de comprobante</li>
+                                <li><a onclick="PrintDocument(@item.SaleId,1)">Ticket</a></li>
+                                <li class="divider"></li>
+                                <li><a onclick="PrintDocument(@item.SaleId,2)">Nota</a></li>
+                            </ul>
+                        </div>*@
                 </td>
             </tr>
-          }
+        }
     </tbody>
     @{
         var totalQuantity = Model.Sum(sale => sale.SaleDetails.Sum(s => s.Quantity));
-        var totalAmount = Model.Sum(sale => sale.TotalAmount);
+        var totalAmount = Model.Sum(sale => sale.TotalTaxedAmount);
     }
 </table>
 
 
 
 <script>
-    $(document).ready(function () 
-    {
-        SetDataTable("#tbSales", "#txtFilter");
+    $(document).ready(function () {
+        Paginate("#tbSales", 10);
 
         var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
 
@@ -61,13 +75,18 @@
         $("#lblTotalQuantity").text(tQuantity);
     });
 
-    function PrintDocument(saleId,printType)
-    {
-        $("#ModalNotes").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-        {
+    function RegistPayment(id) {
+        $("#ModalNotes").off('hidden.bs.modal').on('hidden.bs.modal', function () {
+            ShowPaymentModal(id);
+        });
+
+        $("#ModalNotes").modal('hide');
+    }
+
+    function PrintDocument(saleId, printType) {
+        $("#ModalNotes").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
-            ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response)
-            {
+            ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response) {
                 HideLoading();
                 $("#divNotes").html(response);
                 PrintNote();

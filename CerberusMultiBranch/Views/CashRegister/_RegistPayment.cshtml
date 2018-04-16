@@ -10,75 +10,79 @@
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">
                     <a class="col-xs-4">
-                        FOLIO  @Model.Details.First().Sale.Folio
+                        FOLIO <br /> @Model.Details.First().Sale.Folio
                     </a>
-                    <a class="col-xs-4">
-                        TOTAL VENDIDO
+                    <a class="col-xs-3 text-center">
+                        TOTAL VENDIDO<br />
                         @Model.Details.First().Sale.TotalTaxedAmount.ToString("c")
+                    </a>
+                    <a class="col-xs-4 text-right">
+                       DEUDA TOTAL <br />
+                        @Model.AmountToPay.ToString("c")
                     </a>
                 </h4>
             </div>
             <div class="modal-body panel-group">
-
-                <div style="overflow-y:auto; max-height:320px">
-                    <table id="tbDetails" class="table table-striped small">
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>
-                                    @Html.DisplayName("Código")
-                                </th>
-                                <th>
-                                    @Html.DisplayName("Descripción")
-                                </th>
-                                <th>
-                                    @Html.DisplayName("Precio")
-                                </th>
-                                <th>
-                                    @Html.DisplayName("Cantidad")
-                                </th>
-                                <th>
-                                    @Html.DisplayName("Total")
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.Details)
-                            {
+                <div class="panel panel-default">
+                    <div class="panel-body" style="overflow-y:auto; max-height:320px">
+                        <table id="tbDetails" class="table table-striped small">
+                            <thead>
                                 <tr>
-                                    <td class="col-md-1" align="center">
-                                        @if (item.Product.Images.Count > 0)
+                                    <th></th>
+                                    <th>
+                                        @Html.DisplayName("Código")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Descripción")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Precio")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Cantidad")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Total")
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Details)
+                            {
+                                    <tr>
+                                        <td class="col-md-1" align="center">
+                                            @if (item.Product.Images.Count > 0)
                                         {
-                                            <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
+                                                <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
                                         }
                                         else
                                         {
-                                            <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
+                                                <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
                                         }
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(m => item.Product.Code)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(m => item.Product.Name)<br />
-                                        <label>Por </label>  @Html.DisplayFor(m => item.Product.TradeMark)
-                                        <label>  Unidad </label>  @Html.DisplayFor(m => item.Product.Unit)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(m => item.TaxedPrice)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(m => item.Quantity)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(m => item.TaxedAmount)
-                                    </td>
-                                </tr>
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(m => item.Product.Code)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(m => item.Product.Name)<br />
+                                            <label>Por </label>  @Html.DisplayFor(m => item.Product.TradeMark)
+                                            <label>  Unidad </label>  @Html.DisplayFor(m => item.Product.Unit)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(m => item.TaxedPrice)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(m => item.Quantity)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(m => item.TaxedAmount)
+                                        </td>
+                                    </tr>
                             }
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         @if (Model.Details.First().Sale.TransactionType == TransactionType.Contado)
@@ -133,7 +137,7 @@
             </div>
             <div class="panel-footer clearfix">
 
-                <button class="btn btn-success" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
+                <button class="btn btn-warning" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
                     <span class="fa fa-ticket"></span>
                     Imprimir Ticket
                 </button>
@@ -143,9 +147,9 @@
                     Imprimir Nota
                 </button>
 
-                <button class="btn btn-danger pull-right" type="button" onclick="ClosePayment()">
-                    <span class="fa fa-times"></span>
-                    Cancelar
+                <button class="btn btn-danger pull-right" type="button" onclick="ShowCancel()">
+                    <span class="fa fa-trash-o"></span>
+                    Cancelar Venta
                 </button>
             </div>
 
@@ -155,44 +159,25 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#ModalRegistPayment").modal('show');
-        /*
-            $("input[name=PaymentMethod]").click(function ()
+        
+     
+        if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+        {
+            $("#CashAmount").off('keyup').keyup(function ()
             {
-                var amount = $("#AmountToPay").val();
-                $("#Payment").val(amount);
-                $("#AditionalPayment").val(0);
-                $("#Reference").val('');
-
-
-                if (this.value == 'Efectivo' || this.value == 'Tarjeta')
-                {
-                    $("#Mix").addClass("hidden");
-
-                    if (this.value == 'Tarjeta')
-                        $("#Ref").removeClass("hidden");
-                    else
-                        $("#Ref").addClass("hidden");
-                }
-                else
-                {
-                    $("#Mix").removeClass("hidden");
-                    $("#Ref").removeClass("hidden");
-                }
-            });*/
-
-        if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
-            $("#CashAmount").off('keyup').keyup(function () {
                 var val = $("#CashAmount").val();
                 var result = Calculate(val);
-
+              
                 result = parseFloat(result).toFixed(2);
 
                 $("#CardAmount").val(result);
             });
 
-            $("#CardAmount").off('keyup').keyup(function () {
+            $("#CardAmount").off('keyup').keyup(function ()
+            {
                 var val = $("#CardAmount").val();
                 var result = Calculate(val);
 
@@ -211,28 +196,50 @@
         return result;
     }
 
-    function RegisterPayment(printType) {
-        $("#ModalRegistPayment").off("hidden.bs.modal").on("hidden.bs.modal", function () {
+    function RegisterPayment(printType)
+    {
+        $("#ModalRegistPayment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0)
+            {
+                ShowMessage("La cantidad es Incorrecta!","Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta",'warning');
+                return;
+            }
+                
+
             ShowLoading();
             var param = {
                 saleId: $("#SaleId").val(),
-                //  paymentMethod: $("input[name=PaymentMethod]:checked").val(),
                 cash: $("#CashAmount").val(),
                 card: $("#CardAmount").val(),
                 reference: $("#Reference").val(),
                 printType: printType
             };
 
-            ExecuteAjax('@Url.Action("RegistPayment")', param, function (response) {
+            ExecuteAjax('@Url.Action("RegistPayment")', param, function (response)
+            {
                 HideLoading();
 
                 if ($.isPlainObject(response))
                     ShowMessage(response.Result, response.Message, 'warning');
-                else {
+                else
+                {
                     $("#divPrinter").html(response);
                     PrintNote();
+                    CheckPendingPayments();
                 }
             });
+        });
+
+        $("#ModalRegistPayment").modal('hide');
+    }
+
+    function ShowCancel()
+    {
+        $("#ModalRegistPayment").off("hidden.bs.modal").on('hidden.bs.modal', function ()
+        {
+            $('#ModalCancel').modal('show');
+            $("#TransId").val($("#SaleId").val());
         });
 
         $("#ModalRegistPayment").modal('hide');

@@ -1,6 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Catalog.Product
 @using CerberusMultiBranch.Support
 @using CerberusMultiBranch.Models.Entities.Catalog
+@using CerberusMultiBranch.Models.Entities.Operative
 
 <div id="ModalAddProduct" class="modal" role="dialog">
     <div class="modal-dialog">
@@ -83,7 +84,10 @@
             $("#btnCompleateAdd").attr("disabled",true);
             return;
         }
-        if(parseInt($("#txtQuantity").val()) > quantity)
+
+        var type = $("#TransactionType").val();
+
+        if(type != '@TransactionType.Preventa' && parseInt($("#txtQuantity").val()) > quantity)
         {
             $("#lblQuantity").text("La cantidad no puede ser mayor  a la disponible "+quantity);
             $("#btnCompleateAdd").attr("disabled",true);

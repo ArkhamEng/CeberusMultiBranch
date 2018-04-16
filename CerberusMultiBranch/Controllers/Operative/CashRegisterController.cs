@@ -84,15 +84,13 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var brachId = User.Identity.GetBranchId();
 
-            //using (ApplicationDbContext db = new ApplicationDbContext())
-            //{
+
             var cash = db.CashRegisters.Include(cr => cr.CashDetails).OrderByDescending(cr => cr.OpeningDate).
                 FirstOrDefault(cr => cr.BranchId == brachId && cr.IsOpen);
 
             if (cash != null && cash.CashDetails != null)
                 cash.CashDetails.OrderBy(d => d.InsDate);
             return cash;
-            //}
         }
 
         // GET: CashRegister
@@ -242,6 +240,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return Json(new { Result = "OK", Count = count });
         }
 
+        [HttpPost]
         [Authorize(Roles = "Cajero")]
         public ActionResult OpenPending()
         {
@@ -253,10 +252,133 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_PendingPayment", model);
         }
 
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult OpenRefunding()
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.PreCancel)
+                .Include(s => s.User).Include(s => s.Client).Include(s => s.SalePayments).ToList();
+
+            return PartialView("_PendingRefundment", model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult BeginRefund(int saleId)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
+                FirstOrDefault(s => s.SaleId == saleId && s.Status == TranStatus.PreCancel);
+
+            if (sale == null)
+                return Json(new { Result = "Error", Message = "Esta venta ya no esta disponible para reembolso" });
+
+            var model = new RefundViewModel
+            {
+                RefundSaleId = sale.SaleId,
+                RefundClient = sale.Client.Name,
+                RefundCash = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount),
+                RefundCredit = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount),
+                RefundClientId = sale.ClientId,
+
+            };
+
+            return PartialView("_Refundment", model);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult CreateRefund(RefundViewModel refund)
+        {
+            try
+            {
+                var branchId = User.Identity.GetBranchId();
+
+                var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
+                    FirstOrDefault(s => s.SaleId == refund.RefundSaleId && s.Status == TranStatus.PreCancel);
+
+                if (sale == null)
+                    return Json(new { Result = "Error", Message = "Esta venta ya no esta disponible para reembolso" });
+
+
+                var cr = GetCashRegister();
+
+                var message = "Se ha registrado correctamente el rembolso ";
+
+                if (refund.RefundCash > Cons.Zero)
+                {
+                    message += "Efectivo devuelto " + refund.RefundCash.ToString("c");
+                    var cd = new CashDetail
+                    {
+                        CashRegisterId = cr.CashRegisterId,
+                        Amount = refund.RefundCash,
+                        Type = PaymentMethod.Efectivo,
+                        Comment = "DEVOLUCIÓN POR CANCELACIÓN " + sale.Folio,
+                        InsDate = DateTime.Now.ToLocal(),
+                        User = User.Identity.Name,
+                        DetailType = Cons.Zero,
+                        SaleFolio = sale.Folio,
+                        WithdrawalCauseId = 3
+                    };
+
+                    db.CashDetails.Add(cd);
+                }
+
+                var noteFolio = string.Empty;
+
+                if (refund.RefundCredit > Cons.Zero)
+                {
+                    var year = Convert.ToInt32(DateTime.Now.ToLocal().ToString("yy"));
+                    var last = db.SaleCreditNotes.Where(n => n.Year == year).OrderByDescending(n => n.Sequential).FirstOrDefault();
+
+                    var seq = last == null ? Cons.One : (last.Sequential + Cons.One);
+
+                    var nc = new SaleCreditNote
+                    {
+                        SaleCreditNoteId = sale.SaleId,
+                        Amount = refund.RefundCredit,
+                        ExplirationDate = DateTime.Now.ToLocal().AddDays(Cons.DaysToCancel),
+                        RegisterDate = DateTime.Now.ToLocal(),
+                        IsActive = true,
+                        User = User.Identity.Name,
+                        Year = year,
+                        Sequential = seq,
+                        Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
+                    };
+
+                    message += "Cantidad en Vale " + refund.RefundCredit.ToString("c") + " Folio del vale " + nc.Folio;
+
+                    db.SaleCreditNotes.Add(nc);
+                }
+
+                sale.LastStatus = sale.Status;
+                sale.Status = TranStatus.Canceled;
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now.ToLocal();
+
+                db.Entry(sale).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new { Result = "OK", Message = message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error", Message = "Ocurrio un error al generar al devolución, detalle:" + ex.Message });
+            }
+
+        }
+
+
+        [HttpPost]
         public ActionResult TicketsAndNotes()
         {
-            var sales = LookForNotes(DateTime.Today, null, null, null);
-            return PartialView("_TicketsAndNotes", sales);
+            var model = new TransactionViewModel();
+            model.Sales = LookForNotes(DateTime.Today, null, null, null);
+            return PartialView("_TicketsAndNotes", model);
         }
 
         [HttpPost]
@@ -271,7 +393,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchId = User.Identity.GetBranchId();
 
             //busco las ventas de la sucursal que esten reservadas o completadas (ya pagadas)
-            var sales = db.Sales.Include(s => s.Client).Include(s => s.SaleDetails).Include(s=> s.SalePayments).Include(s => s.User).
+            var sales = db.Sales.Include(s => s.Client).Include(s => s.SaleDetails).Include(s => s.SalePayments).Include(s => s.User).
                 Where(s => s.BranchId == branchId &&
                 (begin == null || s.TransactionDate >= begin) &&
                 (end == null || s.TransactionDate <= end) &&
@@ -303,16 +425,17 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View(sale);
         }
 
-      
+
         [HttpPost]
         [Authorize(Roles = "Cajero")]
         public ActionResult BeginRegistPayment(int id)
         {
             var branchId = User.Identity.GetBranchId();
 
-            //obtengo los detalles de la venta, incluyendo imagenes
-            var details = db.SaleDetails.Include(sd => sd.Sale).Include(sd => sd.Product.Images).
-                       Where(sd => sd.SaleId == id && sd.Sale.Status == TranStatus.Reserved && sd.Sale.BranchId == branchId).ToList();
+            //obtengo los detalles de la venta, incluyendo imagenes y pagos
+            var details = db.SaleDetails.Include(sd => sd.Sale.SalePayments).Include(sd => sd.Product.Images).
+                       Where(sd => sd.SaleId == id && (sd.Sale.Status == TranStatus.Reserved || sd.Sale.Status == TranStatus.Revision)
+                       && sd.Sale.BranchId == branchId).ToList();
 
             //si no encuentro detalles de venta, envío un error
             if (details == null || details.Count == Cons.Zero)
@@ -322,7 +445,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = new ChoosePaymentViewModel
             {
                 Details = details,
-                AmountToPay = details.Sum(d => d.TaxedAmount),
+                AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
                 PaymentMethod = PaymentMethod.Efectivo,
                 SaleId = id
             };
@@ -331,10 +454,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (details.First().Sale.TransactionType == TransactionType.Contado)
                 model.CashAmount = details.Sum(d => d.TaxedAmount);
 
+            if (details.First().Sale.TransactionType == TransactionType.Preventa)
+                model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
+
             return PartialView("_RegistPayment", model);
         }
 
-   
+
         [HttpPost]
         [Authorize(Roles = "Cajero")]
         public ActionResult RegistPayment(int saleId, double cash, double card, string reference, int printType)
@@ -342,43 +468,46 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a pagar
-                var sale = db.Sales.Where(s => s.SaleId == saleId).
+                var sale = db.Sales.Where(s => s.SaleId == saleId).Include(s => s.SalePayments).
                             Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
                             Include(s => s.Client.City).Include(s => s.Client.City.State).
                             Include(s => s.SaleDetails.Select(td => td.Product)).
                             Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
                             Include(s => s.Branch).FirstOrDefault();
-                
-                #region Validaciones
-                if((cash + card) > sale.TotalTaxedAmount)
-                    return Json(new { Result = "Error", Message = "El monto ingresado excede la cantidad total de la venta, por favor verifique" });
 
+                var totalPaymets = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
+
+                totalPaymets += (cash + card);
+
+                #region Validaciones
                 //si la venta ya fue cobrada en su totalidad, envio error
                 if (sale.Status == TranStatus.Compleated)
                     return Json(new { Result = "Error", Message = "Esta venta ya ha sido cobrada en su totalidad" });
 
-                //si la venta no es de CONTADO y esta en status revision, envio error
-                if (sale.TransactionType != TransactionType.Contado && sale.Status == TranStatus.Revision)
-                    return Json(new { Result = "Error", Message = "Los productos de esta venta ya han sido entregados al cliente" });
+                if (totalPaymets > sale.TotalTaxedAmount)
+                    return Json(new { Result = "Error", Message = "El monto ingresado excede la cantidad total de la deuda, por favor verifique" });
 
-                if (sale.TransactionType == TransactionType.Contado && sale.TotalTaxedAmount != (cash + card))
+
+                //si la venta no es de CONTADO y esta en status revision, envio error
+                if (sale.TransactionType != TransactionType.Contado && sale.TotalTaxedAmount < totalPaymets)
+                    return Json(new { Result = "Error", Message = "El monto a pagar excede la cantidad de la deuda" });
+
+                if (sale.TransactionType == TransactionType.Contado && sale.TotalTaxedAmount != totalPaymets)
                     return Json(new { Result = "Error", Message = "El monto del pago no coincide con el total de la venta" });
 
-                //marco la venta como pagada y coloco el tipo de pago
-                sale.LastStatus = sale.Status;
-                if (sale.TransactionType == TransactionType.Contado)
-                    sale.Status = TranStatus.Compleated;
-                else
-                    sale.Status = TranStatus.Revision;
+                //si la venta no es de CONTADO y esta en status revision, envio error
+                if (sale.TransactionType != TransactionType.Preventa && sale.Status == TranStatus.Reserved
+                    && (sale.TotalTaxedAmount / 0.1) < totalPaymets)
+                    return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 10% de anticipo" });
                 #endregion
 
                 //ordeno por el campo Sort Order
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
-                sale.UpdDate        = DateTime.Now.ToLocal();
-                sale.UpdUser        = User.Identity.Name;
-                sale.SalePayments   = new List<SalePayment>();
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.UpdUser = User.Identity.Name;
+                sale.SalePayments = new List<SalePayment>();
 
                 #region Registro de pagos
                 //si viene un monto en efectivo, agrego el registro de pago
@@ -386,36 +515,48 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var p = new SalePayment
                     {
-                        SaleId          = sale.SaleId,
-                        Amount          = cash,
-                        PaymentDate     = DateTime.Now.ToLocal(),
-                        PaymentMethod   = PaymentMethod.Efectivo,
-                        UpdDate         = DateTime.Now.ToLocal(),
-                        UpdUser         = User.Identity.Name,
-                        Comment         = "COBRO AUTOMATICO EN CAJA"
+                        SaleId = sale.SaleId,
+                        Amount = cash,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Efectivo,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "COBRO AUTOMATICO EN CAJA"
                     };
 
                     sale.SalePayments.Add(p);
                 }
                 //si viene un monto de tarjeta, agrego el registro de pago
-                if(card > Cons.Zero)
+                if (card > Cons.Zero)
                 {
                     var p = new SalePayment
                     {
-                        SaleId      = sale.SaleId,
-                        Amount      = card,
+                        SaleId = sale.SaleId,
+                        Amount = card,
                         PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Efectivo,
-                        UpdDate     = DateTime.Now.ToLocal(),
-                        UpdUser     = User.Identity.Name,
-                        Comment     = "COBRO AUTOMATICO EN CAJA",
-                        Reference   = reference
+                        PaymentMethod = PaymentMethod.Tarjeta,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "COBRO AUTOMATICO EN CAJA",
+                        Reference = reference
                     };
 
                     sale.SalePayments.Add(p);
                 }
-      
+
                 #endregion
+
+
+                //marco la venta con el status correspondiente
+                sale.LastStatus = sale.Status;
+
+                if (sale.TotalTaxedAmount == totalPaymets)
+                    sale.Status = TranStatus.Compleated;
+                else
+                    sale.Status = TranStatus.Revision;
+
+                if (sale.TransactionType == TransactionType.Credito)
+                    sale.Client.UsedAmount -= totalPaymets;
 
                 //hago attach a la venta.. esto permite agregar los registros de pago a la base de datos
                 db.Sales.Attach(sale);
@@ -436,15 +577,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //por cada registro de pago agrego una registro de entrada a la caja
                 foreach (var pay in sale.SalePayments)
                 {
-                    var dt              = new CashDetail();
-                    dt.CashRegisterId   = cr.CashRegisterId;
-                    dt.Amount           = pay.Amount;
-                    dt.InsDate          = DateTime.Now.ToLocal();
-                    dt.User             = User.Identity.Name;
-                    dt.Type             = pay.PaymentMethod;
-                    dt.SaleFolio        = sale.Folio;
-                    dt.DetailType       = Cons.One;
-                    dt.Comment          = "COBRO EN CAJA";
+                    var dt = new CashDetail();
+                    dt.CashRegisterId = cr.CashRegisterId;
+                    dt.Amount = pay.Amount;
+                    dt.InsDate = DateTime.Now.ToLocal();
+                    dt.User = User.Identity.Name;
+                    dt.Type = pay.PaymentMethod;
+                    dt.SaleFolio = sale.Folio;
+                    dt.DetailType = Cons.One;
+                    dt.Comment = "COBRO EN CAJA";
 
                     db.CashDetails.Add(dt);
                 }
@@ -471,13 +612,12 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult PrintDocument(int saleId, int printType)
         {
-            var sale = db.Sales.Where(s => s.SaleId == saleId).
+            var sale = db.Sales.Where(s => s.SaleId == saleId).Include(s => s.SalePayments).
                            Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
                            Include(s => s.SaleDetails.Select(td => td.Product)).
                            Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                            Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
-                           Include(s => s.Branch).Include(s => s.SalePayments).
-                           FirstOrDefault();
+                           Include(s => s.Branch).FirstOrDefault();
 
             sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 

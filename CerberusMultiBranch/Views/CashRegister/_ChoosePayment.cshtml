@@ -157,7 +157,8 @@
                 printType: printType
             };
 
-            ExecuteAjax('@Url.Action("RegisterPayment")', param, function (response) {
+            ExecuteAjax('@Url.Action("RegisterPayment")', param, function (response)
+            {
                 HideLoading();
 
                 if ($.isPlainObject(response))

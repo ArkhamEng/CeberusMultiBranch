@@ -26,6 +26,8 @@
                     <option value="@TranStatus.InProcess">Procesando</option>
                     <option value="@TranStatus.Reserved">Reservado</option>
                     <option value="@TranStatus.Compleated">Pagado</option>
+                    <option value="@TranStatus.Revision">Parcial</option>
+                    <option value="@TranStatus.PreCancel">Devolución</option>
                     <option value="@TranStatus.Canceled">Cancelado</option>
                 </select>
 
@@ -46,8 +48,7 @@
             </div>
         </div>
 
-        <br /><br /><br /><br />
-        <div class="col-md-10">
+        <div class="col-md-10" style="margin-top:10px">
             <div class="input-group">
                 @if (User.IsInRole("Supervisor"))
                 { 
@@ -78,7 +79,8 @@
     {
         SetFilterControls("#divFilters", "#btnFilter", "#divSales");
 
-        $("#btnSearch").click(function () {
+        $("#btnSearch").click(function ()
+        {
             ShowLoading();
             var data = {
                 branchId: $("#BranchId").val(),
@@ -89,26 +91,33 @@
                 user: $("#User").val(),
                 status: $("#Status").val()
             };
-            ExecuteAjax('@Url.Action("Search")', data, function (view) {
+            ExecuteAjax('@Url.Action("Search")', data, function (view)
+            {
                 $("#divSales").html(view);
                 HideLoading();
             });
 
         });
 
-        $("#btnCreate").click(function () {
-            ExecuteAjax('@Url.Action("BeginSale")', {}, function (response) {
+        $("#btnCreate").click(function ()
+        {
+            ShowLoading();
+            ExecuteAjax('@Url.Action("BeginSale")', {}, function (response)
+            {
+                HideLoading();
                 $("#divNewSale").html(response);
             });
         });
     });
 
-    function Reload() {
+    function Reload()
+    {
         ShowLoading();
         window.location = '@Url.Action("History")';
     }
 
-    $(document).keydown(function (e) {
+    $(document).keydown(function (e)
+    {
         if (e.which == 13 || (e.altKey && e.which == 66))
         {
             $("#btnSearch").click();

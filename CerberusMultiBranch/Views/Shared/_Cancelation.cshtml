@@ -17,7 +17,7 @@
                 </div>
                 <div class="modal-body panel-body">
                     <div class="col-md-12">
-                        @Html.Label("Agrega un comentario de cancelación", htmlAttributes: new { @class = "control-label" })
+                        @Html.Label("Por favor agrega un comentario sobre la cancelación", htmlAttributes: new { @class = "control-label" })
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-comments"></i></span>
                             @Html.TextArea("txtComment", new { @class = "form-control valid", rows = "2", @data_val = "true",
@@ -36,6 +36,7 @@
         </div>
     </div>
 </form>
+<input id="TransId" type="hidden" value="0" />
 
 <script>
     $(document).ready(function ()
@@ -56,6 +57,7 @@
 
     function BeginCancel()
     {
+        console.log("Cancelacion aceptada");
         var form = $("#cForm");
 
         if (!form.valid())

@@ -156,6 +156,12 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Ledge { get; set; }
 
         [NotMapped]
+        public bool CanSell
+        {
+            get; set;
+        }
+
+        [NotMapped]
         public bool IsLocked
         {
             get

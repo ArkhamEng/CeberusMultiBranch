@@ -52,10 +52,9 @@
     {
         $("#divProductList").html('');
         $("#imgLoading").attr("class", "img-responsive");
-        var filter = { filter: $("#ProductName").val(), systemId:$("#SystemId").val() }
+        var filter = { filter: $("#ProductName").val(), systemId: $("#SystemId").val(), Type: $("#TransactionType").val() }
 
-        console.log(filter);
-
+       
         ExecuteAjax('@Url.Action("SearchProducts")', filter, function (view)
         {
             $("#imgLoading").attr("class", "img-responsive hide");

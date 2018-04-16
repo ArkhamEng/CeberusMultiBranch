@@ -2,92 +2,10 @@
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
-<form id="frmPayment">
-    
-        <div id="pnlPayment" class="panel panel-defaul hidden">
-            <div class="panel-body">
-                <div class="row col-md-12">
-                    @Html.ValidationSummary(true, "", htmlAttributes: new { @class = "control-label text-danger" })
-                    <div class="form-group col-md-3">
-                        @Html.Label("Fecha de Pago", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                            <input id="PaymentDate" name="PaymentDate" class="form-control" data-val=true data-val-required="Se requiere la fecha de pago"
-                                   type="date" />
-                        </div>
-                        @Html.ValidationMessage("PaymentDate", "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group col-md-3">
-                        @Html.Label("Monto del pago", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                            <input id="PAmount" name="PAmount" class="form-control" data-val=true
-                                   data-val-required="Se requiere el monto a pagar" type="number" />
-                        </div>
-                        @Html.ValidationMessage("PAmount", "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        @Html.Label("Metodo de pago", htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <div class="input-group-addon">
-                                <label class="control-label">
-                                    @PaymentMethod.Transferencia.ToString()
-                                    <input name="PaymentMethod" value="@PaymentMethod.Transferencia" type="radio" checked />
-                                </label>
-                            </div>
-                            <div class="input-group-addon">
-                                <label class="control-label">
-                                    @PaymentMethod.Cheque.ToString()
-                                    <input name="PaymentMethod" value="@PaymentMethod.Cheque" type="radio" />
-                                </label>
-                            </div>
-                            <div class="input-group-addon">
-                                <label class="control-label">
-                                    @PaymentMethod.Tarjeta.ToString()
-                                    <input name="PaymentMethod" value="@PaymentMethod.Tarjeta" type="radio" />
-                                </label>
-                            </div>
-
-                            <div class="input-group-addon">
-                                <label class="control-label">
-                                    @PaymentMethod.Efectivo.ToString()
-                                    <input name="PaymentMethod" value="@PaymentMethod.Efectivo" type="radio" />
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group col-md-3">
-                    @Html.Label("Referencia", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-bookmark"></i></span>
-                        <input id="Reference" class="form-control" />
-                    </div>
-                </div>
-                <div class="form-group col-md-9">
-                    @Html.Label("Comentario", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-comment"></i></span>
-                        <input id="Comment" class="form-control" />
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary" type="button" onclick="AddPayment()">
-                                <span class="fa fa-plus"></span>
-                                Agregar pago
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-   
-</form>
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <table class="table table-condensed">
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>
@@ -108,8 +26,6 @@
                     <th>
                         @Html.DisplayName("Capturo")
                     </th>
-
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -134,14 +50,6 @@
                         <td>
                             @item.UpdUser
                         </td>
-                        <td>
-                            @if (item.CanDelete)
-                            {
-                                <button class="btn btn-danger" type="button" title="Eliminar pago" onclick="RemovePayment(@item.SalePaymentId)">
-                                    <span class="fa fa-trash"></span>
-                                </button>
-                            }
-                        </td>
                     </tr>
                 }
             </tbody>
@@ -149,18 +57,15 @@
     </div>
 </div>
 
+
+
 <script>
     $(document).ready(function ()
     {
-        var form = $("#frmPayment");
-        form.validate();
 
-        var totalAmount = $("#TotalAmount").val();
+        //var totalAmount = $("#TotalAmount").val();
 
-        var debt =(totalAmount -@Model.Sum(p => p.Amount));
-
-      
-        $("#Debt").text(GetCurrency(debt))
+        var debt =(totalAmount - @Model.Sum(p => p.Amount));
 
         $("#TotalPayments").text(GetCurrency( @Model.Sum(p => p.Amount)));
 
@@ -174,55 +79,15 @@
             $("#divStatus").text("Reservado");
             $("#divStatus").attr("class","form-control alert-info");
         }
-    
+
         if($("#TransactionType").val() != '@TransactionType.Contado.ToString()')
         {
-            console.log("Visible");
+
             $("#pnlPayment").removeClass('hidden');
         }
         else{
             $("#pnlPayment").addClass('hidden');
         }
-     
+
     });
-
-    function RemovePayment(id)
-    {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("RemovePayment")', { id: id }, function (response)
-        {
-            HideLoading();
-            if ($.isPlainObject(response))
-                ShowMessage(response.Header, response.Message, 'warning', true);
-            else
-                $("#divSalePayments").html(response);
-        });
-    }
-
-    function AddPayment()
-    {
-        var form = $("#frmPayment");
-        if (!form.valid())
-            return;
-
-        ShowLoading();
-        var param =
-            {
-                SaleId: $("#SaleId").val(),
-                PaymentDate: $("#PaymentDate").val(),
-                Comment: $("#Comment").val(),
-                Reference: $("#Reference").val(),
-                PaymentMethod: $("input[name=PaymentMethod]:checked").val(),
-                Amount: $("#PAmount").val(),
-            };
-
-        ExecuteAjax('@Url.Action("AddPayment")', { payment: param }, function (response)
-        {
-            HideLoading();
-            if ($.isPlainObject(response))
-                ShowMessage(response.Header, response.Message, 'warning', true);
-            else
-                $("#divSalePayments").html(response);
-        });
-    }
 </script>

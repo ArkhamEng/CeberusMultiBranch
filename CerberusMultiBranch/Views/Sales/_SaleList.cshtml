@@ -43,23 +43,38 @@
                                 @item.TransactionType.ToString()
                             </div>
                             break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
+                            <div class="form-control alert-info input-sm">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
                     }
                     @switch (item.Status)
                     {
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                            <div class="form-control alert-warning input-sm">
+                            <div class="form-control alert-dismissable input-sm">
                                 Procesando
                             </div>
                             break;
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
-                            <div class="form-control alert-info input-sm">
+                            <div class="form-control alert-info input-sm warning">
                                 Reservado
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.PreCancel:
+                            <div class="form-control alert-warning input-sm">
+                                Devolución
                             </div>
                             break;
 
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
                             <div class="form-control alert-success input-sm">
                                 Pagado
+                            </div>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Revision:
+                            <div class="form-control alert-warning input-sm">
+                                Parcial
                             </div>
                             break;
                         case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:

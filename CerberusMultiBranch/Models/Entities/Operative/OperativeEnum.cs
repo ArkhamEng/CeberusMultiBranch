@@ -7,6 +7,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 {
     public enum TranStatus : int
     {
+        PreCancel = -2,//se termina
         Canceled = -1, //Cancelado en venta y compra
         InProcess = 0, //Abierto-venta, En proceso -compra
         Reserved = 1, // compra / venta concluida pero no pagada | (compra inventariada, venta con producto reservado)
