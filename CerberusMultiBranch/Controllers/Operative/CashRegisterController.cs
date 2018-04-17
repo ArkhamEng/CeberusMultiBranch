@@ -328,7 +328,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.CashDetails.Add(cd);
                 }
 
-                var noteFolio = string.Empty;
+                bool hasNote = false;
+                
 
                 if (refund.RefundCredit > Cons.Zero)
                 {
@@ -351,25 +352,36 @@ namespace CerberusMultiBranch.Controllers.Operative
                     };
 
                     message += "Cantidad en Vale " + refund.RefundCredit.ToString("c") + " Folio del vale " + nc.Folio;
-
+                    hasNote = true;
                     db.SaleCreditNotes.Add(nc);
                 }
 
+                //solo cambio el status sin registrar, el usuario que lo cambia 
+                //para que quede registrado, el usuario que realiza la cancelación
                 sale.LastStatus = sale.Status;
                 sale.Status = TranStatus.Canceled;
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now.ToLocal();
-
+            
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = message });
+                return Json(new { Result = "OK", Message = message, HasNote= hasNote });
             }
             catch (Exception ex)
             {
                 return Json(new { Result = "Error", Message = "Ocurrio un error al generar al devolución, detalle:" + ex.Message });
             }
+        }
 
+        [HttpPost]
+        [Authorize(Roles = "Cajero")]
+        public ActionResult PrintCreditNote(int noteId)
+        {
+            var model = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
+                FirstOrDefault(n => n.SaleCreditNoteId == noteId);
+            if (model == null)
+                return Json(new { Result = "Error", Message = "No se encontro la nota de crédito" });
+            else
+                return PartialView("_PrintCreditNote", model);
         }
 
 
@@ -447,7 +459,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Details = details,
                 AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
                 PaymentMethod = PaymentMethod.Efectivo,
-                SaleId = id
+                SaleId = id,
+                CanCancel = (details.First().Sale.Status == TranStatus.Reserved)
             };
 
             //si la venta es a crédito establesco el moto en efectivo como el total de la venta
@@ -555,7 +568,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                     sale.Status = TranStatus.Revision;
 
-                if (sale.TransactionType == TransactionType.Credito)
+                if (sale.TransactionType != TransactionType.Contado)
                     sale.Client.UsedAmount -= totalPaymets;
 
                 //hago attach a la venta.. esto permite agregar los registros de pago a la base de datos

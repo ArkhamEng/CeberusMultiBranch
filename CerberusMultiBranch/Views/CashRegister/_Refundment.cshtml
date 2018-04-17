@@ -61,19 +61,38 @@
 
             ExecuteAjax('@Url.Action("CreateRefund")', { refund: ref }, function (response)
             {
-                HideLoading();
+              
 
-                if(response.Result!="OK")
+                if (response.Result != "OK")
+                {
+                    HideLoading();
                     ShowMessage("Error al generar el rembolso", response.Message, 'warning');
+                }
+                    
                 else
                 {
-                    ShowMessage("Rembolso generado", response.Message, 'success');
+                    if (response.HasNote)
+                        GetCreditNote(ref.RefundSaleId);
+
+                    HideLoading();
                     CheckRefunding();
+                    ShowMessage("Rembolso generado", response.Message, 'success');
                 }
             });
         });
 
         $("#ModalRefundment").modal("hide");
+    }
 
+    function GetCreditNote(id)
+    {
+        ExecuteAjax('@Url.Action("PrintCreditNote")', { noteId: id }, function (response)
+        {
+            if (!$.isPlainObject(response))
+            {
+                $("#divPrinter").html(response);
+                PrintCreditNote();
+            }
+        });
     }
 </script>

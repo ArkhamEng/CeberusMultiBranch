@@ -9,6 +9,8 @@
             <th class="text-center">@Html.DisplayName("Fecha venta")</th>
 
             <th class="text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+            <th class="text-center">@Html.DisplayName("Tipo")</th>
+
             <th />
         </tr>
     </thead>
@@ -22,6 +24,25 @@
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
 
                 <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
+
+                <td align="center">
+                    @{
+                        var alr = "alert-success";
+
+                        switch (item.TransactionType)
+                        {
+                            case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
+                                alr = "alert-warning";
+                                break;
+                            case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
+                                alr = "alert-info";
+                                break;
+                        }
+                    }
+                    <div class="form-control input-sm @alr">
+                        @item.TransactionType.ToString()
+                    </div>
+                </td>
 
                 <td class="col-xs-2" align="right">
                     <div class="btn-group">

@@ -1,0 +1,180 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.SaleCreditNote
+@using CerberusMultiBranch.Support
+
+
+
+<script src="~/Scripts/printThis.js"></script>
+
+<div class="hidden">
+    <div id="divCreditNote" style="width:816px;">
+        <table class="Note">
+            <tr>
+                <td width="300px">
+                    <table style="width:100%">
+                        @if (User.Identity.GetBranchId() != 2)
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/Content/Images/logo2.png" style="width:150px">
+                                </td>
+                            </tr>
+                            <tr><td colspan="2" style="height:10px"></td></tr>
+                            <tr>
+                                <td>
+                                    <label class="control-label">
+                                        Autopartes Bicentenario S.A. de C.V.
+                                    </label><br />
+                                    APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                                    LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/Content/Images/rebilogo2.png" style="width:180px; height:90px">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="control-label">
+                                        AUTOPARTES BICENTENARIO
+                                    </label><br />
+                                    HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
+                                    COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+                <td width="292px" align="center">
+                    @if (User.Identity.GetBranchId() != 2)
+                    {
+                        <div style="width:250px">
+                            <label>Expedida en sucursal</label><br />
+                            @Model.Sale.Branch.Address
+                        </div>
+                    }
+                </td>
+                <td width="244px">
+                    <table style="width:100%" class="table-bordered">
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>NOTA DE CRÉDITO</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <label>Folio</label>
+                            </td>
+                            <td class="text-center">
+                                <label>Fecha</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                @Model.Folio
+                            </td>
+                            <td class="text-center">
+                                @Model.RegisterDate.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>Agente</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                @Model.User
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>Expira </label> @Model.ExplirationDate.ToString("dd/MM/yyyy")
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="height:20px"></td>
+            </tr>
+          
+            <tr>
+                <td colspan="3">
+                    <table style="width:100%; height:300px; border:1px solid gray;">
+                        <tr style="border-bottom:1px solid gray; height:15px">
+                            <td style="border-right:1px solid gray; width:80%" align="center" >
+                                <label>DESCRIPCIÓN</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:20%" align="center">
+                                <label>TOTAL</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center" style="border-right:1px solid gray; width:80%" valign="middle" >
+                                <h4>
+                                    <LABEL>Devolución de mercancía</LABEL><br />
+                                    <label>Folio de venta</label>  @Model.Sale.Folio
+                                    <br /><br />
+                                    COMENTARIO DE CANCELACIÓN <br />
+                                    @Model.Sale.Comment
+                                </h4>
+                            </td>
+                            <td class="text-center"  style="width:20%" valign="middle">
+                                <h4>
+                                    <label>
+                                        @Model.Amount.ToString("c")
+                                    </label>
+                                </h4>
+                                
+                            </td>
+                        </tr>
+                     
+                        <tr style="height:30px; border-top:1px solid gray;">
+                            <td class="text-center" colspan="2">
+                                <h4>
+                                    IMPORTE CON LETRA <br />
+                                    @Model.Amount.ToText()
+                                </h4>
+                            </td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+           
+            <tr>
+                <td colspan="3" align="center" style="height:100px">
+                   
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" align="center" style="height:30px">
+                    <label>
+                        Firma de Autorización
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <br /><br />
+                    <label>
+                        **La nóta de crédito no será valida despues de la fecha de expiración
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+    function PrintCreditNote() {
+        $("#divCreditNote").printThis();
+    }
+</script>

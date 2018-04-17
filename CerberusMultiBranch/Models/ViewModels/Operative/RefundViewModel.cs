@@ -17,5 +17,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public int RefundClientId { get; set; }
 
+
     }
 }

@@ -146,11 +146,14 @@
                     <span class="fa fa-file"></span>
                     Imprimir Nota
                 </button>
-
-                <button class="btn btn-danger pull-right" type="button" onclick="ShowCancel()">
-                    <span class="fa fa-trash-o"></span>
-                    Cancelar Venta
-                </button>
+                @if (Model.CanCancel)
+                {
+                    <button class="btn btn-danger pull-right" type="button" onclick="ShowCancel()">
+                        <span class="fa fa-trash-o"></span>
+                        Cancelar Venta
+                    </button>
+                }
+                
             </div>
 
         </div>

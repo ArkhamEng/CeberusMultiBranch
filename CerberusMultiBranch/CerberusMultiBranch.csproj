@@ -627,6 +627,7 @@
     <Content Include="Views\CashRegister\_RegistPayment.cshtml" />
     <Content Include="Views\CashRegister\_PendingRefundment.cshtml" />
     <Content Include="Views\CashRegister\_Refundment.cshtml" />
+    <Content Include="Views\CashRegister\_PrintCreditNote.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

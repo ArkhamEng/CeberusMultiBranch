@@ -257,9 +257,22 @@ namespace CerberusMultiBranch.Support
             return res;
         }
 
+        public static string ToText(this double value)
+        {
+            
+            var IntPart = value.toText() +" PESOS";
+
+            var dv = Math.Round((value - Math.Truncate(value)) * Cons.OneHundred, Cons.Two);
+
+            var decPart = " CON " + dv.toText() + " CENTAVOS";
+
+            return IntPart + decPart;
+        }
+
         public static string toText(this double value)
         {
             string Num2Text = "";
+          
             value = Math.Truncate(value);
             if (value == 0) Num2Text = "CERO";
             else if (value == 1) Num2Text = "UNO";

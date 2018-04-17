@@ -101,7 +101,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var payments = sale.SalePayments.Sum(p => p.Amount);
 
                 //si la venta es credito o preventa, se resta el monto deudo de la cuenta del cliente
-                if(sale.TransactionType == TransactionType.Credito)
+                if(sale.TransactionType != TransactionType.Contado)
                     sale.Client.UsedAmount -= (sale.TotalTaxedAmount - payments).RoundMoney();
 
                 sale.LastStatus = sale.Status;
@@ -547,9 +547,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //utilizo el precio seteado, ya que pudo haber sido modificado manualmente
                 detail.Quantity += quantity;
 
-                detail.TaxAmount = detail.TaxAmount * detail.Quantity;
-                detail.Amount = detail.Price * detail.Quantity;
-                detail.TaxedAmount = detail.TaxedPrice * detail.Quantity;
+                detail.TaxAmount    = detail.TaxAmount * detail.Quantity;
+                detail.Amount       = detail.Price * detail.Quantity;
+                detail.TaxedAmount  = detail.TaxedPrice * detail.Quantity;
 
                 //si no es una preventa
                 //verifico el stock y valido si es posible agregar mas producto a la venta
@@ -622,13 +622,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             sale.TotalTaxedAmount   = sale.SaleDetails.Sum(s => s.TaxedAmount);
             sale.TotalTaxAmount     = sale.SaleDetails.Sum(s => s.TaxAmount);
 
-            if (sale.TransactionType == TransactionType.Credito)
+            if (sale.TransactionType != TransactionType.Credito)
             {
                 if (sale.TotalTaxedAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
-                        Result = "Error",
-                        Header = "Limite de crédito excedido",
+                        Result  = "Error",
+                        Header  = "Limite de crédito excedido",
                         Message = "Estas intentando vender una cantidad mayor al crédito disponible, Disponible del cliente " +
                         (sale.Client.CreditLimit - sale.Client.UsedAmount).ToString("c")
                     });
@@ -681,6 +681,177 @@ namespace CerberusMultiBranch.Controllers.Operative
             return Compleate(saleId, Cons.Zero, true);
         }
 
+
+        private JsonResult Compleate(int saleId, int sending, bool addFolio)
+        {
+            try
+            {
+                var sale = db.Sales.Include(s => s.SaleDetails).
+                           FirstOrDefault(s => s.SaleId == saleId);
+
+                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
+
+                if (addFolio)
+                {
+                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
+                                                  s.BranchId == sale.BranchId && s.Year == sale.Year).
+                                                  OrderByDescending(s => s.Sequential).FirstOrDefault();
+
+                    var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
+                    sale.Sequential = (seq + Cons.One);
+
+                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
+                }
+
+
+                int sortOrder = Cons.One;
+
+                foreach (var detail in sale.SaleDetails)
+                {
+                    //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
+                    var pb = db.BranchProducts.Include(brp => brp.Product).
+                        Include(brp => brp.Product.Category).
+                        Include(brp => brp.Product.PackageDetails).
+                        FirstOrDefault(brp => brp.BranchId == sale.BranchId && brp.ProductId == detail.ProductId);
+
+                    // si no hay producto suficiente la operación concluye
+                    if (sale.TransactionType != TransactionType.Preventa && (pb == null || pb.Stock < detail.Quantity))
+                        throw new Exception("El producto con código " + pb.Product.Code +
+                            " no tiene existencia suficiente en la sucursal, para realizar la venta de este articulo debe generar una preventa");
+
+                    //guardo dato del detalle incluyendo la comision de la venta del determinado producto
+
+                    detail.SortOrder = sortOrder;
+
+                    if (pb.Product.Category.Commission > Cons.Zero)
+                        detail.Commission = Math.Round(detail.TaxedAmount * (pb.Product.Category.Commission / Cons.OneHundred), Cons.Two);
+
+                    db.Entry(detail).State = EntityState.Modified;
+
+                    //actualizo stock de sucursal
+                    pb.LastStock = pb.Stock;
+                    pb.Stock -= detail.Quantity;
+
+                    db.Entry(pb).State = EntityState.Modified;
+
+                    //si el producto que se esta vendiendo es un paquete
+                    //agrego todos los productos q lo complementan a la venta con precio 0
+                    if (pb.Product.ProductType == ProductType.Package)
+                    {
+                        foreach (var pckDet in pb.Product.PackageDetails)
+                        {
+                            sortOrder++;
+                            var tDeatil = new SaleDetail
+                            {
+                                SaleId = detail.SaleId,
+                                Quantity = pckDet.Quantity,
+                                Price = Cons.Zero,
+                                Commission = Cons.Zero,
+                                ProductId = pckDet.DetailtId,
+                                SortOrder = sortOrder,
+                                ParentId = pckDet.PackageId,
+                            };
+                            //busco el stock del detalle en sucursal y resto el producto de los reservados
+                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
+                            detBP.LastStock = (detBP.Stock + detBP.Reserved);
+                            detBP.Reserved -= pckDet.Quantity;
+
+                            db.SaleDetails.Add(tDeatil);
+
+                            db.Entry(detBP).State = EntityState.Modified;
+                        }
+                    }
+
+                    //agrego el moviento al inventario
+                    StockMovement sm = new StockMovement
+                    {
+                        BranchId = pb.BranchId,
+                        ProductId = pb.ProductId,
+                        MovementType = MovementType.Exit,
+                        Comment = "SALIDA AUTOMATICA, VENTA FOLIO:" + sale.Folio,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now.ToLocal(),
+                        Quantity = detail.Quantity
+                    };
+
+                    db.StockMovements.Add(sm);
+
+                    sortOrder++;
+                }
+
+                //agrego el folio
+                sale.Folio = sale.Folio;
+
+                //verifico que la venta no exceda el crédito del cliente, siempre y cuando no sea contado
+                if (sale.TransactionType != TransactionType.Contado)
+                {
+                    if ((sale.TotalAmount + sale.Client.UsedAmount) > sale.Client.CreditLimit)
+                    {
+                        return Json(new
+                        {
+                            Result = "Error",
+                            Header = "Limite de crédito excedito",
+                            Message = "El total de la venta excede el disponible de credito"
+                        });
+                    }
+                    else
+                    {
+                        sale.Client.UsedAmount += sale.TotalTaxedAmount.RoundMoney();
+                        db.Entry(sale.Client).State = EntityState.Modified;
+
+                        db.Entry(sale.Client).Property(c => c.CreditDays).IsModified = false;
+                        db.Entry(sale.Client).Property(c => c.CreditLimit).IsModified = false;
+                    }
+                }
+
+                //coloco el porcentaje de comision del empleado
+                sale.ComPer = User.Identity.GetSalePercentage();
+
+                //si tiene comision por venta, coloco la cantidad de esta
+                if (sale.ComPer > Cons.Zero)
+                {
+                    var comTot = sale.SaleDetails.Sum(td => td.Commission);
+                    if (comTot > Cons.Zero)
+                        sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Two);
+                }
+
+                //ajuto la hora y fecha de venta a la actual y concluyo
+                if (sale.TransactionType == TransactionType.Contado)
+                {
+                    sale.TransactionDate = DateTime.Now.ToLocal();
+                    sale.Expiration = DateTime.Now.ToLocal();
+                    sale.SendingType = sending;
+                }
+
+                sale.LastStatus = sale.Status;
+                sale.Status = TranStatus.Reserved;
+
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now.ToLocal();
+
+
+                db.Entry(sale).State = EntityState.Modified;
+                db.SaveChanges();
+
+
+                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + sale.Folio });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Ocurrio un error",
+                    Message = "No se pudo concretar la venta debido a un error inesperado " + ex.Message
+                });
+            }
+        }
+
+        #endregion
+
+
+
+        #region Discontinued Methods
 
         [HttpPost]
         public ActionResult AddPayment(SalePayment payment)
@@ -774,174 +945,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Result = "Error",
                     Header = "Error al remover el pago!!",
                     Message = "Ocurrio un error inesperado al eliminar el pago... detalle: " + ex.Message
-                });
-            }
-        }
-        #endregion
-
-        #region Private Methods
-
-        private JsonResult Compleate(int saleId, int sending, bool addFolio)
-        {
-            try
-            {
-                var sale = db.Sales.Include(s => s.SaleDetails).
-                           FirstOrDefault(s => s.SaleId == saleId);
-
-                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
-
-                if (addFolio)
-                {
-                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
-                                                  s.BranchId == sale.BranchId && s.Year == sale.Year).
-                                                  OrderByDescending(s => s.Sequential).FirstOrDefault();
-
-                    var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
-                    sale.Sequential = (seq + Cons.One);
-
-                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
-                }
-
-
-                int sortOrder = Cons.One;
-
-                foreach (var detail in sale.SaleDetails)
-                {
-                    //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
-                    var pb = db.BranchProducts.Include(brp => brp.Product).
-                        Include(brp => brp.Product.Category).
-                        Include(brp => brp.Product.PackageDetails).
-                        FirstOrDefault(brp => brp.BranchId == sale.BranchId && brp.ProductId == detail.ProductId);
-
-                    // si no hay producto suficiente la operación concluye
-                    if (sale.TransactionType != TransactionType.Preventa && (pb == null || pb.Stock < detail.Quantity))
-                        throw new Exception("El producto con código "+pb.Product.Code+
-                            " no tiene existencia suficiente en la sucursal, para realizar la venta de este articulo debe generar una preventa");
-
-                    //guardo dato del detalle incluyendo la comision de la venta del determinado producto
-
-                    detail.SortOrder = sortOrder;
-
-                    if (pb.Product.Category.Commission > Cons.Zero)
-                        detail.Commission = Math.Round(detail.TaxedAmount * (pb.Product.Category.Commission / Cons.OneHundred), Cons.Two);
-
-                    db.Entry(detail).State = EntityState.Modified;
-
-                    //actualizo stock de sucursal
-                    pb.LastStock = pb.Stock;
-                    pb.Stock -= detail.Quantity;
-
-                    db.Entry(pb).State = EntityState.Modified;
-
-                    //si el producto que se esta vendiendo es un paquete
-                    //agrego todos los productos q lo complementan a la venta con precio 0
-                    if (pb.Product.ProductType == ProductType.Package)
-                    {
-                        foreach (var pckDet in pb.Product.PackageDetails)
-                        {
-                            sortOrder++;
-                            var tDeatil = new SaleDetail
-                            {
-                                SaleId = detail.SaleId,
-                                Quantity = pckDet.Quantity,
-                                Price = Cons.Zero,
-                                Commission = Cons.Zero,
-                                ProductId = pckDet.DetailtId,
-                                SortOrder = sortOrder,
-                                ParentId = pckDet.PackageId,
-                            };
-                            //busco el stock del detalle en sucursal y resto el producto de los reservados
-                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
-                            detBP.LastStock = (detBP.Stock + detBP.Reserved);
-                            detBP.Reserved -= pckDet.Quantity;
-
-                            db.SaleDetails.Add(tDeatil);
-
-                            db.Entry(detBP).State = EntityState.Modified;
-                        }
-                    }
-
-                    //agrego el moviento al inventario
-                    StockMovement sm = new StockMovement
-                    {
-                        BranchId = pb.BranchId,
-                        ProductId = pb.ProductId,
-                        MovementType = MovementType.Exit,
-                        Comment = "SALIDA AUTOMATICA, VENTA FOLIO:" + sale.Folio,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now.ToLocal(),
-                        Quantity = detail.Quantity
-                    };
-
-                    db.StockMovements.Add(sm);
-
-                    sortOrder++;
-                }
-
-                //agrego el folio
-                sale.Folio = sale.Folio;
-
-                //verifico que la venta no exceda el crédito del cliente
-                if (sale.TransactionType == TransactionType.Credito)
-                {
-                    if ((sale.TotalAmount + sale.Client.UsedAmount) > sale.Client.CreditLimit)
-                    {
-                        return Json(new
-                        {
-                            Result = "Error",
-                            Header = "Limite de crédito excedito",
-                            Message = "El total de la venta excede el disponible de credito"
-                        });
-                    }
-                    else
-                    {
-                        sale.Client.UsedAmount += sale.TotalTaxedAmount.RoundMoney();
-                        db.Entry(sale.Client).State = EntityState.Modified;
-
-                        db.Entry(sale.Client).Property(c => c.CreditDays).IsModified = false;
-                        db.Entry(sale.Client).Property(c => c.CreditLimit).IsModified = false;
-                    }
-                }
-
-                //coloco el porcentaje de comision del empleado
-                sale.ComPer = User.Identity.GetSalePercentage();
-
-                //si tiene comision por venta, coloco la cantidad de esta
-                if (sale.ComPer > Cons.Zero)
-                {
-                    var comTot = sale.SaleDetails.Sum(td => td.Commission);
-                    if (comTot > Cons.Zero)
-                        sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Two);
-                }
-
-                //ajuto la hora y fecha de venta a la actual y concluyo
-                if (sale.TransactionType == TransactionType.Contado)
-                {
-                    sale.TransactionDate = DateTime.Now.ToLocal();
-                    sale.Expiration = DateTime.Now.ToLocal();
-                    sale.SendingType = sending;
-                }
-
-                sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Reserved;
-
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now.ToLocal();
-
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-
-
-                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + sale.Folio });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    Result = "Ocurrio un error",
-                    Message = "No se pudo concretar la venta debido a un error inesperado " + ex.Message
                 });
             }
         }
