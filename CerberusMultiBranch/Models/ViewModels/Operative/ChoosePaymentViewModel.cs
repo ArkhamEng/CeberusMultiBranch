@@ -20,9 +20,20 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [DataType(DataType.Currency)]
         public double CardAmount { get; set; }
 
+        [DataType(DataType.Currency)]
+        public double CreditNoteAmount { get; set; }
+
         public bool CanCancel { get; set; }
 
         public string Reference { get; set; }
+
+        public int CreditNoteId { get; set; }
+
+        public string Folio { get; set; }
+
+        public string Expiration { get; set; }
+
+        public int PrintType { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
 

@@ -1,6 +1,8 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 @using CerberusMultiBranch.Models.Entities.Operative;
 @using CerberusMultiBranch.Models.ViewModels.Operative;
+@using CerberusMultiBranch.Support
+
 @{
     ViewBag.Title = "Registro de venta";
     ViewBag.Class = "fa fa-shopping-bag";
@@ -92,7 +94,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                         <div class="form-control input-sm" id="divTotalAmount">
-                                            @Model.TotalAmount.ToString("c")
+                                            @Model.TotalAmount.ToMoney()
                                         </div>
                                     </div>
                                 </div>
@@ -101,7 +103,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                         <div class="form-control input-sm" id="divTaxedAmount">
-                                            @Model.TotalTaxedAmount.ToString("c")
+                                            @Model.TotalTaxedAmount.ToMoney()
                                         </div>
                                     </div>
                                 </div>

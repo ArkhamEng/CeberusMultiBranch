@@ -89,7 +89,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                         <div class="form-control input-sm" id="divTotalAmount">
-                                            @Model.TotalAmount.ToString("c")
+                                            @Model.TotalAmount.ToMoney()
                                         </div>
                                     </div>
                                 </div>
@@ -98,7 +98,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                         <div class="form-control input-sm" id="divTaxedAmount">
-                                            @Model.TotalTaxedAmount.ToString("c")
+                                            @Model.TotalTaxedAmount.ToMoney()
                                         </div>
                                     </div>
                                 </div>

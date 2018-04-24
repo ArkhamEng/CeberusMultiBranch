@@ -1,6 +1,7 @@
 ﻿
 @model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
 @using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
 
 <div class="panel panel-danger">
     <div class="panel-heading">
@@ -34,11 +35,11 @@
                       
                        
                         <td align="center">
-                        @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToString("c") 
+                        @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToMoney()
                         </td>
 
                         <td align="center">
-                        @item.SalePayments.Where(s => s.PaymentMethod != PaymentMethod.Efectivo).Sum(s => s.Amount).ToString("c")  
+                        @item.SalePayments.Where(s => s.PaymentMethod != PaymentMethod.Efectivo).Sum(s => s.Amount).ToMoney()
                         </td>
 
                         <td align="center">@Html.DisplayFor(m => item.UpdUser)</td>
@@ -63,7 +64,7 @@
                         </td>
                         <td align="center">
                             <button class="btn btn-danger" title="Generar devoluciones" onclick="ShowRefundmentModal('@item.SaleId')">
-                                <span class="fa fa-dollar" />
+                                <span class="fa fa-exchange" />
                             </button>
                         </td>
                     </tr>

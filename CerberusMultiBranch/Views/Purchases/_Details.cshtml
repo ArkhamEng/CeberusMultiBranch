@@ -79,9 +79,9 @@
 
 
 
-        $("#divTotalAmount").text('@Model.Sum(d => d.Amount).ToString("c")');
+        $("#divTotalAmount").text('@Model.Sum(d => d.Amount).ToMoney()');
 
-        $("#divTaxedAmount").text('@Model.Sum(d => d.TaxedAmount).ToString("c")');
+        $("#divTaxedAmount").text('@Model.Sum(d => d.TaxedAmount).ToMoney()');
 
 
     });

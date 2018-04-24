@@ -1,4 +1,5 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.SaleDetail>
+@using CerberusMultiBranch.Support
 
 @if (Model.Count > 0)
 {
@@ -96,7 +97,7 @@ else
 <script>
     $(document).ready(function () {
 
-        $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.TaxedAmount).ToString("c")');
+        $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.TaxedAmount).ToMoney()');
 
         if (parseFloat('@Model.Count') > 0)
             $("#btnCompleate").attr("disabled", false);
@@ -105,8 +106,7 @@ else
 
     });
 
-    function ChangePrice(prodId, transId)
-    {
+    function ChangePrice(prodId, transId) {
         var param = { productId: prodId, saleId: transId, isCart: true }
 
         ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {

@@ -1,5 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
 @using CerberusMultiBranch.Models.Entities.Operative;
+@using CerberusMultiBranch.Support
 
 
 @{
@@ -15,7 +16,7 @@
 
 <h4 class="alert alert-success col-md-3  col-md-offset-3">
     Total
-    <label id="lblTotalAmount">@Model.TotalAmount.ToString("c")</label>
+    <label id="lblTotalAmount">@Model.TotalAmount.ToMoney()</label>
 </h4>
 <hr />
 

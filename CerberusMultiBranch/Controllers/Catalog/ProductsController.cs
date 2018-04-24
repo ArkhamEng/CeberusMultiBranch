@@ -14,6 +14,7 @@ using Microsoft.AspNet.Identity;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System.Text.RegularExpressions;
 using System.Web;
+using CerberusMultiBranch.Models.ViewModels.Operative;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
@@ -424,23 +425,23 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
                             && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
                             && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
-                            select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId) != null? 
-                            s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock: Cons.Zero).Take(400).ToList();
+                            select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
+                            s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
             }
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
             {
-                var bp                  = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                prod.Quantity           = bp != null ? bp.Stock : Cons.Zero;
-                prod.StorePercentage    = bp != null ? bp.StorePercentage : Cons.Zero;
-                prod.DealerPercentage   = bp != null ? bp.DealerPercentage : Cons.Zero;
+                var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                prod.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                prod.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
                 prod.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
-                prod.StorePrice         = bp != null ? bp.StorePrice : Cons.Zero;
-                prod.DealerPrice        = bp != null ? bp.DealerPrice : Cons.Zero;
-                prod.WholesalerPrice    = bp != null ? bp.WholesalerPrice : Cons.Zero;
-                prod.Row                = bp != null ? bp.Row : string.Empty;
-                prod.Ledge              = bp != null ? bp.Ledge : string.Empty;
-                prod.StockLocked        = bp != null ? bp.StockLocked : false;
+                prod.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                prod.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                prod.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                prod.Row = bp != null ? bp.Row : string.Empty;
+                prod.Ledge = bp != null ? bp.Ledge : string.Empty;
+                prod.StockLocked = bp != null ? bp.StockLocked : false;
             }
 
             products.OrderCarModels();
@@ -1007,7 +1008,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 };
             }
             //si estoy actualizando pero el inventario ha sido bloqueado, entonces conservo el  precio de compra
-            else if(!package.StockLocked)
+            else if (!package.StockLocked)
                 branchP.BuyPrice = package.BuyPrice;
 
             //coloco los porcentajes de utilidad
@@ -1646,6 +1647,51 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 return Json(new { Result = "Error al eliminar el producto", Message = ex.Message });
             }
+        }
+
+        [Authorize(Roles = "Supervisor")]
+        public ActionResult StockMovement()
+        {
+            var model = new TransactionViewModel();
+            model.Branches = User.Identity.GetBranches().ToSelectList();
+            model.StockMovements = new List<StockMovement>();
+            return View(model);
+        }
+
+        [Authorize(Roles = "Supervisor")]
+        [HttpPost]
+        public ActionResult SearchMovements(int branchId, string description, DateTime? beginDate, DateTime? endDate)
+        {
+
+            string code = null;
+            string[] arr = new List<string>().ToArray();
+
+            if (description != null && description != string.Empty)
+            {
+                arr = description.Trim().Split(' ');
+
+                if (arr.Length == Cons.One)
+                    code = arr.FirstOrDefault();
+            }
+
+            List<StockMovement> model = null;
+            if (code != null)
+            {
+                model = db.StockMovements.Include(sm => sm.BranchProduct.Product).Where(sm => sm.BranchProduct.Product.Code == code).ToList();
+            }
+            else
+            {
+                 model = db.StockMovements.Include(sm => sm.BranchProduct.Product).
+                    Where(sm => (description == null || description == string.Empty ||
+                           arr.All(s => (sm.BranchProduct.Product.Code + " "
+                                        + sm.BranchProduct.Product.Name + " "
+                                        + sm.BranchProduct.Product.TradeMark).Contains(s)) &&
+                                        (beginDate == null || sm.MovementDate >= beginDate.Value) &&
+                                        (endDate == null || sm.MovementDate <= endDate.Value)) &&
+                                        (sm.BranchId == branchId) ).OrderByDescending(s=> s.MovementDate).ToList();
+            }
+
+            return PartialView("_MovementList",model);
         }
 
         protected override void Dispose(bool disposing)

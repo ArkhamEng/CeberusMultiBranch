@@ -66,14 +66,14 @@
                             @Html.DisplayFor(modelItem => item.Product.Unit)
                         </td>
                         <td>
-                            @item.Price.ToString("c")
+                            @item.Price.ToMoney()
                         </td>
 
                         <td align="center">
                             @Html.DisplayFor(modelItem => item.Quantity)
                         </td>
                         <td>
-                          @item.TaxAmount.ToString("c")
+                          @item.TaxAmount.ToMoney()
                         </td>
                         >
                         <td>
@@ -142,10 +142,10 @@
                 <td>
                     @{ var iva = (item.Price / Cons.DeIVA); var priceBI = item.Price - iva; }
 
-                    @priceBI.ToString("c")
+                    @priceBI.ToMoney()
                 </td>
                 <td>
-                    @iva.ToString("c")
+                    @iva.ToMoney()
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Quantity)
@@ -164,7 +164,7 @@
     $(document).ready(function () {
         Paginate("#tbSoldItemsShown", 20);
 
-        $("#hAmount").text("Total " + '@Model.Sum(d=> d.Amount).ToString("c")')
+        $("#hAmount").text("Total " + '@Model.Sum(d=> d.Amount).ToMoney()')
 
         $("#hItems").text("Articulos " + '@Model.Sum(d=> d.Quantity)')
     });

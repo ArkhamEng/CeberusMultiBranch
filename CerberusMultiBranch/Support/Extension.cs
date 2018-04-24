@@ -229,6 +229,11 @@ namespace CerberusMultiBranch.Support
             return Math.Round(amount, Cons.Decimals);
         }
 
+        public static string ToMoney(this double amount)
+        {
+            return Math.Round(amount,Cons.Two).ToString("c");
+        }
+
         public static string enletras(string num)
         {
             string res, dec = "";

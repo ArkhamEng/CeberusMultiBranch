@@ -96,9 +96,9 @@
                                 {
                                     var debt = (Model.TotalTaxedAmount - Model.SalePayments.Sum(s => s.Amount));
 
-                                    <label>Monto pagado </label>   <a>@Model.SalePayments.Sum(s => s.Amount).ToString("c")</a><br />
+                                    <label>Monto pagado </label>   <a>@Model.SalePayments.Sum(s => s.Amount).ToMoney()</a><br />
                                     
-                                    <label>Monto restante </label> <a>@debt.ToString("c")</a>
+                                    <label>Monto restante </label> <a>@debt.ToMoney()</a>
                                 }
 
                                 else if (Model.SalePayments.Count > Cons.One)
@@ -243,7 +243,7 @@
                                 </label>
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
-                                @Model.TotalAmount.ToString("c")
+                                @Model.TotalAmount.ToMoney()
                             </td>
                         </tr>
                         <tr style="height:23px">
@@ -253,7 +253,7 @@
                                 </label>
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
-                                @Model.TotalTaxAmount.ToString("c")
+                                @Model.TotalTaxAmount.ToMoney()
                             </td>
                         </tr>
                         <tr style="height:23px">
@@ -265,7 +265,7 @@
                             </td>
                             <td class="text-right" style="border:1px solid gray; width:10%">
                                 <label class="control-label text-danger">
-                                    @Model.TotalTaxedAmount.ToString("c")
+                                    @Model.TotalTaxedAmount.ToMoney()
                                 </label>
                             </td>
                         </tr>
@@ -292,7 +292,8 @@
 
 
 <script>
-    function PrintNote() {
+    function PrintNote()
+    {
         $("#divNote").printThis();
     }
 </script>

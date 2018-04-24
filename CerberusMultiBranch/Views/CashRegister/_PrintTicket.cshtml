@@ -71,7 +71,7 @@
                         <label> Total Pagos</label>
                     </td>
                     <td class="text-right">
-                        @Model.SalePayments.Sum(s => s.Amount).ToString("c")
+                        @Model.SalePayments.Sum(s => s.Amount).ToMoney()
                     </td>
                 </tr>
                 <tr>
@@ -79,7 +79,7 @@
                         <label> Restante</label>
                     </td>
                     <td class="text-right">
-                        @debt.ToString("c")
+                        @debt.ToMoney()
                     </td>
                 </tr>
             }
@@ -138,7 +138,7 @@
                                 <td class="text-right">
                                     @if (tI.ParentId == null)
                                     {
-                                        @tI.TaxedAmount.ToString("c")
+                                        @tI.TaxedAmount.ToMoney()
                                     }
 
                                 </td>
@@ -153,7 +153,7 @@
                             <td colspan="2" />
                             <td>Total</td>
                             <td align="right">
-                                @Model.TotalTaxedAmount.ToString("c")
+                                @Model.TotalTaxedAmount.ToMoney()
                             </td>
                         </tr>
                         <tr style="height:60px">

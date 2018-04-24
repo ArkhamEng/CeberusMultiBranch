@@ -1,5 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.CashRegister
-
+@using CerberusMultiBranch.Support
 @{
     ViewBag.Title = "Caja";
     ViewBag.Class = "fa fa-laptop";
@@ -34,7 +34,7 @@ else
             <div class="panel-heading">
                 <h4 class="text-uppercase text-center panel-title">
                     <a data-toggle="collapse" href="#collapse1">
-                    @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToString("c")</a>
+                    @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToMoney()</a>
                 </h4>
             </div>
             <div id="collapse1" class="panel-collapse collapse">
@@ -42,7 +42,7 @@ else
                     <div class="col-md-5  text-center  alert bg-primary">
                         <h3>
                             @{
-                                var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToString("c");
+                                var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToMoney();
                             }
                             Ventas Efectivo<br />
                             @cash
@@ -51,7 +51,7 @@ else
                     <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
                         <h3>
                             Ventas Tarjeta<br />
-                            @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToString("c")
+                            @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToMoney()
                         </h3>
                     </div>
 
@@ -79,7 +79,7 @@ else
                  onmouseover="SetPointer(this)" title="Ver y agregar retiros">
                 <h3>
                     Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                    @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
                 </h3>
             </div>
         }
@@ -88,7 +88,7 @@ else
             <div class="text-center col-md-12 alert btn-danger disabled">
                 <h3>
                     Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToString("c")
+                    @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
                 </h3>
             </div>
         }
@@ -264,4 +264,8 @@ else
 
         $("#ModalCancel").modal("hide");
     }
+
+
+   
+
 </script>

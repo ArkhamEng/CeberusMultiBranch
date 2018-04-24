@@ -1,4 +1,5 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.SaleDetail>
+@using CerberusMultiBranch.Support
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 <table class="table table-striped small">
@@ -101,8 +102,8 @@
         else
             $("#btnCompleate").hide();
 
-        $("#divTotalAmount").text('@Model.Sum(d => d.Amount).ToString("c")');
-        $("#divTaxedAmount").text('@Model.Sum(d => d.TaxedAmount).ToString("c")');
+        $("#divTotalAmount").text('@Model.Sum(d => d.Amount).ToMoney()');
+        $("#divTaxedAmount").text('@Model.Sum(d => d.TaxedAmount).ToMoney()');
     });
 
     function ChangePriceDetail(prodId, transId)

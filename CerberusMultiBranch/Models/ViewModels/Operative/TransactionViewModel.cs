@@ -28,6 +28,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public ICollection<CashRegister> CashRegisters { get; set; }
 
+        public ICollection<StockMovement> StockMovements { get; set; }
+
         public TransactionViewModel()
         {
             BeginDate = DateTime.Now.TodayLocal();

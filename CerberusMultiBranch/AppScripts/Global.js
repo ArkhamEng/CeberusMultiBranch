@@ -3,7 +3,8 @@
 /***************************************************
 ************AUTOCOMPLEATE USING JQUERY UI***********
 ***************************************************/
-function Compleate(textbox, list, url, onSelected,entityId) {
+function Compleate(textbox, list, url, onSelected, entityId)
+{
     $(textbox).off('autocomplete').autocomplete(
       {
           source: function (request, response)

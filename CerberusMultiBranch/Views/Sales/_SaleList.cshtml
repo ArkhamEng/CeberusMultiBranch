@@ -1,6 +1,6 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
 @using CerberusMultiBranch.Models.Entities.Operative
-
+@using CerberusMultiBranch.Support
 
 <table id="tbSales" class="table table-striped small">
     <thead>
@@ -25,7 +25,7 @@
                 <td >@item.Expiration.ToString("dd/MM/yyyy")</td>
                 
                 <td class="text-uppercase">@Html.DisplayFor(m => item.User.UserName)<br />
-                @item.ComAmount.ToString("c")
+                @item.ComAmount.ToMoney()
                 </td>
 
                 <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>

@@ -1,5 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ClientViewModel
-
+@using CerberusMultiBranch.Support
 @{
     ViewBag.Title = "Registro de Clientes";
     ViewBag.Class = "fa fa-address-book";
@@ -193,7 +193,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-credit-card-alt"></i></span>
                             <div class="form-control">
-                                @Model.CreditLimit.ToString("c")
+                                @Model.CreditLimit.ToMoney()
                                 @Html.HiddenFor(model => model.CreditLimit)
                             </div>
                         </div>
@@ -226,7 +226,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                             <div class="form-control">
-                                @Model.CreditAvailable.ToString("c")
+                                @Model.CreditAvailable.ToMoney()
                             </div>
                         </div>
                     </div>
@@ -236,7 +236,7 @@
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-piggy-bank"></i></span>
                             <div class="form-control">
-                                @Model.UsedAmount.ToString("c")
+                                @Model.UsedAmount.ToMoney()
                             </div>
                         </div>
                     </div>

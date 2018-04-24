@@ -61,7 +61,7 @@
                     <table style="width:100%" class="table-bordered">
                         <tr>
                             <td colspan="2" class="text-center">
-                                <label>NOTA DE CRÉDITO</label>
+                                <label>VALE DE REFACCIONES</label>
                             </td>
                         </tr>
                         <tr>
@@ -120,14 +120,14 @@
                                     <LABEL>Devolución de mercancía</LABEL><br />
                                     <label>Folio de venta</label>  @Model.Sale.Folio
                                     <br /><br />
-                                    COMENTARIO DE CANCELACIÓN <br />
+                                    COMENTARIOS: <br />
                                     @Model.Sale.Comment
                                 </h4>
                             </td>
                             <td class="text-center"  style="width:20%" valign="middle">
                                 <h4>
                                     <label>
-                                        @Model.Amount.ToString("c")
+                                        @Model.Amount.ToMoney()
                                     </label>
                                 </h4>
                                 

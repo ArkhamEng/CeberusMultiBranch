@@ -1,52 +1,133 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.RefundViewModel
+@using CerberusMultiBranch.Support
 
-<div id="ModalRefundment" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content panel panel-danger panel-group">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">
-                    Rembolso por cancelación de venta
-                </h4>
-            </div>
-            <div class="modal-body panel-body">
-                <div class="col-md-12 text-center">
-                  <h4 class="text-uppercase">
-                      Se aplicara la devolucíon por cancelación para el cliente @Model.RefundClient, ¿deseas continuar?
-                  </h4>
+@section Scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+
+<form id="formRefund">
+    <div id="ModalRefundment" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content panel panel-danger panel-group">
+                <div class="modal-header panel-heading">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">
+                       Aplicación de rembolso, monto total @Model.TotalRefund.ToMoney()
+                    </h4>
                 </div>
-                <hr />
-                <div class="col-md-12">
-                    <div class="form-group col-md-4">
-                        <label>En efectivo</label>
-                        @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control input-lg", disabled = true } })
+                <div class="modal-body panel-body">
+                    <div class="col-md-12 text-center">
+                        <label class="text-uppercase bg-success">
+                            Se aplicara la devolucíon por cancelación para  <u>@Model.RefundClient</u>, ¿deseas continuar?
+                        </label>
                     </div>
-                    <div class="form-group col-md-offset-2 col-md-4">
-                        <label>En vale</label>
-                        @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control input-lg", disabled=true } })
+
+                    <div class="col-md-12">
+                        <div class="form-group col-md-5">
+                            <label>En efectivo</label>
+                            @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control input-lg", type="number" } })
+                        </div>
+                        <div class="form-group col-md-offset-2 col-md-5 pull-right">
+                            <label>En vale</label>
+                            @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control input-lg", type = "number" } })
+                        </div>
+                        <div class="form-group col-md-8 center-block">
+                            <label>Numero IFE (solo para vale)</label>
+                            @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
+                            @Html.ValidationMessageFor(model=> model.Ident, "", new { @class = "text-danger" })
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer panel-footer">
-                <button class="btn btn-success pull-left" type="button" onclick="ApplyRefund()">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Aplicar devolución
-                </button>
+                <div class="modal-footer panel-footer">
+                    <button class="btn btn-success pull-left" type="button" onclick="ApplyRefund()">
+                        <span class="glyphicon glyphicon-ok"></span>
+                        Aplicar devolución
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+</form>
 @Html.HiddenFor(m=> m.RefundClientId)
 @Html.HiddenFor(m => m.RefundSaleId)
+@Html.HiddenFor(m => m.TotalRefund)
 
 <script>
     $(document).ready(function ()
     {
+        var form = $("#formRefund");
+        form.validate();
+
         $("#ModalRefundment").modal('show');
+
+        $("#RefundCash").off('keyup').keyup(function ()
+        {
+            var val = $("#RefundCash").val();
+            var result = CalculateRefund(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#RefundCredit").val(result);
+
+            if (result < 0) {
+                $("#RefundCredit").val(0);
+                $("#RefundCash").val($("#TotalRefund").val());
+            }
+
+
+
+            EvalCredit();
+        });
+
+        $("#RefundCredit").off('keyup').keyup(function ()
+        {
+            var val = $("#RefundCredit").val();
+            var result = CalculateRefund(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#RefundCash").val(result);
+
+            if (result < 0) {
+                $("#RefundCash").val(0);
+                $("#RefundCredit").val($("#TotalRefund").val());
+            }
+
+            EvalCredit();
+        });
+
+        EvalCredit();
     });
+
+    function EvalCredit()
+    {
+        var Ammount = parseFloat($("#RefundCredit").val());
+
+        if (Ammount > 0)
+            $("#Ident").attr("disabled", false);
+        else
+            $("#Ident").attr("disabled", true);
+    }
+
+    function CalculateRefund(val)
+    {
+        var total = parseFloat($("#TotalRefund").val());
+
+        var result = (total - parseFloat(val));
+
+        return result;
+    }
 
     function ApplyRefund()
     {
+        var form = $("#formRefund");
+
+        if (!form.valid())
+            return;
        
         $("#ModalRefundment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
         {
@@ -56,7 +137,8 @@
                 RefundClientId: $("#RefundClientId").val(),
                 RefundSaleId: $("#RefundSaleId").val(),
                 RefundCash: $("#RefundCash").val(),
-                RefundCredit: $("#RefundCredit").val()
+                RefundCredit: $("#RefundCredit").val(),
+                Ident: $("#Ident").val()
             }
 
             ExecuteAjax('@Url.Action("CreateRefund")', { refund: ref }, function (response)

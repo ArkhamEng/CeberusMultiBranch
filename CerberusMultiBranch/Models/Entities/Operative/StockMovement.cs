@@ -19,6 +19,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public double Quantity { get; set; }
 
+
         public DateTime MovementDate { get; set; }
 
         public string User { get; set; }

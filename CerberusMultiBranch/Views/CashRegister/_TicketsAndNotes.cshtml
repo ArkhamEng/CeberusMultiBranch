@@ -1,4 +1,5 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
+@using CerberusMultiBranch.Support
 
 <div id="ModalNotes" class="modal fade" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -30,7 +31,7 @@
                                style = "width:70% !important"
                            })
                                 <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar ventas liquidades y en espera de pago">
+                                    <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar ventas completadas, o con abonos pendintes">
                                         <span class="glyphicon glyphicon-search"></span>
                                         <u>B</u>uscar
                                     </button>

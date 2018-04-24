@@ -22,7 +22,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         Efectivo = 2, // Efectivo
         Cheque = 3, // Con cheque
         Mixto = 4, //Efectivo y Tarjeta
-        Transferencia = 5
+        Transferencia = 5,
+        Vale = 6
     }
 
     public enum TransactionType

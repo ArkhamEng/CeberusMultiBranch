@@ -149,7 +149,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 return Json(new {Result = "Error", Message = "El cliente no tiene suficiente crédito" });
 
             return Json(new { Result = "OK", Days=client.CreditDays,
-                Message = string.Format("Credito dispoible {0} con {1} días para pagar",client.CreditAvailable.ToString("c"),client.CreditDays) });
+                Message = string.Format("Credito dispoible {0} con {1} días para pagar",client.CreditAvailable.ToMoney(), client.CreditDays) });
         }
 
 

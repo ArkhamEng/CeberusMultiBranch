@@ -21,9 +21,12 @@
                 &nbsp;Productos<span class="fa fa-dropbox" style="float:left" />
             </a>
         </li>
+        @if (User.IsInRole("Supervisor"))
+        {
+            <li><a href="/Products/StockMovement" onclick="ShowLoading()">&nbsp;Movimientos<span class="fa fa-cubes" style="float:left" /></a></li>
+        }
         @if (User.IsInRole("Vendedor"))
         {
-           
             <li>
                 <a href="/Sales/History" onclick="ShowLoading()">
                     &nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" />

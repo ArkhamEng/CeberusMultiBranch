@@ -290,6 +290,18 @@
     <Compile Include="Migrations\201804160527571_Refunding.Designer.cs">
       <DependentUpon>201804160527571_Refunding.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201804190230507_IdentCreditNote.cs" />
+    <Compile Include="Migrations\201804190230507_IdentCreditNote.Designer.cs">
+      <DependentUpon>201804190230507_IdentCreditNote.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804202258276_NoteCreditHistory.cs" />
+    <Compile Include="Migrations\201804202258276_NoteCreditHistory.Designer.cs">
+      <DependentUpon>201804202258276_NoteCreditHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201804210055355_ChangeTableName.cs" />
+    <Compile Include="Migrations\201804210055355_ChangeTableName.Designer.cs">
+      <DependentUpon>201804210055355_ChangeTableName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -352,6 +364,7 @@
     <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
@@ -628,6 +641,9 @@
     <Content Include="Views\CashRegister\_PendingRefundment.cshtml" />
     <Content Include="Views\CashRegister\_Refundment.cshtml" />
     <Content Include="Views\CashRegister\_PrintCreditNote.cshtml" />
+    <Content Include="Views\CashRegister\_PrintElements.cshtml" />
+    <Content Include="Views\Products\StockMovement.cshtml" />
+    <Content Include="Views\Products\_MovementList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -709,6 +725,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201804160527571_Refunding.resx">
       <DependentUpon>201804160527571_Refunding.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804190230507_IdentCreditNote.resx">
+      <DependentUpon>201804190230507_IdentCreditNote.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804202258276_NoteCreditHistory.resx">
+      <DependentUpon>201804202258276_NoteCreditHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201804210055355_ChangeTableName.resx">
+      <DependentUpon>201804210055355_ChangeTableName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

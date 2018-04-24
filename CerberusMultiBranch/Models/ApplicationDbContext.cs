@@ -69,6 +69,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<SaleCreditNote> SaleCreditNotes { get; set; }
 
+        public DbSet<CreditNoteHistory> CreditNoteHistories { get; set; }
+
         public DbSet<Purchase> Purchases { get; set; }
 
         public DbSet<PurchaseDetail> PurchaseDetails { get; set; }

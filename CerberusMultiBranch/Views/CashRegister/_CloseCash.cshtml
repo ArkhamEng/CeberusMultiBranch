@@ -1,11 +1,13 @@
 ﻿
 @model double
+@using CerberusMultiBranch.Support
+
 <div id="ModalCloseCash" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel panel-danger panel-group">
             <div class="modal-header panel-heading">
                 <h4 class="modal-title">
-                   El monto en Caja es de @Model.ToString("c")
+                   El monto en Caja es de @Model.ToMoney()
                 </h4>
             </div>
             <div class="modal-body">

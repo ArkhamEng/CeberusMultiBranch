@@ -1,0 +1,96 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.StockMovement>
+@using CerberusMultiBranch.Models.Entities.Operative
+
+<table id="tbMovements" class="table table table-striped small">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayName("Códigos")
+            </th>
+            <th>
+                @Html.DisplayName("Descripción")
+            </th>
+            <th>
+                @Html.DisplayName("Cantidad")
+            </th>
+            <th>
+                @Html.DisplayName("Fecha")
+            </th>
+            <th>
+                @Html.DisplayName("Usuario")
+            </th>
+            <th>
+                @Html.DisplayName("Comentario")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var c = item.Comment.ToUpper().Contains("MANUAL")? (item.MovementType == MovementType.Exit ? "danger" : "warning") :string.Empty;
+            
+
+            <tr class="@c">
+                <td class="col-md-1">
+                    @if (item.BranchProduct.Product.Images != null && item.BranchProduct.Product.Images.Count > 0)
+                    {
+                        <img src="@item.BranchProduct.Product.Images.First().Path" class="img-responsive" style="max-height:60px" />
+                    }
+                    else
+                    {
+                        <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" style="max-height:60px" />
+                    }
+                </td>
+
+                <td>
+                    <label>Código</label>
+                    @Html.DisplayFor(modelItem => item.BranchProduct.Product.Code)<br />
+                    <label>Clave Sat</label>
+                    @Html.DisplayFor(modelItem => item.BranchProduct.Product.Category.SatCode)
+                </td>
+                <td class="col-xs-3">
+                    @Html.DisplayFor(modelItem => item.BranchProduct.Product.Name) <br />
+                    <label>Por </label> @Html.DisplayFor(modelItem => item.BranchProduct.Product.TradeMark) |
+                    <label>Unidad </label> @Html.DisplayFor(modelItem => item.BranchProduct.Product.Unit)
+                </td>
+
+                <td align="center">
+                    @switch (item.MovementType)
+                    {
+                        case CerberusMultiBranch.Models.Entities.Operative.MovementType.Entry:
+                            <a>Entrada</a>
+                            break;
+                        case CerberusMultiBranch.Models.Entities.Operative.MovementType.Exit:
+                            <a>Salida</a>
+                            break;
+                    }
+                    <br />
+                    @Html.DisplayFor(modelItem => item.Quantity)
+
+                </td>
+
+
+                <td>
+                    @item.MovementDate.ToString("dd/MM/yyyy")<br />
+                    @item.MovementDate.ToString("HH:mm:ss")
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.User)
+                </td>
+
+                <td class="col-xs-3">
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        Paginate("#tbMovements", 20)
+    });
+</script>

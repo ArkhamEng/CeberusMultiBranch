@@ -1,6 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.ChoosePaymentViewModel
 @using CerberusMultiBranch.Models.Entities.Operative;
-
+@using CerberusMultiBranch.Support
 
 
 <div id="ModalRegistPayment" class="modal fade" role="dialog">
@@ -14,11 +14,11 @@
                     </a>
                     <a class="col-xs-3 text-center">
                         TOTAL VENDIDO<br />
-                        @Model.Details.First().Sale.TotalTaxedAmount.ToString("c")
+                        @Model.Details.First().Sale.TotalTaxedAmount.ToMoney()
                     </a>
                     <a class="col-xs-4 text-right">
-                       DEUDA TOTAL <br />
-                        @Model.AmountToPay.ToString("c")
+                        DEUDA TOTAL <br />
+                        @Model.AmountToPay.ToMoney()
                     </a>
                 </h4>
             </div>
@@ -48,17 +48,17 @@
                             </thead>
                             <tbody>
                                 @foreach (var item in Model.Details)
-                            {
+                                {
                                     <tr>
                                         <td class="col-md-1" align="center">
                                             @if (item.Product.Images.Count > 0)
-                                        {
+                                            {
                                                 <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
-                                        }
-                                        else
-                                        {
+                                            }
+                                            else
+                                            {
                                                 <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
-                                        }
+                                            }
                                         </td>
                                         <td>
                                             @Html.DisplayFor(m => item.Product.Code)
@@ -78,13 +78,13 @@
                                             @Html.DisplayFor(m => item.TaxedAmount)
                                         </td>
                                     </tr>
-                            }
+                                }
                             </tbody>
                         </table>
                     </div>
                 </div>
                 <div class="panel panel-default">
-                    <div class="panel-heading">
+                    <div class="panel-heading clearfix">
                         @if (Model.Details.First().Sale.TransactionType == TransactionType.Contado)
                         {
                             <label>Registre el pago exacto de la venta de contado</label>
@@ -93,6 +93,9 @@
                         {
                             <label>Registre el monto del anticipo (opcional) </label>
                         }
+                        <div class="pull-right">
+                            <label class="text-danger"> Total Ingresado $ <a id="total"></a></label>
+                        </div>
                     </div>
                     <div class="panel-body">
                         <div id="Mix">
@@ -120,13 +123,41 @@
 
                         <div id="Ref">
                             <div class="form-group col-md-6">
+
                                 <div class="input-group">
                                     <span class="input-group-addon">
-                                        Referencia
-                                        @*<i class="fa fa-bookmark"></i>*@
+                                        Vale
                                     </span>
-                                    @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @class = "form-control", placeholder = "REFERENCÍA BANCARIA" } })
+                                    @Html.EditorFor(model => model.Folio, new { htmlAttributes = new { @class = "form-control bg-success", placeholder = "Folio de vale ó Número de IFE", list = "Folios" } })
+                                    <datalist id="Folios"></datalist>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    Referencia
+                                    @*<i class="fa fa-bookmark"></i>*@
+                                </span>
+                                @Html.EditorFor(model => model.Reference, new { htmlAttributes = new { @class = "form-control", placeholder = "REFERENCÍA BANCARIA" } })
+                            </div>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    Expira
+                                </span>
+                                @Html.EditorFor(model => model.Expiration, new { htmlAttributes = new { @class = "form-control", disabled = true } })
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-3 pull-right">
+                            <div class="input-group">
+                                <span class="input-group-addon">
+                                    Monto vale
+                                </span>
+                                @Html.EditorFor(model => model.CreditNoteAmount, new { htmlAttributes = new { @class = "form-control", disabled = true } })
                             </div>
                         </div>
                     </div>
@@ -153,73 +184,122 @@
                         Cancelar Venta
                     </button>
                 }
-                
+
             </div>
 
         </div>
 
     </div>
 </div>
-
+@Html.HiddenFor(m => m.CreditNoteId)
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#ModalRegistPayment").modal('show');
-        
-     
-        if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
-        {
-            $("#CashAmount").off('keyup').keyup(function ()
-            {
-                var val = $("#CashAmount").val();
-                var result = Calculate(val);
-              
-                result = parseFloat(result).toFixed(2);
 
-                $("#CardAmount").val(result);
-            });
+        SetInputEvents();
 
-            $("#CardAmount").off('keyup').keyup(function ()
-            {
-                var val = $("#CardAmount").val();
-                var result = Calculate(val);
+        Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, value) {
+            OnFolioSelected(id, value);
+        });
 
-                result = parseFloat(result).toFixed(2);
-
-                $("#CashAmount").val(result);
-            });
-        }
+        SumAmount();
     });
 
-    function Calculate(val) {
-        var total = $("#AmountToPay").val();
+
+
+    function OnFolioSelected(id, value)
+    {
+        $("#CreditNoteId").val(id);
+
+        $("#Folio").removeClass('alert-info');
+
+        ExecuteAjax('@Url.Action("GetFolioAmount")', { id: id }, function (response)
+        {
+            if (response.Result = 'OK')
+            {
+                $("#CreditNoteAmount").val(response.Amount);
+                $("#Expiration").val(response.Expiration);
+                $("#Folio").val(response.Label);
+
+                $("#Folio").addClass('alert-info');
+
+                var tot = parseFloat($("#AmountToPay").val());
+
+                //si el monto del vale excede o es igual a la cantidad  pagar, inhibo el ingreso de otra forma de pago
+                if (response.Amount > tot || response.Amount == tot)
+                {
+                    $("#CashAmount").val(0);
+                    $("#CashAmount").attr("disabled", true);
+
+                    $("#CardAmount").val(0);
+                    $("#CardAmount").attr("disabled", true);
+
+                    $("#Reference").val('');
+                    $("#Reference").attr("disabled", true);
+                }
+
+                    //de otra forma si la venta es de contado, recalculo el monto a pagar
+                else if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+                {
+                    var cash = parseFloat($("#AmountToPay").val()) - response.Amount;
+                    $("#CashAmount").val(cash);
+                    $("#CardAmount").val(0);
+                    $("#Reference").val('');
+                }
+                else
+                {
+                    $("#CashAmount").val(0);
+                    $("#CardAmount").val(0);
+                    $("#Reference").val('');
+                }
+            }
+
+            SumAmount();
+        });
+    }
+
+    function SumAmount()
+    {
+        var amount = parseFloat($("#CashAmount").val()) + parseFloat($("#CardAmount").val()) + parseFloat($("#CreditNoteAmount").val());
+        $("#total").text(amount.toFixed(2));
+    }
+
+    function Calculate(val)
+    {
+        var total = parseFloat($("#AmountToPay").val()) - parseFloat($("#CreditNoteAmount").val());
 
         var result = (total - parseFloat(val));
+
+        if (result < 0)
+            result = 0;
 
         return result;
     }
 
     function RegisterPayment(printType)
     {
+       
         $("#ModalRegistPayment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
         {
-            if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0)
-            {
-                ShowMessage("La cantidad es Incorrecta!","Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta",'warning');
+            if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
+                ShowMessage("La cantidad es Incorrecta!",
+                    "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 'warning');
                 return;
             }
-                
 
             ShowLoading();
+
             var param = {
-                saleId: $("#SaleId").val(),
-                cash: $("#CashAmount").val(),
-                card: $("#CardAmount").val(),
-                reference: $("#Reference").val(),
-                printType: printType
+                SaleId: $("#SaleId").val(),
+                CashAmount: $("#CashAmount").val(),
+                CardAmount: $("#CardAmount").val(),
+                Reference: $("#Reference").val(),
+                CreditNoteId: $("#CreditNoteId").val(),
+                CreditNoteAmount: $("#CreditNoteAmount").val(),
+                PrintType: printType
             };
 
-            ExecuteAjax('@Url.Action("RegistPayment")', param, function (response)
+            ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response)
             {
                 HideLoading();
 
@@ -227,9 +307,8 @@
                     ShowMessage(response.Result, response.Message, 'warning');
                 else
                 {
-                    $("#divPrinter").html(response);
-                    PrintNote();
                     CheckPendingPayments();
+                    $("#divPrinter").html(response);
                 }
             });
         });
@@ -246,5 +325,70 @@
         });
 
         $("#ModalRegistPayment").modal('hide');
+    }
+
+    function SetInputEvents()
+    {
+
+        $("#CashAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
+                var val = $("#CashAmount").val();
+                var result = Calculate(val);
+
+                result = parseFloat(result).toFixed(2);
+
+                $("#CardAmount").val(result);
+            }
+
+            SumAmount();
+        });
+
+        $("#CardAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
+                var val = $("#CardAmount").val();
+                var result = Calculate(val);
+
+                result = parseFloat(result).toFixed(2);
+
+                $("#CashAmount").val(result);
+            }
+
+            SumAmount();
+        });
+
+        //cuando se limpia el campo de folio
+        $("#Folio").off('keyup').keyup(function (e)
+        {
+            if (e.keyCode == 9)
+                return;
+
+            if (!$("#Folio").hasClass('alert-info'))
+                return;
+
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
+                $("#CashAmount").val($("#AmountToPay").val());
+            }
+
+            $("#Reference").val('');
+            $("#CardAmount").val(0);
+            $("#CreditNoteId").val(0);
+            $("#CreditNoteAmount").val(0);
+
+            $("#Expiration").val('');
+
+
+            $("#CashAmount").attr("disabled", false);
+            $("#CardAmount").attr("disabled", false);
+            $("#Reference").attr("disabled", false);
+
+            $("#Folio").removeClass('alert-info');
+
+            SumAmount();
+        });
     }
 </script>

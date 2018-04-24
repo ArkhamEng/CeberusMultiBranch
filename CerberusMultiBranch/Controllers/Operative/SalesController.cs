@@ -630,7 +630,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Result  = "Error",
                         Header  = "Limite de crédito excedido",
                         Message = "Estas intentando vender una cantidad mayor al crédito disponible, Disponible del cliente " +
-                        (sale.Client.CreditLimit - sale.Client.UsedAmount).ToString("c")
+                        (sale.Client.CreditLimit - sale.Client.UsedAmount).ToMoney()
                     });
             }
 

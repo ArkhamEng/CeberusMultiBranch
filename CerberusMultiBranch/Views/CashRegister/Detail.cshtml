@@ -1,5 +1,7 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Operative.CashRegister
 @using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
+
 @{
     ViewBag.Title = "Detalle de caja";
     ViewBag.Class = "fa fa-calculator";
@@ -20,7 +22,7 @@
         <div class="col-md-9">
             <div class="panel panel-default col-md-5 alert alert-success">
                 <div class="panel-body">
-                    <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToString("c")</h4> <hr />
+                    <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToMoney()</h4> <hr />
                     <h5 class="col-md-6">
                         <label class="control-label"> Hora</label><br />@Model.OpeningDate.ToString("HH:mm:ss")
                     </h5>
@@ -32,7 +34,7 @@
 
             <div class="panel panel-default col-md-5 col-md-offset-2 alert alert-danger">
                 <div class="panel-body">
-                    <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToString("c")</h4> <hr />
+                    <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToMoney()</h4> <hr />
                     <h5 class="col-md-6">
                         <label class="control-label"> Hora</label><br />@if (Model.ClosingDate != null)
                         { <a>@Model.ClosingDate.Value.ToString("HH:mm:ss")</a>}
@@ -56,13 +58,13 @@
             <div class="panel-body ">
 
                 <span class="fa fa-money"></span> Efectivo<br />
-                @Model.Incomes.Where(i => i.Type == PaymentMethod.Efectivo).Sum(i => i.Amount).ToString("c")<hr />
+                @Model.Incomes.Where(i => i.Type == PaymentMethod.Efectivo).Sum(i => i.Amount).ToMoney()<hr />
 
 
                 <span class="fa fa-credit-card"></span> Tarjeta<br />
-                @Model.Incomes.Where(i => i.Type == PaymentMethod.Tarjeta).Sum(i => i.Amount).ToString("c")<hr />
+                @Model.Incomes.Where(i => i.Type == PaymentMethod.Tarjeta).Sum(i => i.Amount).ToMoney()<hr />
 
-                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToString("c")
+                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToMoney()
 
             </div>
         </div>
@@ -144,7 +146,7 @@
         </div>
         <div class="row">
             <div class="col-xs-6" style="border:solid 1px">
-                <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToString("c")</h4> <hr />
+                <h4 class="control-label"><span class="fa fa-hourglass-start"></span> Apertura de caja  @Model.InitialAmount.ToMoney()</h4> <hr />
                 <h5 class="col-xs-4">
                     <label class="control-label"> Hora</label><br />@Model.OpeningDate.ToString("HH:mm:ss")
                 </h5>
@@ -153,7 +155,7 @@
                 </h5>
             </div>
             <div class="col-xs-6" style="border:solid 1px">
-                <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToString("c")</h4> <hr />
+                <h4 class="control-label"> <span class="fa fa-hourglass-end"></span>Cierre de caja  @Model.FinalAmount.ToMoney()</h4> <hr />
                 <h5 class="col-xs-4">
                     <label class="control-label"> Hora</label><br />@if (Model.ClosingDate != null)
             { <a>@Model.ClosingDate.Value.ToString("HH:mm:ss")</a>}
@@ -166,14 +168,14 @@
         <div class="col-xs-12" style="border-bottom:solid 1px">
             <div class="col-xs-4">
                 <span class="fa fa-money"></span> Efectivo<br />
-                @Model.Incomes.Where(i => i.Type == PaymentMethod.Efectivo).Sum(i => i.Amount).ToString("c")
+                @Model.Incomes.Where(i => i.Type == PaymentMethod.Efectivo).Sum(i => i.Amount).ToMoney()
             </div>
             <div class="col-xs-4">
                 <span class="fa fa-credit-card"></span> Tarjeta<br />
-                @Model.Incomes.Where(i => i.Type == PaymentMethod.Tarjeta).Sum(i => i.Amount).ToString("c")
+                @Model.Incomes.Where(i => i.Type == PaymentMethod.Tarjeta).Sum(i => i.Amount).ToMoney()
             </div>
             <div class="col-xs-4">
-                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToString("c")
+                <span class="fa fa-external-link"></span>Retiros <br /> @Model.Withdrawals.Sum(i => i.Amount).ToMoney()
             </div>
         </div>
         <div class="col-xs-12">
