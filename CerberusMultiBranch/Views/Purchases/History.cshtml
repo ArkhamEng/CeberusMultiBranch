@@ -107,8 +107,10 @@
 
         $("#btnCreate").click(function ()
         {
+            ShowLoading();
             ExecuteAjax('@Url.Action("BeginPurchase")', {}, function (response)
             {
+                HideLoading();
                 $("#divNewPurchase").html(response);
             });
         });

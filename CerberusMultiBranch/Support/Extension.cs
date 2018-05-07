@@ -22,9 +22,43 @@ namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+        public static bool IsValid(this IPrincipal user)
+        {
+            if(user.IsInRole("Administrador"))
+                return true;
+            else
+            {
+                var hour = DateTime.Now.ToLocal().Hour;
+
+                if(DateTime.Now.ToLocal().DayOfWeek == DayOfWeek.Sunday)
+                {
+                    if (hour < 8 || hour > 16)
+                    {
+                        return false;
+                    }
+                    else
+                        return true;
+                }
+
+                else
+                {
+                    if (hour < 8 || hour > 20)
+                        return false;
+                    else
+                        return true;
+                }
+                
+            }
+        }
+
+        public static string GetServerDate()
+        {
+            return "Fecha del servidor " + DateTime.Now.ToString("dd/MM/yyyy hh:mm:ss") + " | Fecha local  " + DateTime.Now.ToLocal().ToString("dd/MM/yyyy hh:mm:ss");
+        }
+
         public static DateTime ToLocal(this DateTime serverDate)
         {
-            DateTime localTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(serverDate, 
+            DateTime localTime = TimeZoneInfo.ConvertTimeBySystemTimeZoneId(serverDate,
                 TimeZoneInfo.Local.Id, "Central Standard Time (Mexico)");
 
             return localTime;
@@ -42,7 +76,7 @@ namespace CerberusMultiBranch.Support
 
         public static double GetPrice(this double buyPrice, int percentage)
         {
-            return Math.Round( buyPrice * (Cons.One + (percentage / Cons.OneHundred)),Cons.Zero);
+            return Math.Round(buyPrice * (Cons.One + (percentage / Cons.OneHundred)), Cons.Zero);
         }
 
         public static string Val(this string value)
@@ -114,16 +148,16 @@ namespace CerberusMultiBranch.Support
             return user.GetBranchSession().Id;
         }
 
-        public static string GetFolio(this IIdentity user,int sequential)
+        public static string GetFolio(this IIdentity user, int sequential)
         {
-            var id =  user.GetBranchSession().Id;
+            var id = user.GetBranchSession().Id;
             string code = string.Empty;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                code =  db.Branches.Find(id).Code;
+                code = db.Branches.Find(id).Code;
             }
 
-            var yearPart = DateTime.Now.TodayLocal().Year.ToString().Substring(2,2);
+            var yearPart = DateTime.Now.TodayLocal().Year.ToString().Substring(2, 2);
 
             return string.Format(Cons.CodeMask, code, yearPart, sequential.ToString(Cons.CodeSeqFormat));
         }
@@ -133,7 +167,7 @@ namespace CerberusMultiBranch.Support
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-               return db.Users.Find(user.GetUserId()).ComissionForSale;
+                return db.Users.Find(user.GetUserId()).ComissionForSale;
             }
         }
 
@@ -141,7 +175,7 @@ namespace CerberusMultiBranch.Support
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                string userId =  u.GetUserId();
+                string userId = u.GetUserId();
                 var user = db.Users.Find(userId);
 
                 FileContentResult picture = null;
@@ -231,7 +265,7 @@ namespace CerberusMultiBranch.Support
 
         public static string ToMoney(this double amount)
         {
-            return Math.Round(amount,Cons.Two).ToString("c");
+            return Math.Round(amount, Cons.Two).ToString("c");
         }
 
         public static string enletras(string num)
@@ -264,8 +298,8 @@ namespace CerberusMultiBranch.Support
 
         public static string ToText(this double value)
         {
-            
-            var IntPart = value.toText() +" PESOS";
+
+            var IntPart = value.toText() + " PESOS";
 
             var dv = Math.Round((value - Math.Truncate(value)) * Cons.OneHundred, Cons.Two);
 
@@ -277,7 +311,7 @@ namespace CerberusMultiBranch.Support
         public static string toText(this double value)
         {
             string Num2Text = "";
-          
+
             value = Math.Truncate(value);
             if (value == 0) Num2Text = "CERO";
             else if (value == 1) Num2Text = "UNO";

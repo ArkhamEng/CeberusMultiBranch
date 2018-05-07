@@ -27,10 +27,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ICollection<PurchasePayment> PurchasePayments { get; set; }
 
         public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
+
+        public ICollection<PurchaseDiscount> PurchaseDiscount { get; set; }
         #endregion
 
 
-      
+
     }
 
 

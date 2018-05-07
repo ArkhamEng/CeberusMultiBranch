@@ -44,7 +44,7 @@
                             </label>
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
-                                <textarea class="form-control"  id="txtComment"  rows="2" cols="1" />
+                                <textarea class="form-control"  id="txtCommentW"  rows="2" cols="1" />
                             </div>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
 
         $("#btnAdd").off('click').click(function ()
         {
-            var data = { amount: $("#txtAmount").val(), comment: $("#txtComment").val(), causeId: $("#CauseId").val() };
+            var data = { amount: $("#txtAmount").val(), comment: $("#txtCommentW").val(), causeId: $("#CauseId").val() };
 
             ExecuteAjax('@Url.Action("AddWithdrawal","CashRegister")', data, function (data)
             {

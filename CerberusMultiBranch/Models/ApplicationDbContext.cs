@@ -73,6 +73,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<Purchase> Purchases { get; set; }
 
+        public DbSet<PurchaseDiscount> PurchaseDiscount { get; set; }
+
         public DbSet<PurchaseDetail> PurchaseDetails { get; set; }
 
         public DbSet<Sale> Sales { get; set; }

@@ -54,6 +54,14 @@
                     @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")
                 </td>
             </tr>
+            <tr>
+                <td class="text-left">
+                    <label>Tipo de venta</label><br />
+                </td>
+                <td class="text-right">
+                    @Model.TransactionType.ToString()
+                </td>
+            </tr>
            
             @if (Model.Status == TranStatus.Revision)
             {

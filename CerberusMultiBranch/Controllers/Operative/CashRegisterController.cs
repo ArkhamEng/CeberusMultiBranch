@@ -604,7 +604,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
                         return Json(new { Result = "Error", Message = "El monto del pago es menor que el  monto de la deuda, por favor verifique" });
 
-                    if (sale.TransactionType != TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
+                    if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
                         return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 10% de anticipo" });
                 }
 

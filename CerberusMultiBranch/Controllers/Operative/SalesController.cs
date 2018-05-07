@@ -138,10 +138,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             string folio, string client, string user, TranStatus? status)
         {
             //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
-            if (!User.IsInRole("Supervisor"))
-                user = User.Identity.GetUserName();
+            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
-            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status, null);
+            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status,userId);
 
             return PartialView("_SaleList", model);
         }
@@ -295,8 +294,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if(sale.SaleDetails != null || sale.SaleDetails.Count > Cons.Zero)
                 {
                     sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-                    sale.TotalTaxAmount = sale.SaleDetails.Sum(d => d.TaxAmount).RoundMoney();
                     sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+                    sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+                    sale.FinalAmount = sale.TotalTaxedAmount;
+
                 }
 
                 db.Entry(sale).State = EntityState.Modified;
@@ -338,9 +339,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 det.TaxAmount = ((det.TaxedPrice - det.Price) * det.Quantity).RoundMoney();
 
                 //actualizo los totales de la venta
-                sale.TotalAmount = sale.SaleDetails.Sum(sd => sd.Amount);
-                sale.TotalTaxAmount = sale.SaleDetails.Sum(sd => sd.TaxAmount);
-                sale.TotalTaxedAmount = sale.SaleDetails.Sum(sd => sd.TaxedAmount);
+                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+                sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+                sale.FinalAmount = sale.TotalTaxedAmount;
+
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
@@ -547,9 +550,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //utilizo el precio seteado, ya que pudo haber sido modificado manualmente
                 detail.Quantity += quantity;
 
-                detail.TaxAmount    = detail.TaxAmount * detail.Quantity;
-                detail.Amount       = detail.Price * detail.Quantity;
-                detail.TaxedAmount  = detail.TaxedPrice * detail.Quantity;
+                detail.Amount       = (detail.Price * detail.Quantity).RoundMoney();
+                detail.TaxedAmount  = (detail.TaxedPrice * detail.Quantity).RoundMoney();
+                detail.TaxAmount    = (detail.TaxedAmount - detail.Amount).RoundMoney();
 
                 //si no es una preventa
                 //verifico el stock y valido si es posible agregar mas producto a la venta
@@ -604,23 +607,25 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 detail = new SaleDetail
                 {
-                    ProductId = productId,
-                    SaleId = sale.SaleId,
-                    Quantity = quantity,
-                    Price = price, //Precio Sin IVA
-                    TaxedPrice = taxedPrice, //Precio Con IVA
-                    TaxAmount = (taxAmount * quantity).RoundMoney(), //El monto total de IVA
-                    Amount = (price * quantity).RoundMoney(), //El total sin IVA
+                    ProductId   = productId,
+                    SaleId      = sale.SaleId,
+                    Quantity    = quantity,
+                    Price       = price, //Precio Sin IVA
+                    TaxedPrice  = taxedPrice, //Precio Con IVA
+                    Amount      = (price * quantity).RoundMoney(), //El total sin IVA
                     TaxedAmount = taxedPrice * quantity, //El total con IVA
                     TaxPercentage = iva
                 };
+                detail.TaxAmount = (detail.TaxedAmount - detail.Amount).RoundMoney(); //El monto total de IVA
 
                 sale.SaleDetails.Add(detail);
             }
 
-            sale.TotalAmount        = sale.SaleDetails.Sum(s => s.Amount);
-            sale.TotalTaxedAmount   = sale.SaleDetails.Sum(s => s.TaxedAmount);
-            sale.TotalTaxAmount     = sale.SaleDetails.Sum(s => s.TaxAmount);
+            sale.TotalAmount      = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+            sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+            sale.TotalTaxAmount   = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+            sale.FinalAmount      = sale.TotalTaxedAmount;
+
 
             if (sale.TransactionType != TransactionType.Credito)
             {
@@ -661,9 +666,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 sale.SaleDetails.Remove(detail);
 
-                sale.TotalAmount = sale.SaleDetails.Sum(sd => sd.Amount);
-                sale.TotalTaxAmount = sale.SaleDetails.Sum(sd => sd.TaxAmount);
-                sale.TotalTaxedAmount = sale.SaleDetails.Sum(sd => sd.TaxedAmount);
+                sale.TotalAmount        = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+                sale.TotalTaxedAmount   = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+                sale.TotalTaxAmount     = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+                sale.FinalAmount        = sale.TotalTaxedAmount;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
@@ -752,9 +758,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 ParentId = pckDet.PackageId,
                             };
                             //busco el stock del detalle en sucursal y resto el producto de los reservados
-                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
+                            var detBP       = db.BranchProducts.Find(pckDet.DetailtId);
                             detBP.LastStock = (detBP.Stock + detBP.Reserved);
-                            detBP.Reserved -= pckDet.Quantity;
+                            detBP.Reserved  -= pckDet.Quantity;
 
                             db.SaleDetails.Add(tDeatil);
 
@@ -797,10 +803,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     else
                     {
                         sale.Client.UsedAmount += sale.TotalTaxedAmount.RoundMoney();
-                        db.Entry(sale.Client).State = EntityState.Modified;
-
-                        db.Entry(sale.Client).Property(c => c.CreditDays).IsModified = false;
-                        db.Entry(sale.Client).Property(c => c.CreditLimit).IsModified = false;
+                        db.Entry(sale.Client).Property(c => c.UsedAmount).IsModified = true;
                     }
                 }
 

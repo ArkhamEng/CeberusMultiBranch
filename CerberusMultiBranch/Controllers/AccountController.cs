@@ -602,7 +602,15 @@ namespace CerberusMultiBranch.Controllers
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             HttpContext.Session.RemoveAll();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
+        }
+
+        [HttpPost]
+        public ActionResult LogOut()
+        {
+            AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+            HttpContext.Session.RemoveAll();
+            return Json("OK");
         }
 
         //

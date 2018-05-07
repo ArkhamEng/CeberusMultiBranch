@@ -62,24 +62,23 @@ namespace CerberusMultiBranch.Controllers.Operative
         [Authorize(Roles = "Vendedor")]
         public ActionResult RemoveFromCart(int transactionId, int productId)
         {
-            var detail = db.SaleDetails.Find(transactionId, productId);
+            var sale = db.Sales.Include(s => s.SaleDetails.Select(d=> d.Product.Images)).FirstOrDefault(s=> s.SaleId == transactionId);
+
+            var detail = sale.SaleDetails.FirstOrDefault(d => d.ProductId == productId);
 
             if (detail != null)
             {
                 try
                 {
-                    db.SaleDetails.Remove(detail);
-                    db.SaveChanges();
-
-                    var model = db.SaleDetails.Include(t => t.Product).
-                        Include(t => t.Product.Images).
-                        Where(t => t.SaleId == transactionId).ToList();
-
-                    var sale = db.Sales.Find(transactionId);
+                    sale.SaleDetails.Remove(detail);
 
                     if (sale != null)
                     {
-                        sale.TotalAmount = model.Count > Cons.Zero ? model.Sum(td => td.Amount) : Cons.Zero;
+                        sale.TotalAmount        = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+                        sale.TotalTaxedAmount   = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+                        sale.TotalTaxAmount     = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+                        sale.FinalAmount        = sale.TotalTaxedAmount;
+
                         sale.UpdDate = DateTime.Now.ToLocal();
                         sale.UpdUser = User.Identity.GetUserName();
 
@@ -87,6 +86,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         db.SaveChanges();
                     }
 
+                    var model = sale.SaleDetails;
                     return PartialView("_CartDetails", model);
                 }
                 catch (Exception ex)
@@ -222,17 +222,19 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 detail.TaxPercentage    = iva;
                 detail.Quantity         = quantity;
-                detail.TaxedAmount      = amount;
-                detail.TaxedPrice       = price;
+                detail.TaxedAmount      = amount.RoundMoney();
+                detail.TaxedPrice       = price.RoundMoney();
                 detail.Price            = (detail.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney();
                 detail.Amount           = (detail.Price * detail.Quantity).RoundMoney();
                 detail.TaxAmount        = ((detail.TaxedPrice - detail.Price) * detail.Quantity).RoundMoney();
 
                 sale.SaleDetails.Add(detail);
             }
-            sale.TotalAmount        = sale.SaleDetails.Sum(s=> s.Amount);
-            sale.TotalTaxedAmount   = sale.SaleDetails.Sum(s => s.TaxedAmount);
-            sale.TotalTaxAmount     = sale.SaleDetails.Sum(s => s.TaxAmount);
+            sale.TotalAmount        = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+            sale.TotalTaxedAmount   = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+            sale.TotalTaxAmount     = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+            sale.FinalAmount        = sale.TotalTaxedAmount;
+
 
             //verifico el stock y valido si es posible agregar mas producto a la venta
             if (existance < detail.Quantity)

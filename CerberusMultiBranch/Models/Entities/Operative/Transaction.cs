@@ -45,6 +45,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalTaxAmount { get; set; }
 
+        public double DiscountedAmount { get; set; }
+
+        public double DiscountPercentage { get; set; }
+
+        public double FinalAmount { get; set; }
+
         [Index("IDX_Status", IsUnique = false)]
         public TranStatus Status { get; set; }
 

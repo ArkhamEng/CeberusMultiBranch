@@ -33,7 +33,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name = "Descripción")]
         [MaxLength(200)]
         [Index("IDX_Name", IsUnique = false)]
-        [Required]
+        [Required(ErrorMessage ="Se requiere una descripción del producto")]
         public string Name { get; set; }
 
 
@@ -148,11 +148,13 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         [Display(Name = "Fila")]
         [MaxLength(30)]
+        [Required(ErrorMessage ="Se requiere la fila")]
         public string Row { get; set; }
 
         [NotMapped]
         [Display(Name = "Anaquel")]
         [MaxLength(30)]
+        [Required(ErrorMessage = "Se requiere el anaquel")]
         public string Ledge { get; set; }
 
         [NotMapped]

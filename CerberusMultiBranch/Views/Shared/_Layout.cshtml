@@ -1,26 +1,84 @@
-﻿@{ 
+﻿
+@using CerberusMultiBranch.Support
+
+@{
     Layout = "~/Views/Shared/MainLayout.cshtml";
 }
-<div class="wrapper">
-    @Html.Partial("_SideBar")
 
-    @Html.Partial("_Confirm")
 
-    @Html.Partial("_ConfirmPopOver")
+    <div class="wrapper">
+        @Html.Partial("_SideBar")
 
-    <div id="divModalCart">
-    </div>
+        @Html.Partial("_Confirm")
 
-    <div id="divPriceSelector"></div>
-   
-    @Html.Partial("_QuickClient")
+        @Html.Partial("_ConfirmPopOver")
 
-    
+        <div id="divModalCart">
+        </div>
+
+        <div id="divPriceSelector"></div>
+
+        @Html.Partial("_QuickClient")
+
+
         <div id="content" class="container-fluid">
             @RenderBody()
         </div>
-   
+
+    </div>
+
+
+<div id="AccessBlock" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content panel-danger">
+            <div class="modal-header panel-heading">
+                <h4  class="modal-title">
+                    Ingreso fuera de Horario
+                </h4>
+            </div>
+            <div class="modal-body panel-body">
+                <div class="col-md-2 col-xs-4 col-sm-2">
+                    <img  class="img-responsive" src="~/Content/Images/warning.png" />
+                </div>
+                <div class="col-md-10 col-xs-8 col-sm-10">
+                    <p>
+                        Estas intentando ingresar al sistema fuera del horario laboral,
+                        este privilegio es solo para el administardor, ingresos no autorizados pueden ser penalizados 
+                        severamente.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" onclick="Cerrar()" >
+                    <span class="glyphicon glyphicon-log-out"></span>
+                    Cerrar session 
+                </button>
+            </div>
+        </div>
+
+    </div>
 </div>
+
 @RenderSection("scripts", required: false)
 
 
+<script>
+    $(document).ready(function ()
+    {
+        console.log('@Extension.GetServerDate()');
+
+        if ('@User.IsValid()' != 'True')
+        {
+            $("#AccessBlock").modal({ backdrop: 'static' });
+        }
+    });
+
+    function Cerrar()
+    {
+        ExecuteAjax('@Url.Action("LogOut","Account")', {}, function ()
+        {
+            window.location = '@Url.Action("LogIn","Account")'
+        });
+    }
+
+</script>

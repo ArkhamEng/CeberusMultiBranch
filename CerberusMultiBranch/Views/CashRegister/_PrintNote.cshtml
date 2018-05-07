@@ -98,19 +98,22 @@
 
                                     <label>Monto pagado </label>   <a>@Model.SalePayments.Sum(s => s.Amount).ToMoney()</a><br />
                                     
-                                    <label>Monto restante </label> <a>@debt.ToMoney()</a>
+                                    <label>Monto restante </label> <a>@debt.ToMoney()</a><br />
                                 }
 
                                 else if (Model.SalePayments.Count > Cons.One)
                                 {
                                     <label>Tipo de pago:</label>
-                                    <a>@PaymentMethod.Mixto.ToString()</a>
+                                    <a>@PaymentMethod.Mixto.ToString()</a><br />
                                 }
                                 else
                                 {
                                     <label>Tipo de pago:</label>
-                                    <a>@Model.SalePayments.First().PaymentMethod.ToString()</a>
+                                    <a>@Model.SalePayments.First().PaymentMethod.ToString()</a><br />
                                 }
+
+                                <label>Tipo de venta:</label>
+                                <a>@Model.TransactionType.ToString()</a>
                             </td>
                         </tr>
                         @if (Model.Status == TranStatus.Revision)

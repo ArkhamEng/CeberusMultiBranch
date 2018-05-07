@@ -181,12 +181,14 @@
         if ('@User.IsInRole("Administrador")' == 'True' && '@User.IsInRole("Supervisor")' == 'True')
             allowLock = true;
         
+        if(parseInt('@Model.ProductId') > 0)
+            $("#StockRequired").attr("disabled", true);
 
         $("#StockLocked").attr("disabled", !allowLock);
-        $("#StockRequired").attr("disabled", !allowLock);
+        
 
         $("#StockLocked").change(function (a) {
-            ValidateStock();
+            ValidateStock(); 
         });
 
 
@@ -203,7 +205,6 @@
 
         if (!isLocked)
             $("#Quantity").attr("disabled", !checked);
-
 
 
         $("#Ledge").attr("disabled", !checked);

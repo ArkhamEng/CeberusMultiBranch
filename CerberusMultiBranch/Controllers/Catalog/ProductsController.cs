@@ -406,7 +406,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             List<Product> products = new List<Product>();
 
-            if (code != null)
+          /*  if (code != null)
             {
                 products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
                              .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
@@ -415,7 +415,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
             if (products.Count == Cons.Zero)
-            {
+            {*/
                 products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
                                .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
                             where (categoryId == null || p.CategoryId == categoryId)
@@ -427,7 +427,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
                             select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
                             s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
-            }
+            //}
             //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
             {
@@ -1675,21 +1675,20 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
             List<StockMovement> model = null;
-            if (code != null)
-            {
-                model = db.StockMovements.Include(sm => sm.BranchProduct.Product).Where(sm => sm.BranchProduct.Product.Code == code).ToList();
-            }
-            else
-            {
-                 model = db.StockMovements.Include(sm => sm.BranchProduct.Product).
-                    Where(sm => (description == null || description == string.Empty ||
-                           arr.All(s => (sm.BranchProduct.Product.Code + " "
-                                        + sm.BranchProduct.Product.Name + " "
-                                        + sm.BranchProduct.Product.TradeMark).Contains(s)) &&
-                                        (beginDate == null || sm.MovementDate >= beginDate.Value) &&
-                                        (endDate == null || sm.MovementDate <= endDate.Value)) &&
-                                        (sm.BranchId == branchId) ).OrderByDescending(s=> s.MovementDate).ToList();
-            }
+            //if (code != null)
+            //{
+            //    model = db.StockMovements.Include(sm => sm.BranchProduct.Product).Where(sm => sm.BranchProduct.Product.Code == code).ToList();
+            //}
+            //else
+            //{
+                 model =(from sm in db.StockMovements.Include(sm => sm.BranchProduct.Product)
+
+                         where (description == null || description == string.Empty ||
+                                arr.All(s => (sm.BranchProduct.Product.Code + " "+ sm.BranchProduct.Product.Name + " "+ sm.BranchProduct.Product.TradeMark).Contains(s) ) )
+                              && (beginDate == null || sm.MovementDate >= beginDate) 
+                              && (endDate == null || sm.MovementDate <= endDate) 
+                              && (sm.BranchId == branchId) select sm ).OrderByDescending(s=> s.MovementDate).ToList();
+            //}
 
             return PartialView("_MovementList",model);
         }

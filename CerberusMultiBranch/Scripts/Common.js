@@ -58,23 +58,34 @@ function SetPointer(element)
 }
 
 
-function ExecuteAjax(url, parameters, callback) {
-    console.log("Executing Ajax..");
-
+function ExecuteAjax(url, parameters, callback)
+{
     $.ajax({
         url: url,
         type: "POST",
         data: parameters,
-        error: function (data) {
+        error: function (data)
+        {
             callback("Error al ejecutar Ajax")
         },
         statusCode:
         {
-            200: function (data) {
+            200: function (data)
+            {
                 callback(data);
             },
-            401: function (data) {
+            401: function (data)
+            {
+                console.log("Error 401, se requiere inicio de session");
                 callback(data);
+            },
+            511: function ()
+            {
+                console.log("Error 511 Network Authentication Required");
+            },
+            407: function ()
+            {
+                console.log("Error 407 Authentication Required");
             }
         }
     });
