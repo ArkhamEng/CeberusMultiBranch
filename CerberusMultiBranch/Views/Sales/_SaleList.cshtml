@@ -4,33 +4,44 @@
 
 <table id="tbSales" class="table table-striped small">
     <thead>
-        <tr>
-            <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
-            <th class="col-md-3 text-center">@Html.DisplayName("Cliente")</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Fecha Venta")</th>
-            <th class="col-md-1">@Html.DisplayName("Fecha Expira")</th>
-            <th class="col-md-2 text-center">@Html.DisplayName("Usuario | Comision")</th>
-            <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="col-md-1 text-center">@Html.DisplayName("Status")</th>
-            <th class="col-md-1 text-right" />
+        <tr hidden>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th class="col-xs-1"></th>
+            <th class="col-xs-1"></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Folio)</td>
-                <td class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
-                <td >@item.TransactionDate.ToString("dd/MM/yyyy")</td>
-                <td >@item.Expiration.ToString("dd/MM/yyyy")</td>
-                
-                <td class="text-uppercase">@Html.DisplayFor(m => item.User.UserName)<br />
-                @item.ComAmount.ToMoney()
+                <td>
+                    <label>Sucursal </label> <br /> @Html.DisplayFor(m => item.Branch.Name)<br />
+                    <label>Agente  </label> <br /> @Html.DisplayFor(m => item.User.UserName)
+                </td>
+                <td>
+
+                    <label>Folio  </label>   <br /> @Html.DisplayFor(m => item.Folio)<br />
+                    <label>Cliente</label>  <br />@Html.DisplayFor(m => item.Client.Name)<br />
                 </td>
 
-                <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
-               
-                <td class="input-group text-uppercase">
+                <td>
+                    <label>Fecha Compra</label><br /> @item.TransactionDate.ToString("dd/MM/yyyy")<br />
+                    <label>Fecha Expira</label> <br />@item.Expiration.ToString("dd/MM/yyyy")
+                </td>
+
+                <td>
+                    @{ var debt = item.TotalTaxedAmount - item.SalePayments.Sum(p => p.Amount); }
+                    <label>Total Venta</label><br /> @Html.DisplayFor(m => item.TotalTaxedAmount)<br />
+
+                    <label>Pagos  </label> @item.SalePayments.Sum(p => p.Amount).ToMoney() <br />
+                    <label>Adeudo </label> @debt.ToMoney()
+                    
+                </td>
+
+                <td class="input-group text-uppercase col-xs-1">
                     @switch (item.TransactionType)
                     {
                         case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Contado:
@@ -85,20 +96,20 @@
                     }
                 </td>
 
-                <td align="center">
+                <td class="col-xs-1" align="center">
                     <button class="btn btn-primary" title="Ver detalle y editar"
                             onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.SaleId })'">
                         <span class="fa fa-edit" />
                     </button>
                 </td>
             </tr>
-           }
+                        }
     </tbody>
     @{
         var totalCommision = Model.Sum(sale => sale.ComAmount);
         var totalAmount = Model.Sum(sale => sale.TotalTaxedAmount);
     }
-   
+
 </table>
 
 

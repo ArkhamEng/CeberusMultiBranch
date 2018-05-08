@@ -1592,7 +1592,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         product.UpdDate = DateTime.Now.ToLocal();
                         product.UpdUser = User.Identity.Name;
 
-                        db.Entry(product).State = EntityState.Modified;
+                        db.Entry(product).Property(p => p.IsActive).IsModified = true;
+                        db.Entry(product).Property(p => p.UpdDate).IsModified = true;
+                        db.Entry(product).Property(p => p.UpdUser).IsModified = true;
+
+                        db.Configuration.ValidateOnSaveEnabled = false;
                     }
                     else
                     {
@@ -1637,7 +1641,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 var product = db.Products.Find(id);
 
                 product.IsActive = true;
-                db.Entry(product).State = EntityState.Modified;
+                product.UpdDate = DateTime.Now.ToLocal();
+                product.UpdUser = User.Identity.Name;
+
+                db.Entry(product).Property(p => p.IsActive).IsModified = true;
+                db.Entry(product).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(product).Property(p => p.UpdUser).IsModified = true;
+
+                db.Configuration.ValidateOnSaveEnabled = false;
 
                 db.SaveChanges();
 

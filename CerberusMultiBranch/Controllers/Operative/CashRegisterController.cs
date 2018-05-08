@@ -210,7 +210,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
             var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
 
-            var total = cr.InitialAmount + i - o;
+            var total = 0.0;
+
+
+            if (i > o)
+                total = cr.InitialAmount + (i - o);
+            else
+                total = cr.InitialAmount + (o - i);
 
             return PartialView("_CloseCash", total);
         }
@@ -220,7 +226,17 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = GetCashRegister();
 
-            cr.FinalAmount = Math.Round(amount, Cons.Two);
+            var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
+            var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
+            var total = 0.0;
+
+
+            if (i > o)
+                total = cr.InitialAmount + (i - o);
+            else 
+                total = cr.InitialAmount + (o - i);
+
+            cr.FinalAmount = total.RoundMoney();
             cr.UserClose = User.Identity.Name;
             cr.ClosingDate = DateTime.Now.ToLocal();
             cr.CloseComment = comment;
@@ -400,18 +416,18 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult TicketsAndNotes()
         {
             var model = new TransactionViewModel();
-            model.Sales = LookForNotes(DateTime.Today, null, null, null);
+            model.Sales = LookForNotes(DateTime.Today, null, null, null,null);
             return PartialView("_TicketsAndNotes", model);
         }
 
         [HttpPost]
-        public ActionResult SearchNotes(DateTime? begin, DateTime? end, string folio, string client)
+        public ActionResult SearchNotes(DateTime? begin, DateTime? end, string folio, string client, TranStatus? status)
         {
-            var sales = LookForNotes(begin, end, folio, client);
+            var sales = LookForNotes(begin, end, folio, client, status);
             return PartialView("_SalesToPayList", sales);
         }
 
-        private List<Sale> LookForNotes(DateTime? begin, DateTime? end, string folio, string client)
+        private List<Sale> LookForNotes(DateTime? begin, DateTime? end, string folio, string client, TranStatus? status)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -422,7 +438,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 (end == null || s.TransactionDate <= end) &&
                 (folio == null || folio == string.Empty || s.Folio == folio) &&
                 (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
-                (s.Status == TranStatus.Compleated || s.Status == TranStatus.Revision)).
+                ( status == null  && (s.Status == TranStatus.Compleated || s.Status == TranStatus.Revision) || s.Status == status)).
                 OrderByDescending(s => s.TransactionDate).ToList();
 
             return sales;
@@ -561,20 +577,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                             return Json(new { Result = "Error", Message = "El vale que intentas aplicar ya ha caducado y no se puede aplicar como pago" });
 
                         if (note.Amount != payment.CreditNoteAmount)
-                            return Json(new { Result = "Error", Message = "El monto aplicado en el vale, no conicide con el monto "+ 
-                                "en base de datos, intente asignarlo nuevamente para reflejar los cambios" });
+                            return Json(new
+                            {
+                                Result = "Error",
+                                Message = "El monto aplicado en el vale, no conicide con el monto " +
+                                "en base de datos, intente asignarlo nuevamente para reflejar los cambios"
+                            });
 
-                        if(payment.CreditNoteAmount >= toPay && money > Cons.Zero)
-                                return Json(new { Result = "Error", Message = "El monto aplicado en el vale, ya cubre el total de la deuda " +
-                                    "no es necesario la aplicación de otro tipo de pago" });
+                        if (payment.CreditNoteAmount >= toPay && money > Cons.Zero)
+                            return Json(new
+                            {
+                                Result = "Error",
+                                Message = "El monto aplicado en el vale, ya cubre el total de la deuda " +
+                                "no es necesario la aplicación de otro tipo de pago"
+                            });
 
                         //agrego el historico
                         var history = new CreditNoteHistory
                         {
                             SaleCreditNoteId = note.SaleCreditNoteId,
-                            Amount           = note.Amount,
-                            ChangeDate       = DateTime.Now.ToLocal(),
-                            User             = note.User
+                            Amount = note.Amount,
+                            ChangeDate = DateTime.Now.ToLocal(),
+                            User = note.User
                         };
 
                         db.CreditNoteHistories.Add(history);
@@ -583,7 +607,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         if (note.Amount > toPay)
                         {
                             folioChanged = true;
-                            note.Amount = (note.Amount - toPay);                
+                            note.Amount = (note.Amount - toPay);
                         }
                         else
                         {
@@ -633,7 +657,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Comment = "COBRO AUTOMATICO EN CAJA"
                     };
 
-                    sale.SalePayments.Add(p);                    
+                    sale.SalePayments.Add(p);
                 }
                 //si viene un monto de tarjeta, agrego el registro de pago
                 if (payment.CardAmount > Cons.Zero)
@@ -668,7 +692,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Reference = note.Folio
                     };
 
-                    sale.SalePayments.Add(p);                    
+                    sale.SalePayments.Add(p);
                 }
 
                 #endregion
@@ -685,7 +709,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (sale.TransactionType != TransactionType.Contado)
                     sale.Client.UsedAmount -= (cPayments + wholePayment);
 
-                
+
                 db.Sales.Attach(sale);
                 db.Entry(sale).State = EntityState.Modified;
 

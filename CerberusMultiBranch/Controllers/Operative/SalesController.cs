@@ -33,12 +33,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = new List<Sale>();
+            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null);
 
             return View(model);
         }
 
-    
+
         [HttpPost]
         [Authorize(Roles = "Supervisor, Cajero")]
         public JsonResult Cancel(int saleId, string comment)
@@ -46,20 +46,23 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a la que se le cambiara el status
-                var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SalePayments).Include(s=> s.Client).
+                var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SalePayments).Include(s => s.Client).
                     FirstOrDefault(s => s.SaleId == saleId);
 
                 //si es una venta en proceso borro el registro
-                if(sale.Status == TranStatus.InProcess)
+                if (sale.Status == TranStatus.InProcess)
                 {
                     db.Sales.Remove(sale);
                     db.SaveChanges();
 
-                    return Json(new { Result = "OK",
-                        Message = "Venta Cancelada, el producto ha sido regreado al stock, no se requiere devolución de efectivo" });
+                    return Json(new
+                    {
+                        Result = "OK",
+                        Message = "Venta Cancelada, el producto ha sido regreado al stock, no se requiere devolución de efectivo"
+                    });
                 }
 
-             
+
                 //regreso los productos al stock
                 foreach (var detail in sale.SaleDetails)
                 {
@@ -101,16 +104,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var payments = sale.SalePayments.Sum(p => p.Amount);
 
                 //si la venta es credito o preventa, se resta el monto deudo de la cuenta del cliente
-                if(sale.TransactionType != TransactionType.Contado)
+                if (sale.TransactionType != TransactionType.Contado)
                     sale.Client.UsedAmount -= (sale.TotalTaxedAmount - payments).RoundMoney();
 
                 sale.LastStatus = sale.Status;
-                sale.Status     = TranStatus.Canceled; //status cancelado
-                sale.UpdUser    = User.Identity.Name;
-                sale.UpdDate    = DateTime.Now.ToLocal();
-                sale.Comment    = comment;
-                
-                var message = "Venta Cancelada, el producto ha sido regreado al stock" ;
+                sale.Status = TranStatus.Canceled; //status cancelado
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.Comment = comment;
+
+                var message = "Venta Cancelada, el producto ha sido regreado al stock";
 
                 //si la venta tiene pagos, coloco el status como precancel para que pase por caja para generar 
                 //una devolución
@@ -119,8 +122,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.Status = TranStatus.PreCancel;
                     message = "Venta Cancelada, podra realizar la devolución de efectivo desde el modulo de caja";
                 }
-                    
-                
+
+
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
@@ -140,7 +143,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
-            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status,userId);
+            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status, userId);
 
             return PartialView("_SaleList", model);
         }
@@ -152,16 +155,16 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.SaleDetails)
+            var sales = (from p in db.Sales.Include(p => p.User).Include(p => p.SaleDetails).Include(p => p.SalePayments)
                          where
-                            (branchId   == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
-                         && (beginDate  == null || p.TransactionDate >= beginDate)
-                         && (endDate    == null || p.TransactionDate <= endDate)
-                         && (folio      == null || folio == string.Empty || p.Folio.Contains(folio))
-                         && (client     == null || client == string.Empty || p.Client.Name.Contains(client))
-                         && (user       == null || user == string.Empty || p.User.UserName.Contains(user))
-                         && (userId     == null || userId == string.Empty || p.UserId == userId)
-                         && (status     == null || p.Status == status)
+                            (branchId == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
+                         && (beginDate == null || p.TransactionDate >= beginDate)
+                         && (endDate == null || p.TransactionDate <= endDate)
+                         && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
+                         && (client == null || client == string.Empty || p.Client.Name.Contains(client))
+                         && (user == null || user == string.Empty || p.User.UserName.Contains(user))
+                         && (userId == null || userId == string.Empty || p.UserId == userId)
+                         && (status == null || p.Status == status)
                          select p).OrderByDescending(p => p.TransactionDate).ToList();
 
             return sales;
@@ -242,7 +245,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 else
                 {
-                  
+
                     var b = User.Identity.GetBranchSession();
 
                     sale = new Sale();
@@ -291,7 +294,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 //ajusto los precios de la venta
-                if(sale.SaleDetails != null || sale.SaleDetails.Count > Cons.Zero)
+                if (sale.SaleDetails != null || sale.SaleDetails.Count > Cons.Zero)
                 {
                     sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
                     sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
@@ -420,7 +423,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Status = TranStatus.InProcess,
                     UpdUser = User.Identity.Name,
                     UpdDate = DateTime.Now.ToLocal(),
-                    Folio   = User.Identity.GetFolio(Cons.Zero)
+                    Folio = User.Identity.GetFolio(Cons.Zero)
                 };
 
                 db.Sales.Add(sale);
@@ -447,10 +450,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(p => p.SalePayments).Include(p => p.User).
                 Include(s => s.SaleDetails.Select(td => td.Product.Category)).
                 Include(s => s.SaleDetails.Select(td => td.Product.Images)).
-                FirstOrDefault(p => p.SaleId == id && branchIds.Contains(p.BranchId)); 
+                FirstOrDefault(p => p.SaleId == id && branchIds.Contains(p.BranchId));
 
             if (model == null)
-               return RedirectToAction("History");
+                return RedirectToAction("History");
 
             return View(model);
         }
@@ -495,7 +498,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 prod.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
                 prod.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
                 prod.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
-                prod.CanSell = (prod.IsActive && ((type == TransactionType.Preventa) || (prod.Quantity > Cons.Zero) ));
+                prod.CanSell = (prod.IsActive && ((type == TransactionType.Preventa) || (prod.Quantity > Cons.Zero)));
             }
 
 
@@ -550,9 +553,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //utilizo el precio seteado, ya que pudo haber sido modificado manualmente
                 detail.Quantity += quantity;
 
-                detail.Amount       = (detail.Price * detail.Quantity).RoundMoney();
-                detail.TaxedAmount  = (detail.TaxedPrice * detail.Quantity).RoundMoney();
-                detail.TaxAmount    = (detail.TaxedAmount - detail.Amount).RoundMoney();
+                detail.Amount = (detail.Price * detail.Quantity).RoundMoney();
+                detail.TaxedAmount = (detail.TaxedPrice * detail.Quantity).RoundMoney();
+                detail.TaxAmount = (detail.TaxedAmount - detail.Amount).RoundMoney();
 
                 //si no es una preventa
                 //verifico el stock y valido si es posible agregar mas producto a la venta
@@ -561,7 +564,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var j = new
                     {
                         Result = "Cantidad insuficiente",
-                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, "+
+                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, " +
                         "para vender producto sin existencia, es necesario registrar una preventa desde el modulo de ventas"
                     };
 
@@ -579,7 +582,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var j = new
                     {
                         Result = "Cantidad insuficiente",
-                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, para vender producto sin existencia"+
+                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, para vender producto sin existencia" +
                         " es necesario registrar una preventa desde el modulo de ventas"
                     };
 
@@ -607,12 +610,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 detail = new SaleDetail
                 {
-                    ProductId   = productId,
-                    SaleId      = sale.SaleId,
-                    Quantity    = quantity,
-                    Price       = price, //Precio Sin IVA
-                    TaxedPrice  = taxedPrice, //Precio Con IVA
-                    Amount      = (price * quantity).RoundMoney(), //El total sin IVA
+                    ProductId = productId,
+                    SaleId = sale.SaleId,
+                    Quantity = quantity,
+                    Price = price, //Precio Sin IVA
+                    TaxedPrice = taxedPrice, //Precio Con IVA
+                    Amount = (price * quantity).RoundMoney(), //El total sin IVA
                     TaxedAmount = taxedPrice * quantity, //El total con IVA
                     TaxPercentage = iva
                 };
@@ -621,10 +624,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.SaleDetails.Add(detail);
             }
 
-            sale.TotalAmount      = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+            sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
             sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-            sale.TotalTaxAmount   = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-            sale.FinalAmount      = sale.TotalTaxedAmount;
+            sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+            sale.FinalAmount = sale.TotalTaxedAmount;
 
 
             if (sale.TransactionType != TransactionType.Credito)
@@ -632,8 +635,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (sale.TotalTaxedAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
-                        Result  = "Error",
-                        Header  = "Limite de crédito excedido",
+                        Result = "Error",
+                        Header = "Limite de crédito excedido",
                         Message = "Estas intentando vender una cantidad mayor al crédito disponible, Disponible del cliente " +
                         (sale.Client.CreditLimit - sale.Client.UsedAmount).ToMoney()
                     });
@@ -666,10 +669,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 sale.SaleDetails.Remove(detail);
 
-                sale.TotalAmount        = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-                sale.TotalTaxedAmount   = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-                sale.TotalTaxAmount     = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-                sale.FinalAmount        = sale.TotalTaxedAmount;
+                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+                sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
+                sale.FinalAmount = sale.TotalTaxedAmount;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
@@ -758,9 +761,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 ParentId = pckDet.PackageId,
                             };
                             //busco el stock del detalle en sucursal y resto el producto de los reservados
-                            var detBP       = db.BranchProducts.Find(pckDet.DetailtId);
+                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
                             detBP.LastStock = (detBP.Stock + detBP.Reserved);
-                            detBP.Reserved  -= pckDet.Quantity;
+                            detBP.Reserved -= pckDet.Quantity;
 
                             db.SaleDetails.Add(tDeatil);
 
@@ -825,6 +828,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.Expiration = DateTime.Now.ToLocal();
                     sale.SendingType = sending;
                 }
+                else if (sale.TransactionDate == DateTime.Now.TodayLocal())
+                    sale.TransactionDate = DateTime.Now.ToLocal();
 
                 sale.LastStatus = sale.Status;
                 sale.Status = TranStatus.Reserved;
