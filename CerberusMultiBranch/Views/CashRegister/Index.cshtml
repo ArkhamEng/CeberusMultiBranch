@@ -224,7 +224,8 @@ else
            });
     }
 
-    function CheckRefunding() {
+    function CheckRefunding()
+    {
         ExecuteAjax('@Url.Action("OpenRefunding", "CashRegister")', {},
            function (response)
            {

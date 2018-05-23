@@ -60,7 +60,7 @@ namespace CerberusMultiBranch.Controllers.Common
         [HttpPost]
         public JsonResult GetCities(int parentId)
         {
-            var list = db.Cities.Where(c => c.StateId == parentId).ToSelectList();
+            var list = db.Cities.Where(c => c.StateId == parentId).OrderBy(c=> c.Name).ToSelectList();
             return Json(list);
         }
 
@@ -68,7 +68,7 @@ namespace CerberusMultiBranch.Controllers.Common
         public JsonResult GetCategories(int parentId)
         {
             var list = db.SystemCategories.Where(sc => sc.PartSystemId == parentId).
-                Select(sc=> sc.Category).OrderBy(c=> c.Name).ToList();
+                Select(sc=> sc.Category).OrderBy(c=> c.Name).OrderBy(sc=> sc.Name).ToList();
 
             list.ForEach(c => c.Name = c.Name + " | " + c.SatCode);
 
@@ -78,14 +78,14 @@ namespace CerberusMultiBranch.Controllers.Common
         [HttpPost]
         public JsonResult GetModels(int parentId)
         {
-            var list = db.CarModels.Where(m => m.CarMakeId == parentId).ToSelectList();
+            var list = db.CarModels.Where(m => m.CarMakeId == parentId).OrderBy(m=> m.Name).ToSelectList();
             return Json(list);
         }
 
         [HttpPost]
         public JsonResult GetYears(int parentId)
         {
-            var list = db.CarYears.Where(m => m.CarModelId == parentId).ToSelectList();
+            var list = db.CarYears.Where(m => m.CarModelId == parentId).OrderBy(y=> y.Year).ToSelectList();
             return Json(list);
         }
 
@@ -105,7 +105,7 @@ namespace CerberusMultiBranch.Controllers.Common
                                  (id == null || id == Cons.Zero || c.ClientId == id)
 
                            select new JCatalogEntity { Id = c.ClientId, Name = c.Name, Code = c.Code, Phone = c.Phone }
-                ).Take(20).ToList();
+                ).OrderBy(c=> c.Name).Take(20).ToList();
 
             return Json(clients);
         }
@@ -144,7 +144,7 @@ namespace CerberusMultiBranch.Controllers.Common
         public JsonResult GetAvailableBranches()
         {
             var userId = User.Identity.GetUserId();
-            var list = db.UserBranches.Include(e => e.Branch).Where(e => e.UserId == userId).Select(e => e.Branch).ToList();
+            var list = db.UserBranches.Include(e => e.Branch).Where(e => e.UserId == userId).Select(e => e.Branch).OrderBy(b=> b.Name).ToList();
 
             return Json(list);
         }

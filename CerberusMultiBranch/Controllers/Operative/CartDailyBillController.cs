@@ -239,13 +239,15 @@ namespace CerberusMultiBranch.Controllers.Operative
             //verifico el stock y valido si es posible agregar mas producto a la venta
             if (existance < detail.Quantity)
             {
+                var message = string.Format("Estas intentando vender {0} unidades del producto {1} ", detail.Quantity, bp.Product.Code);
+                message += string.Format("el inventario solo contiene {1} unidades disponibles, revisa el carrito de venta! ", bp.Stock);
+                message += "sólo puedes vender productos sin existencia en una preventa desde el módulo de ventas";
+
                 var j = new
                 {
                     Result = "Cantidad insuficiente",
-                    Message = "Estas intentando vender mas productos de los disponibles, revisa el carrito de venta, solo puedes vender productos sin existencia "+
-                    "Iniciando una preventa desde el modulo de ventas"
-                };
-
+                    Message = message
+                };              
                 return Json(j);
             }
 

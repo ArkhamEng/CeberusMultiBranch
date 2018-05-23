@@ -58,10 +58,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(new
                     {
                         Result = "OK",
-                        Message = "Venta Cancelada, el producto ha sido regreado al stock, no se requiere devolución de efectivo"
+                        Message = "Venta Cancelada, el producto ha sido regreado al stock, no se requiere devolución"
                     });
                 }
-
 
                 //regreso los productos al stock
                 foreach (var detail in sale.SaleDetails)
@@ -103,8 +102,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var payments = sale.SalePayments.Sum(p => p.Amount);
 
-                //si la venta es credito o preventa, se resta el monto deudo de la cuenta del cliente
-                if (sale.TransactionType != TransactionType.Contado)
+                //si la venta es credito, se resta el monto deudo de la cuenta del cliente
+                if (sale.TransactionType == TransactionType.Credito)
                     sale.Client.UsedAmount -= (sale.TotalTaxedAmount - payments).RoundMoney();
 
                 sale.LastStatus = sale.Status;
@@ -464,6 +463,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             string[] arr = new List<string>().ToArray();
             string code = string.Empty;
 
+            var branchId = User.Identity.GetBranchId();
+
             if (filter != null && filter != string.Empty)
             {
                 arr = filter.Trim().Split(' ');
@@ -483,10 +484,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
                             && (systemId == null || ep.PartSystemId == systemId)
-                            select ep).Take((int)Cons.OneHundred).ToList();
+                            && (ep.IsActive)
+                            select ep).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
+                            s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take((int)Cons.OneHundred).ToList();
             }
 
-            var branchId = User.Identity.GetBranchId();
+           
 
             foreach (var prod in products)
             {
@@ -526,7 +529,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult CompleateAdd(int productId, int saleId, double quantity)
         {
-            var userId = User.Identity.GetUserId();
+            var userId   = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
 
             //obtengo el IVA configurado en base de datos
@@ -563,7 +566,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     var j = new
                     {
-                        Result = "Cantidad insuficiente",
+                        Result  = "Cantidad insuficiente",
                         Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, " +
                         "para vender producto sin existencia, es necesario registrar una preventa desde el modulo de ventas"
                     };
@@ -630,14 +633,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             sale.FinalAmount = sale.TotalTaxedAmount;
 
 
-            if (sale.TransactionType != TransactionType.Credito)
+            if (sale.TransactionType == TransactionType.Credito)
             {
                 if (sale.TotalTaxedAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
                         Result = "Error",
                         Header = "Limite de crédito excedido",
-                        Message = "Estas intentando vender una cantidad mayor al crédito disponible, Disponible del cliente " +
+                        Message = "Estas intentando vender una cantidad mayor al crédito disponible del cliente! Crédito restante: " +
                         (sale.Client.CreditLimit - sale.Client.UsedAmount).ToMoney()
                     });
             }
@@ -792,7 +795,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.Folio = sale.Folio;
 
                 //verifico que la venta no exceda el crédito del cliente, siempre y cuando no sea contado
-                if (sale.TransactionType != TransactionType.Contado)
+                if (sale.TransactionType == TransactionType.Credito)
                 {
                     if ((sale.TotalAmount + sale.Client.UsedAmount) > sale.Client.CreditLimit)
                     {

@@ -20,7 +20,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchClientViewModel();
-            model.States = db.States.ToSelectList();
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
             model.Clients = db.Clients.Where(c => c.ClientId != Cons.Zero).ToList();
 
             return View(model);
@@ -29,7 +29,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult AutoCompleate(string filter)
         {
-            var model = db.Clients.Where(p => p.Name.Contains(filter) && p.IsActive).Take(20).
+            var model = db.Clients.Where(p => p.Name.Contains(filter) && p.IsActive).OrderBy(c => c.Name).Take(20).
                 Select(p => new { Id = p.ClientId, Label = p.Name.ToUpper(), Value = p.FTR.ToUpper() });
 
             return Json(model);
@@ -51,7 +51,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (cityId    == null || c.CityId == cityId) &&
                              (ftr     == null || ftr == string.Empty || c.FTR == ftr) &&
                              (c.ClientId != Cons.Zero)
-                         select c).ToList();
+                         select c).OrderBy(c=> c.Name).ToList();
 
             return PartialView("_List", model);
         }
@@ -66,7 +66,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var model = (from p in db.Clients
                          where (name == null || name == string.Empty || arr.All(s => (p.Code + "" + p.Name).Contains(s)))
-                         select p).Take(Cons.QuickResults).ToList();
+                         select p).OrderBy(c=> c.Name).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickClientList", model);
         }
@@ -91,9 +91,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         private ClientViewModel CreateModel(Client client)
         {
             var model = new ClientViewModel(client);
-            model.States = db.States.ToSelectList();
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
             model.StateId = db.Cities.Find(model.CityId).StateId;
-            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
+            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).OrderBy(c=> c.Name).ToSelectList();
 
             return model;
         }

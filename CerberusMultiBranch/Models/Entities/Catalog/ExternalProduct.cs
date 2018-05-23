@@ -29,7 +29,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
 
         [DataType(DataType.Currency)]
-        [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+        //[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
         public double Price { get; set; }
 
         [Display(Name = "Marca")]

@@ -14,20 +14,23 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public int SaleCreditNoteId { get; set; }
 
         [MaxLength(30)]
+        [Index("IDX_Identifier_Active",Order =0)]
         public string Folio { get; set; }
+
+        [Index("IDX_Identifier_Active",Order =1)]
+        [MaxLength(15)]
+        public string Ident { get; set; }
 
         [DataType(DataType.Currency)]
         public double Amount { get; set; }
 
-        [Index("IDX_Year")]
+        [Index("IDX_Sequential",0)]
         public int Year { get; set; }
 
-        [Index("IDX_Sequential")]
+        [Index("IDX_Sequential",1)]
         public int Sequential { get; set; }
 
-        [Index("IDX_Ident")]
-        [MaxLength(15)]
-        public string Ident { get; set; }
+     
 
         [MaxLength(30)]
         public string User { get; set; }
@@ -36,6 +39,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime ExplirationDate { get; set; }
 
+        [Index("IDX_Identifier_Active", Order = 2)]
         public bool IsActive { get; set; }
 
         public virtual Sale Sale { get; set; }

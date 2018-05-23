@@ -16,23 +16,22 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public int ProductId { get; set; }
 
         [Display(Name = "Categoría")]
-        [Index("IDX_CategoryId", IsUnique = false)]
         public int CategoryId { get; set; }
 
         [Display(Name = "Sistema")]
-        [Index("IDX_PartSystemId", IsUnique = false)]
         public int? PartSystemId { get; set; }
 
         [Display(Name = "Código")]
         [Required]
         [MaxLength(30)]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "El código solo admite letras y numeros (sin espacios en blanco)")]
-        [Index("IDX_Code", IsUnique = true)]
+        [Index("UNQ_Code", IsUnique = true)]
+        [Index("IDX_Ident_TradeMark", Order =0)]
         public string Code { get; set; }
 
         [Display(Name = "Descripción")]
         [MaxLength(200)]
-        [Index("IDX_Name", IsUnique = false)]
+        [Index("IDX_Ident_TradeMark", Order = 1)]
         [Required(ErrorMessage ="Se requiere una descripción del producto")]
         public string Name { get; set; }
 
@@ -57,6 +56,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Fabricante")]
         [MaxLength(50)]
+        [Index("IDX_Ident_TradeMark", Order = 2)]
         public string TradeMark { get; set; }
 
         [Display(Name = "Unidad")]
@@ -75,10 +75,10 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(100)]
         public string UpdUser { get; set; }
 
-        [Index("IDX_LockDate")]
+        [Index("IDX_Lock",Order =0)]
         public DateTime? LockDate { get; set; }
 
-        [Index("IDX_UserLock")]
+        [Index("IDX_Lock",Order =1)]
         [MaxLength(30)]
         public string UserLock { get; set; }
 
@@ -109,7 +109,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         [Display(Name = "Precio de Compra")]
         [DataType(DataType.Currency)]
-        [DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
         public double BuyPrice { get; set; }
 
         [NotMapped]
@@ -125,6 +124,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         [Display(Name = "% Mayorista")]
         [Required]
+        [Range(15, 100, ErrorMessage = "El porcentaje de mayoreo debe ser mayor o igual a 15%")]
         public int WholesalerPercentage { get; set; }
 
         [NotMapped]

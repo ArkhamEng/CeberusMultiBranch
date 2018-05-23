@@ -351,6 +351,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         WithdrawalCauseId = 3
                     };
 
+                 
                     db.CashDetails.Add(cd);
                 }
 
@@ -378,6 +379,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
                     };
 
+                  
                     message += "Cantidad en Vale " + refund.RefundCredit.ToMoney() + " Folio del vale " + nc.Folio;
                     hasNote = true;
                     db.SaleCreditNotes.Add(nc);
@@ -643,9 +645,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.SalePayments = sale.SalePayments ?? new List<SalePayment>();
 
                 #region Registro de pagos
+
+                var totalPayments = 0.00;
                 //si viene un monto en efectivo, agrego el registro de pago
                 if (payment.CashAmount > Cons.Zero)
                 {
+                    totalPayments += payment.CashAmount;
                     var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
@@ -662,6 +667,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //si viene un monto de tarjeta, agrego el registro de pago
                 if (payment.CardAmount > Cons.Zero)
                 {
+                    totalPayments += payment.CardAmount;
                     var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
@@ -680,6 +686,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //si se esta aplicando un folio
                 if (payment.CreditNoteAmount > Cons.Zero)
                 {
+                    totalPayments += payment.CreditNoteAmount;
+
                     var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
@@ -695,6 +703,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.SalePayments.Add(p);
                 }
 
+                
+
                 #endregion
 
 
@@ -706,7 +716,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                     sale.Status = TranStatus.Revision;
 
-                if (sale.TransactionType != TransactionType.Contado)
+                if (sale.TransactionType == TransactionType.Credito)
                     sale.Client.UsedAmount -= (cPayments + wholePayment);
 
 

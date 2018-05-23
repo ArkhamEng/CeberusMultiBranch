@@ -144,7 +144,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                              && (userId == null || p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                              && (status == null || p.Status == status)
-                             select p).ToList();
+                             select p).OrderByDescending(p=> p.TransactionDate).ToList();
 
             return purchases;
         }
@@ -223,17 +223,18 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             List<Product> products = new List<Product>();
 
-            products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
+          /*  products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
                         where (p.Code == code) && (p.ProductType == ProductType.Single)
                         select p).Take((int)Cons.OneHundred).ToList();
 
             if (products.Count == Cons.Zero)
-            {
+            {*/
                 products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
                             && (ep.ProductType == ProductType.Single)
+                            && (ep.IsActive)
                             select ep).Take((int)Cons.OneHundred).ToList();
-            }
+            //}
 
             //obtengo el código del proveedor si es que tiene
             products.ForEach(p =>

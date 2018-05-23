@@ -26,8 +26,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchEmployeeViewModel();
-            model.Employees = db.Employees.Include(e => e.City).Where(e=> e.IsActive);
-            model.States = db.States.ToSelectList();
+            model.Employees = db.Employees.OrderBy(e=> e.Name).Include(e => e.City).Where(e=> e.IsActive);
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
 
             return View(model);
         }
@@ -47,7 +47,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (stateId == null || c.City.StateId == stateId) &&
                              (cityId == null || c.CityId == cityId) &&
                              (phone == null || phone == string.Empty || c.Phone == phone) 
-                         select c).ToList();
+                         select c).OrderBy(e=> e.Name).ToList();
 
             return PartialView("_List", model);
         }
@@ -62,12 +62,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 model = new EmployeeViewModel(db.Employees.FirstOrDefault(e=> e.EmployeeId==id));
 
                 model.StateId = db.Cities.Find(model.CityId).StateId;
-                model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
+                model.Cities = db.Cities.OrderBy(c=> c.Name).Where(c => c.StateId == model.StateId).ToSelectList();
             }
             else
                 model = new EmployeeViewModel();
 
-            model.States = db.States.ToSelectList();
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
 
             return View(model);
         }

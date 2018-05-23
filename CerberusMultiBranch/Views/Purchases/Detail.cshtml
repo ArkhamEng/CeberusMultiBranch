@@ -125,7 +125,7 @@
                             </button>
                        
 
-                        <button id="btnCancel" class="btn btn-danger pull-right" type="button">
+                        <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
                             <span class="glyphicon glyphicon-remove"></span>
                             Cancelar
                         </button>
@@ -217,6 +217,30 @@
             else
                 window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
         });
+    }
+
+    function Cancel() {
+        $('#ModalCancel').modal('show');
+    }
+
+    function BeginCancel()
+    {
+        $("#ModalCancel").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+
+            var param = { PurchaseId: $("#PurchaseId").val(), comment: $("#txtComment").val() }
+
+            ExecuteAjax('@Url.Action("Cancel","Purchases")', param, function (j) {
+                if (j.Result = 'OK')
+                    location.reload(true);
+                else
+                    ShowMessage(j.Result, j.Message, 'warning');
+            });
+        });
+
+        $("#ModalCancel").modal("hide");
+
     }
 
 </script>

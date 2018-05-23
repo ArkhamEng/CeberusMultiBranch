@@ -24,8 +24,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchProviderViewModel();
-            model.Providers = db.Providers.ToList();
-            model.States = db.States.ToSelectList();
+            model.Providers = db.Providers.OrderBy(p=> p.Name).ToList();
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
 
             return View(model);
         }
@@ -33,7 +33,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult AutoCompleate(string filter)
         {
-            var model = db.Providers.Where(p => p.Name.Contains(filter)).Take(20).
+            var model = db.Providers.OrderBy(p=> p.Name).Where(p => p.Name.Contains(filter)).Take(20).
                 Select(p => new { Id = p.ProviderId, Label = p.Name, Value = p.FTR });
 
             return Json(model);
@@ -53,7 +53,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (stateId == null || c.City.StateId == stateId) &&
                              (cityId == null || c.CityId == cityId) &&
                              (ftr == null || ftr == string.Empty || c.FTR == ftr)
-                         select c).ToList();
+                         select c).OrderBy(p=> p.Name).ToList();
 
             return PartialView("_List", model);
         }
@@ -78,9 +78,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         private ProviderViewModel CreateModel(Provider provider)
         {
             var model = new ProviderViewModel(provider);
-            model.States = db.States.ToSelectList();
+            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
             model.StateId = db.Cities.Find(model.CityId).StateId;
-            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).ToSelectList();
+            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).OrderBy(c=> c.Name).ToSelectList();
 
             return model;
         }
@@ -118,7 +118,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var providers = (from p in db.Providers
                              where (name == null || name == string.Empty || arr.Any(n => (p.Code + " " + p.Name).Contains(name)))
-                             select p).Take(Cons.QuickResults).ToList();
+                             select p).OrderBy(p=> p.Name).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickProviderList", providers);
         }

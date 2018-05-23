@@ -28,9 +28,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var model = new SearchProductViewModel();
             model.Products = new List<List<Product>>();
-            model.Systems = db.Systems.ToSelectList();
-            model.Categories = db.Categories.ToSelectList();
-            model.Makes = db.CarMakes.ToSelectList();
+            model.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
+            model.Categories = db.Categories.OrderBy(c=> c.Name).ToSelectList();
+            model.Makes = db.CarMakes.OrderBy(m=> m.Name).ToSelectList();
             return View(model);
         }
 
@@ -728,7 +728,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             //asigno la lista de categorias y sistemas al view model
             vm.Categories = cats.ToSelectList();
-            vm.Systems = db.Systems.ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
 
             //si es un producto existente, busco la lista de Armadoras de vehiculos, para el view model
             if (vm.ProductId > Cons.Zero)
@@ -748,7 +748,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             vm.IsActive = true;
             vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
-            vm.Systems = db.Systems.ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
             vm.Name = ep.Description;
             vm.TradeMark = ep.TradeMark;
             vm.Unit = ep.Unit;

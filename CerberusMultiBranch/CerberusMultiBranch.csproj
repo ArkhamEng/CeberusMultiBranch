@@ -310,6 +310,10 @@
     <Compile Include="Migrations\201805030433599_newTransactionFields.Designer.cs">
       <DependentUpon>201805030433599_newTransactionFields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805230436459_IndexProduct_CreditNote.cs" />
+    <Compile Include="Migrations\201805230436459_IndexProduct_CreditNote.Designer.cs">
+      <DependentUpon>201805230436459_IndexProduct_CreditNote.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -749,6 +753,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805030433599_newTransactionFields.resx">
       <DependentUpon>201805030433599_newTransactionFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805230436459_IndexProduct_CreditNote.resx">
+      <DependentUpon>201805230436459_IndexProduct_CreditNote.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

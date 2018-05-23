@@ -90,6 +90,7 @@
 @Html.Hidden("CreditDays")
 
 <script>
+    var hasCredit = false;
 
     $(document).ready(function ()
     {
@@ -98,63 +99,107 @@
 
         $("#ModalBeginSale").modal({ backdrop: 'static' });
 
+      
+
         Compleate("#ClientName", "#Clients", '@Url.Action("AutoCompleate","Clients")', function (id, value)
         {
             $("#ClientId").val(id);
 
-            ExecuteAjax('@Url.Action("GetClientCreditData","Clients")',{id:id},function(response)
+            var type = $("input[name=TransactionType]:checked").val();
+
+            ExecuteAjax('@Url.Action("GetClientCreditData","Clients")', { id: id }, function (response)
             {
                 $("#lblMessage").text(response.Message);
-                if(response.Result!="OK")
+
+                $("#btnAccept").attr('disabled', false);
+                $("#lblMessage").addClass("hidden");
+
+                if (response.Result != "OK")
                 {
                     $("#Days").val(0);
                     $("#CreditDays").val(0);
-                    $("#btnAccept").attr('disabled', true);
-                    $("#lblMessage").removeClass("text-info");
-                    $("#lblMessage").addClass("text-danger");
+
+                    if (type == '@TransactionType.Credito')
+                    {
+                        $("#btnAccept").attr('disabled', true);
+                        $("#lblMessage").removeClass("text-info");
+
+                        $("#lblMessage").addClass("text-danger");
+                        $("#lblMessage").removeClass("hidden");
+                    }
+
+                    hasCredit = false;
                 }
-                else
-                {
-                    $("#btnAccept").attr('disabled', false);
-                    $("#Days").val(response.Days);
-                    $("#CreditDays").val(response.Days);
-                    $("#lblMessage").removeClass("text-danger");
-                    $("#lblMessage").addClass("text-info");
+                else {
+                    if (type == '@TransactionType.Credito') {
+                        $("#Days").val(response.Days);
+                        $("#CreditDays").val(response.Days);
+                        $("#lblMessage").removeClass("text-danger");
+                        $("#lblMessage").addClass("text-info");
+                        $("#lblMessage").removeClass("hidden");
+                    }
+                    hasCredit = true;
                 }
             });
-    });
 
-    $("input[name=TransactionType]").click(function ()
-    {
-        if (this.value == '@TransactionType.Credito' || this.value == '@TransactionType.Preventa')
-        {
-            $("#divDays").removeClass("hidden");
-        }
-        else
-        {
-            $("#divDays").val(0);
-            $("#divDays").addClass("hidden");
-        }
-    });
+        });
 
-        $("#Days").off("keyup").keyup(function ()
+        $("input[name=TransactionType]").click(function ()
         {
-            if (parseInt($("#Days").val()) > parseInt($("#CreditDays").val()))
-                $("#btnAccept").attr('disabled', true);
-            else
+            var id = parseInt($("#ClientId").val());
+
+            $("#Days").val(0);
+
+            if (this.value == '@TransactionType.Credito') {
+                $("#lblMessage").removeClass("hidden");
+
+                if (hasCredit && id > 0)
+                    $("#btnAccept").attr('disabled', false);
+                else
+                    $("#btnAccept").attr('disabled', true);
+            }
+
+            if (this.value == '@TransactionType.Preventa') {
+                if (id > 0) {
+                    $("#btnAccept").attr('disabled', false);
+                    $("#lblMessage").addClass("hidden");
+                }
+                else {
+                    $("#btnAccept").attr('disabled', true);
+                    $("#lblMessage").addClass("hidden");
+                }
+            }
+        });
+
+        $("#Days").off("keyup").keyup(function () {
+            var id = parseInt($("#ClientId").val());
+            var type = $("input[name=TransactionType]:checked").val();
+
+            if (type == '@TransactionType.Credito') {
+                if (hasCredit && parseInt($("#Days").val()) > parseInt($("#CreditDays").val()))
+                    $("#btnAccept").attr('disabled', true);
+                else
+                    $("#btnAccept").attr('disabled', false);
+
+                $("#lblMessage").removeClass("hidden");
+            }
+
+            if (type == '@TransactionType.Preventa')
+            {
                 $("#btnAccept").attr('disabled', false);
+
+                $("#lblMessage").addClass("hidden");
+            }
         });
     });
 
-    function AcceptCreate()
-    {
+    function AcceptCreate() {
         var form = $("#frmBeginSale");
 
         if (!form.valid())
             return;
 
-        $("#ModalBeginSale").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-        {
+        $("#ModalBeginSale").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
             var sale =
                 {
@@ -164,10 +209,8 @@
                     TransactionType: $("input[name=TransactionType]:checked").val()
                 };
 
-            ExecuteAjax('@Url.Action("Create","Sales")', { model: sale }, function (response)
-            {
-                if (response.Result != "OK")
-                {
+            ExecuteAjax('@Url.Action("Create","Sales")', { model: sale }, function (response) {
+                if (response.Result != "OK") {
                     HideLoading();
                     ShowMessage(response.Header, response.Message, 'warning');
                 }
@@ -180,8 +223,7 @@
 
     }
 
-    function Close()
-    {
+    function Close() {
         $("#ModalBeginSale").modal('hide');
     }
 </script>
