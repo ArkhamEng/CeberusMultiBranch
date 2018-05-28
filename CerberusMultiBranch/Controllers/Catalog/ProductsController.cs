@@ -28,9 +28,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var model = new SearchProductViewModel();
             model.Products = new List<List<Product>>();
-            model.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
-            model.Categories = db.Categories.OrderBy(c=> c.Name).ToSelectList();
-            model.Makes = db.CarMakes.OrderBy(m=> m.Name).ToSelectList();
+            model.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+            model.Categories = db.Categories.OrderBy(c => c.Name).ToSelectList();
+            model.Makes = db.CarMakes.OrderBy(m => m.Name).ToSelectList();
             return View(model);
         }
 
@@ -406,29 +406,21 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             List<Product> products = new List<Product>();
 
-          /*  if (code != null)
-            {
-                products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
-                             .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
-                            where (p.Code == code)
-                            select p).ToList();
-            }
+            products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
+                        Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
+                        Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
+                        where (categoryId == null || p.CategoryId == categoryId)
+                        && (partSystemId == null || p.PartSystemId == partSystemId)
+                        && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
 
-            if (products.Count == Cons.Zero)
-            {*/
-                products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).Include(p => p.BranchProducts)
-                               .Include(p => p.Compatibilities.Select(c => c.CarYear)).Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
-                            where (categoryId == null || p.CategoryId == categoryId)
-                            && (partSystemId == null || p.PartSystemId == partSystemId)
-                            && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
+                        && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                        && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
+                        && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
+                        select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
+                        s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
+            var userId = User.Identity.GetUserId();
+            var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId ==userId ).Select(s=> s.ProductId).ToArray();
 
-                            && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                            && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
-                            && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
-                            select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
-                            s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
-            //}
-            //   products.ForEach(p => p.Quantity = p.BranchProducts.FirstOrDefault(bp=> bp.BranchId == branchId).Stock);
             foreach (var prod in products)
             {
                 var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
@@ -442,6 +434,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 prod.Row = bp != null ? bp.Row : string.Empty;
                 prod.Ledge = bp != null ? bp.Ledge : string.Empty;
                 prod.StockLocked = bp != null ? bp.StockLocked : false;
+                prod.IsIncart = ids.Contains(prod.ProductId);
             }
 
             products.OrderCarModels();
@@ -728,7 +721,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             //asigno la lista de categorias y sistemas al view model
             vm.Categories = cats.ToSelectList();
-            vm.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
 
             //si es un producto existente, busco la lista de Armadoras de vehiculos, para el view model
             if (vm.ProductId > Cons.Zero)
@@ -748,7 +741,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             vm.IsActive = true;
             vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
-            vm.Systems = db.Systems.OrderBy(s=> s.Name).ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
             vm.Name = ep.Description;
             vm.TradeMark = ep.TradeMark;
             vm.Unit = ep.Unit;
@@ -1692,16 +1685,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
             //}
             //else
             //{
-                 model =(from sm in db.StockMovements.Include(sm => sm.BranchProduct.Product)
+            model = (from sm in db.StockMovements.Include(sm => sm.BranchProduct.Product)
 
-                         where (description == null || description == string.Empty ||
-                                arr.All(s => (sm.BranchProduct.Product.Code + " "+ sm.BranchProduct.Product.Name + " "+ sm.BranchProduct.Product.TradeMark).Contains(s) ) )
-                              && (beginDate == null || sm.MovementDate >= beginDate) 
-                              && (endDate == null || sm.MovementDate <= endDate) 
-                              && (sm.BranchId == branchId) select sm ).OrderByDescending(s=> s.MovementDate).ToList();
+                     where (description == null || description == string.Empty ||
+                            arr.All(s => (sm.BranchProduct.Product.Code + " " + sm.BranchProduct.Product.Name + " " + sm.BranchProduct.Product.TradeMark).Contains(s)))
+                          && (beginDate == null || sm.MovementDate >= beginDate)
+                          && (endDate == null || sm.MovementDate <= endDate)
+                          && (sm.BranchId == branchId)
+                     select sm).OrderByDescending(s => s.MovementDate).ToList();
             //}
 
-            return PartialView("_MovementList",model);
+            return PartialView("_MovementList", model);
         }
 
         protected override void Dispose(bool disposing)

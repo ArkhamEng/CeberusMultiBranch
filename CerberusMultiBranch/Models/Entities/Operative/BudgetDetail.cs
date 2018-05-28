@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Config;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,8 +9,12 @@ using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
-    public class TransactionDetail
+    [Table("BudgetDetail", Schema = "Operative")]
+    public class BudgetDetail
     {
+        [Column(Order =0),Key,ForeignKey("Budget")]
+        public int BudgetId { get; set; }
+
         [Column(Order = 1), Key, ForeignKey("Product")]
         public int ProductId { get; set; }
 
@@ -33,7 +38,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DataType(DataType.Currency)]
         public double TaxedPrice { get; set; }
 
-       
         [Display(Name = "Cantidad")]
         public double Quantity { get; set; }
 
@@ -45,6 +49,15 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DataType(DataType.Currency)]
         public double TaxedAmount { get; set; }
 
+        public DateTime InsDate { get; set; }
+
+    
+        #region Navitation Properties
+   
         public virtual Product Product { get; set; }
+
+        public virtual Budget Budget { get; set; }
+
+        #endregion
     }
 }

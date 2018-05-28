@@ -16,6 +16,9 @@
         <div id="divModalCart">
         </div>
 
+        <div id="divPrintBudget">
+        </div>
+
         <div id="divPriceSelector"></div>
 
         @Html.Partial("_QuickClient")
@@ -65,8 +68,6 @@
 <script>
     $(document).ready(function ()
     {
-        console.log('@Extension.GetServerDate()');
-
         if ('@User.IsValid()' != 'True')
         {
             $("#AccessBlock").modal({ backdrop: 'static' });

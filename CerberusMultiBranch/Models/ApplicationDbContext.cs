@@ -86,10 +86,17 @@ namespace CerberusMultiBranch.Models
         public DbSet<CashDetail> CashDetails { get; set; }
         
         public DbSet<BranchProduct> BranchProducts { get; set; }
+
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+
+        public DbSet<Budget> Budgets { get; set; }
+
+        public DbSet<BudgetDetail> BudgetDetails { get; set; }
+
         #endregion
 
         #region Finances
-       
+
         public DbSet<SalePayment> SalePayments { get; set; }
 
         public DbSet<PurchasePayment> PurchasePayments { get; set; }

@@ -100,7 +100,6 @@ function SetCascade(ddlParent, ddlChild, action)
 
     $(ddlParent).change(function ()
     {
-        console.log("Populating Cascade");
         if ($(ddlParent).val() != '') {
             var parentId = $(ddlParent).val();
         
@@ -110,11 +109,13 @@ function SetCascade(ddlParent, ddlChild, action)
                     type: "POST",
                     data: { parentId: parentId },
 
-                    success: function (data) {
-                        console.log("cascade data adquired");
+                    success: function (data)
+                    {
                         $(ddlChild).empty();
                         $(ddlChild).append($('<option></option>').val("").html(""));
-                        for (var i = 0; i < data.length; i++) {
+
+                        for (var i = 0; i < data.length; i++)
+                        {
                             $(ddlChild).append($('<option></option>').val(data[i].Value).html(data[i].Text));
                         }
                         if (data.length > 0)

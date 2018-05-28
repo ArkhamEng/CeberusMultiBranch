@@ -27,9 +27,9 @@
 <script>
     $(document).ready(function ()
     {
-        console.log("Iniciando Branch Selector");
         GetBranchSession();
-        $("#btnBranchSelector").click(function ()
+
+        $("#btnBranchSelector").off('click').click(function ()
         {
             BeginBranchSession();
         });
@@ -38,8 +38,9 @@
     function LoadBranches()
     {
         $("#ddBranchSelector").empty();
+
          ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (result)
-        {
+         {
             $.each(result, function (i, item)
             {
                 var option = "<option value='" + item.BranchId + "'>" + item.Name + "</option>";
@@ -60,7 +61,6 @@
         {
             if (result.Id == 0)
             {
-                console.log("Load Branches");
                 LoadBranches();
             }
             else

@@ -12,53 +12,76 @@
 
     <div id="pnlFilters" class="panel panel-danger panel top">
         <div class="panel-body">
-            <div class="input-group">
-                @Html.DropDownList("SystemId", Model.Systems, "Sistema", new { @class = "form-control text-uppercase input-lg", style = "width:18% !important" })
-                @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:82% !important" })
-                <div class="input-group-btn">
-                    <button class="btn btn-default btn-lg hidden-xs hidden-sm" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
-                        <span class="fa fa-binoculars"></span>
-                    </button>
-                    <button class="btn btn-primary btn-lg" type="button" id="btnSearch" title="Buscar">
-                        <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
-                    </button>
+            <div class="hidden-sm hidden-xs">
+                <div class="input-group">
+                    @Html.DropDownList("SystemId", Model.Systems, "Sistema", new { @class = "form-control text-uppercase input-lg", style = "width:18% !important" })
+                    @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control text-uppercase  input-lg", placeholder = "Búsqueda por código o descripción", style = "width:82% !important" })
+                    <div class="input-group-btn">
+                        <button class="btn btn-default btn-lg" type="button" id="btnSearchProvider" title="Buscar en lista de proveedores">
+                            <span class="fa fa-binoculars"></span>
+                        </button>
+                        <button class="btn btn-primary btn-lg" type="button" id="btnSearch" title="Buscar">
+                            <span class="glyphicon glyphicon-search"></span>
+                            <u>B</u>uscar
+                        </button>
 
-                    @if (User.IsInRole("Capturista"))
-                    {
-                    <button type="button" class="btn btn-success btn-lg hidden-xs hidden-sm" id="btnCreate" title="Crear nuevo registro">
-                        <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>uevo
-                    </button>
-                    }
+                        @if (User.IsInRole("Capturista"))
+                        {
+                            <button type="button" class="btn btn-success btn-lg hidden-xs hidden-sm" id="btnCreate" title="Crear nuevo registro">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                <u>N</u>uevo
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <br />
+
+                <div class="input-group col-md-10">
+                    <span class="input-group-addon"><i class="fa fa-registered"></i></span>
+                    @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
+                    <span class="input-group-addon"><i class="fa fa-car"></i></span>
+                    @Html.DropDownList("CarModelId", Model.Models, "Modelo", new { @class = "form-control text-uppercase " })
+                    <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
+                    @Html.DropDownList("CarYearId", Model.Years, "Año", new { @class = "form-control text-uppercase " })
+                    <span class="input-group-btn">
+                        <button id="btnSwitch" type="button" class="btn btn-default" title="Ver como tabla">
+                            <span id="spSwitch" class="fa fa-th-large"></span>
+                        </button>
+                        <button class="btn btn-info" type="button" id="btnClear" title="Recargar">
+                            <span class="glyphicon glyphicon-refresh"></span>
+                            <u>L</u>impiar
+                        </button>
+                    </span>
                 </div>
             </div>
 
+            <div class="hidden-md hidden-lg">
+                <div class="form-group">
+                    @Html.Label("Sistema", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-list"></i></span>
+                        @Html.DropDownList("SystemIdSm", Model.Systems, "Sistema", new { @class = "form-control text-uppercase input-sm" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.Label("Descripción o código", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                        @Html.TextBox("txtNameSm", "", htmlAttributes: new { @class = "form-control text-uppercase  input-sm", placeholder = "Búsqueda por código o descripción" })
+                    </div>
+                </div>
 
-            <br />
-
-            <div class="input-group col-md-10 hidden-sm hidden-xs">
-                <span class="input-group-addon"><i class="fa fa-registered"></i></span>
-                @Html.DropDownList("CarMakeId", Model.Makes, "armadora", new { @class = "form-control text-uppercase " })
-                <span class="input-group-addon"><i class="fa fa-car"></i></span>
-                @Html.DropDownList("CarModelId", Model.Models, "Modelo", new { @class = "form-control text-uppercase " })
-                <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
-                @Html.DropDownList("CarYearId", Model.Years, "Año", new { @class = "form-control text-uppercase " })
-                <span class="input-group-btn">
-                    <button id="btnSwitch" type="button" class="btn btn-default" title="Ver como tabla">
-                        <span id="spSwitch" class="fa fa-th-large"></span>
-                    </button>
-                    <button class="btn btn-info" type="button" id="btnClear" title="Recargar">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                        <u>L</u>impiar
-                    </button>
-                </span>
+                <button class="btn btn-primary col-xs-12 col-sm-12" type="button" title="Buscar" onclick="SearchSmal()">
+                    <span class="glyphicon glyphicon-search"></span>
+                    Buscar productos
+                </button>
             </div>
         </div>
     </div>
     <input id="IsGrid" type="hidden" value="false" />
 
-    <div id="divProducts" >
+    <div id="divProducts">
         @Html.Partial("_List", Model.Products)
     </div>
 
@@ -67,33 +90,27 @@
 </div>
 <script>
 
-    $(document).ready(function ()
-    {
-        $("#CarMakeId").change(function ()
-        {
+    $(document).ready(function () {
+        $("#CarMakeId").change(function () {
             CascadeMake();
         });
 
-        $("#CarModelId").change(function ()
-        {
+        $("#CarModelId").change(function () {
             CascadeModel();
         });
 
-        $("#btnCreate").click(function ()
-        {
+        $("#btnCreate").click(function () {
             ShowLoading();
-            ExecuteAjax('@Url.Action("Edit","Products")', {}, function (response)
-            {
+            ExecuteAjax('@Url.Action("Edit","Products")', {}, function (response) {
                 HideLoading();
                 if ($.isPlainObject(response))
                     ShowMessage(response.Result, response.Message, "warning");
-                else 
+                else
                     $("#divModals").html(response)
             });
         });
 
-        $("#btnSearch").click(function ()
-        {
+        $("#btnSearch").click(function () {
             LookFor();
         });
 
@@ -136,7 +153,8 @@
         $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
     });
 
-    function LookFor() {
+    function LookFor()
+    {
 
         ShowLoading();
         var data =
@@ -148,6 +166,23 @@
             name: $("#txtName").val(),
             isGrid: $("#IsGrid").val(),
             partSystemId: $("#SystemId").val()
+        };
+        ExecuteAjax('@Url.Action("Search")', data, function (view) {
+
+            HideLoading();
+
+            $("#divProducts").html(view);
+        });
+    }
+
+    function SearchSmal()
+    {
+        ShowLoading();
+        var data =
+        {
+            name: $("#txtNameSm").val(),
+            isGrid: false,
+            partSystemId: $("#SystemIdSm").val()
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view) {
 

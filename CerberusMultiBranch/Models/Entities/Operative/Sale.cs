@@ -1,9 +1,11 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Finances;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -45,9 +47,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public Sale()
         {
-            this.SaleDetails = new List<SaleDetail>();
-            this.TransactionDate = DateTime.Now;
-            this.UpdDate = DateTime.Now;
+            this.SaleDetails     = new List<SaleDetail>();
+            this.TransactionDate = DateTime.Now.ToLocal();
+            this.UpdUser         = HttpContext.Current.User.Identity.Name;
+            this.UpdDate         = DateTime.Now.ToLocal();
         }
     }
 

@@ -1,4 +1,4 @@
-﻿@model CerberusMultiBranch.Models.ViewModels.Operative.SaleViewModel
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.ShoppingCart>
 
 
 <div id="ModalCart" class="modal fade" role="dialog">
@@ -6,58 +6,41 @@
         <div class="modal-content panel panel-primary panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4  class="modal-title text-uppercase">
+                <h4 class="modal-title text-uppercase">
                     <span class="fa fa-shopping-cart" style="float:left">
                     </span>
                     &nbsp;<a id="ModalCartHeader"></a>
                 </h4>
             </div>
-
-            <div class="modal-body panel-body">
-
-                @Html.HiddenFor(m => m.SaleId)
-
-                @Html.HiddenFor(m => m.ClientId)
-
-                @if (Model.Client != null)
-                {
-                    <h4 id="hClientName" class="text-primary text-uppercase">
-                        @Model.Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        RFC:&nbsp;&nbsp;@Model.Client.FTR
-                    </h4>
-                }
-                else
-                {
-                    <h4 id="hClientName" class="text-danger"></h4>
-                }
-
-
-                <div class="panel panel-danger col-md-12">
-                    <div id="divCartDetails" class="row">
-                            @Html.Partial("_CartDetails", Model.SaleDetails)
-                    </div>
+            <div class="modal-body panel-body panel-group">
+                <div id="divCartDetails" class="row">
+                    @Html.Partial("_CartDetails", Model)
                 </div>
             </div>
 
-            <div class="panel panel-primary panel-body">
-                <div class="input-group col-md-12 row">
-                    <div class="col-md-6">
-                        <select class="form-control" style="font-family: 'FontAwesome', 'Second Font name'" id="CartSending">
-                            <option value="0"><text class="fa fa-building"> &#xf0f7; Recoge en sucursal</text></option>
-                            <option value="1"><text class="fa fa-truck">&#xf0d1; Envío a domicilio</text></option>
-                        </select>
-                    </div>
-                    <div class="input-group-btn">
-                            <button id="btnShowClients" class="btn btn-success" type="button">
-                                <span class="fa fa-user-plus"></span>
-                                Cargo a cliente
-                            </button>
-                            <button class="btn btn-primary" type="button" id="btnCompleate" onclick="CompleateSale('@Model.SaleId')">
-                                <span class="fa fa-upload"></span>
-                                Terminar venta
-                            </button>
-                    </div>
+
+
+            <div class="modal-footer">
+                <div class="col-md-3">
+                    <select class="form-control" style="font-family: 'FontAwesome', 'Second Font name'" id="CartSending">
+                        <option value="0"><text class="fa fa-building"> &#xf0f7; Recoge en sucursal</text></option>
+                        <option value="1"><text class="fa fa-truck">&#xf0d1; Envío a domicilio</text></option>
+                    </select>
                 </div>
+
+                <button id="btnShowClients" class="btn btn-success" type="button">
+                    <span class="fa fa-user-plus"></span>
+                    Cargo a cliente
+                </button>
+                <button class="btn btn-primary" type="button" id="btnCompleate" onclick="CompleateSale()">
+                    <span class="fa fa-upload"></span>
+                    Terminar venta
+                </button>
+                <button class="btn btn-warning" type="button" id="btnBudget" onclick="CreateBudget()">
+                    <span class="fa fa-print"></span>
+                    Generar Cotización
+                </button>
+
             </div>
         </div>
     </div>
@@ -77,18 +60,17 @@
             $("#ModalCart").modal('hide');
         });
 
-        $("#lblTotalAmount").val('@Html.DisplayFor(model => model.TotalAmount)');
+        $("#lblTotalAmount").val('@Model.Sum(s=> s.TaxedAmount)');
     });
 
-    function CompleateSale(transactionId)
+    function CompleateSale()
     {
         var param =
         {
-            transactionId: transactionId,
             sending: $("#CartSending").val()
         };
-
-        ExecuteAjax('@Url.Action("CompleateSale","Sales")',param, function(response)
+        
+        ExecuteAjax('@Url.Action("CompleateSale", "Sales")', param, function (response)
         {
             $("#ModalCart").modal("hide");
             CheckCart();
@@ -97,6 +79,26 @@
             else
                 ShowMessage(response.Result, response.Message, 'warning');
         });
+    }
+
+    function CreateBudget()
+    {
+        $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+        {
+            ShowLoading();
+            ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response)
+            {
+                HideLoading();
+                CheckCart();
+
+                if (!$.isPlainObject(response))
+                    $("#divPrintBudget").html(response);
+                else
+                    ShowMessage(response.Result, response.Message, 'warning');
+            });
+        }).modal("hide");
+
+       
     }
 
 </script>

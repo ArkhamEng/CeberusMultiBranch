@@ -19,9 +19,10 @@
             <tr>
                 @foreach (var prod in item)
                 {
-                    string c = string.Format("col-md-{0}  col-xs-4 col-sm-4", (12 / i));
+                    string c = string.Format("col-md-{0}  col-xs-4 col-sm-4 {1}", (12 / i),prod.IsIncart?"info":"");
+                    string toolTip = prod.IsIncart ? "Este producto ya esta en el carrito" : "";
 
-                    <td class='@c'>
+                    <td class='@c' title="@toolTip">
 
                         @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", 2); }
 

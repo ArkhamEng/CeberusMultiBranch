@@ -182,6 +182,13 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         }
 
         [NotMapped]
+        public bool IsIncart
+        {
+            get;set;
+        }
+
+       
+        [NotMapped]
         public bool StockLocked { get; set; }
 
         [NotMapped]

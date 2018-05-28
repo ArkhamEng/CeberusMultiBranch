@@ -169,25 +169,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             return sales;
         }
 
-        [HttpPost]
-        public JsonResult CheckCart()
-        {
-            var userId = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchId();
-
-            var sale = db.Sales.Include(s => s.SaleDetails).
-                FirstOrDefault(s => s.BranchId == branchId && s.UserId == userId
-                && s.Status == TranStatus.InProcess && s.TransactionType == TransactionType.Contado);
-
-            if (sale != null)
-            {
-                var list = sale.SaleDetails;
-                return Json(new { Result = "OK", Message = (list.Sum(td => td.Quantity)).ToString() });
-            }
-
-            else
-                return Json(new { Result = "OK", Message = Cons.Zero.ToString() });
-        }
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
@@ -214,105 +195,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_PriceSelector", model);
         }
 
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public JsonResult SetClient(int clientId, int transactionId)
-        {
-            try
-            {
-                var branchId = User.Identity.GetBranchId();
-
-                var sale = db.Sales.Include(s => s.SaleDetails).
-                    Include(s => s.SaleDetails.Select(td => td.Product)).
-                    Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
-                    FirstOrDefault(s => s.SaleId == transactionId);
-
-                //obtengo el IVA configurado en base de datos
-                var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
-
-
-                if (sale != null)
-                {
-                    foreach (var detail in sale.SaleDetails)
-                    {
-                        var brp = detail.Product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
-                        detail.Product.Quantity = brp != null ? brp.Stock : Cons.Zero;
-                        detail.Product.StorePrice = brp != null ? brp.StorePrice : Cons.Zero;
-                        detail.Product.DealerPrice = brp != null ? brp.DealerPrice : Cons.Zero;
-                        detail.Product.WholesalerPrice = brp != null ? brp.WholesalerPrice : Cons.Zero;
-                    }
-                }
-                else
-                {
-
-                    var b = User.Identity.GetBranchSession();
-
-                    sale = new Sale();
-                    sale.BranchId = branchId;
-                    sale.UpdUser = User.Identity.GetUserName();
-                    sale.UpdDate = DateTime.Now.ToLocal();
-                    sale.ClientId = clientId;
-                    sale.UserId = User.Identity.GetUserId();
-                    sale.Folio = User.Identity.GetFolio(Cons.Zero);
-
-                    db.Sales.Add(sale);
-                    db.SaveChanges();
-
-                    return Json(new { Result = "OK" });
-                }
-
-                var client = db.Clients.Find(clientId);
-
-                sale.ClientId = clientId;
-
-                foreach (var deteail in sale.SaleDetails)
-                {
-                    //ajusto el precio dependiendo de la configuración del cliente
-                    switch (client.Type)
-                    {
-                        case ClientType.Store:
-                            deteail.TaxedPrice = deteail.Product.StorePrice;
-                            break;
-                        case ClientType.Dealer:
-                            deteail.TaxedPrice = deteail.Product.DealerPrice;
-                            break;
-                        case ClientType.Wholesaler:
-                            deteail.TaxedPrice = deteail.Product.WholesalerPrice;
-                            break;
-                    }
-
-                    deteail.TaxedAmount = deteail.Quantity * deteail.TaxedPrice;
-
-                    //Calculo el precio sin IVA y el monto Total sin IVA
-                    deteail.Price = (deteail.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney();
-                    deteail.Amount = (deteail.Price * deteail.Quantity).RoundMoney();
-
-                    //calculo el monto de IVA en el detalle
-                    deteail.TaxAmount = ((deteail.TaxedPrice - deteail.Price) * deteail.Quantity).RoundMoney();
-                    db.Entry(deteail).State = EntityState.Modified;
-                }
-
-                //ajusto los precios de la venta
-                if (sale.SaleDetails != null || sale.SaleDetails.Count > Cons.Zero)
-                {
-                    sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-                    sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-                    sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-                    sale.FinalAmount = sale.TotalTaxedAmount;
-
-                }
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-
-                return Json(new { Result = "OK" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error Al asignar el cliente", Data = ex.Message });
-            }
-        }
-
+       
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
         public ActionResult SetNewPrice(int productId, int transactionId, double price, bool isCart)
@@ -362,14 +245,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 return Json(new { Result = "Error al cambiar el costo!", Message = "Ocurrio un error al actualizar el precio detail " + ex.Message });
             }
-        }
-
-
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public JsonResult CompleateSale(int transactionId, int sending)
-        {
-            return Compleate(transactionId, sending, true);
         }
 
 

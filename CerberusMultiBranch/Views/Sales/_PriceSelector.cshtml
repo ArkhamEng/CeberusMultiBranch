@@ -61,7 +61,7 @@
             $("#divPriceSelector").html("")
         });
 
-        
+
         $("#ModalPrice").modal({ backdrop: false });
     });
 
@@ -91,54 +91,64 @@
         });
     }
 
-    function SetNewPrice() {
+    function SetNewPrice()
+    {
         var value = parseFloat($("#txtPriceSelected").val());
         var sPrice = parseFloat($("#SPrice").val());
         var wPrice = parseFloat($("#WPrice").val());
 
-        if (value > sPrice || value < wPrice) {
+        if (value > sPrice || value < wPrice)
+        {
             $("#lblPsError").text("El precio de venta debe estar entre $" + wPrice + " y $" + sPrice + " pesos");
             return;
         }
         else
             $("lblPsError").text("");
 
-       
 
-        var param =
-            {
+        var param;
+
+        var url = '@Url.Action("SetNewPrice","Sales")';
+        var isCart = false;
+        if ($("#IsCart").val() == 'True')
+        {
+            isCart = true;
+            url = '@Url.Action("SetPrice","Sales")';
+            param = { productId: $("#PsProductId").val(), price: $("#txtPriceSelected").val(), };
+        }
+        else
+        {
+            param = {
                 productId: $("#PsProductId").val(),
                 transactionId: $("#PsTransactionId").val(),
                 price: $("#txtPriceSelected").val(),
                 IsCart: $("#IsCart").val()
             }
 
-        ExecuteAjax('@Url.Action("SetNewPrice","Sales")', param, function (response)
+        }
+           
+        ExecuteAjax(url, param, function (response)
         {
             if ($.isPlainObject(response))
                 ShowMessage(response.Result, response.Message, 'warning');
             else
             {
-                console.log(param);
-                console.log("Es vista parcial");
-                if (param.IsCart == 'true')
+                if (isCart)
                 {
-                    console.log("es carrito")
                     $("#divCartDetails").html(response);
                 }
                 else
                 {
-                    console.log("Es venta tradicional");
                     $("#divDetails").html(response);
                 }
-                    
             }
         });
 
         $("#ModalPrice").modal("hide");
     }
 
-    function SetCheck(cb, idPrice) {
+    function SetCheck(cb, idPrice)
+    {
         $("#txtPrice").val($(idPrice).val());
         $('.checkbox').not(cb).prop('checked', false);
     }
