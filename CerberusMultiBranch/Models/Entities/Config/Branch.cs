@@ -23,6 +23,16 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [MaxLength(4)]
         public string Code { get; set; }
 
+        [MaxLength(500)]
+        public string NoteMemberHtml { get; set; }
+
+        [MaxLength(500)]
+        public string NoteLocalHtml { get; set; }
+
+
+        [MaxLength(50)]
+        public string LogoPath { get; set; }
+
         public ICollection<Sale> Sales { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }

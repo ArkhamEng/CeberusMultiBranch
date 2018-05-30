@@ -1,0 +1,81 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.BudgetDetail>
+@using CerberusMultiBranch.Support
+
+<div id="ModalBudgetDetail" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content panel panel-primary">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">
+                    <span class="fa fa-dollar" style="float:left">
+                    </span>
+                    &nbsp;Monto total en cotización @Model.Sum(s=> s.TaxedAmount).ToMoney()
+                </h4>
+            </div>
+            <div class="modal-body panel-body" style="overflow-y:auto; max-height:500px">
+                <table id="tbCartDetails" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th class="text-center">@Html.DisplayName("Descripción")</th>
+                            <th class="text-center">@Html.DisplayName("Precio")</th>
+                            <th class="text-center">@Html.DisplayName("Cantidad")</th>
+                            <th class="text-center">@Html.DisplayName("Total")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var item in Model)
+                            {
+                            <tr>
+                                <td class="col-md-1" align="center">
+                                    <img src="@item.Image" class="img-responsive" style="max-height:50px" />
+                                </td>
+                                <td>
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Product.Code)
+                                    </label>
+                                    <br />
+                                    @Html.DisplayFor(modelItem => item.Product.Name)
+                                </td>
+
+                                @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                                    {
+                                    <td class="col-md-2 text-center">
+                                        <h5 id="txtPrice" class="text-info">
+                                            <u>
+                                                @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                            </u>
+                                        </h5>
+                                    </td>
+                                    }
+                                    else
+                                    {
+                                    <td class="col-md-2 text-center">
+                                        <h5 id="txtPrice" class="text-info">
+                                            @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                        </h5>
+                                    </td>
+                                    }
+                                <td class="col-md-1 text-info text-center">
+                                    <h5> @item.Quantity</h5>
+                                </td>
+                                <td class="text-right">
+                                    <h5 id="txtAmount" class="text-right">
+                                        @Html.DisplayFor(modelItem => item.TaxedAmount)
+                                    </h5>
+                                </td>
+                            </tr>
+                            }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#ModalBudgetDetail").modal("show");
+    });
+</script>

@@ -1,0 +1,107 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Budget>
+@using CerberusMultiBranch.Support
+
+<table id="tbBudgets" class="table table-striped small">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BranchId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BudgetId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClientId)
+            </th>
+          
+            <th>
+                @Html.DisplayNameFor(model => model.BudgetDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Branch.Name)
+                </td>
+                <td>
+                    @item.BudgetId.ToString(Cons.BudgetFormat)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.Name)
+                </td>
+               
+                <td>
+                    @item.BudgetDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @item.DueDate.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td class="pull-right">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-success" onclick="ViewBudgetDetail('@item.BudgetId')">
+                            <span class="fa fa-eye"></span>
+                            Ver
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="ApplyBudget('@item.BudgetId')">
+                            <span class="fa fa-cart-plus"></span>
+                            Aplicar
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbBudgets",10)
+    });
+
+    function ViewBudgetDetail(id)
+    {
+        ShowLoading();
+
+        ExecuteAjax('@Url.Action("GetBudgeDetail", "Sales")', { budgetId: id }, function (response)
+        {
+            HideLoading();
+
+            if (!$.isPlainObject(response))
+                $("#divBudgetDetails").html(response)
+            else
+                ShowMessage(response.Header, response.Message, 'warning', true);
+        });
+    }
+
+    function ApplyBudget(id)
+    {
+        ShowLoading();
+
+        ExecuteAjax('@Url.Action("ApplyBudget", "Sales")', { budgetId: id }, function (response)
+        {
+            HideLoading();
+
+            if (response.Result == 'OK')
+            {
+                CheckCart();
+                ShowMessage(response.Header, response.Message, 'success', true);
+            }
+            else
+                ShowMessage(response.Header, response.Message, 'warning', true);
+        });
+    }
+</script>

@@ -1,0 +1,139 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.PrintRefundViewModel
+@using CerberusMultiBranch.Support
+
+<script src="~/Scripts/printThis.js"></script>
+<div class="hidden">
+    <div id="divPrintRefund" style="width:816px;">
+        <table class="Note">
+            <tr>
+                <td width="300px">
+                    <table style="width:100%">
+                        <tr>
+                            <td>
+                                <img src="@Model.Branch.LogoPath" style="width:150px">
+                            </td>
+                        </tr>
+                        <tr><td colspan="2" style="height:10px"></td></tr>
+                        <tr>
+                            <td>
+                                @Html.Raw(Model.Branch.NoteMemberHtml)
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td width="292px" align="center">
+                    @Html.Raw(Model.Branch.NoteLocalHtml)
+                </td>
+                <td width="244px">
+                    <table style="width:100%" class="table-bordered">
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>COMPROBANTE DE DEVOLUCÍON</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <label>Folio de venta</label>
+                            </td>
+                            <td class="text-center">
+                                <label>Fecha</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                @Model.Folio
+                            </td>
+                            <td class="text-center">
+                                @Model.Date
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>Agente</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                @Model.User
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="height:20px"></td>
+            </tr>
+
+            <tr>
+                <td colspan="3">
+                    <table style="width:100%; height:300px; border:1px solid gray;">
+                        <tr>
+                            <td class="text-center" style="border-right:1px solid gray; width:80%" valign="middle">
+                                <h4>
+                                    MONTO DEVUELTO EN EFECTIVO
+                                </h4>
+                            </td>
+                            <td class="text-center" style="width:20%" valign="middle">
+                                <h4>
+                                    <label>
+                                        @Model.Cash
+                                    </label>
+                                </h4>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="text-center" style="border-right:1px solid gray; width:80%" valign="middle">
+                                <h4>
+                                    MONTO DEVUELTO EN VALE
+                                </h4>
+                            </td>
+                            <td class="text-center" style="width:20%" valign="middle">
+                                <h4>
+                                    <label>
+                                        @Model.Note
+                                    </label>
+                                </h4>
+                            </td>
+                        </tr>
+
+                        <tr style="height:30px; border-top:1px solid gray;">
+                            <td class="text-center" colspan="2">
+                                <h4>
+                                    IMPORTE CON LETRA <br />
+                                    @Model.Total
+                                </h4>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3" align="center" style="height:100px">
+                    ACEPTO DEVOLUCIÓN
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" align="center" style="height:50px">
+                    <label>
+                        @Model.Client
+                    </label>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+@if(Model.CreditNote != null)
+{
+    @Html.Partial("_PrintCreditNote", Model.CreditNote)
+}
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#divPrintRefund").printThis();
+    });
+</script>

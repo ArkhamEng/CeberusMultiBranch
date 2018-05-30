@@ -13,17 +13,23 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     [Table("Budget", Schema = "Operative")]
     public class Budget
     {
+        [Display(Name = "Folio")]
         public int BudgetId { get; set; }
 
+        [Display(Name = "Sucursal")]
         public int BranchId { get; set; }
 
+        [Display(Name = "Cliente")]
         public int ClientId { get; set; }
       
+        [Display(Name ="Fecha")]
         public DateTime BudgetDate { get; set; }
 
+        [Display(Name = "Expira")]
         public DateTime DueDate { get; set; }
 
         [MaxLength(30)]
+        [Display(Name = "Agente")]
         public string UserName { get; set; }
 
        

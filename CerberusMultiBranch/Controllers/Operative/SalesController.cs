@@ -25,6 +25,7 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
+        #region Sale History
         [Authorize(Roles = "Supervisor,Vendedor")]
         public ActionResult History()
         {
@@ -170,84 +171,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public ActionResult OpenChangePrice(int productId, int saleId, bool isCart)
-        {
-            var branchId = User.Identity.GetBranchId();
-
-            var transDet = db.SaleDetails.Include(td => td.Product).Include(td => td.Product.BranchProducts).
-                FirstOrDefault(td => td.ProductId == productId && td.SaleId == saleId);
-
-            var bp = transDet.Product.BranchProducts.FirstOrDefault(p => p.BranchId == branchId);
-
-            var model = new PriceSelectorViewModel
-            {
-                PsProductId = productId,
-                PsTransactionId = saleId,
-                CPrice = transDet.TaxedPrice,
-                SPrice = bp != null ? bp.StorePrice : Cons.Zero,
-                DPrice = bp != null ? bp.DealerPrice : Cons.Zero,
-                WPrice = bp != null ? bp.WholesalerPrice : Cons.Zero,
-                IsCart = isCart
-            };
-
-            return PartialView("_PriceSelector", model);
-        }
-
-       
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public ActionResult SetNewPrice(int productId, int transactionId, double price, bool isCart)
-        {
-            try
-            {
-                //obtengo el IVA configurado en base de datos
-                var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
-
-                //obtengo toda la venta, con sus detalles
-                var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SaleDetails.Select(sd => sd.Product.Images)).
-                           FirstOrDefault(s => s.SaleId == transactionId);
-
-                //dentro de la venta, busco  el detalle a modificar
-                var det = sale.SaleDetails.FirstOrDefault(sd => sd.ProductId == productId);
-
-                //el precio seteado Incluye IVA
-                det.TaxedPrice = price;
-                det.TaxedAmount = det.TaxedPrice * det.Quantity;
-
-                //Calculo el precio sin IVA y el monto Total sin IVA
-                det.Price = (det.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney();
-                det.Amount = (det.Price * det.Quantity).RoundMoney();
-
-                //calculo el monto de IVA en el detalle
-                det.TaxAmount = ((det.TaxedPrice - det.Price) * det.Quantity).RoundMoney();
-
-                //actualizo los totales de la venta
-                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-                sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-                sale.FinalAmount = sale.TotalTaxedAmount;
-
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-
-                var model = db.SaleDetails.Include(s => s.Product).
-                    Include(s => s.Product.Images).Where(s => s.SaleId == transactionId).ToList();
-
-                if (isCart)
-                    return PartialView("_CartDetails", model);
-                else
-                    return PartialView("_Details", sale.SaleDetails);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error al cambiar el costo!", Message = "Ocurrio un error al actualizar el precio detail " + ex.Message });
-            }
-        }
-
-
         private SaleViewModel GetVM(int id)
         {
             if (db == null)
@@ -267,50 +190,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             return model;
         }
 
-        #region Manual Sale
-
-        //this method is call when a new purchase is going to be registered
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public ActionResult BeginSale()
-        {
-            BeginSaleViewModel model = new BeginSaleViewModel();
-
-            return PartialView("_BeginSale", model);
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "Vendedor")]
-        public ActionResult Create(BeginSaleViewModel model)
-        {
-            try
-            {
-                var sale = new Sale
-                {
-                    BranchId = User.Identity.GetBranchId(),
-                    UserId = User.Identity.GetUserId(),
-                    TransactionDate = model.SaleDate,
-                    ComPer = User.Identity.GetSalePercentage(),
-                    Expiration = model.SaleDate.AddDays(model.Days),
-                    TransactionType = model.TransactionType,
-                    ClientId = model.ClientId,
-                    Status = TranStatus.InProcess,
-                    UpdUser = User.Identity.Name,
-                    UpdDate = DateTime.Now.ToLocal(),
-                    Folio = User.Identity.GetFolio(Cons.Zero)
-                };
-
-                db.Sales.Add(sale);
-                db.SaveChanges();
-
-                return Json(new { Result = "OK", Id = sale.SaleId });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error al registrar la venta", Message = "Ocurrio un error al crear la venta detalle " + ex.Message });
-            }
-        }
 
 
         [Authorize(Roles = "Supervisor,Vendedor")]
@@ -331,509 +210,135 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return View(model);
         }
+        #endregion
+
+
+        #region Budget History
+
+        [Authorize(Roles = "Supervisor,Vendedor")]
+        public ActionResult Budget()
+        {
+            var model = new BudgetViewModel();
+
+            model.Branches = db.Branches.ToSelectList();
+
+            return View(model);
+        }
+
+
 
         [HttpPost]
-        public ActionResult SearchProducts(string filter, int? systemId, TransactionType type)
+        [Authorize(Roles = "Supervisor,Vendedor")]
+        public ActionResult SearchBudgets(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
-            string[] arr = new List<string>().ToArray();
-            string code = string.Empty;
+            int? fol = (folio != null && folio != string.Empty)? Convert.ToInt32(folio):new Nullable<int>();
 
-            var branchId = User.Identity.GetBranchId();
+            var model = (from p in db.Budgets.Include(p => p.Client).Include(p => p.Branch)
+                         where
+                         (branchId == null || p.BranchId == branchId)
+                         && (beginDate == null || p.BudgetDate >= beginDate)
+                         && (endDate == null || p.BudgetDate <= endDate)
+                         && (folio == null || folio == string.Empty || p.BudgetId == fol)
+                         && (client == null || client == string.Empty || p.Client.Name.Contains(client))
 
-            if (filter != null && filter != string.Empty)
-            {
-                arr = filter.Trim().Split(' ');
+                         select p).OrderByDescending(p => p.BudgetDate).ToList();
 
-                if (arr.Length == Cons.One)
-                    code = arr.FirstOrDefault();
-            }
-
-            List<Product> products = new List<Product>();
-
-            products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
-                        where (p.Code == code) && (p.ProductType == ProductType.Single)
-                        select p).Take((int)Cons.OneHundred).ToList();
-
-            if (products.Count == Cons.Zero)
-            {
-                products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts)
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
-                            && (systemId == null || ep.PartSystemId == systemId)
-                            && (ep.IsActive)
-                            select ep).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
-                            s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take((int)Cons.OneHundred).ToList();
-            }
-
-           
-
-            foreach (var prod in products)
-            {
-                var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                prod.Quantity = bp != null ? bp.Stock : Cons.Zero;
-                prod.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
-                prod.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
-                prod.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
-                prod.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
-                prod.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
-                prod.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
-                prod.CanSell = (prod.IsActive && ((type == TransactionType.Preventa) || (prod.Quantity > Cons.Zero)));
-            }
-
-
-            return PartialView("_ProductResult", products);
+            return PartialView("_BudgetList",model);
         }
 
         [HttpPost]
-        public ActionResult BeginAdd(int productId)
+        [Authorize(Roles = "Supervisor,Vendedor")]
+        public ActionResult ApplyBudget(int budgetId)
         {
-            var branchId = User.Identity.GetBranchId();
-
-
-            var branchProd = db.BranchProducts.Include(bp => bp.Product).Include(bp => bp.Product.Images).
-                FirstOrDefault(bp => bp.ProductId == productId && bp.BranchId == branchId);
-
-
-            branchProd.Product.StorePrice = branchProd.StorePrice;
-            branchProd.Product.DealerPrice = branchProd.DealerPrice;
-            branchProd.Product.WholesalerPrice = branchProd.WholesalerPrice;
-            branchProd.Product.Quantity = branchProd.Stock;
-
-            return PartialView("_AddProduct", branchProd.Product);
-        }
-
-        [HttpPost]
-        public ActionResult CompleateAdd(int productId, int saleId, double quantity)
-        {
-            var userId   = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchId();
-
-            //obtengo el IVA configurado en base de datos
-            var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
-
-            var bp = db.BranchProducts.Include(brp => brp.Product).
-                        FirstOrDefault(brp => brp.BranchId == branchId && brp.ProductId == productId);
-
-            var existance = bp != null ? bp.Stock : Cons.Zero;
-
-            //consulto si el usuario tiene una venta activa
-            var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.Client).
-                Include(s => s.SaleDetails.Select(sd => sd.Product.Images)).FirstOrDefault(s => s.SaleId == saleId);
-
-            var taxedPrice = 0.0;
-
-            //checo si el producto ya esta en la venta
-            var detail = sale.SaleDetails.
-                FirstOrDefault(td => td.ProductId == productId && td.SaleId == sale.SaleId);
-
-            //si lo esta, sumo la cantidad
-            if (detail != null)
+            try
             {
-                //utilizo el precio seteado, ya que pudo haber sido modificado manualmente
-                detail.Quantity += quantity;
+                var branchId = User.Identity.GetBranchId();
+                var userId = User.Identity.GetUserId();
 
-                detail.Amount = (detail.Price * detail.Quantity).RoundMoney();
-                detail.TaxedAmount = (detail.TaxedPrice * detail.Quantity).RoundMoney();
-                detail.TaxAmount = (detail.TaxedAmount - detail.Amount).RoundMoney();
+                var cartItems = GetCart(userId, branchId);
 
-                //si no es una preventa
-                //verifico el stock y valido si es posible agregar mas producto a la venta
-                if (sale.TransactionType != TransactionType.Preventa && existance < quantity)
+                if (cartItems.Count > Cons.Zero)
                 {
-                    var j = new
-                    {
-                        Result  = "Cantidad insuficiente",
-                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, " +
-                        "para vender producto sin existencia, es necesario registrar una preventa desde el modulo de ventas"
-                    };
-
-                    return Json(j);
-                }
-
-                db.Entry(detail).State = EntityState.Modified;
-            }
-            else
-            {
-                //si no es una preventa
-                //verifico el stock y valido si es posible agregar mas producto a la venta
-                if (sale.TransactionType != TransactionType.Preventa && existance < quantity)
-                {
-                    var j = new
-                    {
-                        Result = "Cantidad insuficiente",
-                        Message = "Estas intentando vender mas productos de los disponibles, consulta existencias, para vender producto sin existencia" +
-                        " es necesario registrar una preventa desde el modulo de ventas"
-                    };
-
-                    return Json(j);
-                }
-
-                //obtengo el precio por el tipo de cliente (Precio con IVA)
-                switch (sale.Client.Type)
-                {
-                    case ClientType.Store:
-                        taxedPrice = bp.StorePrice;
-                        break;
-                    case ClientType.Dealer:
-                        taxedPrice = bp.DealerPrice;
-                        break;
-                    case ClientType.Wholesaler:
-                        taxedPrice = bp.WholesalerPrice;
-                        break;
-                }
-
-                //Calculo el precio sin IVA y el monto del IVA
-                var price = (taxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney();
-                var taxAmount = (taxedPrice - price).RoundMoney();
-
-
-                detail = new SaleDetail
-                {
-                    ProductId = productId,
-                    SaleId = sale.SaleId,
-                    Quantity = quantity,
-                    Price = price, //Precio Sin IVA
-                    TaxedPrice = taxedPrice, //Precio Con IVA
-                    Amount = (price * quantity).RoundMoney(), //El total sin IVA
-                    TaxedAmount = taxedPrice * quantity, //El total con IVA
-                    TaxPercentage = iva
-                };
-                detail.TaxAmount = (detail.TaxedAmount - detail.Amount).RoundMoney(); //El monto total de IVA
-
-                sale.SaleDetails.Add(detail);
-            }
-
-            sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-            sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-            sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-            sale.FinalAmount = sale.TotalTaxedAmount;
-
-
-            if (sale.TransactionType == TransactionType.Credito)
-            {
-                if (sale.TotalTaxedAmount > (sale.Client.CreditLimit - sale.Client.UsedAmount))
                     return Json(new
                     {
                         Result = "Error",
-                        Header = "Limite de crédito excedido",
-                        Message = "Estas intentando vender una cantidad mayor al crédito disponible del cliente! Crédito restante: " +
-                        (sale.Client.CreditLimit - sale.Client.UsedAmount).ToMoney()
+                        Header = "Carrito lleno",
+                        Message = "Antes de aplicar una cotización es necesario vaciar el carrito"
                     });
-            }
-
-            try
-            {
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error", Header = "Error desconocido", Message = ex.Message });
-            }
-
-            var model = sale.SaleDetails;//db.SaleDetails.Where(sd => sd.SaleId == saleId).Include(sd => sd.Product.Images).ToList();
-            return PartialView("_Details", model);
-        }
-
-        [HttpPost]
-        public ActionResult RemoveDetail(int saleId, int productId)
-        {
-            //obtnego la venta con imagenes
-            var sale = db.Sales.Include(s => s.SaleDetails).
-                Include(s => s.SaleDetails.Select(sd => sd.Product.Images)).FirstOrDefault(s => s.SaleId == saleId);
-
-            var detail = sale.SaleDetails.FirstOrDefault(d => d.ProductId == productId);
-
-            if (detail != null)
-            {
-                sale.SaleDetails.Remove(detail);
-
-                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
-                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
-                sale.TotalTaxAmount = (sale.TotalTaxedAmount - sale.TotalAmount).RoundMoney();
-                sale.FinalAmount = sale.TotalTaxedAmount;
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-            }
-
-            var model = db.SaleDetails.Include(d => d.Product.Images).
-              Where(d => d.SaleId == saleId).ToList();
-
-            return PartialView("_Details", model);
-        }
-
-        [HttpPost]
-        public ActionResult CompleateManual(int saleId)
-        {
-            return Compleate(saleId, Cons.Zero, true);
-        }
-
-
-        private JsonResult Compleate(int saleId, int sending, bool addFolio)
-        {
-            try
-            {
-                var sale = db.Sales.Include(s => s.SaleDetails).
-                           FirstOrDefault(s => s.SaleId == saleId);
-
-                sale.Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
-
-                if (addFolio)
-                {
-                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
-                                                  s.BranchId == sale.BranchId && s.Year == sale.Year).
-                                                  OrderByDescending(s => s.Sequential).FirstOrDefault();
-
-                    var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
-                    sale.Sequential = (seq + Cons.One);
-
-                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
                 }
-
-
-                int sortOrder = Cons.One;
-
-                foreach (var detail in sale.SaleDetails)
+                else
                 {
-                    //busco stock en sucursal incluyo la categoría de producto para el calculo de comision
-                    var pb = db.BranchProducts.Include(brp => brp.Product).
-                        Include(brp => brp.Product.Category).
-                        Include(brp => brp.Product.PackageDetails).
-                        FirstOrDefault(brp => brp.BranchId == sale.BranchId && brp.ProductId == detail.ProductId);
 
-                    // si no hay producto suficiente la operación concluye
-                    if (sale.TransactionType != TransactionType.Preventa && (pb == null || pb.Stock < detail.Quantity))
-                        throw new Exception("El producto con código " + pb.Product.Code +
-                            " no tiene existencia suficiente en la sucursal, para realizar la venta de este articulo debe generar una preventa");
+                    var budget = db.Budgets.Include(b => b.Branch).Include(b=> b.BudgetDetails).
+                                 FirstOrDefault(b => b.BudgetId == budgetId);
 
-                    //guardo dato del detalle incluyendo la comision de la venta del determinado producto
 
-                    detail.SortOrder = sortOrder;
-
-                    if (pb.Product.Category.Commission > Cons.Zero)
-                        detail.Commission = Math.Round(detail.TaxedAmount * (pb.Product.Category.Commission / Cons.OneHundred), Cons.Two);
-
-                    db.Entry(detail).State = EntityState.Modified;
-
-                    //actualizo stock de sucursal
-                    pb.LastStock = pb.Stock;
-                    pb.Stock -= detail.Quantity;
-
-                    db.Entry(pb).State = EntityState.Modified;
-
-                    //si el producto que se esta vendiendo es un paquete
-                    //agrego todos los productos q lo complementan a la venta con precio 0
-                    if (pb.Product.ProductType == ProductType.Package)
-                    {
-                        foreach (var pckDet in pb.Product.PackageDetails)
-                        {
-                            sortOrder++;
-                            var tDeatil = new SaleDetail
-                            {
-                                SaleId = detail.SaleId,
-                                Quantity = pckDet.Quantity,
-                                Price = Cons.Zero,
-                                Commission = Cons.Zero,
-                                ProductId = pckDet.DetailtId,
-                                SortOrder = sortOrder,
-                                ParentId = pckDet.PackageId,
-                            };
-                            //busco el stock del detalle en sucursal y resto el producto de los reservados
-                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
-                            detBP.LastStock = (detBP.Stock + detBP.Reserved);
-                            detBP.Reserved -= pckDet.Quantity;
-
-                            db.SaleDetails.Add(tDeatil);
-
-                            db.Entry(detBP).State = EntityState.Modified;
-                        }
-                    }
-
-                    //agrego el moviento al inventario
-                    StockMovement sm = new StockMovement
-                    {
-                        BranchId = pb.BranchId,
-                        ProductId = pb.ProductId,
-                        MovementType = MovementType.Exit,
-                        Comment = "SALIDA AUTOMATICA, VENTA FOLIO:" + sale.Folio,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now.ToLocal(),
-                        Quantity = detail.Quantity
-                    };
-
-                    db.StockMovements.Add(sm);
-
-                    sortOrder++;
-                }
-
-                //agrego el folio
-                sale.Folio = sale.Folio;
-
-                //verifico que la venta no exceda el crédito del cliente, siempre y cuando no sea contado
-                if (sale.TransactionType == TransactionType.Credito)
-                {
-                    if ((sale.TotalAmount + sale.Client.UsedAmount) > sale.Client.CreditLimit)
+                    if (budget.DueDate < DateTime.Now.ToLocal())
                     {
                         return Json(new
                         {
                             Result = "Error",
-                            Header = "Limite de crédito excedito",
-                            Message = "El total de la venta excede el disponible de credito"
+                            Header = "Cotización invalida",
+                            Message = "Esta cotización ya exipiro!"
                         });
                     }
-                    else
+
+                    foreach (var detail in budget.BudgetDetails)
                     {
-                        sale.Client.UsedAmount += sale.TotalTaxedAmount.RoundMoney();
-                        db.Entry(sale.Client).Property(c => c.UsedAmount).IsModified = true;
-                    }
-                }
+                        ShoppingCart item = new ShoppingCart
+                        {
+                            Amount    = detail.Amount,
+                            Price     = detail.Price,
+                            ProductId = detail.ProductId,
+                            BranchId  = branchId,
+                            ClientId  = budget.ClientId,
+                            BudgetId  = detail.BudgetId,
+                            InsDate   = DateTime.Now.ToLocal(),
+                            Quantity  = detail.Quantity,
+                            TaxAmount = detail.TaxAmount,
+                            TaxedAmount = detail.TaxedAmount,
+                            TaxedPrice = detail.TaxedPrice,
+                            TaxPercentage = detail.TaxPercentage,
+                            UserId = userId
+                        };
 
-                //coloco el porcentaje de comision del empleado
-                sale.ComPer = User.Identity.GetSalePercentage();
-
-                //si tiene comision por venta, coloco la cantidad de esta
-                if (sale.ComPer > Cons.Zero)
-                {
-                    var comTot = sale.SaleDetails.Sum(td => td.Commission);
-                    if (comTot > Cons.Zero)
-                        sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Two);
-                }
-
-                //ajuto la hora y fecha de venta a la actual y concluyo
-                if (sale.TransactionType == TransactionType.Contado)
-                {
-                    sale.TransactionDate = DateTime.Now.ToLocal();
-                    sale.Expiration = DateTime.Now.ToLocal();
-                    sale.SendingType = sending;
-                }
-                else if (sale.TransactionDate == DateTime.Now.TodayLocal())
-                    sale.TransactionDate = DateTime.Now.ToLocal();
-
-                sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Reserved;
-
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now.ToLocal();
-
-
-                db.Entry(sale).State = EntityState.Modified;
-                db.SaveChanges();
-
-
-                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + sale.Folio });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    Result = "Ocurrio un error",
-                    Message = "No se pudo concretar la venta debido a un error inesperado " + ex.Message
-                });
-            }
-        }
-
-        #endregion
-
-
-
-        #region Discontinued Methods
-
-        [HttpPost]
-        public ActionResult AddPayment(SalePayment payment)
-        {
-            try
-            {
-                payment.UpdDate = DateTime.Now.ToLocal();
-                payment.UpdUser = User.Identity.Name;
-
-                var sale = db.Sales.Include(p => p.SalePayments).
-                    FirstOrDefault(p => p.SaleId == payment.SaleId);
-
-                var total = sale.SalePayments.Sum(p => p.Amount);
-
-                total += payment.Amount;
-                if (sale.TotalAmount >= total)
-                {
-                    db.SalePayments.Add(payment);
-
-                    if (total == sale.TotalAmount)
-                    {
-                        sale.Status = TranStatus.Compleated;
-                        sale.UpdDate = DateTime.Now.ToLocal();
-                        sale.UpdUser = User.Identity.Name;
-
-                        db.Entry(sale).State = EntityState.Modified;
+                        db.ShoppingCarts.Add(item);
                     }
 
-                    sale.Client.UsedAmount -= total;
                     db.SaveChanges();
-                    sale.SalePayments.OrderByDescending(p => p.PaymentDate);
 
-
-                    return PartialView("_SalePayments", sale.SalePayments);
-                }
-                else
-                {
                     return Json(new
                     {
-                        Result = "warning",
-                        Header = "Error al registrar el pago!!",
-                        Message = "La cantidad que intenta registrar supera lo permitido para esta cuenta"
+                        Result = "OK",
+                        Header = "Cotizacón aplicada",
+                        Message = "Los productos en la cotización fueron aplicados al carrito"
                     });
                 }
+
             }
             catch (Exception ex)
             {
                 return Json(new
                 {
                     Result = "Error",
-                    Header = "Error al registrar el pago!!",
-                    Message = "Ocurrio un error inesperado detalle " + ex.Message
+                    Header = "Error al aplicar la cotización",
+                    Message = "Ocurrio un error al cargar la cotizacion " + ex.Message
                 });
             }
         }
-
-
 
         [HttpPost]
-        public ActionResult RemovePayment(int id)
+        [Authorize(Roles = "Supervisor,Vendedor")]
+        public ActionResult GetBudgeDetail(int budgetId)
         {
-            try
-            {
-                var payment = db.SalePayments.Find(id);
+            var model = db.BudgetDetails.Include(d => d.Product.Images).
+                        Where(d => d.BudgetId == budgetId).ToList();
 
-                var saleId = payment.SaleId;
-
-                if (payment.Sale.Status == TranStatus.Compleated)
-                {
-                    payment.Sale.Status = TranStatus.Reserved;
-                    payment.Sale.UpdDate = DateTime.Now.ToLocal();
-                    payment.Sale.UpdUser = User.Identity.Name;
-
-                    db.Entry(payment.Sale).State = EntityState.Modified;
-                }
-
-                var client = db.Clients.Find(payment.Sale.ClientId);
-                client.UsedAmount += payment.Amount;
-
-                db.Entry(client).State = EntityState.Modified;
-                db.SalePayments.Remove(payment);
-                db.SaveChanges();
-
-                var model = db.SalePayments.Where(p => p.SaleId == saleId).ToList();
-                return PartialView("_SalePayments", model);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    Result = "Error",
-                    Header = "Error al remover el pago!!",
-                    Message = "Ocurrio un error inesperado al eliminar el pago... detalle: " + ex.Message
-                });
-            }
+            return PartialView("_BudgetDetail",model);
         }
+
+
+
         #endregion
 
         protected override void Dispose(bool disposing)

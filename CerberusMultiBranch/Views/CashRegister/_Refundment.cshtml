@@ -35,7 +35,14 @@
                             <label>En vale</label>
                             @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control input-lg", type = "number" } })
                         </div>
-                        <div class="form-group col-md-8 center-block">
+
+                        <div class="form-group col-md-7 center-block">
+                            <label>Recibido por</label>
+                            @Html.EditorFor(model => model.ReceivedBy, new { htmlAttributes = new { @class = "form-control text-uppercase", autocomplete = "off" } })
+                            @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-5 center-block">
                             <label>Numero IFE (solo para vale)</label>
                             @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
                             @Html.ValidationMessageFor(model=> model.Ident, "", new { @class = "text-danger" })
@@ -77,8 +84,6 @@
                 $("#RefundCredit").val(0);
                 $("#RefundCash").val($("#TotalRefund").val());
             }
-
-
 
             EvalCredit();
         });
@@ -138,27 +143,23 @@
                 RefundSaleId: $("#RefundSaleId").val(),
                 RefundCash: $("#RefundCash").val(),
                 RefundCredit: $("#RefundCredit").val(),
-                Ident: $("#Ident").val()
+                Ident: $("#Ident").val(),
+                ReceivedBy: $("#ReceivedBy").val()
             }
 
             ExecuteAjax('@Url.Action("CreateRefund")', { refund: ref }, function (response)
             {
               
-
-                if (response.Result != "OK")
+                HideLoading();
+                if ($.isPlainObject(response))
                 {
                     HideLoading();
                     ShowMessage("Error al generar el rembolso", response.Message, 'warning');
-                }
-                    
+                } 
                 else
                 {
-                    if (response.HasNote)
-                        GetCreditNote(ref.RefundSaleId);
-
-                    HideLoading();
                     CheckRefunding();
-                    ShowMessage("Rembolso generado", response.Message, 'success');
+                    $("#divPrinter").html(response);
                 }
             });
         });

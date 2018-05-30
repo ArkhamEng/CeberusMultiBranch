@@ -322,6 +322,10 @@
     <Compile Include="Migrations\201805272359152_Budget.Designer.cs">
       <DependentUpon>201805272359152_Budget.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201805281900528_BranchHtml.cs" />
+    <Compile Include="Migrations\201805281900528_BranchHtml.Designer.cs">
+      <DependentUpon>201805281900528_BranchHtml.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -389,7 +393,9 @@
     <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -886,7 +892,6 @@
     <Content Include="Views\Shared\_ConfirmPopOver.cshtml" />
     <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
     <Content Include="Views\CashRegister\_PrintTicket.cshtml" />
-    <Content Include="Views\Sales\_BeginSale.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
     <Content Include="Views\Sales\_Details.cshtml" />
     <Content Include="Views\Sales\_SalePayments.cshtml" />
@@ -905,6 +910,10 @@
     <Content Include="Views\Products\StockMovement.cshtml" />
     <Content Include="Views\Products\_MovementList.cshtml" />
     <Content Include="Views\Shared\_PrintBudget.cshtml" />
+    <Content Include="Views\CashRegister\_PrintRefund.cshtml" />
+    <Content Include="Views\Sales\Budget.cshtml" />
+    <Content Include="Views\Sales\_BudgetDetail.cshtml" />
+    <Content Include="Views\Sales\_BudgetList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1010,6 +1019,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805272359152_Budget.resx">
       <DependentUpon>201805272359152_Budget.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201805281900528_BranchHtml.resx">
+      <DependentUpon>201805281900528_BranchHtml.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

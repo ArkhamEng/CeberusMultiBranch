@@ -1,0 +1,89 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.BudgetViewModel
+
+@{
+    ViewBag.Title = "Cotizaciones";
+    ViewBag.Class = "fa fa-dollar";
+}
+
+<hr />
+<div class="panel panel-danger">
+    <div class="panel-body">
+        <div class="col-md-11">
+            <div class="input-group ">
+                @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:25% !important" })
+                @Html.TextBox("Folio", "", htmlAttributes: new
+           {
+               @class = "form-control",
+               placeholder = "Folio",
+               style = "width:25% !important"
+           })
+
+                @Html.TextBox("Client", "", htmlAttributes: new
+           {
+               @class = "form-control",
+               placeholder = "Nombre del cliente",
+               style = "width:50% !important"
+           })
+
+                <span class="input-group-btn">
+                    <button class="btn btn-primary" type="button" title="Buscar cotizaciones, usando los filtros" onclick="SearchBudgets()">
+                        <span class="glyphicon glyphicon-search"></span>
+                        <u>B</u>uscar
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <div class="col-md-8" style="margin-top:10px">
+            <div class="input-group">
+                <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
+
+                <span class="input-group-addon"><a>Fecha final</a></span>
+                @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+                <span class="input-group-btn">
+                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear" title="Limpiar la busqueda y los filtros">
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        <u>L</u>impiar
+                    </button>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div id="divBudgets" class="panel-body">
+        @Html.Partial("_BudgetList", Model.Budgets)
+    </div>
+</div>
+
+
+<div id="divBudgetDetails"></div>
+
+
+<script>
+    function SearchBudgets()
+    {
+        ShowLoading();
+
+        var param =
+            {
+                branchId: $("#BranchId").val(),
+                beginDate: $("#BeginDate").val(), 
+                endDate: $("#EndDate").val(), 
+                folio: $("#Folio").val(),
+                client: $("#Client").val()
+            }
+
+        ExecuteAjax('@Url.Action("SearchBudgets", "Sales")', param, function (response)
+        {
+            HideLoading();
+
+            if (!$.isPlainObject(response))
+                $("#divBudgets").html(response)
+            else
+                ShowMessage(response.Header, response.Message, 'warning', true);
+        });
+    }
+</script>

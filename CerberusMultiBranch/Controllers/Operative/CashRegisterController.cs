@@ -173,8 +173,11 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var cr = GetCashRegister();
 
-            var list = db.CashDetails.Include(w => w.Cause).Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
-            ViewBag.Causes = db.WithdrawalCauses.ToSelectList();
+            var list = db.CashDetails.Include(w => w.Cause).
+                        Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
+
+            ViewBag.Causes = db.WithdrawalCauses.Where(c=> c.WithdrawalCauseId != Cons.RefundId).ToSelectList();
+
             return PartialView("_Withdrawals", list);
         }
 
@@ -322,6 +325,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
+                var printRefund = new PrintRefundViewModel();
+
                 var branchId = User.Identity.GetBranchId();
 
                 var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
@@ -329,6 +334,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (sale == null)
                     return Json(new { Result = "Error", Message = "Esta venta ya no esta disponible para reembolso" });
+
+                printRefund.Branch = sale.Branch;
+                printRefund.Client = refund.ReceivedBy;
+                printRefund.Cash = refund.RefundCash.ToMoney();
+                printRefund.Note = refund.RefundCredit.ToMoney();
+                printRefund.Total = (refund.RefundCash + refund.RefundCredit).toText();
+                printRefund.Folio = sale.Folio;
+                printRefund.Comment = sale.Comment;
+                printRefund.Date = DateTime.Now.ToLocal().ToString("dd/MM/yyyy hh:mm");
 
 
                 var cr = GetCashRegister();
@@ -343,20 +357,17 @@ namespace CerberusMultiBranch.Controllers.Operative
                         CashRegisterId = cr.CashRegisterId,
                         Amount = refund.RefundCash,
                         Type = PaymentMethod.Efectivo,
-                        Comment = "DEVOLUCIÓN POR CANCELACIÓN " + sale.Folio,
+                        Comment = string.Format("DEVOLUCIÓN POR CANCELACIÓN {0}! RECIBIDA POR {1}", sale.Folio,refund.ReceivedBy.ToUpper()),
                         InsDate = DateTime.Now.ToLocal(),
                         User = User.Identity.Name,
                         DetailType = Cons.Zero,
                         SaleFolio = sale.Folio,
-                        WithdrawalCauseId = 3
+                        WithdrawalCauseId = Cons.RefundId
                     };
 
-                 
                     db.CashDetails.Add(cd);
                 }
-
-                bool hasNote = false;
-
+                SaleCreditNote nc = null;
 
                 if (refund.RefundCredit > Cons.Zero)
                 {
@@ -365,7 +376,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     var seq = last == null ? Cons.One : (last.Sequential + Cons.One);
 
-                    var nc = new SaleCreditNote
+                    nc = new SaleCreditNote
                     {
                         SaleCreditNoteId = sale.SaleId,
                         Amount = refund.RefundCredit,
@@ -379,21 +390,25 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
                     };
 
-                  
                     message += "Cantidad en Vale " + refund.RefundCredit.ToMoney() + " Folio del vale " + nc.Folio;
-                    hasNote = true;
+                    printRefund.HasNote = true;
+
                     db.SaleCreditNotes.Add(nc);
                 }
 
                 //solo cambio el status sin registrar, el usuario que lo cambia 
                 //para que quede registrado, el usuario que realiza la cancelación
                 sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Canceled;
+                sale.Status     = TranStatus.Canceled;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = message, HasNote = hasNote });
+              printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
+              FirstOrDefault(n => n.SaleCreditNoteId == sale.SaleId);
+
+
+                return PartialView("_PrintRefund",printRefund);
             }
             catch (Exception ex)
             {
@@ -703,8 +718,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.SalePayments.Add(p);
                 }
 
-                
-
                 #endregion
 
 
@@ -741,10 +754,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     if (pay.PaymentMethod != PaymentMethod.Vale)
                     {
-                        var dt = new CashDetail();
+                        var dt            = new CashDetail();
                         dt.CashRegisterId = cr.CashRegisterId;
-                        dt.Amount = pay.Amount;
-                        dt.InsDate = DateTime.Now.ToLocal();
+                        dt.Amount         = pay.Amount;
+                        dt.InsDate        = DateTime.Now.ToLocal();
                         dt.User = User.Identity.Name;
                         dt.Type = pay.PaymentMethod;
                         dt.SaleFolio = sale.Folio;

@@ -11,6 +11,10 @@ namespace CerberusMultiBranch.Support
         public const int One = 1;
         public const int Two = 2;
 
+        public const int RefundId = 3;
+
+        public const string BudgetFormat = "000000000";
+
         public const int Decimals = 4; //cantidad de decimales en redondeo de dinero
 
         public const double DeIVA = 1.16;

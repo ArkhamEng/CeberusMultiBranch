@@ -4,23 +4,16 @@
 @if (Model.HasCreditNote)
 {
     @Html.Partial("_PrintCreditNote", Model.SaleCreditNote)
-    <script>
-        PrintCreditNote();
-    </script>
 }
 
 @if (Model.PrintType == Cons.One)
 {
     @Html.Partial("_PrintTicket", Model.Sale)
-    <script>
-        PrintNote();
-    </script>
+   
 }
 
 else
 {
    @Html.Partial("_PrintNote", Model.Sale)
-    <script>
-        PrintNote();
-    </script>
+  
 }

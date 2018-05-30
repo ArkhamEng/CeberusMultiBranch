@@ -10,10 +10,10 @@
                      onmouseover="SetPointer(this)" title="Cambiar foto de perfil"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture", "Manage")'" />
             </div>
-          <div class="btn btn-file btn-xs btn-danger col-xs-12"  onmouseover="SetPointer(this)" 
-             onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword", "Manage")'">              
-             @User.Identity.GetUserName()
-          </div>
+            <div class="btn btn-file btn-xs btn-danger col-xs-12" onmouseover="SetPointer(this)"
+                 onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword", "Manage")'">
+                @User.Identity.GetUserName()
+            </div>
         </div>
     </div>
     <ul class="list-unstyled components">
@@ -22,17 +22,9 @@
                 &nbsp;Productos<span class="fa fa-dropbox" style="float:left" />
             </a>
         </li>
-        @if (User.IsInRole("Supervisor"))
+        @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
         {
-            <li><a href="/Products/StockMovement" onclick="ShowLoading()">&nbsp;Movimientos<span class="fa fa-cubes" style="float:left" /></a></li>
-        }
-        @if (User.IsInRole("Vendedor"))
-        {
-            <li>
-                <a href="/Sales/History" onclick="ShowLoading()">
-                    &nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" />
-                </a>
-            </li>
+            <li><a href="/CashRegister/" onclick="ShowLoading()">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
         }
         <li>
             <a href="#catalogsSm" data-toggle="collapse" aria-expanded="false">&nbsp;Catálogos<span class="glyphicon glyphicon-book" style="float:left" /></a>
@@ -54,14 +46,43 @@
             </ul>
         </li>
 
-
-
         @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
-        {
+            {
             <li><a href="/Sales/DailyBill" onclick="ShowLoading()">&nbsp;Factura del día<span class="fa fa-file-excel-o" style="float:left" /></a></li>
-            <li><a href="/CashRegister/" onclick="ShowLoading()">&nbsp;Caja<span class="fa fa-laptop" style="float:left" /></a></li>
-            <li><a href="/CashRegister/History" onclick="ShowLoading()">&nbsp;Historial Caja<span class="fa fa-hourglass-o" style="float:left" /></a></li>
         }
+
+        @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
+        {
+            <li>
+                <a href="#HistorySubMenu" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Historicos<span class="fa fa-history" style="float:left" />
+                </a>
+
+                <ul class="collapse list-unstyled" id="HistorySubMenu">
+                    <li>
+                        <a href="/Sales/History" onclick="ShowLoading()">
+                            &nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Sales/Budget" onclick="ShowLoading()">
+                            &nbsp;Cotizaciones<span class="fa fa-dollar" style="float:left" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Products/StockMovement" onclick="ShowLoading()">
+                            &nbsp;Movimientos<span class="fa fa-cubes" style="float:left" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/CashRegister/History" onclick="ShowLoading()">
+                            &nbsp;Historial Caja<span class="fa fa-hourglass-o" style="float:left" />
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        }
+
 
 
 
@@ -80,7 +101,7 @@
                 </a>
                 <ul class="collapse list-unstyled" id="configurationSubMenu">
                     <li><a href="/Configuration/" onclick="ShowLoading()">&nbsp;Conf. de aplicación<span class="fa fa-cog" style="float:left" /></a></li>
-                   
+
                     <li><a href="/Account/UserList" onclick="ShowLoading()">&nbsp;Cuentas de usuario<span class="fa fa-users" style="float:left" /></a></li>
                 </ul>
             </li>

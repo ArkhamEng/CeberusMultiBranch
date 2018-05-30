@@ -105,13 +105,14 @@
         $("#ModalNotes").modal('hide');
     }
 
-    function PrintDocument(saleId, printType) {
+    function PrintDocument(saleId, printType)
+    {
         $("#ModalNotes").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
-            ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response) {
+            ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response)
+            {
                 HideLoading();
                 $("#divNotes").html(response);
-                PrintNote();
             });
         });
         $("#ModalNotes").modal('hide');

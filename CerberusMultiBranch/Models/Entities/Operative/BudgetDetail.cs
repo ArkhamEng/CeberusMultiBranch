@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -51,9 +52,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime InsDate { get; set; }
 
-    
+        public string Image
+        {
+            get
+            {
+                if (this.Product != null && this.Product.Images.Count > Cons.Zero)
+                    return this.Product.Images.FirstOrDefault().Path;
+                else
+                    return "/Content/Images/sinimagen.jpg";
+            }
+        }
+
+
         #region Navitation Properties
-   
+
         public virtual Product Product { get; set; }
 
         public virtual Budget Budget { get; set; }

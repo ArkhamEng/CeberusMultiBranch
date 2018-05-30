@@ -7,18 +7,53 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
-            <h4 id="hClientName" class="text-primary text-uppercase">
-                @Model.First().Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                RFC:&nbsp;&nbsp;@Model.First().Client.FTR
-            </h4>
+            <div class="row">
+                <div class="col-md-5">
+                    CLIENTE<br />
+                    <label class="text-primary">@Model.First().Client.Name.ToUpper()</label>
+                </div>
+                <div class="col-md-3 text-center">
+                    RFC<br />
+                    @{
+                        if (Model.First().Client.FTR == string.Empty || Model.First().Client.FTR == null)
+                        {
+                            <label class="text-danger">NO CAPTURADO</label>
+                        }
+                        else
+                        {
+                            <label class="text-primary">@Model.First().Client.FTR.ToUpper()</label>
+                        }
+                    }
+
+                </div>
+                <div class="col-md-4 pull-right text-right">
+                    CRÉDITO DISPONIBLE <br />
+                    @{
+                        if (Model.First().Client.CreditAvailable <= Cons.Zero || Model.First().Client.CreditDays <= Cons.Zero)
+                        {
+                            <label class="text-danger">SIN CRÉDITO</label>
+                        }
+                        else
+                        {
+                            <label class="text-primary">@Model.First().Client.CreditAvailable.ToMoney()</label>
+                        }
+                    }
+                </div>
+            </div>
+
+            @*<h4 id="hClientName" class="text-primary text-uppercase">
+                    @Model.First().Client.Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    RFC:&nbsp;&nbsp;@Model.First().Client.FTR
+                    <a class="pull-right">Crédito disponible: @Model.First().Client.CreditAvailable.ToMoney()</a>
+                </h4>*@
 
         </div>
     </div>
-  
+
     <div class="panel panel-default">
         <div class="panel-body" style="overflow-y:auto; max-height:300px">
-            <table id="tbCartDetails" class="table table-striped">
-                <thead>
+            <table id="tbCartDetails" class="table table-striped panel panel-primary">
+                <thead class="panel-heading">
                     <tr>
                         <th></th>
                         <th class="text-center">@Html.DisplayName("Descripción")</th>
@@ -33,100 +68,94 @@
 
                     @foreach (var item in Model)
                 {
-                        <tr class="@item.RowClass">
-                            <td class="col-md-1" align="center">
-                                <img src="@item.Image" class="img-responsive" style="max-height:50px" />
-                            </td>
-                            <td>
-                                <label>
-                                    @Html.DisplayFor(modelItem => item.Product.Code)
-                                </label>
-                                <br />
-                                @Html.DisplayFor(modelItem => item.Product.Name)
-                            </td>
+                    <tr class="@item.RowClass">
+                        <td class="col-md-1" align="center">
+                            <img src="@item.Image" class="img-responsive" style="max-height:50px" />
+                        </td>
+                        <td>
+                            <label>
+                                @Html.DisplayFor(modelItem => item.Product.Code)
+                            </label>
+                            <br />
+                            @Html.DisplayFor(modelItem => item.Product.Name)
+                        </td>
 
-                            @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
-                                {
-                                <td class="col-md-2 text-center">
-                                    <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId)">
-                                        <u>
-                                            @Html.DisplayFor(modelItem => item.TaxedPrice)
-                                        </u>
-                                    </h5>
-                                </td>
-                                }
-                                else
-                                {
-                                <td class="col-md-2 text-center">
-                                    <h5 id="txtPrice" class="text-info">
+                        @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                            {
+                            <td class="col-md-2 text-center">
+                                <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId)">
+                                    <u>
                                         @Html.DisplayFor(modelItem => item.TaxedPrice)
-                                    </h5>
-                                </td>
-                                }
-                            <td class="col-md-1 text-info text-center">
-                                <h5> @item.Quantity</h5>
-                            </td>
-                            <td class="text-right">
-                                <h5 id="txtAmount" class="text-right">
-                                    @Html.DisplayFor(modelItem => item.TaxedAmount)
+                                    </u>
                                 </h5>
                             </td>
-                            <td>
-                                <div class="btn-group">
-                                    <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId')"
-                                            title="Quitar del carritos">
-                                        <span class="glyphicon glyphicon-trash"></span>
-                                    </button>
-                                </div>
+                            }
+                            else
+                            {
+                            <td class="col-md-2 text-center">
+                                <h5 id="txtPrice" class="text-info">
+                                    @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                </h5>
                             </td>
-                        </tr>
-                        }
+                            }
+                        <td class="col-md-1 text-info text-center">
+                            <h5> @item.Quantity</h5>
+                        </td>
+                        <td class="text-right">
+                            <h5 id="txtAmount" class="text-right">
+                                @Html.DisplayFor(modelItem => item.TaxedAmount)
+                            </h5>
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId')"
+                                        title="Quitar del carritos">
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    }
                 </tbody>
             </table>
         </div>
     </div>
 
 
-}
-else
-{
-    <div class="panel-body">
-        <div class="col-md-offset-2 col-md-8">
-            <p>
-                <h3>
-                    Aun no has agregado ningun producto al carrito, Agregaga productos
-                    desde el Catálogo selecciona la opcion PRODUCTOS en el menú lateral
-                </h3>
-            </p>
-        </div>
-    </div>
-}
+                        }
+                        else
+                        {
+                            <div class="panel-body">
+                                <div class="col-md-offset-2 col-md-8">
+                                    <p>
+                                        <h3>
+                                            Aun no has agregado ningun producto al carrito, Agregaga productos
+                                            desde el Catálogo selecciona la opcion PRODUCTOS en el menú lateral
+                                        </h3>
+                                    </p>
+                                </div>
+                            </div>
+                        }
 
 <script>
     $(document).ready(function () {
         $("#ModalCartHeader").text("Total en el carrito " + '@Model.Sum(d => d.TaxedAmount).ToMoney()');
 
         if (parseFloat('@Model.Count') > 0) {
-            $("#btnCompleate").attr("disabled", false);
-            $("#btnBudget").attr("disabled", false);
-            $("#btnShowClients").attr("disabled", false);
+            $(".btnCart").attr("disabled", false);
         }
         else {
-            $("#btnShowClients").attr("disabled", true);
-            $("#btnCompleate").attr("disabled", true);
-            $("#btnBudget").attr("disabled", true);
+            $(".btnCart").attr("disabled", true);
+
         }
     });
 
-    function ChangePrice(prodId)
-    {
+    function ChangePrice(prodId) {
         var param = { productId: prodId }
 
-        ExecuteAjax('@Url.Action("BeginChangePrice", "Sales")', param, function (response)
-        {
+        ExecuteAjax('@Url.Action("BeginChangePrice", "Sales")', param, function (response) {
 
-            if ($.isPlainObject(response))
-            {
+            if ($.isPlainObject(response)) {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
             else
