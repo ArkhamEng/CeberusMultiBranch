@@ -80,7 +80,7 @@
                             @Html.DisplayFor(modelItem => item.TaxedAmount)
                         </td>
                     </tr>
-                                }
+               }
             </tbody>
         </table>
     </div>
@@ -154,34 +154,39 @@
                     @Html.DisplayFor(modelItem => item.Amount)
                 </td>
             </tr>
-                        }
+       }
     </tbody>
 </table>
 
 <iframe id="txtArea1" style="display:none"></iframe>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         Paginate("#tbSoldItemsShown", 20);
 
         $("#hAmount").text("Total " + '@Model.Sum(d=> d.Amount).ToMoney()')
 
         $("#hItems").text("Articulos " + '@Model.Sum(d=> d.Quantity)')
     });
-    function ExportToExcel() {
+
+    function ExportToExcel()
+    {
         $("#tbSoldItems").table2excel({
             name: "Articulos",
             filename: "VentaDia-" + $("#Date").val() //do not include extension
         });
     }
 
-    function ExportToExcel1() {
+    function ExportToExcel1()
+    {
         var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
         var textRange; var j = 0;
         tab = document.getElementById('tbSoldItems'); // id of table
         txtArea1 = document.getElementById('txtArea1');
 
-        for (j = 0 ; j < tab.rows.length ; j++) {
+        for (j = 0 ; j < tab.rows.length ; j++)
+        {
             tab_text = tab_text + tab.rows[j].innerHTML + "</tr>";
             //tab_text=tab_text+"</tr>";
         }

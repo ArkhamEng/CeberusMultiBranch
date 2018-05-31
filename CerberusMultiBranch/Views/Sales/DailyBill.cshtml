@@ -58,7 +58,6 @@
 </div>
 <div id="divDetails">
     @Html.Partial("_SoldItemsDetails",Model.SoldItems)
-
 </div>
 
 
@@ -80,13 +79,10 @@
                 Date: $("#Date").val(),
                 Folio: $("#Folio").val() };
 
-        console.log(model);
-
         ExecuteAjax('@Url.Action("SearchSoldItems", "Sales")', { model: model }, function (response)
         {
             $("#divDetails").html(response);
             HideLoading();
         });
     }
-
 </script>

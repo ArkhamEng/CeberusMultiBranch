@@ -498,20 +498,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }
                 }
                 //preventa, solo permite productos sin existencias
-                if (type == TransactionType.Preventa)
-                {
-                    var item = cartItems.FirstOrDefault(i => i.InStock > Cons.Zero);
+                //if (type == TransactionType.Preventa)
+                //{
+                //    var item = cartItems.FirstOrDefault(i => i.InStock > Cons.Zero);
 
-                    if (item != null)
-                    {
-                        return Json(new
-                        {
-                            Result = "Producto con existencia",
-                            Message = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
-                            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper())
-                        });
-                    }
-                }
+                //    if (item != null)
+                //    {
+                //        return Json(new
+                //        {
+                //            Result = "Producto con existencia",
+                //            Message = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
+                //            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper())
+                //        });
+                //    }
+                //}
 
                 #endregion
 
@@ -697,6 +697,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var cartItems = GetCart(User.Identity.GetUserId(), User.Identity.GetBranchId());
 
                 Budget budget = new Budget();
+                budget.ClientId = cartItems.First().ClientId;
 
                 cartItems.ForEach(item =>
                 {

@@ -896,6 +896,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 product.UpdDate = DateTime.Now.ToLocal();
                 product.UpdUser = User.Identity.GetUserName();
 
+                if (product.WholesalerPercentage < 10)
+                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de mayorista no puede ser menor al 10%" });
+                if (product.DealerPercentage < 15)
+                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de distribuidor no puede ser menor al 15%" });
+                if (product.StorePercentage < 20)
+                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de mostrador no puede ser menor al 20%" });
+
+
                 //si el producto es nuevo
                 if (product.ProductId == Cons.Zero)
                 {
@@ -1270,6 +1278,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 try
                 {
+                   
                     var branchId = User.Identity.GetBranchId();
 
                     product.UpdDate = DateTime.Now.ToLocal();
@@ -1399,7 +1408,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
 
                     ViewBag.Header = "Error al guardar";
-                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detail:" + ex.Message + " inner exception" + ex.InnerException.Message;
+                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detalle:" + ex.Message + " inner exception" + ex.InnerException.Message;
                     var model = new ProductViewModel(product);
 
                     model.Images = new List<ProductImage>();

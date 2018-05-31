@@ -114,17 +114,19 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [NotMapped]
         [Display(Name = "% Mostrador")]
         [Required]
+        [Range(20, 100, ErrorMessage = "El porcentaje de mostrador debe ser mayor o igual a 20%")]
         public int StorePercentage { get; set; }
 
         [NotMapped]
         [Display(Name = "% Distribuidor")]
         [Required]
+        [Range(15, 100, ErrorMessage = "El porcentaje de distribuidor debe ser mayor o igual a 15%")]
         public int DealerPercentage { get; set; }
 
         [NotMapped]
         [Display(Name = "% Mayorista")]
         [Required]
-        [Range(15, 100, ErrorMessage = "El porcentaje de mayoreo debe ser mayor o igual a 15%")]
+        [Range(10, 100, ErrorMessage = "El porcentaje de mayoreo debe ser mayor o igual a 10%")]
         public int WholesalerPercentage { get; set; }
 
         [NotMapped]
