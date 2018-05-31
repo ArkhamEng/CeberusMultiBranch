@@ -113,7 +113,10 @@
                 CheckCart();
 
                 if (!$.isPlainObject(response))
+                {
+                    $(".prodRow").removeClass("info");
                     $("#divPrintBudget").html(response);
+                }
                 else
                     ShowMessage(response.Result, response.Message, 'warning');
             });

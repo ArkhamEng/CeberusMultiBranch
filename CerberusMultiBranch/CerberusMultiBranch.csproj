@@ -914,6 +914,7 @@
     <Content Include="Views\Sales\Budget.cshtml" />
     <Content Include="Views\Sales\_BudgetDetail.cshtml" />
     <Content Include="Views\Sales\_BudgetList.cshtml" />
+    <Content Include="Views\Sales\_ChangeQuantity.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

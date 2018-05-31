@@ -52,7 +52,7 @@
 
     <div class="panel panel-default">
         <div class="panel-body" style="overflow-y:auto; max-height:300px">
-            <table id="tbCartDetails" class="table table-striped panel panel-primary">
+            <table id="tbCartDetails" class="table table-bordered panel panel-primary">
                 <thead class="panel-heading">
                     <tr>
                         <th></th>
@@ -61,60 +61,69 @@
                         <th class="text-center">@Html.DisplayName("Cantidad")</th>
                         @*<th class="text-center">@Html.DisplayName("Disponibles")</th>*@
                         <th class="text-center">@Html.DisplayName("Total")</th>
-                        <th></th>
+                        <th>
+                            <button class="btn btn-danger btn-sm" type="button" onclick="EmptyCart()"
+                                    title="vaciar carrito">
+                                <span class="fa fa-trash"></span>
+                            </button>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
 
                     @foreach (var item in Model)
                 {
-                    <tr class="@item.RowClass">
-                        <td class="col-md-1" align="center">
-                            <img src="@item.Image" class="img-responsive" style="max-height:50px" />
-                        </td>
-                        <td>
-                            <label>
-                                @Html.DisplayFor(modelItem => item.Product.Code)
-                            </label>
-                            <br />
-                            @Html.DisplayFor(modelItem => item.Product.Name)
-                        </td>
-
-                        @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
-                            {
-                            <td class="col-md-2 text-center">
-                                <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId)">
-                                    <u>
-                                        @Html.DisplayFor(modelItem => item.TaxedPrice)
-                                    </u>
-                                </h5>
+                        <tr class="@item.RowClass">
+                            <td class="col-md-1" align="center">
+                                <img src="@item.Image" class="img-responsive" style="max-height:50px" />
                             </td>
+                            <td>
+                                <label>
+                                    @Html.DisplayFor(modelItem => item.Product.Code)
+                                </label>
+                                <br />
+                                @Html.DisplayFor(modelItem => item.Product.Name)
+                            </td>
+
+                            @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                            {
+                                <td class="col-md-2 text-center">
+                                    <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId)">
+                                        <u>
+                                            @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                        </u>
+                                    </h5>
+                                </td>
                             }
                             else
                             {
-                            <td class="col-md-2 text-center">
-                                <h5 id="txtPrice" class="text-info">
-                                    @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                <td class="col-md-2 text-center">
+                                    <h5 id="txtPrice" class="text-info">
+                                        @Html.DisplayFor(modelItem => item.TaxedPrice)
+                                    </h5>
+                                </td>
+                            }
+                            <td class="col-md-1 text-info text-center">
+                                <h5 id="txtQuantity" class="text-info" onmouseover="SetPointer(this)" onclick="ChangeQuantity(@item.ProductId)">
+                                    <u>
+                                        @Html.DisplayFor(modelItem => item.Quantity)
+                                    </u>
                                 </h5>
                             </td>
-                            }
-                        <td class="col-md-1 text-info text-center">
-                            <h5> @item.Quantity</h5>
-                        </td>
-                        <td class="text-right">
-                            <h5 id="txtAmount" class="text-right">
-                                @Html.DisplayFor(modelItem => item.TaxedAmount)
-                            </h5>
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                <button class="btn btn-danger btn-xs" type="button" onclick="RemoveFromCart('@item.ProductId')"
-                                        title="Quitar del carritos">
-                                    <span class="glyphicon glyphicon-trash"></span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                            <td class="text-right">
+                                <h5 id="txtAmount" class="text-right">
+                                    @Html.DisplayFor(modelItem => item.TaxedAmount)
+                                </h5>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-danger btn-sm" type="button" onclick="RemoveFromCart('@item.ProductId')"
+                                            title="Quitar del carrito">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                     }
                 </tbody>
             </table>
@@ -163,6 +172,19 @@
         });
     }
 
+    function ChangeQuantity(prodId)
+    {
+        ExecuteAjax('@Url.Action("OpenQuantity", "Sales")', { productId: prodId }, function (response)
+        {
+            if ($.isPlainObject(response))
+            {
+                ShowMessage(response.Result, response.Message, 'warning');
+            }
+            else
+                $("#divPriceSelector").html(response);
+        });
+    }
+
     function QuantityChanged(input) {
         quantity = parseFloat($(input).val());
 
@@ -188,15 +210,40 @@
     }
 
 
-    function RemoveFromCart(productId) {
+    function RemoveFromCart(productId)
+    {
         var data = { productId: productId }
 
-        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response) {
-            if ($.isPlainObject(response)) {
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response)
+        {
+            if ($.isPlainObject(response))
+            {
                 $("#ModalCart").modal("hide");
                 ShowMessage(response.Result, response.Message, "warning");
             }
-            else {
+            else
+            {
+                var rowId = '#prodRow' + productId;
+                $(rowId).removeClass('info');
+
+                CheckCart();
+                $("#divCartDetails").html(response);
+            }
+        });
+    }
+
+    function EmptyCart()
+    {
+        ExecuteAjax('@Url.Action("EmptyCart", "Sales")', {}, function (response)
+        {
+            if ($.isPlainObject(response))
+            {
+                $("#ModalCart").modal("hide");
+                ShowMessage(response.Result, response.Message, "warning");
+            }
+            else
+            {
+                $(".prodRow").removeClass("info");
                 CheckCart();
                 $("#divCartDetails").html(response);
             }

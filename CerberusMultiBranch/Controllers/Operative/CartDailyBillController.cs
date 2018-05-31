@@ -378,6 +378,73 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [Authorize(Roles = "Vendedor")]
+        public ActionResult SetQuantity(int productId, double quantity)
+        {
+            var userId = User.Identity.GetUserId();
+            var branchId = User.Identity.GetBranchId();
+
+            var model = GetCart(userId, branchId);
+
+            var i = model.FirstOrDefault(s => s.ProductId == productId);
+
+            i.Quantity    = quantity;
+            i.Amount      = (quantity * i.Amount).RoundMoney();
+            i.TaxedAmount = (quantity * i.TaxedPrice).RoundMoney();
+            i.TaxAmount   = (i.TaxedAmount - i.Amount).RoundMoney();
+
+            db.Entry(i).Property(p => p.Quantity).IsModified = true;
+            db.Entry(i).Property(p => p.Amount).IsModified = true;
+            db.Entry(i).Property(p => p.TaxedAmount).IsModified = true;
+            db.Entry(i).Property(p => p.TaxAmount).IsModified = true;
+
+            db.SaveChanges();
+
+            return PartialView("_CartDetails", model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult OpenQuantity(int productId)
+        {
+            var userId = User.Identity.GetUserId();
+            var branchId = User.Identity.GetBranchId();
+            var prod = db.ShoppingCarts.Include(s=> s.Product).FirstOrDefault(s => s.ProductId == productId && 
+                                        s.UserId == userId && s.BranchId == branchId);
+
+            QuantityChangeViewModel model = new QuantityChangeViewModel
+            { cqProductId = productId, cqCode = prod.Product.Code, cqQuantity = prod.Quantity , cqUnit = prod.Product.Unit};
+
+            return PartialView("_ChangeQuantity", model);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Vendedor")]
+        public ActionResult EmptyCart()
+        {
+            try
+            {
+                var cartItems = GetCart(User.Identity.GetUserId(), User.Identity.GetBranchId());
+
+                Budget budget = new Budget();
+
+                db.ShoppingCarts.RemoveRange(cartItems);
+                db.SaveChanges();
+
+                return PartialView("_CartDetails", new List<ShoppingCart>());
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al imprimir el presupuesto",
+                    Message = "Ocurrion un error mientras se generaba el presupuesto " + ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Vendedor")]
         public JsonResult CompleateSale(int sending, TransactionType type)
         {
             try

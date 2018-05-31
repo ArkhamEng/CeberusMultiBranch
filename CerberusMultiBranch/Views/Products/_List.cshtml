@@ -3,7 +3,7 @@
 
 @{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
 
-<table id="tbProducts" class="table table-hover text-uppercase">
+<table id="tbProducts" class="table  text-uppercase">
     <thead class="panel-heading">
         <tr hidden="hidden">
             @for (var j = 0; j < i; j++)
@@ -16,13 +16,15 @@
 
         @foreach (var item in Model)
         {
+           
             <tr>
                 @foreach (var prod in item)
                 {
-                    string c = string.Format("col-md-{0}  col-xs-4 col-sm-4 {1}", (12 / i),prod.IsIncart?"info":"");
-                    string toolTip = prod.IsIncart ? "Este producto ya esta en el carrito" : "";
+                    string c = string.Format("prodRow col-md-{0}  col-xs-4 col-sm-4 {1}", (12 / i),prod.IsIncart?"info":"");
 
-                    <td class='@c' title="@toolTip">
+                    var rowId = "prodRow" + prod.ProductId.ToString();
+
+                    <td id='@rowId' class="@c">
 
                         @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", 2); }
 
@@ -32,7 +34,7 @@
                                 <img src="@prod.Images.First().Path" class="img-responsive img-rounded" style="max-height:150px" />
                             }
                             else
-                            {
+                            { 
                                 <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
                             }
                         </div>

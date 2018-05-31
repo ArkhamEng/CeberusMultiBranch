@@ -21,4 +21,15 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public bool IsCart { get; set; }
     }
+
+    public class QuantityChangeViewModel
+    {
+        public int cqProductId { get; set; }
+
+        public double cqQuantity { get; set; }
+
+        public string cqCode { get; set; }
+
+        public  string cqUnit { get; set; }
+    }
 }

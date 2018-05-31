@@ -88,7 +88,7 @@
                         @if (User.IsInRole("Vendedor"))
                         {
                             <div class="col-md-8 row input-group">
-                                @Html.TextBox("txtQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
+                                @Html.TextBox("txtDetailQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
                                 <span class="input-group-btn">
                                     @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
                                     {
@@ -260,7 +260,7 @@
 <script>
     $(document).ready(function ()
     {
-        $("#txtQuantity").val(1);
+        $("#txtDetailQuantity").val(1);
 
         Paginate("#tbCompatibilities", 3)
 
@@ -289,7 +289,7 @@
         var data =
         {
             productId: productId,
-            quantity: $("#txtQuantity").val()
+            quantity: $("#txtDetailQuantity").val()
         }
 
         ExecuteAjax('@Url.Action("AddToCart", "Sales")', data, function (data)
@@ -297,7 +297,11 @@
             $("#ModalProductDetail").off("hidden.bs.modal").on("hidden.bs.modal", function ()
             {
                 if (data.Result == "OK")
+                {
+                    var rowId = '#prodRow' + productId;
+                    $(rowId).addClass('info');
                     CheckCart();
+                }
                 else
                     ShowMessage(data.Result, data.Message, "warning");
             });

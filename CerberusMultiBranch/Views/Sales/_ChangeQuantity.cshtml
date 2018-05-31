@@ -1,0 +1,81 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.QuantityChangeViewModel
+
+<div id="ModalQuantity" class="modal" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content panel panel-info panel-group">
+            <div class="modal-header panel-heading">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <div class="modal-title">
+                    <span class="fa fa-cubes" style="float:left">
+                    </span>
+                    &nbsp;
+                    Cambio de cantidad
+                </div>
+            </div>
+            <div class="modal-body panel-body">
+
+                @Html.HiddenFor(m => Model.cqProductId)
+                <h4 class="text-center">
+                    Código:
+                    <label>@Model.cqCode</label>
+                </h4>
+
+                <div class="col-md-12">
+                    <div class="input-group col-md-10 col-md-offset-1">
+                        @Html.EditorFor(model => model.cqQuantity, new { htmlAttributes = new { @class = "form-control input-lg", type = "number",   max="999", min = "0" } })
+                        <span class="input-group-btn">
+                            <button id="btnChangeQuantity" class="btn btn-primary btn-lg" type="button" onclick="SetQuantity()">
+                                <span class="glyphicon glyphicon-ok"></span>
+                                Aplicar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <br /><br />
+                <h4 class="text-center">
+                    Unidad:
+                    <label>@Model.cqUnit</label>
+                </h4>
+                <label class="text-danger" id="lblCqError"></label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#ModalQuantity").on("hide.bs.modal", function ()
+        {
+            $("#divPriceSelector").html("");
+        });
+
+        $("#ModalQuantity").modal({ backdrop: false });
+    });
+
+
+    function SetQuantity()
+    {
+        var quantity = parseFloat($("#cqQuantity").val());
+        var productId = $("#cqProductId").val();
+
+        console.log(quantity);
+
+        if (quantity <= 0)
+        {
+            $("#lblCqError").text("La cantidad no puede ser menor o igual a cero");
+            return;
+        }
+            
+
+        ExecuteAjax('@Url.Action("SetQuantity", "Sales")', { productId: productId, quantity: quantity }, function (response)
+        {
+            if ($.isPlainObject(response))
+                ShowMessage(response.Result, response.Message, 'warning');
+            else
+                $("#divCartDetails").html(response);
+
+            $("#ModalQuantity").modal("hide");
+        });
+    }
+</script>

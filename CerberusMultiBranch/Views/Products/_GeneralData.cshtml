@@ -178,7 +178,7 @@
 
         var allowLock = false;
 
-        if ('@User.IsInRole("Administrador")' == 'True' && '@User.IsInRole("Supervisor")' == 'True')
+        if ('@User.IsInRole("Administrador")' == 'True' || '@User.IsInRole("Supervisor")' == 'True')
             allowLock = true;
         
         if(parseInt('@Model.ProductId') > 0)

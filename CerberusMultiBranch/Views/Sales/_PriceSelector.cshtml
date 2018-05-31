@@ -8,12 +8,12 @@
         <div class="modal-content panel panel-info panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">
+                <div class="modal-title">
                     <span class="fa fa-money" style="float:left">
                     </span>
                     &nbsp;
                     Ajusta el precio
-                </h4>
+                </div>
             </div>
             <div class="modal-body panel-body">
 
@@ -25,16 +25,19 @@
                     <hr />
                 </div>
                 <div class="row">
-                    <input id="txtPriceSelected" class="col-xs-6 col-xs-offset-3 input-lg" type="number"
-                           max="@Model.SPrice" min="@Model.WPrice" />
+                    <div class="input-group col-md-10 col-md-offset-1">
+                        <input id="txtPriceSelected" class="form-control input-lg" type="number"
+                               max="@Model.SPrice" min="@Model.WPrice" />
+                        <span class="input-group-btn">
+                            <button id="txtChangePrice" class="btn btn-primary btn-lg" type="button" onclick="SetNewPrice()">
+                                <span class="glyphicon glyphicon-ok"></span>
+                                Aplicar
+                            </button>
+                        </span>
+                    </div>
+
                 </div>
                 <label class="text-danger" id="lblPsError"></label>
-            </div>
-            <div class="modal-footer">
-                <button id="txtChangePrice" class="btn btn-primary" type="button" onclick="SetNewPrice()">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Aplicar
-                </button>
             </div>
         </div>
     </div>
@@ -56,8 +59,7 @@
             SetValues();
         });
 
-        $("#ModalPrice").on("hide.bs.modal", function ()
-        {
+        $("#ModalPrice").on("hide.bs.modal", function () {
             $("#divPriceSelector").html("")
         });
 
@@ -110,45 +112,26 @@
 
         var url = '@Url.Action("SetNewPrice","Sales")';
         var isCart = false;
-        if ($("#IsCart").val() == 'True')
-        {
-            isCart = true;
-            url = '@Url.Action("SetPrice","Sales")';
-            param = { productId: $("#PsProductId").val(), price: $("#txtPriceSelected").val(), };
-        }
-        else
-        {
-            param = {
-                productId: $("#PsProductId").val(),
-                transactionId: $("#PsTransactionId").val(),
-                price: $("#txtPriceSelected").val(),
-                IsCart: $("#IsCart").val()
-            }
 
-        }
-           
+
+        isCart = true;
+        url = '@Url.Action("SetPrice","Sales")';
+        param = { productId: $("#PsProductId").val(), price: $("#txtPriceSelected").val(), };
+
         ExecuteAjax(url, param, function (response)
         {
             if ($.isPlainObject(response))
                 ShowMessage(response.Result, response.Message, 'warning');
             else
-            {
-                if (isCart)
-                {
-                    $("#divCartDetails").html(response);
-                }
-                else
-                {
-                    $("#divDetails").html(response);
-                }
-            }
+                $("#divCartDetails").html(response);
+
+            $("#ModalPrice").modal("hide");
         });
 
-        $("#ModalPrice").modal("hide");
+
     }
 
-    function SetCheck(cb, idPrice)
-    {
+    function SetCheck(cb, idPrice) {
         $("#txtPrice").val($(idPrice).val());
         $('.checkbox').not(cb).prop('checked', false);
     }
