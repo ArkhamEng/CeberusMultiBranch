@@ -37,13 +37,29 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         [HttpPost]
         [Authorize(Roles = "Supervisor")]
-        public ActionResult BeginTransference(int branchId, int productId)
+        public ActionResult BeginTransference(int destBranchId, int productId)
         {
+            var branchId = User.Identity.GetBranchId();
+
             var branchP = db.BranchProducts.Include(bp => bp.Product).
                 Include(bp => bp.Product.Images).Include(bp => bp.Branch).
                  FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
 
-            return PartialView("_Transference", branchP);
+            var destBranch = db.Branches.Find(destBranchId);
+
+            TransferViewModel transfer = new TransferViewModel
+            {
+                TransBranch = destBranch.Name,
+                TransBranchId = destBranch.BranchId,
+                TransCode = branchP.Product.Code,
+                TransImage = branchP.Product.Images.Count > Cons.Zero ? branchP.Product.Images.First().Path : "/Content/Images/sinimagen.jpg",
+                TransName = branchP.Product.Name,
+                TransProductId = productId,
+                TransStock = branchP.Stock,
+                TransUnit = branchP.Product.Unit
+            };
+
+            return PartialView("_Transference", transfer);
         }
 
 
@@ -221,14 +237,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         [HttpPost]
         [Authorize(Roles = "Supervisor")]
-        public JsonResult Transfer(int originBranchId, int productId, double quantity)
+        public JsonResult Transfer(int detsBranchId, int productId, double quantity)
         {
             var branchId = User.Identity.GetBranchId();
 
-            var bp = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
-                FirstOrDefault(br => br.BranchId == originBranchId && br.ProductId == productId);
+            var orBP = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
+                FirstOrDefault(br => br.BranchId == branchId && br.ProductId == productId);
 
-            if (bp.Stock < quantity)
+            if (orBP.Stock < quantity)
             {
                 return Json(new
                 {
@@ -237,40 +253,40 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 });
             }
 
-
             //Obtengo la relacion producto sucursal destino
-            var myBp = db.BranchProducts.Find(branchId, productId);
+            var destBp = db.BranchProducts.Include(b=> b.Branch).
+                        FirstOrDefault(b=> b.BranchId == detsBranchId && b.ProductId == productId);
 
             try
             {
                 //si no existe la creo de lo contrario la actualizo
-                if (myBp == null)
+                if (destBp == null)
                 {
-                    myBp = new BranchProduct
+                    return Json(new
                     {
-                        Stock = quantity,
-                        LastStock = Cons.Zero,
-                        BranchId = branchId,
-                        ProductId = productId,
-                        UpdDate = DateTime.Now
-                    };
-
-                    db.BranchProducts.Add(myBp);
+                        Result = "Imposible realizar la transferencia",
+                        Message = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
+                    });
                 }
                 else
                 {
-                    myBp.LastStock = myBp.Stock;
-                    myBp.Stock += quantity;
-                    myBp.UpdDate = DateTime.Now;
-                    db.Entry(myBp).State = EntityState.Modified;
+                    destBp.LastStock = destBp.Stock;
+                    destBp.Stock += quantity;
+                    destBp.UpdDate = DateTime.Now;
+                    destBp.UpdUser = User.Identity.Name;
                 }
+
+                db.Entry(destBp).Property(p => p.LastStock).IsModified = true;
+                db.Entry(destBp).Property(p => p.Stock).IsModified = true;
+                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
 
                 //agrego los movimientos de Stock en la sucursal destino
                 StockMovement smD = new StockMovement
                 {
-                    BranchId = myBp.BranchId,
-                    ProductId = myBp.ProductId,
-                    Comment = "Ingreso por transferencia",
+                    BranchId = destBp.BranchId,
+                    ProductId = destBp.ProductId,
+                    Comment = "Transferencia de sucursal "+orBP.Branch.Name,
                     MovementType = MovementType.Entry,
                     MovementDate = DateTime.Now,
                     User = User.Identity.Name,
@@ -282,29 +298,35 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 //agrego los movimientos de Stock en la sucursal origen
                 StockMovement smO = new StockMovement
                 {
-                    BranchId = bp.BranchId,
-                    ProductId = bp.ProductId,
-                    Comment = "Salida por transferencia",
+                    BranchId     = orBP.BranchId,
+                    ProductId    = orBP.ProductId,
+                    Comment      = "Transferencia a sucursal "+destBp.Branch.Name,
                     MovementType = MovementType.Exit,
                     MovementDate = DateTime.Now,
-                    User = User.Identity.Name,
-                    Quantity = quantity
+                    User         = User.Identity.Name,
+                    Quantity     = quantity
                 };
 
                 db.StockMovements.Add(smO);
 
-
                 //actualizo stock en sucursal de origen
-                bp.LastStock = bp.Stock;
-                bp.Stock -= quantity;
-                db.Entry(bp).State = EntityState.Modified;
+                orBP.LastStock  = orBP.Stock;
+                orBP.Stock     -= quantity;
+                orBP.UpdUser    = User.Identity.Name;
+                orBP.UpdDate    = DateTime.Now.ToLocal();
+
+                db.Entry(orBP).Property(p => p.LastStock).IsModified = true;
+                db.Entry(orBP).Property(p => p.Stock).IsModified = true;
+                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
+
                 db.SaveChanges();
 
                 return Json(new
                 {
                     Result = "OK",
                     Message = "Transferencia exitosa!",
-                    Code = bp.Product.Code
+                    Code = orBP.Product.Code
                 });
             }
             catch (Exception ex)
@@ -419,7 +441,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
                         s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
             var userId = User.Identity.GetUserId();
-            var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId ==userId ).Select(s=> s.ProductId).ToArray();
+            var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId == userId).Select(s => s.ProductId).ToArray();
 
             foreach (var prod in products)
             {
@@ -1278,7 +1300,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 try
                 {
-                   
+
                     var branchId = User.Identity.GetBranchId();
 
                     product.UpdDate = DateTime.Now.ToLocal();

@@ -514,6 +514,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (details.First().Sale.TransactionType == TransactionType.Preventa)
                 model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
 
+            if (details.First().Sale.TransactionType == TransactionType.Apartado)
+                model.CashAmount = (details.Sum(d => d.TaxedAmount)* 0.1).RoundMoney();
+
             return PartialView("_RegistPayment", model);
         }
 
@@ -645,8 +648,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
                         return Json(new { Result = "Error", Message = "El monto del pago es menor que el  monto de la deuda, por favor verifique" });
 
-                    if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
-                        return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 10% de anticipo" });
+                    if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
+                        return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 20% de anticipo" });
+
+                    if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
+                        return Json(new { Result = "Error", Message = "Los apartados requieren un anticipo de 10% por lo menos" });
                 }
 
                 #endregion

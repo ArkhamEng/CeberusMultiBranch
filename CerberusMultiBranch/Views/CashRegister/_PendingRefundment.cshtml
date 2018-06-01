@@ -12,7 +12,7 @@
         </h4>
     </div>
     <div class="panel-body">
-        <table id="tbPendingPayment" class="table table-striped small">
+        <table id="tbPendingPayment" class="table table-bordered small">
             <thead>
                 <tr>
                     <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
@@ -29,11 +29,9 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td>@Html.DisplayFor(m => item.Folio)</td>
-                        <td>@Html.DisplayFor(m => item.Client.Name)</td>
+                        <td  class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
+                        <td  class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
 
-                      
-                       
                         <td align="center">
                         @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToMoney()
                         </td>
@@ -51,10 +49,13 @@
                                 switch (item.TransactionType)
                                 {
                                     case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                                        alr = "alert-warning";
+                                        alr = "alert-danger";
                                         break;
                                     case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
                                         alr = "alert-info";
+                                        break;
+                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Apartado:
+                                        alr = "alert-warning";
                                         break;
                                 }
                             }

@@ -59,6 +59,12 @@
                                 @item.TransactionType.ToString()
                             </div>
                             break;
+                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Apartado:
+                            <div class="form-control alert-warning input-sm">
+                                @item.TransactionType.ToString()
+                            </div>
+                            break;
+
                     }
                     @switch (item.Status)
                     {

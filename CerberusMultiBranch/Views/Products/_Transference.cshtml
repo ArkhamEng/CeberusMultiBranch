@@ -1,4 +1,4 @@
-﻿@model CerberusMultiBranch.Models.Entities.Operative.BranchProduct
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.TransferViewModel
 
 
 <div id="ModalTransference" class="modal fade" role="dialog">
@@ -6,24 +6,18 @@
         <div class="modal-content panel panel-danger panel-group">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Transferencia desde @Model.Branch.Name</h4>
+                <h4 class="modal-title">Transferencia de producto</h4>
             </div>
             <div class="modal-body panel-body text-uppercase">
+                <label>Tranferencia a sucursal @Model.TransBranch</label><br />
                 <div class="col-md-12">
                     <div class="col-md-4">
-                        @if (Model.Product.Images != null && Model.Product.Images.Count > 0)
-                        {
-                            <img class="img-responsive" src="@Model.Product.Images.First().Path" style="max-height:130px" />
-                        }
-                        else
-                        {
-                            <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" />
-                        }
+                        <img class="img-responsive"  src="@Model.TransImage" style="max-height:130px" />
                     </div>
                     <div class="col-md-8">
-                        <h5><label>@Model.Product.Code</label></h5>
+                        <h5><label>@Model.TransCode</label></h5>
                         <h5>
-                            @Model.Product.Name
+                            @Model.TransName
                         </h5>
                     </div>
 
@@ -31,25 +25,25 @@
                 <div class="col-md-12 text-center">
                     <h5>
                         <span class="badge bg-info">
-                            @Model.Stock
+                            @Model.TransStock
                         </span>
                         disponibles
                         <span class="fa fa-cubes"></span>
-                        Unidad @Model.Product.Unit
+                        Unidad @Model.TransUnit
                     </h5>
                 </div>
-                <div class="col-md-8 col-md-offset-2 text-center">
+                <div class="col-md-6 col-md-offset-4 text-center">
                     @Html.Label("Cantidad a transferir", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                        <input id="txtQuantityTransfer" class="form-control" 
-                               type="number"  max='@Model.Stock' min="1" value="0" />
+                        <input id="txtQuantityTransfer" class="form-control"
+                               type="number" max='@Model.TransStock' min="1" value="1" />
 
                         <span class="input-group-btn">
                             <button class="btn btn-danger" type="button" title="Realizar transferencia"
-                                    onclick="Transfer('@Model.BranchId','@Model.ProductId')">
+                                    onclick="Transfer('@Model.TransBranchId','@Model.TransProductId')">
                                 <span class="glyphicon glyphicon-ok" />
-                                Autorizar transferencia
+                                Autorizar 
                             </button>
                         </span>
                     </div>
@@ -60,7 +54,8 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#ModalTransference").modal("show");
     });
 
@@ -68,26 +63,26 @@
     {
         $("#ModalTransference").modal("hide");
         ShowLoading();
-        var param ={originBranchId:branchId, productId:productId, quantity:$("#txtQuantityTransfer").val()}
+
+        var param = { detsBranchId: branchId, productId: productId, quantity: $("#txtQuantityTransfer").val() }
+
         ExecuteAjax('@Url.Action("Transfer")', param, function (j)
         {
-            HideLoading();
             if (j.Result == 'OK')
             {
-                ShowLoading();
-                var data =
-                {
-                    name: j.Code,
-                };
-                ExecuteAjax('@Url.Action("Search")', data, function (view)
+                ExecuteAjax('@Url.Action("Search")', { name: j.Code, isGrid: false }, function (view)
                 {
                     HideLoading();
                     $("#divProducts").html(view);
+
                     ShowMessage(j.Result, j.Message, 'success');
                 });
             }
             else
+            {
+                HideLoading();
                 ShowMessage(j.Result, j.Message, 'warning');
+            }
         });
     }
 </script>

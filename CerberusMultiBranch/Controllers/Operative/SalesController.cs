@@ -50,19 +50,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SalePayments).Include(s => s.Client).
                     FirstOrDefault(s => s.SaleId == saleId);
 
-                //si es una venta en proceso borro el registro
-                if (sale.Status == TranStatus.InProcess)
-                {
-                    db.Sales.Remove(sale);
-                    db.SaveChanges();
-
-                    return Json(new
-                    {
-                        Result = "OK",
-                        Message = "Venta Cancelada, el producto ha sido regreado al stock, no se requiere devolución"
-                    });
-                }
-
                 //regreso los productos al stock
                 foreach (var detail in sale.SaleDetails)
                 {

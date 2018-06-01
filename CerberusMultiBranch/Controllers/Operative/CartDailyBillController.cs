@@ -458,16 +458,18 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 #region Validaciones para preventas y ventas a credito
                 //validación de cliente valido
-                if ((type == TransactionType.Credito || type == TransactionType.Preventa) && client.ClientId == Cons.Zero)
+                if (type != TransactionType.Contado && client.ClientId == Cons.Zero)
                 {
                     return Json(new
                     {
                         Result = "Venta sin cliente asignado",
-                        Message = "Se requiere asignar un cliente en ventas a credito o preventas",
+                        Message = "Los apartados, preventas y ventas a crédito requieren que asigne un cliente",
                     });
                 }
 
                 var amount = cartItems.Sum(i => i.TaxedAmount);
+
+                int days = 30;
 
                 //validaciones de crédito
                 if (type == TransactionType.Credito)
@@ -496,22 +498,24 @@ namespace CerberusMultiBranch.Controllers.Operative
                         client.UsedAmount += amount;
                         db.Entry(client).Property(c => c.UsedAmount).IsModified = true;
                     }
+
+                    days = client.CreditDays;
                 }
                 //preventa, solo permite productos sin existencias
-                //if (type == TransactionType.Preventa)
-                //{
-                //    var item = cartItems.FirstOrDefault(i => i.InStock > Cons.Zero);
+                if (type == TransactionType.Preventa)
+                {
+                    var item = cartItems.FirstOrDefault(i => i.InStock > Cons.Zero);
 
-                //    if (item != null)
-                //    {
-                //        return Json(new
-                //        {
-                //            Result = "Producto con existencia",
-                //            Message = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
-                //            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper())
-                //        });
-                //    }
-                //}
+                    if (item != null)
+                    {
+                        return Json(new
+                        {
+                            Result = "Producto con existencia",
+                            Message = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
+                            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper())
+                        });
+                    }
+                }
 
                 #endregion
 
@@ -525,8 +529,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     ClientId = cartItems.FirstOrDefault().ClientId,
                     LastStatus = TranStatus.InProcess,
                     Status = TranStatus.Reserved,
-                    TransactionType = type
+                    TransactionType = type,
+                    Expiration = type == TransactionType.Contado? DateTime.Now.ToLocal(): DateTime.Now.ToLocal().AddDays(days)
                 };
+
+                
 
                 int sortOrder = Cons.One;
                 List<StockMovement> movements = new List<StockMovement>();

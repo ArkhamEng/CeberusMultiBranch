@@ -132,7 +132,6 @@
                                                 <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
                                                 <th></th>
                                             </tr>
-
                                         </thead>
                                         <tbody>
                                             @{
@@ -143,37 +142,35 @@
 
                                             @for (int i = 0; i < rows; i++)
                                             {
-                                            <tr>
-                                                @for (int j = begin; j < limit; j++)
+                                                <tr>
+                                                    @for (int j = begin; j < limit; j++)
                                                     {
                                                         if (j < Model.Branches.Count)
                                                         {
-                                                    <td class="col-md-4 danger">
-                                                        @Html.DisplayFor(modelItem => Model.Branches[j].Name)
-                                                    </td>
-                                                    <td class="col-md-2" align="center">
-                                                        <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
-                                                    </td>
-                                                    <td>
-                                                        @if (User.IsInRole("Supervisor") &&
-                            Model.Branches[j].Quantity > 0 && Model.Branches[j].BranchId != User.Identity.GetBranchId())
+                                                            <td class="col-md-4 danger">
+                                                                @Html.DisplayFor(modelItem => Model.Branches[j].Name)
+                                                            </td>
+                                                            <td class="col-md-2" align="center">
+                                                                <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
+                                                            </td>
+                                                            <td>
+                                                                @if (User.IsInRole("Supervisor") && Model.Quantity > 0 && Model.Branches[j].BranchId != User.Identity.GetBranchId())
                                                                 {
-                                                                <button class="btn btn-danger btn-xs" title="Transferir este producto"
-                                                                        onclick="BeginTransference('@Model.Branches[j].BranchId','@Model.ProductId')">
-                                                                    <span class="fa fa-exchange"></span>
-                                                                </button>
+                                                                    <button class="btn btn-danger btn-xs" title="Enviar transferencia"
+                                                                            onclick="BeginTransference('@Model.Branches[j].BranchId','@Model.ProductId')">
+                                                                        <span class="fa fa-send"></span>
+                                                                    </button>
                                                                 }
-
-                                                    </td>
+                                                            </td>
                                                         }
                                                         else
                                                         {
-                                                    <td class="col-md-4 danger"></td>
-                                                    <td class="col-md-2"></td>
-                                                    <td />
+                                                            <td class="col-md-4 danger"></td>
+                                                            <td class="col-md-2"></td>
+                                                            <td />
                                                         }
                                                     }
-                                            </tr>
+                                                </tr>
                                                 limit = limit + 2;
                                                 begin = begin + 2;
 
@@ -195,14 +192,14 @@
                                         </thead>
                                         @foreach (var item in Model.ModelCompatibilities)
                                         {
-                                        <tr>
-                                            <td>
-                                                @Html.DisplayName(item.CarMake.Name + " " + item.Name)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayName(item.CarYears.Min(y => y.Year).ToString() + " - " + item.CarYears.Max(y => y.Year).ToString())
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td>
+                                                    @Html.DisplayName(item.CarMake.Name + " " + item.Name)
+                                                </td>
+                                                <td>
+                                                    @Html.DisplayName(item.CarYears.Min(y => y.Year).ToString() + " - " + item.CarYears.Max(y => y.Year).ToString())
+                                                </td>
+                                            </tr>
                                         }
                                     </table>
                                 </div>
@@ -267,11 +264,9 @@
         $("#ModalProductDetail").modal("show");
     });
 
-    function BeginTransference(branchId, productId)
-    {
-        var param = { branchId: branchId, productId: productId }
-
-        ExecuteAjax('@Url.Action("BeginTransference")', param, function (view)
+    function BeginTransference(branchId, productId) {
+      
+        ExecuteAjax('@Url.Action("BeginTransference")', {destBranchId:branchId, productId: productId }, function (view)
         {
             $("#ModalProductDetail").off("hidden.bs.modal").on("hidden.bs.modal", function ()
             {
@@ -307,7 +302,7 @@
             });
 
             $("#ModalProductDetail").modal("hide");
-           
+
         });
     }
 </script>

@@ -90,7 +90,8 @@
 </div>
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#CarMakeId").change(function () {
             CascadeMake();
         });
@@ -184,24 +185,28 @@
             isGrid: false,
             partSystemId: $("#SystemIdSm").val()
         };
-        ExecuteAjax('@Url.Action("Search")', data, function (view) {
-
+        ExecuteAjax('@Url.Action("Search")', data, function (view)
+        {
             HideLoading();
-
             $("#divProducts").html(view);
         });
     }
 
-    $(document).keydown(function (e) {
-        if (!$("#ModalQuickAddProduct").hasClass('in')) {
-            if (e.which == 13 || (e.altKey && e.which == 66)) {
+    $(document).keydown(function (e)
+    {
+        if (!$("#ModalQuickAddProduct").hasClass('in'))
+        {
+            if (e.which == 13 || (e.altKey && e.which == 66))
+            {
                 $("#btnSearch").click();
             }
 
-            if (e.altKey && e.keyCode == 76) {
+            if (e.altKey && e.keyCode == 76)
+            {
                 $("#btnClear").click();
             }
-            if (e.altKey && e.keyCode == 78) {
+            if (e.altKey && e.keyCode == 78)
+            {
                 $("#btnCreate").click();
             }
 
@@ -209,8 +214,10 @@
         }
     });
 
-    function CascadeModel() {
-        if ($("#CarModelId").val() != '') {
+    function CascadeModel()
+    {
+        if ($("#CarModelId").val() != '')
+        {
             var parentId = $("#CarModelId").val();
 
             ExecuteAjax('@Url.Action("GetYears", "Json")', { parentId: parentId }, function (response) {
@@ -227,11 +234,14 @@
         }
     }
 
-    function CascadeMake() {
-        if ($("#CarMakeId").val() != '') {
+    function CascadeMake()
+    {
+        if ($("#CarMakeId").val() != '')
+        {
             var parentId = $("#CarMakeId").val();
 
-            ExecuteAjax('@Url.Action("GetModels", "Json")', { parentId: parentId }, function (response) {
+            ExecuteAjax('@Url.Action("GetModels", "Json")', { parentId: parentId }, function (response)
+            {
                 $("#CarModelId").empty();
                 $("#CarModelId").append($('<option></option>').val("").html("Modelo"));
                 $("#CarYearId").empty();
@@ -242,7 +252,8 @@
                 }
             });
         }
-        else {
+        else
+        {
             $("#CarModelId").empty();
             $("#CarModelId").append($('<option></option>').val("").html("Modelo"));
 

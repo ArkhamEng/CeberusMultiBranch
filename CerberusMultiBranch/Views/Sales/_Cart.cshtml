@@ -21,7 +21,7 @@
 
 
             <div class="modal-footer">
-                <div class="col-md-3">
+                <div class="col-md-3" >
                     <select class="form-control" style="font-family: 'FontAwesome', 'Second Font name'" id="CartSending">
                         <option value="0"><text class="fa fa-building"> &#xf0f7; Recoge en sucursal</text></option>
                         <option value="1"><text class="fa fa-truck">&#xf0d1; Envío a domicilio</text></option>
@@ -36,19 +36,24 @@
                     </select>
                 </div>*@
 
-                <button id="btnShowClients" class="btn btn-success btnCart" type="button">
+                <button id="btnShowClients" class="btn btn-default btnCart" type="button">
                     <span class="fa fa-user-plus"></span>
-                    Cargo a cliente
+                    Cliente
                 </button>
 
-                <button class="btn btn-warning btnCart" type="button"  onclick="CreateBudget()">
+                <button class="btn btn-success btnCart" type="button"  onclick="CreateBudget()">
                     <span class="fa fa-print"></span>
-                    Generar Cotización
+                    Cotización
                 </button>
 
                 <button class="btn btn-info btnCart" type="button"  onclick="CompleateSale(2)">
                     <span class="fa fa-calendar"></span>
                     Preventa
+                </button>
+
+                <button class="btn btn-warning btnCart" type="button" onclick="CompleateSale(3)">
+                    <span class="fa fa-clock-o"></span>
+                    Apartado
                 </button>
 
                 <button class="btn btn-danger btnCart" type="button" onclick="CompleateSale(1)">
@@ -96,7 +101,10 @@
             $("#ModalCart").modal("hide");
             CheckCart();
             if (response.Result == "OK")
+            {
+                $(".prodRow").removeClass("info");
                 ShowMessage("Venta concluida", response.Message, 'success');
+            }
             else
                 ShowMessage(response.Result, response.Message, 'warning');
         });

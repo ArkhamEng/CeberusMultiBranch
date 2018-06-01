@@ -383,6 +383,7 @@
     <Compile Include="Models\ViewModels\Catalog\SearchEmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\TransferViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />

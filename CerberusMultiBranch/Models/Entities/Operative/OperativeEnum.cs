@@ -28,9 +28,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     public enum TransactionType
     {
-        Contado = 0,
-        Credito = 1,
-        Preventa =2
+        Contado  = 0,
+        Credito  = 1,
+        Preventa = 2,
+        Apartado = 3,
     }
 
     public enum MovementType
