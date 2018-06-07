@@ -22,7 +22,8 @@
     <li class="active"><a data-toggle="tab" href="#tabProducts">Detalle de compra</a></li>
     @if (Model.Status == TranStatus.Reserved || Model.Status == TranStatus.Compleated)
     {
-        <li><a data-toggle="tab" href="#tabPayments">Pagos <span id="TotalPayments" class="badge"></span></a></li>
+        <li><a data-toggle="tab" href="#tabPayments">Pagos <span id="TotalPayments" class="badge"></span> 
+            | Deuda <span id="Debt" class="badge bg-danger"></span> </a></li>
     }
 </ul>
 
@@ -32,36 +33,6 @@
             <div class="panel-body">
                 <div class="panel panel-default">
                     <div class="panel-body text-uppercase">
-                        <div class="row">
-                            <div class="col-md-6 form-group">
-                                @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label small" })
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
-                                    <div class="form-control input-sm">
-                                        @Model.Provider.Name
-                                    </div>
-                                </div>
-                                @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
-                            </div>
-                            <div class="col-md-5  pull-right">
-                                <div class="col-md-6">
-                                    @Html.Label("Fecha de Venta", htmlAttributes: new { @class = "control-label small" })
-                                </div>
-                                <div class="col-md-6">
-                                    @Html.Label("Fecha de Expiración", htmlAttributes: new { @class = "control-label small" })
-                                </div>
-                                <div class="input-group">
-                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <div class="form-control input-sm">
-                                        @Model.TransactionDate.ToString("dd/MM/yyyy")
-                                    </div>
-                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                    <div class="form-control input-sm">
-                                        @Model.Expiration.ToString("dd/MM/yyyy")
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col-md-3 form-group">
                                 @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label small" })
@@ -84,46 +55,94 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-5 row pull-right">
-                                <div class="col-md-6 form-group">
-                                    @Html.Label("Sub-Total", htmlAttributes: new { @class = "control-label small" })
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                                        <div class="form-control input-sm" id="divTotalAmount">
-                                            @Model.TotalAmount.ToMoney()
-                                        </div>
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Fecha", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.TransactionDate.ToString("dd/MM/yyyy")
                                     </div>
                                 </div>
-                                <div class="col-md-6 form-group">
-                                    @Html.Label("Total", htmlAttributes: new { @class = "control-label small" })
-                                    <div class="input-group">
-                                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                                        <div class="form-control input-sm" id="divTaxedAmount">
-                                            @Model.TotalTaxedAmount.ToMoney()
-                                        </div>
+                            </div>
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Expira", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-calendar-times-o"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.Expiration.ToString("dd/MM/yyyy")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Descuento", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.DiscountPercentage
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                @Html.Label("Proveedor", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.Provider.Name
+                                    </div>
+                                </div>
+                                @Html.ValidationMessageFor(model => model.Bill, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Sub-Total", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                    <div class="form-control input-sm" id="divTotalAmount">
+                                        @Model.TotalAmount.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Total", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                    <div class="form-control input-sm" id="divTaxedAmount">
+                                        @Model.TotalTaxedAmount.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Monto Final", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                    <div class="form-control input-sm">
+                                        @Model.FinalAmount.ToMoney()
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="panel-footer">
-                     
-                            <button type="button" class="btn btn-primary" title="Nueva búsqueda"
-                                    onclick="ShowLoading(); window.location='@Url.Action("History")'">
-                                <span class="fa fa-backward"></span>
-                                Volver
-                            </button>
 
-                            <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar e inventariar?"
-                                    tooltip-title="Ingresar al Inventario">
-                                <span class="fa fa-cubes"></span>
-                                Terminar
-                            </button>
-                            <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
-                                <span class="glyphicon glyphicon-plus-sign"></span>
-                                Agregar
-                            </button>
-                       
+                        <button type="button" class="btn btn-primary" title="Nueva búsqueda"
+                                onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                            <span class="fa fa-backward"></span>
+                            Volver
+                        </button>
+
+                        <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar e inventariar?"
+                                tooltip-title="Ingresar al Inventario">
+                            <span class="fa fa-cubes"></span>
+                            Terminar
+                        </button>
+                        <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            Agregar
+                        </button>
 
                         <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
                             <span class="glyphicon glyphicon-remove"></span>
@@ -162,6 +181,8 @@
 
 @Html.Hidden("ExCode")
 
+@Html.HiddenFor(m => m.FinalAmount)
+
 
 <script>
     $(document).ready(function () {
@@ -183,7 +204,8 @@
 
         $("input[name=TransactionType]").click(function ()
         {
-            if (this.value != 'Credito') {
+            if (this.value != 'Credito')
+            {
                 var date = $("#TransactionDate").val();
                 $("#Expiration").val(date);
             }
@@ -219,7 +241,8 @@
         });
     }
 
-    function Cancel() {
+    function Cancel()
+    {
         $('#ModalCancel').modal('show');
     }
 
@@ -231,7 +254,8 @@
 
             var param = { PurchaseId: $("#PurchaseId").val(), comment: $("#txtComment").val() }
 
-            ExecuteAjax('@Url.Action("Cancel","Purchases")', param, function (j) {
+            ExecuteAjax('@Url.Action("Cancel","Purchases")', param, function (j)
+            {
                 if (j.Result = 'OK')
                     location.reload(true);
                 else

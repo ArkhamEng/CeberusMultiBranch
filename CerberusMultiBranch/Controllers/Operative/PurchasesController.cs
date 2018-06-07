@@ -32,7 +32,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Purchases = new List<Purchase>();
+            model.Purchases = LookFor(null, null, null, null, null, null, null, TranStatus.Reserved);
 
             return View(model);
         }
@@ -135,7 +135,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             //Busco las compras hechas en las sucursales asignadas del usuario
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).Include(p => p.PurchaseDetails)
+            var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).
+                             Include(p => p.PurchaseDetails).Include(p=> p.PurchasePayments)
                              where (branchId == null && branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
@@ -646,18 +647,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var total = purchase.PurchasePayments.Sum(p => p.Amount);
 
                 total += payment.Amount;
-                if (purchase.TotalAmount >= total)
+
+                if (purchase.FinalAmount >= total)
                 {
-                    db.PurchasePayments.Add(payment);
-                    if (total == purchase.TotalAmount)
+                   
+                    if (total == purchase.FinalAmount)
                     {
-                        purchase.Status = TranStatus.Compleated;
+                        purchase.Status  = TranStatus.Compleated;
                         purchase.UpdDate = DateTime.Now.ToLocal();
                         purchase.UpdUser = User.Identity.Name;
-
-                        db.Entry(purchase).State = EntityState.Modified;
                     }
 
+                    db.PurchasePayments.Add(payment);
+                    db.Entry(purchase).State = EntityState.Modified;
                     db.SaveChanges();
 
                     purchase.PurchasePayments.Add(payment);

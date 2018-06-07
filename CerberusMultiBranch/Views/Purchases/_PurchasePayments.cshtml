@@ -3,8 +3,8 @@
 @using CerberusMultiBranch.Support
 
 <form id="frmPayment">
-    <div class="panel panel-default">
-        <div class="panel-body">
+    <div class="panel panel-default" >
+        <div id="divPayments"  class="panel-body">
             <div class="row col-md-12">
                 @Html.ValidationSummary(true, "", htmlAttributes: new { @class = "control-label text-danger" })
                 <div class="form-group col-md-3">
@@ -153,25 +153,22 @@
         var form = $("#frmPayment");
         form.validate();
 
-        var totalAmount = $("#TotalAmount").val();
+        var totalAmount = $("#FinalAmount").val();
 
         var debt =(totalAmount -@Model.Sum(p => p.Amount));
 
-        console.log(debt);
-
+      
         $("#Debt").text(GetCurrency(debt))
 
         $("#TotalPayments").text(GetCurrency( @Model.Sum(p => p.Amount)));
 
         if(debt == 0)
         {
-            $("#divStatus").text("Pagado");
-            $("#divStatus").attr("class","form-control alert-success");
+            $("#divPayments *").children().prop("disabled",true);
         }
         else
         {
-            $("#divStatus").text("Inventariado");
-            $("#divStatus").attr("class","form-control alert-info");
+            $("#divPayments *").children().prop("disabled",false);
         }
     });
 

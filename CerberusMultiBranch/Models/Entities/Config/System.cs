@@ -19,6 +19,10 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Index("IDX_Name", IsUnique = true)]
         public string Name { get; set; }
 
+        [Display(Name = "% Comision")]
+        [Required(ErrorMessage = "Se require un porcentaje de 0 a 100")]
+        public int Commission { get; set; }
+
         [Required]
         public DateTime UpdDate { get; set; }
 

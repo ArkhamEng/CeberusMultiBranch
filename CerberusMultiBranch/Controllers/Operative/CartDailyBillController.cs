@@ -86,10 +86,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             model.ForEach(m =>
             {
                 var bp    = m.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                m.InStock = bp.Stock;
-                m.Product.StorePrice = bp.StorePrice;
-                m.Product.DealerPrice = bp.DealerPrice;
-                m.Product.WholesalerPrice = bp.WholesalerPrice;
+                m.InStock = bp!= null? bp.Stock:Cons.Zero;
+                m.Product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                m.Product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                m.Product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
             });
 
             return model;
@@ -449,8 +449,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var userId = User.Identity.GetUserId();
-                var branchId = User.Identity.GetBranchId();
+                var userId    = User.Identity.GetUserId();
+                var branchId  = User.Identity.GetBranchId();
 
                 var cartItems = GetCart(userId, branchId);
 
@@ -522,9 +522,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //creo la venta
                 Sale sale = new Sale
                 {
-                    Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
-                    BranchId = User.Identity.GetBranchId(),
-                    UserId = User.Identity.GetUserId(),
+                    Year        = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
+                    BranchId    = User.Identity.GetBranchId(),
+                    UserId      = User.Identity.GetUserId(),
                     SendingType = sending,
                     ClientId = cartItems.FirstOrDefault().ClientId,
                     LastStatus = TranStatus.InProcess,
@@ -566,8 +566,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     detail.SortOrder = sortOrder;
 
-                    if (item.Product.Category.Commission > Cons.Zero)
-                        detail.Commission = Math.Round(detail.TaxedAmount * (item.Product.Category.Commission / Cons.OneHundred), Cons.Two);
+                    if (item.Product.System.Commission > Cons.Zero)
+                        detail.Commission = Math.Round(detail.TaxedAmount * (item.Product.System.Commission / Cons.OneHundred), Cons.Two);
 
                     //agrego el detalle a la venta
                     sale.SaleDetails.Add(detail);

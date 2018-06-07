@@ -326,6 +326,10 @@
     <Compile Include="Migrations\201805281900528_BranchHtml.Designer.cs">
       <DependentUpon>201805281900528_BranchHtml.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201806062026437_ComissionOnSystem.cs" />
+    <Compile Include="Migrations\201806062026437_ComissionOnSystem.Designer.cs">
+      <DependentUpon>201806062026437_ComissionOnSystem.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1024,6 +1028,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201805281900528_BranchHtml.resx">
       <DependentUpon>201805281900528_BranchHtml.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201806062026437_ComissionOnSystem.resx">
+      <DependentUpon>201806062026437_ComissionOnSystem.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

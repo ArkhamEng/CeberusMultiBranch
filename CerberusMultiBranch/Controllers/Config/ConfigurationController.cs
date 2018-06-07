@@ -20,10 +20,6 @@ namespace CerberusMultiBranch.Controllers.Config
             return View();
         }
 
-       
-     
-
-
         [HttpPost]
         [Authorize(Roles = "Administrador")]
         public ActionResult GetCauses()

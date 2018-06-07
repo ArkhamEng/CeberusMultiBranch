@@ -68,16 +68,13 @@
         var data = new FormData();
         var files = $("#imgUploader").get(0).files
 
-        console.log(data);
-        console.log(files);
-
+      
         if (files.length > 0)
         {
             data.append("image", files[0]);
             data.append("productId", $("#ProductId").val());
         }
-        console.log("hasta aqui ok");
-
+     
         $.ajax({
             url: '@Url.Action("SaveImage")',
             type: "POST",

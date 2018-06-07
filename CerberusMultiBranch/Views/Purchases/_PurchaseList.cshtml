@@ -88,6 +88,12 @@
 @{
 
     var totalAmount = Model.Sum(purchase => purchase.FinalAmount);
+    var debst = 0.0;
+
+    foreach(var purchase in Model)
+    {
+        debst += purchase.FinalAmount - purchase.PurchasePayments.Sum(a => a.Amount);
+    }
 }
 <script>
     $(document).ready(function () {
@@ -95,8 +101,9 @@
 
         var tAmount = "Total " + GetCurrency(parseFloat('@totalAmount'));
 
+        var tDebst = "Por Pagar " + GetCurrency(parseFloat('@debst'));
         $("#Total").text(tAmount);
-
+        $("#Debts").text(tDebst);
     });
 
 

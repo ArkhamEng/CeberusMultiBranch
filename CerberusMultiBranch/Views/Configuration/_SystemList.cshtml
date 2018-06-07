@@ -11,6 +11,9 @@
                     @Html.DisplayName("Categorias")
                 </th>
                 <th>
+                    @Html.DisplayName("Comisión")
+                </th>
+                <th>
                     @Html.DisplayName("Ultima Modificación")
                 </th>
                 <th>
@@ -19,7 +22,7 @@
                 <th></th>
             </tr>
         </thead>
-        <tbody>
+        <tbody class="text-capitalize">
             @foreach (var item in Model)
             {
                 <tr onmouseover="$(this).css('cursor', 'pointer')">
@@ -28,6 +31,9 @@
                     </td>
                     <td>
                        @item.SystemCategories.Count
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Commission)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.UpdDate)
