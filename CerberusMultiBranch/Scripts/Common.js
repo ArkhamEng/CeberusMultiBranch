@@ -72,12 +72,25 @@ function ExecuteAjax(url, parameters, callback)
         {
             200: function (data)
             {
-                callback(data);
+                if (data.Error == "NotAuthorized")
+                {
+                    window.location = data.LogOnUrl;
+                }
+                else
+                {
+                    callback(data);
+                }
             },
             401: function (data)
             {
-                console.log("Error 401, se requiere inicio de session");
-                callback(data);
+                if (data.Error == "NotAuthorized")
+                {
+                    window.location = data.LogOnUrl;
+                }
+                else
+                {
+                    callback(data);
+                }
             },
             511: function ()
             {
@@ -165,7 +178,8 @@ function Search(url, data, target)
 
 
 
-function SetDataTable(table, filter) {
+function SetDataTable(table, filter)
+{
     var oTable = $(table).DataTable(
        {
            destroy: true,

@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
-    [Authorize]
+    [CustomAuthorize]
     public class ClientsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -103,7 +103,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Capturista,Vendedor")]
+        [CustomAuthorize(Roles = "Capturista,Vendedor")]
         public ActionResult Create(Client client)
         {
             try

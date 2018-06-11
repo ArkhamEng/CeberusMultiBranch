@@ -6,6 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch
 {
@@ -25,8 +26,8 @@ namespace CerberusMultiBranch
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
-                LoginPath = new PathString("/Account/Login"),
-                ExpireTimeSpan = TimeSpan.FromMinutes(15),
+                LoginPath = new PathString(Cons.LogingUrl),
+                ExpireTimeSpan = TimeSpan.FromMinutes(10),
                 Provider = new CookieAuthenticationProvider
                 {
                     // Enables the application to validate the security stamp when the user logs in.

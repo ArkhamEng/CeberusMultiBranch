@@ -16,7 +16,7 @@ using System.Data.Entity;
 
 namespace CerberusMultiBranch.Controllers.Common
 {
-    [Authorize]
+    [CustomAuthorize]
     public class JsonController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

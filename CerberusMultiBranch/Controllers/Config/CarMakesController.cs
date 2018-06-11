@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Support;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
@@ -7,7 +8,7 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    [Authorize]
+    [CustomAuthorize]
     public class CarMakesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

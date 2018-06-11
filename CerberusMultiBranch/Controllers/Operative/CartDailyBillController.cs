@@ -17,7 +17,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         #region Shopping Cart Methods
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public JsonResult CheckCart()
         {
             var model = GetCart(User.Identity.GetUserId(), User.Identity.GetBranchId());
@@ -31,7 +31,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new { Result = "OK", Message = Cons.Zero.ToString() });
         }
 
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         [HttpPost]
         public ActionResult OpenCart()
         {
@@ -47,7 +47,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult RemoveFromCart(int productId)
         {
             var branchId = User.Identity.GetBranchId();
@@ -96,7 +96,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public JsonResult AddToCart(int productId, double quantity)
         {
             try
@@ -257,7 +257,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public JsonResult SetClient(int clientId)
         {
             try
@@ -313,7 +313,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult BeginChangePrice(int productId)
         {
             var userId = User.Identity.GetUserId();
@@ -338,7 +338,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult SetPrice(int productId, double price)
         {
             try
@@ -377,7 +377,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult SetQuantity(int productId, double quantity)
         {
             var userId = User.Identity.GetUserId();
@@ -388,7 +388,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var i = model.FirstOrDefault(s => s.ProductId == productId);
 
             i.Quantity    = quantity;
-            i.Amount      = (quantity * i.Amount).RoundMoney();
+            i.Amount      = (quantity * i.Price).RoundMoney();
             i.TaxedAmount = (quantity * i.TaxedPrice).RoundMoney();
             i.TaxAmount   = (i.TaxedAmount - i.Amount).RoundMoney();
 
@@ -403,7 +403,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult OpenQuantity(int productId)
         {
             var userId = User.Identity.GetUserId();
@@ -419,7 +419,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult EmptyCart()
         {
             try
@@ -444,7 +444,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public JsonResult CompleateSale(int sending, TransactionType type)
         {
             try
@@ -696,7 +696,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Vendedor")]
+        [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult CreateBudget()
         {
             try

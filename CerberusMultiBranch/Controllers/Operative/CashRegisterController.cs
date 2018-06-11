@@ -15,7 +15,7 @@ using CerberusMultiBranch.Models.ViewModels.Operative;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [Authorize(Roles = "Supervisor,Cajero")]
+    [CustomAuthorize(Roles = "Supervisor,Cajero")]
     public class CashRegisterController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -148,7 +148,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public JsonResult OpenCashRegister(double initialAmount)
         {
             try
@@ -182,7 +182,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult AddWithdrawal(double amount, string comment, int causeId)
         {
             var cr = GetCashRegister();
@@ -260,7 +260,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult OpenPending()
         {
             var branchId = User.Identity.GetBranchId();
@@ -272,7 +272,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult OpenRefunding()
         {
             var branchId = User.Identity.GetBranchId();
@@ -284,7 +284,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult BeginRefund(int saleId)
         {
             var branchId = User.Identity.GetBranchId();
@@ -320,7 +320,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult CreateRefund(RefundViewModel refund)
         {
             try
@@ -417,7 +417,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult PrintCreditNote(int noteId)
         {
             var model = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
@@ -483,7 +483,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult BeginRegistPayment(int id)
         {
             var branchId = User.Identity.GetBranchId();
@@ -521,7 +521,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult GetFolioAmount(int id)
         {
             var note = db.SaleCreditNotes.Find(id);
@@ -541,7 +541,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Cajero")]
+        [CustomAuthorize(Roles = "Cajero")]
         public ActionResult RegistPayment(ChoosePaymentViewModel payment)
         {
             try

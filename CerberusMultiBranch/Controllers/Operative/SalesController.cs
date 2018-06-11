@@ -20,13 +20,13 @@ using CerberusMultiBranch.Models.Entities.Finances;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [Authorize]
+    [CustomAuthorize]
     public partial class SalesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         #region Sale History
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult History()
         {
             //obtengo las sucursales configuradas para el empleado
@@ -41,7 +41,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor, Cajero")]
+        [CustomAuthorize(Roles = "Supervisor, Cajero")]
         public JsonResult Cancel(int saleId, string comment)
         {
             try
@@ -123,7 +123,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
             string folio, string client, string user, TranStatus? status)
         {
@@ -179,7 +179,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
 
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult Detail(int id)
         {
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
@@ -202,7 +202,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         #region Budget History
 
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult Budget()
         {
             var model = new BudgetViewModel();
@@ -215,7 +215,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult SearchBudgets(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
             int? fol = (folio != null && folio != string.Empty)? Convert.ToInt32(folio):new Nullable<int>();
@@ -234,7 +234,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult ApplyBudget(int budgetId)
         {
             try
@@ -315,7 +315,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor,Vendedor")]
+        [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult GetBudgeDetail(int budgetId)
         {
             var model = db.BudgetDetails.Include(d => d.Product.Images).

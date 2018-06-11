@@ -15,7 +15,7 @@ using System.IO;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
-    [Authorize]
+    [CustomAuthorize]
     public class ProvidersController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

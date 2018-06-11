@@ -50,6 +50,8 @@ namespace CerberusMultiBranch.Support
         public const int DaysToModify = 30;
 
         public const int DescriptionLength = 300;
+
+        public const string LogingUrl = "/Account/Login";
     }
 
     public struct FileStruct

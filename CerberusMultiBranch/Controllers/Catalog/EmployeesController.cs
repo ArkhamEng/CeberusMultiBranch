@@ -17,7 +17,7 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
-    [Authorize]
+    [CustomAuthorize]
     public class EmployeesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

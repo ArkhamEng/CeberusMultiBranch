@@ -18,7 +18,7 @@ using CerberusMultiBranch.Models.ViewModels.Operative;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
-    [Authorize]
+    [CustomAuthorize]
     public class ProductsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -36,7 +36,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult BeginTransference(int destBranchId, int productId)
         {
             var branchId = User.Identity.GetBranchId();
@@ -64,7 +64,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult BeginMovement(int productId)
         {
             var branchId = User.Identity.GetBranchId();
@@ -92,7 +92,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public JsonResult Move(int productId, MovementType type, double quantity)
         {
             var branchId = User.Identity.GetBranchId();
@@ -236,7 +236,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public JsonResult Transfer(int detsBranchId, int productId, double quantity)
         {
             var branchId = User.Identity.GetBranchId();
@@ -587,7 +587,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult AddToPackage(int packagedId, int productId, double quantity)
         {
             // busco el producto padre (paquete)
@@ -638,7 +638,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult SaveImage()
         {
             var productId = System.Web.HttpContext.Current.Request.Form["productId"].ToInt();
@@ -670,7 +670,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult Edit(int? productId)
         {
             ProductViewModel vm;
@@ -753,7 +753,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult BeginCopy(int providerId, string code)
         {
             var variables = db.Variables;
@@ -910,7 +910,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult QuickSave(Product product)
         {
             try
@@ -1292,7 +1292,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         //public ActionResult Create([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product,HttpPostedFileBase file)
         public ActionResult Create([Bind(Exclude = "Compatibilities")]Product product)
         {
@@ -1552,7 +1552,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult DeleteImage(int? id)
         {
             if (id == null)
@@ -1582,7 +1582,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult Delete(int id)
         {
             try
@@ -1657,7 +1657,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult Activate(int id, bool isGrid)
         {
             try
@@ -1684,7 +1684,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult StockMovement()
         {
             var model = new TransactionViewModel();
@@ -1693,7 +1693,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return View(model);
         }
 
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         [HttpPost]
         public ActionResult SearchMovements(int branchId, string description, DateTime? beginDate, DateTime? endDate)
         {

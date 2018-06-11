@@ -99,7 +99,7 @@
         var sPrice = parseFloat($("#SPrice").val());
         var wPrice = parseFloat($("#WPrice").val());
 
-        if (value > sPrice || value < wPrice)
+        if (isNaN(value) || value > sPrice || value < wPrice)
         {
             $("#lblPsError").text("El precio de venta debe estar entre $" + wPrice + " y $" + sPrice + " pesos");
             return;

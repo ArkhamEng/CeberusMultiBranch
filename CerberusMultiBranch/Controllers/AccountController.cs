@@ -18,7 +18,7 @@ using CerberusMultiBranch.Models.Entities.Config;
 
 namespace CerberusMultiBranch.Controllers
 {
-    [Authorize]
+    [CustomAuthorize]
     public class AccountController : Controller
     {
         private ApplicationSignInManager _signInManager;

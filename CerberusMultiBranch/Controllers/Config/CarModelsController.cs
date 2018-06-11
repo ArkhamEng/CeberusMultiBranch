@@ -11,7 +11,7 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Config
 {
-    [Authorize]
+    [CustomAuthorize]
     public class CarModelsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();

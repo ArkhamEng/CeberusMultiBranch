@@ -56,12 +56,11 @@
 
     function SetQuantity()
     {
+       
         var quantity = parseFloat($("#cqQuantity").val());
         var productId = $("#cqProductId").val();
 
-        console.log(quantity);
-
-        if (quantity <= 0)
+        if (isNaN(quantity) || quantity <= 0)
         {
             $("#lblCqError").text("La cantidad no puede ser menor o igual a cero");
             return;

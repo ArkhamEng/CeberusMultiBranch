@@ -20,7 +20,7 @@ using CerberusMultiBranch.Models.Entities.Finances;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [Authorize(Roles = "Supervisor,Capturista")]
+    [CustomAuthorize(Roles = "Supervisor,Capturista")]
     public class PurchasesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -67,7 +67,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        [Authorize(Roles = "Supervisor")]
+        [CustomAuthorize(Roles = "Supervisor")]
         public JsonResult Cancel(int transactionId, string comment)
         {
             try
@@ -162,7 +162,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         //this method is call when a new purchase is going to be saved
         [HttpPost]
-        [Authorize(Roles = "Capturista")]
+        [CustomAuthorize(Roles = "Capturista")]
         public ActionResult Create(BeginPurchaseViewModel model)
         {
             try
