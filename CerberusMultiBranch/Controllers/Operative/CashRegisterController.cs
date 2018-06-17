@@ -176,7 +176,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var list = db.CashDetails.Include(w => w.Cause).
                         Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
 
-            ViewBag.Causes = db.WithdrawalCauses.Where(c=> c.WithdrawalCauseId != Cons.RefundId).ToSelectList();
+            ViewBag.Causes = db.WithdrawalCauses.Where(c => c.WithdrawalCauseId != Cons.RefundId).ToSelectList();
 
             return PartialView("_Withdrawals", list);
         }
@@ -236,7 +236,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (i > o)
                 total = cr.InitialAmount + (i - o);
-            else 
+            else
                 total = cr.InitialAmount + (o - i);
 
             cr.FinalAmount = total.RoundMoney();
@@ -357,7 +357,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         CashRegisterId = cr.CashRegisterId,
                         Amount = refund.RefundCash,
                         Type = PaymentMethod.Efectivo,
-                        Comment = string.Format("DEVOLUCIÓN POR CANCELACIÓN {0}! RECIBIDA POR {1}", sale.Folio,refund.ReceivedBy.ToUpper()),
+                        Comment = string.Format("DEVOLUCIÓN POR CANCELACIÓN {0}! RECIBIDA POR {1}", sale.Folio, refund.ReceivedBy.ToUpper()),
                         InsDate = DateTime.Now.ToLocal(),
                         User = User.Identity.Name,
                         DetailType = Cons.Zero,
@@ -399,16 +399,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //solo cambio el status sin registrar, el usuario que lo cambia 
                 //para que quede registrado, el usuario que realiza la cancelación
                 sale.LastStatus = sale.Status;
-                sale.Status     = TranStatus.Canceled;
+                sale.Status = TranStatus.Canceled;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-              printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
-              FirstOrDefault(n => n.SaleCreditNoteId == sale.SaleId);
+                printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
+                FirstOrDefault(n => n.SaleCreditNoteId == sale.SaleId);
 
 
-                return PartialView("_PrintRefund",printRefund);
+                return PartialView("_PrintRefund", printRefund);
             }
             catch (Exception ex)
             {
@@ -433,7 +433,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult TicketsAndNotes()
         {
             var model = new TransactionViewModel();
-            model.Sales = LookForNotes(DateTime.Today, null, null, null,null);
+            model.Sales = LookForNotes(DateTime.Today, null, null, null, null);
             return PartialView("_TicketsAndNotes", model);
         }
 
@@ -455,7 +455,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 (end == null || s.TransactionDate <= end) &&
                 (folio == null || folio == string.Empty || s.Folio == folio) &&
                 (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
-                ( status == null  && (s.Status == TranStatus.Compleated || s.Status == TranStatus.Revision) || s.Status == status)).
+                (status == null && (s.Status == TranStatus.Compleated || s.Status == TranStatus.Revision) || s.Status == status)).
                 OrderByDescending(s => s.TransactionDate).ToList();
 
             return sales;
@@ -515,7 +515,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
 
             if (details.First().Sale.TransactionType == TransactionType.Apartado)
-                model.CashAmount = (details.Sum(d => d.TaxedAmount)* 0.1).RoundMoney();
+                model.CashAmount = (details.Sum(d => d.TaxedAmount) * 0.1).RoundMoney();
 
             return PartialView("_RegistPayment", model);
         }
@@ -569,6 +569,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var hasFolio = (payment.CreditNoteAmount > Cons.Zero);
 
+                if (toPay < wholePayment)
+                    return Json(new { Result = "Error", Message = "El monto ingresado supera el total de la venta!" });
+
+
                 if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
                     return Json(new { Result = "Error", Message = "Esta venta ha sido cancelada!!" });
 
@@ -579,10 +583,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
                     return Json(new { Result = "Error", Message = "No puede ingresar montos negativos, en el pago de una venta" });
 
-                SaleCreditNote note = null;
+                if (wholePayment > toPay)
+                    return Json(new { Result = "Error", Message = "El monto ingresado excede la deuda total, por favor verifique" });
+
+                if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
+                    return Json(new { Result = "Error", Message = "El monto del pago es menor que el  monto de la deuda, por favor verifique" });
+
+                if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
+                    return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 20% de anticipo" });
+
+                if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
+                    return Json(new { Result = "Error", Message = "Los apartados requieren un anticipo de 10% por lo menos" });
 
                 #region Logica para el uso de folio
-
+                SaleCreditNote note = null;
                 var folioChanged = false;
 
                 //si se registro un vale, hago validaciones de este
@@ -627,6 +641,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         if (note.Amount > toPay)
                         {
                             folioChanged = true;
+                            note.User = User.Identity.Name;
                             note.Amount = (note.Amount - toPay);
                         }
                         else
@@ -640,21 +655,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     else
                         return Json(new { Result = "Error", Message = "El vale que intentas aplicar ya fue usado o ha caducado" });
                 }
-                else
-                {
-                    if (wholePayment > toPay)
-                        return Json(new { Result = "Error", Message = "El monto ingresado excede la deuda total, por favor verifique" });
 
-                    if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
-                        return Json(new { Result = "Error", Message = "El monto del pago es menor que el  monto de la deuda, por favor verifique" });
-
-                    if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
-                        return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 20% de anticipo" });
-
-                    if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
-                        return Json(new { Result = "Error", Message = "Los apartados requieren un anticipo de 10% por lo menos" });
-                }
-
+          
                 #endregion
 
 
@@ -760,10 +762,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     if (pay.PaymentMethod != PaymentMethod.Vale)
                     {
-                        var dt            = new CashDetail();
+                        var dt = new CashDetail();
                         dt.CashRegisterId = cr.CashRegisterId;
-                        dt.Amount         = pay.Amount;
-                        dt.InsDate        = DateTime.Now.ToLocal();
+                        dt.Amount = pay.Amount;
+                        dt.InsDate = DateTime.Now.ToLocal();
                         dt.User = User.Identity.Name;
                         dt.Type = pay.PaymentMethod;
                         dt.SaleFolio = sale.Folio;

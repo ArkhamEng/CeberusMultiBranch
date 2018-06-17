@@ -81,7 +81,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var model = db.ShoppingCarts.Include(s => s.Product.Images).Include(s => s.Client).
                             Include(s => s.Product.BranchProducts).Include(s => s.Product.PackageDetails).
-                            Where(s => s.UserId == userId && s.BranchId == branchId).OrderBy(s => s.InsDate).ToList();
+                            Where(s => s.UserId == userId && s.BranchId == branchId).OrderBy(s => s.InsDate)
+                            .OrderByDescending(s=> s.InsDate).ToList();
 
             model.ForEach(m =>
             {
