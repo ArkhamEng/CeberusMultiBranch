@@ -330,6 +330,10 @@
     <Compile Include="Migrations\201806062026437_ComissionOnSystem.Designer.cs">
       <DependentUpon>201806062026437_ComissionOnSystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201807040415056_RangeReferencePayment.cs" />
+    <Compile Include="Migrations\201807040415056_RangeReferencePayment.Designer.cs">
+      <DependentUpon>201807040415056_RangeReferencePayment.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1032,6 +1036,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201806062026437_ComissionOnSystem.resx">
       <DependentUpon>201806062026437_ComissionOnSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201807040415056_RangeReferencePayment.resx">
+      <DependentUpon>201807040415056_RangeReferencePayment.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -82,7 +82,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 try
                 {
                     employee.UpdUser = User.Identity.Name;
-                    employee.UpdDate = DateTime.Now;
+                    employee.UpdDate = DateTime.Now.ToLocal();
 
                     if (employee.EmployeeId == Cons.Zero)
                     {

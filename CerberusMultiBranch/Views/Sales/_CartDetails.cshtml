@@ -172,12 +172,9 @@
         });
     }
 
-    function ChangeQuantity(prodId)
-    {
-        ExecuteAjax('@Url.Action("OpenQuantity", "Sales")', { productId: prodId }, function (response)
-        {
-            if ($.isPlainObject(response))
-            {
+    function ChangeQuantity(prodId) {
+        ExecuteAjax('@Url.Action("OpenQuantity", "Sales")', { productId: prodId }, function (response) {
+            if ($.isPlainObject(response)) {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
             else
@@ -210,19 +207,15 @@
     }
 
 
-    function RemoveFromCart(productId)
-    {
+    function RemoveFromCart(productId) {
         var data = { productId: productId }
 
-        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response)
-        {
-            if ($.isPlainObject(response))
-            {
+        ExecuteAjax('@Url.Action("RemoveFromCart", "Sales")', data, function (response) {
+            if ($.isPlainObject(response)) {
                 $("#ModalCart").modal("hide");
                 ShowMessage(response.Result, response.Message, "warning");
             }
-            else
-            {
+            else {
                 var rowId = '#prodRow' + productId;
                 $(rowId).removeClass('info');
 
@@ -232,17 +225,13 @@
         });
     }
 
-    function EmptyCart()
-    {
-        ExecuteAjax('@Url.Action("EmptyCart", "Sales")', {}, function (response)
-        {
-            if ($.isPlainObject(response))
-            {
+    function EmptyCart() {
+        ExecuteAjax('@Url.Action("EmptyCart", "Sales")', {}, function (response) {
+            if ($.isPlainObject(response)) {
                 $("#ModalCart").modal("hide");
                 ShowMessage(response.Result, response.Message, "warning");
             }
-            else
-            {
+            else {
                 $(".prodRow").removeClass("info");
                 CheckCart();
                 $("#divCartDetails").html(response);

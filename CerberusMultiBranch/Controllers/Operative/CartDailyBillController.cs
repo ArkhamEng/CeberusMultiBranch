@@ -119,6 +119,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(j);
                 }
 
+                if(bp.Product.IsLocked && bp.Product.UserLock == User.Identity.Name)
+                {
+                    if (bp == null)
+                    {
+                        var j = new
+                        {
+                            Result = "Producto no bloqueado temporalmente",
+                            Message = "Bloqueado por "+bp.Product.UserLock+" hora de bloqueo "+bp.Product.LockDate.Value.ToString("dd/MM/yyyy hh:mm")
+                        };
+                        return Json(j);
+                    }
+                }
+
                 #region validación de precios
                 //valido la configuración de precios
                 if (bp.StorePrice <= Cons.Zero)
@@ -458,6 +471,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var client = cartItems.First().Client;
 
                 #region Validaciones para preventas y ventas a credito
+                
                 //validación de cliente valido
                 if (type != TransactionType.Contado && client.ClientId == Cons.Zero)
                 {
@@ -574,8 +588,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.SaleDetails.Add(detail);
 
                     //las preventas no generan movimiento de inventario al ser creadas
-                    if (type != TransactionType.Preventa)
-                    {
+                    //if (type != TransactionType.Preventa)
+                    //{
                         var bp = item.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
 
                         //actualizo stock de sucursal
@@ -585,7 +599,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         bp.UpdUser = User.Identity.Name;
 
                         db.Entry(bp).State = EntityState.Modified;
-                    }
+                    //}
 
 
                     //si el producto que se esta vendiendo es un paquete
@@ -626,8 +640,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }
 
                     //las preventas no generan movimiento de inventario al ser creadas
-                    if (type != TransactionType.Preventa)
-                    {
+                    //if (type != TransactionType.Preventa)
+                    //{
                         //agrego el moviento al inventario
                         StockMovement sm = new StockMovement
                         {
@@ -639,7 +653,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             Quantity = detail.Quantity
                         };
                         movements.Add(sm);
-                    }
+                    //}
                     sortOrder++;
                 }
 

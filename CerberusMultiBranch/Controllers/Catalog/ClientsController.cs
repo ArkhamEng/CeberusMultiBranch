@@ -108,6 +108,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             try
             {
+                client.UpdUser = User.Identity.Name;
+                
                 if (client.ClientId == Cons.Zero)
                 {
                     client.Code = db.Clients.Max(c => c.Code).ToCode();

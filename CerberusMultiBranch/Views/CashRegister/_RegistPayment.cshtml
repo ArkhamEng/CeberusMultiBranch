@@ -168,18 +168,18 @@
             </div>
             <div class="panel-footer clearfix">
 
-                <button class="btn btn-warning" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)">
+                <button class="btn btn-warning" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)" this.onclick=null>
                     <span class="fa fa-ticket"></span>
                     Imprimir Ticket
                 </button>
 
-                <button class="btn btn-primary" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)">
+                <button class="btn btn-primary" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)" this.onclick=null>
                     <span class="fa fa-file"></span>
                     Imprimir Nota
                 </button>
                 @if (Model.CanCancel)
                 {
-                    <button class="btn btn-danger pull-right" type="button" onclick="ShowCancel()">
+                    <button class="btn btn-danger pull-right" type="button" onclick="ShowCancel()" this.onclick=null>
                         <span class="fa fa-trash-o"></span>
                         Cancelar Venta
                     </button>
@@ -193,7 +193,8 @@
 </div>
 @Html.HiddenFor(m => m.CreditNoteId)
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#ModalRegistPayment").modal('show');
 
         SetInputEvents();
@@ -275,13 +276,14 @@
 
         return result;
     }
-
+  
     function RegisterPayment(printType)
     {
        
         $("#ModalRegistPayment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
         {
-            if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
+            if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0)
+            {
                 ShowMessage("La cantidad es Incorrecta!",
                     "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 'warning');
                 return;

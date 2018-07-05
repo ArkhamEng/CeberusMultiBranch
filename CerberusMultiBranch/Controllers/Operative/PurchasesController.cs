@@ -149,12 +149,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return purchases;
         }
-
+        
         //this method is call when a new purchase is going to be registered
         [HttpPost]
         public ActionResult BeginPurchase()
         {
             BeginPurchaseViewModel model = new BeginPurchaseViewModel();
+            model.TransactionType = TransactionType.Credito;
 
             return PartialView("_BeginPurchase", model);
         }

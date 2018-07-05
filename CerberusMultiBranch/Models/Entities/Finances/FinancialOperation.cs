@@ -25,7 +25,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
         [Display(Name = "Comentarios")]
         public string Comment { get; set; }
 
-        [MaxLength(30, ErrorMessage = "Solo se permiten 30 caractéres")]
+        [MaxLength(100, ErrorMessage = "Solo se permiten 30 caractéres")]
         [Display(Name = "Referencia")]
         public string Reference { get; set; }
 

@@ -107,8 +107,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public Client()
         {
             this.IsActive  = true;
-            this.Entrance  = DateTime.Now;
-            this.UpdDate   = DateTime.Now;
+            this.Entrance  = DateTime.Now.ToLocal();
+            this.UpdDate   = DateTime.Now.ToLocal();
             this.Code      = Cons.CodeSeqFormat;
         }
 
