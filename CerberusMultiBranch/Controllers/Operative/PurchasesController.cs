@@ -649,10 +649,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 total += payment.Amount;
 
-                if (purchase.FinalAmount >= total)
+                if (Math.Round(purchase.FinalAmount,2) >= total)
                 {
                    
-                    if (total == purchase.FinalAmount)
+                    if (total == Math.Round(purchase.FinalAmount,2))
                     {
                         purchase.Status  = TranStatus.Compleated;
                         purchase.UpdDate = DateTime.Now.ToLocal();

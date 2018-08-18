@@ -153,9 +153,11 @@
         var form = $("#frmPayment");
         form.validate();
 
-        var totalAmount = $("#FinalAmount").val();
+        var totalAmount = parseFloat($("#FinalAmount").val()).toFixed(2);
 
-        var debt =(totalAmount -@Model.Sum(p => p.Amount));
+        console.log("Final Amount "+totalAmount);
+
+        var debt =(totalAmount - @Model.Sum(p => p.Amount));
 
       
         $("#Debt").text(GetCurrency(debt))
