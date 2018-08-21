@@ -334,6 +334,14 @@
     <Compile Include="Migrations\201807040415056_RangeReferencePayment.Designer.cs">
       <DependentUpon>201807040415056_RangeReferencePayment.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201808210351007_PathLengthImage.cs" />
+    <Compile Include="Migrations\201808210351007_PathLengthImage.Designer.cs">
+      <DependentUpon>201808210351007_PathLengthImage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201808210430422_PathLengthImage1.cs" />
+    <Compile Include="Migrations\201808210430422_PathLengthImage1.Designer.cs">
+      <DependentUpon>201808210430422_PathLengthImage1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1039,6 +1047,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201807040415056_RangeReferencePayment.resx">
       <DependentUpon>201807040415056_RangeReferencePayment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808210351007_PathLengthImage.resx">
+      <DependentUpon>201808210351007_PathLengthImage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201808210430422_PathLengthImage1.resx">
+      <DependentUpon>201808210430422_PathLengthImage1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

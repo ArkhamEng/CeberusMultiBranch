@@ -646,6 +646,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 var file = System.Web.HttpContext.Current.Request.Files["image"];
 
+                if (file.FileName.Trim().Length >= 80)
+                    return Json(new { Result="Nombre de Archivo Invalido!", Message="El nombre del archivo no puede ser mayor a 80 caracteres"});
+                
 
                 if (file.ContentLength > 0)
                 {
@@ -657,7 +660,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         f.ProductId = productId;
                         f.Name = file.FileName;
                         f.Type = file.ContentType;
-                        f.Size = file.ContentLength;
+                        f.Size = file.ContentLength; 
 
                         db.ProductImages.Add(f);
                         db.SaveChanges();

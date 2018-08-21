@@ -47,45 +47,46 @@
     <label id="uplPicture" class="btn btn-primary">
         <span class="fa fa-upload"></span>
         Agregar Imagen al producto
-        <input type="file"  id="imgUploader" onchange="ImageLoaded()" style="display: none;">
+        <input type="file" id="imgUploader" onchange="ImageLoaded()" style="display: none;">
     </label>
 </div>
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#Pictures").val("@imgIndex");
     });
 
-    function DeleteImage(id)
-    {
+    function DeleteImage(id) {
         ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response) {
             $("#divImages").html(response);
         });
     }
 
-    function ImageLoaded()
-    {
+    function ImageLoaded() {
         var data = new FormData();
         var files = $("#imgUploader").get(0).files
 
-      
-        if (files.length > 0)
-        {
+
+        if (files.length > 0) {
             data.append("image", files[0]);
             data.append("productId", $("#ProductId").val());
         }
-     
+
         $.ajax({
             url: '@Url.Action("SaveImage")',
             type: "POST",
             processData: false,
             contentType: false,
             data: data,
-            
-            success: function (response) {
-                $("#divImages").html(response);
+
+            success: function (response)
+            {
+                if ($.isPlainObject(response))
+                    alert(response.Message);
+                else
+                    $("#divImages").html(response);
             },
-            error: function (er) {
+            error: function (er)
+            {
                 alert(er);
             }
 
