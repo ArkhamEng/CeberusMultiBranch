@@ -16,9 +16,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public int ClientId { get; set; }
 
         [Display(Name = "Ciudad/Municipio")]
-        [Index("IDX_CityId", IsUnique = false)]
-        [Required]
-        public int CityId { get; set; }
+        public int? CityId { get; set; }
 
         [Display(Name = "Clave")]
         [Required]
@@ -43,7 +41,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [Display(Name = "Dirección")]
         [MaxLength(150)]
-        [Required]
         public string Address { get; set; }
 
         [Display(Name = "C.P.")]
@@ -56,30 +53,33 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Entrance { get; set; }
 
-        [Display(Name = "E-mail")]
-        [DataType(DataType.EmailAddress)]
+        [Display(Name = "Correo Electrónico")]
+        [DataType(DataType.EmailAddress, ErrorMessage ="Ingresa una dirección de correo válida ej. nombre@tudominio.com")]
         [MaxLength(100)]
         public string Email { get; set; }
 
-        [Display(Name = "Teléfono")]
+        [Display(Name = "Correo Adicional")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Ingresa una dirección de correo válida ej. nombre@tudominio.com")]
+        [MaxLength(100)]
+        public string Email2 { get; set; }
+
+        [Display(Name = "Teléfono Principal")]
         [DataType(DataType.PhoneNumber)]
         [MaxLength(20)]
         public string Phone { get; set; }
 
+        [Display(Name = "Teléfono Adicional")]
+        [DataType(DataType.PhoneNumber)]
+        [MaxLength(20)]
+        public string Phone2 { get; set; }
+
+        [Display(Name = "Tipo de cliente")]
         public ClientType Type { get; set; }
 
-        public bool IsActive { get; set; }
+        [Display(Name = "Persona Fiscal")]
+        public string PersonType { get; set; }
 
-        [Required]
-        public DateTime UpdDate { get; set; }
-
-        [MaxLength(100)]
-        public string UpdUser { get; set; }
-
-        public virtual City City { get; set; }
-
-        public ICollection<Sale> Sale { get; set; }
-
+      
         [Display(Name="Credito Limite")]
         [DataType(DataType.Currency)]
         public double CreditLimit { get; set; }
@@ -100,8 +100,28 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name="Comentario Sobre Crédito")]
         public string CreditComment { get; set; }
 
-        
-      
+        public bool IsActive { get; set; }
+
+        [Required]
+        [Display(Name = "Fecha Edición")]
+        [DataType(DataType.DateTime)]
+        public DateTime UpdDate { get; set; }
+
+        [MaxLength(100)]
+        [Display(Name = "Editado por")]
+        public string UpdUser { get; set; }
+
+
+        public DateTime? LockEndDate { get; set; }
+
+        [MaxLength(100)]
+        public string LockUser { get; set; }
+
+        //public virtual City City { get; set; }
+
+        public ICollection<Sale> Sale { get; set; }
+
+        public ICollection<Address> Addresses { get; set; }
 
 
         public Client()
@@ -109,19 +129,25 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.IsActive  = true;
             this.Entrance  = DateTime.Now.ToLocal();
             this.UpdDate   = DateTime.Now.ToLocal();
+            this.UpdUser    = HttpContext.Current.User.Identity.Name;
             this.Code      = Cons.CodeSeqFormat;
+
+            //temp
+            this.Addresses = new List<Address>();
+            
         }
 
         public override string ToString()
         {
-            var a = string.Empty;
+            //var a = string.Empty;
 
-            if (this.City != null && this.City.State != null)
-                a= string.Format("{0} CP {1} {2}, {3} ", this.Address, this.ZipCode, this.City.State.Name, this.City.Name);
-            else
-               a= this.Address + " CP " + ZipCode;
+            //if (this.City != null && this.City.State != null)
+            //    a= string.Format("{0} CP {1} {2}, {3} ", this.Address, this.ZipCode, this.City.State.Name, this.City.Name);
+            //else
+            //   a= this.Address + " CP " + ZipCode;
 
-            return a;
+            //return a;
+            return base.ToString();
         }
     }
 

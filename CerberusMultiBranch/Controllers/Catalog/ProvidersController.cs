@@ -20,92 +20,297 @@ namespace CerberusMultiBranch.Controllers.Catalog
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Providers
+        // GET: Employees
         public ActionResult Index()
         {
-            var model = new SearchProviderViewModel();
-            model.Providers = db.Providers.OrderBy(p=> p.Name).ToList();
-            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
+            var model = new SearchPersonViewModel<ProviderViewModel>();
+            model.Persons = LookFor(null, null, null, null, null);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult AutoCompleate(string filter)
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone, int? id)
         {
-            var model = db.Providers.OrderBy(p=> p.Name).Where(p => p.Name.Contains(filter)).Take(20).
-                Select(p => new { Id = p.ProviderId, Label = p.Name, Value = p.FTR });
-
-            return Json(model);
+            var model = LookFor(stateId, cityId, name, phone, id);
+            return PartialView("_List", model);
         }
 
-        [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string name, string ftr)
+
+
+        private List<ProviderViewModel> LookFor(int? stateId, int? cityId, string name, string phone, int? id)
         {
             string[] arr = new List<string>().ToArray();
 
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
 
-            var model = (from c in db.Providers
+            var model = (from provider in db.Providers.Include(e => e.Addresses)
                          where
-                             (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
-                             (stateId == null || c.City.StateId == stateId) &&
-                             (cityId == null || c.CityId == cityId) &&
-                             (ftr == null || ftr == string.Empty || c.FTR == ftr)
-                         select c).OrderBy(p=> p.Name).ToList();
+                             (id == null || provider.ProviderId == id) &&
+                             (name == null || name == string.Empty || arr.Any(n => (provider.Code + " " + provider.Name).Contains(name))) &&
+                             //(stateId == null || provider.City.StateId == stateId) &&
+                             //(cityId == null || provider.CityId == cityId) &&
+                             (phone == null || phone == string.Empty || provider.Phone == phone) &&
+                             (provider.IsActive)
+                         select new ProviderViewModel
+                         {
+                             ProviderId = provider.ProviderId,
+                             Code = provider.Code,
+                             Email = provider.Email,
+                             Email2 = provider.Email2,
+                             WebSite = provider.WebSite,
+                             FTR = provider.FTR,
+                             IsActive = provider.IsActive,
+                             Name = provider.Name,
+                             Phone = provider.Phone,
+                             Phone2 = provider.Phone2,
+                             Phone3 = provider.Phone3,
+                             Agent = provider.Agent,
+                             AgentPhone = provider.AgentPhone,
+                             BusinessName = provider.BusinessName,
+                             Catalog = provider.Catalog,
+                             CreditLimit = provider.CreditLimit,
+                             DaysToPay = provider.DaysToPay,
+                             Line = provider.Line,
+                             UpdDate = provider.UpdDate,
+                             UpdUser = provider.UpdUser,
 
-            return PartialView("_List", model);
-        }
-
-        // GET: Providers/Create
-        public ActionResult Create(int? id)
-        {
-            ProviderViewModel model;
-            if (id != null)
-            {
-                model = CreateModel(db.Providers.Find(id));
-            }
-            else
-                model = new ProviderViewModel();
-
-            model.WebSite = model.WebSite ?? "http://";
-            model.States = db.States.ToSelectList();
-            return View(model);
-
-        }
-
-        private ProviderViewModel CreateModel(Provider provider)
-        {
-            var model = new ProviderViewModel(provider);
-            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
-            model.StateId = db.Cities.Find(model.CityId).StateId;
-            model.Cities = db.Cities.Where(c => c.StateId == model.StateId).OrderBy(c=> c.Name).ToSelectList();
+                             LockUser = provider.LockUser,
+                             LockEndDate = provider.LockEndDate,
+                             Addresses = provider.Addresses,
+                         }).OrderBy(e => e.Name).ToList();
 
             return model;
         }
 
-        // POST: Providers/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(Provider provider)
+        [CustomAuthorize(Roles = "Capturista,Supervisor")]
+        public ActionResult BeginAdd(int? id)
         {
-            provider.UdpUser = User.Identity.Name;
-            provider.UpdDate = DateTime.Now.ToLocal();
+            ProviderViewModel model;
 
-            if (provider.ProviderId == Cons.Zero)
+            if (id != null)
             {
-                provider.Code = db.Providers.Max(c => c.Code).ToCode();
-                db.Providers.Add(provider);
+                var provider = db.Providers.Include(p => p.Addresses).FirstOrDefault(p => p.ProviderId == id);
+                model = new ProviderViewModel(provider);
+
+                if (model.IsLocked)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordLocked,
+                        Header = "Registro bloqueado",
+                        Body = "Este proveedor " + provider.Name.ToUpper() + " se encuentra bloqueado por " + model.LockUser + " y no puede ser editado hasta ser liberado",
+                    });
+                }
+
+                //bloqueo del registro
+                try
+                {
+                    provider.LockEndDate = DateTime.Now.ToLocal().AddMinutes(Cons.LockTimeOut);
+                    provider.LockUser = HttpContext.User.Identity.Name;
+                    model.LockEndDate = provider.LockEndDate;
+                    model.LockUser = provider.LockUser;
+
+                    db.Entry(provider).State = EntityState.Modified;
+
+                    db.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Danger,
+                        Code = Cons.Responses.Codes.ServerError,
+                        Header = "Error al bloquear",
+                        Body = "Ocurrio un error al bloquear el proveedor " + provider.Name.ToUpper()
+                    });
+                }
+
+                var stateId = model.Addresses.First().City.StateId;
+                model.StateId = stateId;
+                model.States = db.States.OrderBy(s => s.Name).ToSelectList(stateId);
+                model.Cities = db.Cities.Where(c => c.StateId == model.StateId).OrderBy(c => c.Name).ToSelectList(model.Addresses.First().CityId);
             }
             else
-                db.Entry(provider).State = EntityState.Modified;
+                model = new ProviderViewModel();
 
-            db.SaveChanges();
+            model.States = db.States.OrderBy(s => s.Name).ToSelectList();
 
-            return RedirectToAction("Create", new { id = provider.ProviderId });
+            return PartialView("_ProviderEdition", model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [CustomAuthorize(Roles = "Capturista,Supervisor")]
+        public ActionResult Save(Provider provider)
+        {
+            try
+            {
+                var response = new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success
+                };
+
+                if (provider.ProviderId == Cons.Zero)
+                {
+
+                    var exProv = db.Providers.FirstOrDefault(p => p.FTR == provider.FTR || provider.Name == provider.Name);
+
+                    if (exProv != null)
+                    {
+                        response.Result = Cons.Responses.Danger;
+                        response.Code = Cons.Responses.Codes.ErroSaving;
+                        response.Header = "Registro duplicado";
+                        response.Body = string.Format("Ya existe un proveedor con nombre {0} y rfc {1}, no debe repetir Nombre o RFC", exProv.Name, exProv.FTR);
+
+                        return Json(response);
+                    }
+
+                    provider.Code = db.Providers.Max(c => c.Code).ToCode();
+                    db.Providers.Add(provider);
+
+                    response.Header = "Nuevo Proveedor registrado";
+                    response.Body = "El Proveedor " + provider.Name.ToUpperInvariant() +
+                        " fue agregado correctamente";
+                }
+                else
+                {
+
+                    var exProv = db.Providers.FirstOrDefault(p => p.ProviderId != provider.ProviderId &&
+                    (p.FTR == provider.FTR || p.Name == provider.Name));
+
+                    if (exProv != null)
+                    {
+                        response.Result = Cons.Responses.Danger;
+                        response.Code = Cons.Responses.Codes.ErroSaving;
+                        response.Header = "Registro duplicado";
+                        response.Body = string.Format("Ya existe un proveedor con nombre {0} y rfc {1}, no debe repetir Nombre o RFC", exProv.Name, exProv.FTR);
+
+                        return Json(response);
+                    }
+
+
+                    db.Entry(provider).State = EntityState.Modified;
+                    db.Entry(provider).Property(c => c.IsActive).IsModified = false;
+                    db.Entry(provider).Property(c => c.Catalog).IsModified = false;
+                    db.Entry(provider).Property(c => c.Code).IsModified = false;
+
+                    foreach (var address in provider.Addresses)
+                        db.Entry(address).State = EntityState.Modified;
+
+                    response.Header = "Proveedor actualizado!";
+                    response.Body = "Se registraron las modificaciones del proveedor " + provider.Name.ToUpperInvariant() +
+                        " y se liberaron bloqueos sobre el registro";
+                }
+
+                db.SaveChanges();
+
+                response.Id = provider.ProviderId;
+
+                return Json(response);
+            }
+
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al guardar",
+                    Body = "Ocurrio un error al guardar los datos del proveedor " +
+                            provider.Name.ToUpperInvariant() + " Detalle:" + ex.Message
+                });
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult UnLock(int id)
+        {
+            try
+            {
+                var provider = db.Providers.Find(id);
+                provider.LockEndDate = null;
+                provider.LockUser = null;
+
+                db.Entry(provider).Property(p => p.LockUser).IsModified = true;
+                db.Entry(provider).Property(p => p.LockEndDate).IsModified = true;
+
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Proveedor desbloqueado!",
+                    Body = "Se libero el bloque del proveedor: " +
+                          provider.Name.ToUpperInvariant()
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al desbloquear",
+                    Body = "Ocurrio un error al desbloquear el registro del Proveedor"
+                });
+            }
+
+        }
+
+        [HttpPost]
+        public ActionResult Deactivate(int id)
+        {
+            try
+            {
+                var provider = db.Providers.Find(id);
+
+                provider.UpdDate = DateTime.Now.ToLocal();
+                provider.UpdUser = HttpContext.User.Identity.Name;
+                provider.IsActive = false;
+
+                db.Entry(provider).Property(p => p.IsActive).IsModified = true;
+                db.Entry(provider).Property(p => p.UpdUser).IsModified = true;
+                db.Entry(provider).Property(p => p.UpdDate).IsModified = true;
+
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Proveedor Eliminado",
+                    Body = "Se elimino el proveedor: " +
+                          provider.Name.ToUpperInvariant() + " del catálogo"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al Eliminar",
+                    Body = "Ocurrio un error al eliminar el registro de proveedor"
+                });
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult AutoCompleate(string filter)
+        {
+            var model = db.Providers.OrderBy(p => p.Name).Where(p => p.Name.Contains(filter)).Take(20).
+                Select(p => new { Id = p.ProviderId, Label = p.Name, Value = p.FTR });
+
+            return Json(model);
         }
 
         [HttpPost]
@@ -118,34 +323,62 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var providers = (from p in db.Providers
                              where (name == null || name == string.Empty || arr.Any(n => (p.Code + " " + p.Name).Contains(name)))
-                             select p).OrderBy(p=> p.Name).Take(Cons.QuickResults).ToList();
+                             select p).OrderBy(p => p.Name).Take(Cons.QuickResults).ToList();
 
             return PartialView("_QuickProviderList", providers);
         }
 
-        public ActionResult UpdateCatalog(int id)
+        [HttpPost]
+        public ActionResult BeginUpdateCatalog(int id)
         {
-            var p = db.Providers.Include(d=> d.ExternalProducts).FirstOrDefault(d=> d.ProviderId == id);
+            var p = db.Providers.FirstOrDefault(d => d.ProviderId == id);
+
+            var pCount = db.ExternalProducts.Count(d => d.ProviderId == id);
 
             var pending = db.TempExternalProducts.Count(te => te.ProviderId == id);
 
-            ViewBag.Name        = p.Name;
-            ViewBag.Code        = p.Code;
-            ViewBag.ProviderId  = id;
-            ViewBag.Products    = p.ExternalProducts.Count;
-            ViewBag.Pending     = pending;
-            return View();
+            var model = new ProviderCatalogViewModel
+            {
+                ProviderName = p.Name,
+                ProviderKey = id,
+                ProductsCount = pCount,
+                PendingCount = pending
+            };
+
+            return PartialView("_ProviderCatalogEdition", model);
         }
 
         [HttpPost]
         public ActionResult ProcessCatalog(int providerId)
         {
-           var done = DBHelper.ProcessExternalProducts(providerId);
-            return Json("OK");
+            try
+            {
+                var done = DBHelper.ProcessExternalProducts(providerId);
+
+                return Json(new JResponse
+                {
+                    Header = "Productos Procesados",
+                    Body = "Los productos cargados fueron procesados correctamente",
+                    Id = providerId,
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Header = "Error al Procesar",
+                    Body = "Ocurrio un error inesperado al cargar la lista de producto, revisa que no existan codigos repetidos",
+                    Id = providerId,
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving
+                });
+            }
         }
 
         [HttpPost]
-        public ActionResult UpdateCatalog(int providerId, string name, HttpPostedFileBase file)
+        public ActionResult UpdateCatalog(int ProviderKey, string ProviderName, HttpPostedFileBase file)
         {
             RecordSet records = null;
             List<TempExternalProduct> toInsert = new List<TempExternalProduct>();
@@ -161,7 +394,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     Stream myStr = file.InputStream;
                     records = (RecordSet)xml.Deserialize(file.InputStream);
 
-                    records.Records.ForEach(r => 
+                    records.Records.ForEach(r =>
                     {
                         var description = r.Description.Trim();
 
@@ -171,7 +404,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         TempExternalProduct ex = new TempExternalProduct
                         {
                             Code = r.Code.Trim().Length > 30 ? r.Code.Trim().Substring(0, 30) : r.Code,
-                            ProviderId = providerId,
+                            ProviderId = ProviderKey,
                             Description = description,
                             TradeMark = r.TradeMark.Trim() ?? "N/A",
                             Unit = r.Unit.Trim() ?? "N/A",
@@ -181,12 +414,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         toInsert.Add(ex);
                     });
 
-            
+
                     xml = null;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw new Exception("Error deserializar el archivo", ex.InnerException);
+                    return Json(new JResponse
+                    {
+                        Header = "Error de Formato",
+                        Body = "Ocurrio un error en la recepcion de los datos, verifica que estas cargando el archivo corrento y que no tienes datos incorrectos",
+                        Id = ProviderKey,
+                        Result = Cons.Responses.Danger,
+                        Code = Cons.Responses.Codes.ErroSaving
+                    });
                 }
 
 
@@ -196,30 +436,44 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         DBHelper.BulkInsertBulkCopy(toInsert);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        throw new Exception("Error al agregar nuevos registros "+ex.Message, ex);
+                        return Json(new JResponse
+                        {
+                            Header = "Error al Cargar",
+                            Body = "Ocurrio un error inesperado al procesar la lista de producto, revisa que no existan codigos repetidos",
+                            Id = ProviderKey,
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.ErroSaving
+                        });
                     }
                 }
 
                 var time = (DateTime.Now - begin).TotalMinutes;
-                ViewBag.Result = "OK";
-                ViewBag.Message = string.Format("Operación concluida, se agregaron {0} tiempo total {1}", toInsert.Count, time.ToString("MM:ss"));
-                ViewBag.ProviderId = providerId;
-                ViewBag.Name = name;
-                ViewBag.Products = db.ExternalProducts.Count(ex => ex.ProviderId == providerId);
-                ViewBag.Pending = db.TempExternalProducts.Count(te => te.ProviderId == providerId);
-                return View();
 
+                var response = new JResponse
+                {
+                    Header = "Productos cargados",
+                    Body = string.Format("Se cargaron {0} productos al proveedor {1}, utiliza el botón 'Procesar' para concluir el proceso", 
+                                        toInsert.Count, ProviderName),
+                    Id = ProviderKey,
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Extra = toInsert.Count.ToString()
+                };
+
+                return Json(response);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                var time = (DateTime.Now - begin).TotalMinutes;
-                ViewBag.Result = ex.Message;
-                ViewBag.Message = "Se encontro un error inesperado al insertar los registros";
-                ViewBag.ProviderId = providerId;
-                ViewBag.Name = name;
-                return View();
+                return Json(new JResponse
+                {
+                    Header = "Error al Cargar",
+                    Body = "Ocurrio un error inesperado al cargar la lista de producto, revisa que no existan codigos repetidos",
+                    Id = ProviderKey,
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving
+                });
             }
             finally
             {

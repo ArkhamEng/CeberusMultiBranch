@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "SystemTest";
+    Layout = "~/Views/Shared/PageLayout.cshtml";
+}
+
+<h2>SystemTest</h2>
+
+<table id="tbSystems" class="table dt-responsive nowrap table-bordered small" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                Nombre
+            </th>
+            <th>
+                Categorias
+            </th>
+            <th>
+                Comision
+            </th>
+            <th>
+                Ultima Modificación
+            </th>
+            <th>
+                Modificado por
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody >
+     
+    </tbody>
+</table>
+
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $('#tbSystems').DataTable({
+            "processing": true,
+            "serverSide": true,
+            ajax: {
+                url: "/Configuration/DtSearchSystem",
+                "dataSrc": ""
+            },
+            "columns": [
+                { "data": "Name" },
+                { "data": "Name" },
+                { "data": "Commission" },
+                { "data": "UpdDate" },
+                { "data": "UpdUser" }
+            ]
+        });
+    });
+</script>

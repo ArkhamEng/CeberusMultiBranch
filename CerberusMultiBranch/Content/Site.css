@@ -2,6 +2,15 @@
     padding-top: 50px;
     padding-bottom: 20px;
     -webkit-print-color-adjust: exact;
+    
+
+}
+
+.BodyLogin
+{
+    background-color:#3D322F !important;
+    background-image:url(Images/background.png);
+     opacity: 0.9;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -70,12 +79,12 @@ textarea {
     display: block;
     border-top: 1px solid #ccc;
 }
-/*************TABLE ELEMENT CENTERED********************/
+/*************TABLE ELEMENT CENTERED********************
 .table > tbody > tr > td {
     vertical-align: middle;
 }
 
-/***************DATA TABLES**********************/
+***************DATA TABLES**********************
 table.TablePrimary {
     width: 100%;
     clear: both;
@@ -149,7 +158,7 @@ html[xmlns] .dataTables_wrapper {
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
     box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
     height: 100%;
-    /*border-color: #337ab7;*/
+   
 }
 
     .dataTables_wrapper > .TablePrimary thead th {
@@ -161,7 +170,7 @@ table.TablePrimary tbody th {
     text-align: left;
     background: #91c5d4;
     border-color: #337ab7;
-}
+}*/
 
 /********************************************************/
 /*********************SIDE BAR***************************/
@@ -189,8 +198,8 @@ table.TablePrimary tbody th {
 a[aria-expanded="false"]::before, a[aria-expanded="true"]::before {
     content: '\e259';
     display: block;
-    position: absolute;
-    right: 20px;
+    position: absolute; 
+    right: 2px;
     font-family: 'Glyphicons Halflings';
     font-size: 0.6em;
 }
@@ -199,20 +208,42 @@ a[aria-expanded="true"]::before {
     content: '\e260';
 }
 
-@media (max-width: 768px) 
-{
-    #sidebar 
-    {
+@media (max-width: 768px) {
+    #sidebar {
         margin-left: -200px;
     }
 
-        #sidebar.active 
-        {
+        #sidebar.active {
             margin-left: 0;
         }
+
+    .dtContainer {
+        width: 400px;
+    }
 }
 
+.dtContainer {
+    max-width: 1100px;
+}
 
+@media (min-width: 769px) {
+     
+    .dtContainer {
+        width: 700px;
+    }
+}
+
+@media (min-width: 992px) {
+    .dtContainer {
+        width: 900px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dtContainer {
+        width: 1100px;
+    }
+}
 
 /********************/
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
@@ -250,7 +281,7 @@ a, a:hover, a:focus {
     }
 
     #sidebar ul.components {
-        padding: 0px 0;
+        padding: 1px 0;
         border-bottom: 1px solid #47748b;
     }
 
@@ -260,7 +291,7 @@ a, a:hover, a:focus {
     }
 
     #sidebar ul li a {
-        padding: 10px;
+        padding: 8px;
         font-size: 1.1em;
         display: block;
     }
@@ -277,7 +308,7 @@ a, a:hover, a:focus {
 
 ul ul a {
     font-size: 0.9em !important;
-    padding-left: 30px !important;
+    padding-left: 20px !important;
     background: #6d7fcc;
 }
 
@@ -311,7 +342,6 @@ ul ul a {
 
 @media print {
 
-
     .Note table {
         font-size: 8pt !important;
         font-family: Tahoma;
@@ -321,8 +351,6 @@ ul ul a {
         font-size: 10pt !important;
         font-family: Arial;
     }
-
-
 
     .BkPrint {
         color: #FFFFFF !important;
@@ -336,4 +364,86 @@ ul ul a {
     display: block;
     height: 0;
     overflow-y: hidden;
-} 
+}
+
+
+/*PNOTIFY OVERLOAD*/
+.alert-success {
+    color: #ffffff;
+    background-color: rgba(38, 185, 154, 0.88);
+    border-color: rgba(38, 185, 154, 0.88);
+}
+
+.alert-info {
+    color: #E9EDEF;
+    background-color: rgba(52, 152, 219, 0.88);
+    border-color: rgba(52, 152, 219, 0.88);
+}
+
+.alert-warning {
+    color: #E9EDEF;
+    background-color: rgba(243, 156, 18, 0.88);
+    border-color: rgba(243, 156, 18, 0.88);
+}
+
+.alert-danger,
+.alert-error {
+    color: #E9EDEF;
+    background-color: rgba(231, 76, 60, 0.88);
+    border-color: rgba(231, 76, 60, 0.88);
+}
+
+.ui-pnotify.dark .ui-pnotify-container {
+    color: #E9EDEF;
+    background-color: rgba(52, 73, 94, 0.88);
+    border-color: rgba(52, 73, 94, 0.88);
+}
+
+.custom-notifications {
+    position: fixed;
+    margin: 15px;
+    right: 0;
+    float: right;
+    width: 400px;
+    z-index: 4000;
+    bottom: 0;
+}
+
+ul.notifications {
+    float: right;
+    display: block;
+    margin-bottom: 7px;
+    padding: 0;
+    width: 100%;
+}
+
+.notifications li {
+    float: right;
+    margin: 3px;
+    width: 36px;
+    box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
+}
+
+    .notifications li:last-child {
+        margin-left: 0;
+    }
+
+.notifications a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
+    padding: 9px 8px;
+}
+
+
+/*******square image*******/
+.image {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 100%;
+}
+
+    .image img {
+        position: absolute;
+    }

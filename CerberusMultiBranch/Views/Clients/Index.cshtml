@@ -1,4 +1,6 @@
-﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.SearchClientViewModel
+﻿@model SearchPersonViewModel<ClientViewModel>
+
+@using CerberusMultiBranch.Models.ViewModels.Catalog
 
 @{
     ViewBag.Title = "Catálogo de Clientes";
@@ -6,56 +8,37 @@
 }
 
 <hr />
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtons" class="col-md-6"></div>
 
-<div class="panel panel-danger">
-    <div class="panel-body">
-        <div class="col-md-11">
-            <div class="input-group ">
-                @Html.TextBox("Ftr", "", htmlAttributes: new
-           {
-               @class = "form-control",
-               placeholder = "RFC",
-               style = "width:30%"
-           })
-                @Html.TextBox("txtName", "", htmlAttributes: new
-           {
-               @class = "form-control",
-               placeholder = "Clave o nombre del cliente",
-               style = "width:70%"
-           })
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="btnSearch">
-                        <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
-                    </button>
-                    <button type="button" class="btn btn-success" id="btnCreate">
-                        <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>uevo
-                    </button>
-                </span>
-            </div>
-        </div>
-        <br /><br />
-        <div class="col-md-10">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                @Html.DropDownList("StateId", Model.States, "Estado / Entidad", new { @class = "form-control" })
-                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                @Html.DropDownList("CityId", Model.Cities, "Ciudad / Municipio", new { @class = "form-control" })
-                <span class="input-group-btn">
-                    <button class="btn btn-info" type="button" id="btnClear">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                        <u>L</u>impiar
-                    </button>
-                </span>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre del cliente" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar clientes">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnCreate" disabled='@Model.CreateDisabled' title="Agregar nuevo cliente">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-
-<div id="divClients" class="col-md-12">
-    @Html.Partial("_List", Model.Clients)
+    <div class="panel panel-default">
+        <div id="divClients" class="panel-body dtContainer">
+            @Html.Partial("_List", Model.Persons)
+        </div>
+    </div>
 </div>
 
 
@@ -65,41 +48,47 @@
     {
         $("#btnCreate").click(function ()
         {
-            ShowLoading();
-            window.location ='@Url.Action("Create")';
+            ShowCatalogModal(SearchById, null, 'Client', 0);
         });
 
-        $("#btnClear").click(function ()
-        {
-            ShowLoading();
-            window.location = '@Url.Action("Index",new { })'
-        })
-
-        SetCascade("#StateId", "#CityId", "GetCities");
-
+     
         $("#btnSearch").click(function ()
         {
-            ShowLoading();
-            var data = { stateId: $("#StateId").val(), cityId: $("#CityId").val(), name: $("#txtName").val(), ftr: $("#Ftr").val() };
+            ShowLoading('static');
+            var data = {  name: $("#txtName").val() };
 
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
-                $("#divClients").html(view);
-                HideLoading();
+                HideLoading(function ()
+                {
+                    $("#divClients").html(view);
+                });
             });
-          
         });
     });
 
-    $(document).keydown(function (e) {
-        if (e.which == 13 || (e.altKey && e.which == 66)) {
+
+    function SearchById(id)
+    {
+        ExecuteAjax('@Url.Action("Search")', { id: id }, function (view)
+        {
+            $("#divClients").html(view);
+        });
+    }
+
+    $(document).keydown(function (e)
+    {
+        if (e.which == 13 || (e.altKey && e.which == 66))
+        {
             $("#btnSearch").click();
         }
 
-        if (e.altKey && e.keyCode == 76) {
+        if (e.altKey && e.keyCode == 76)
+        {
             $("#btnClear").click();
         }
-        if (e.altKey && e.keyCode == 78) {
+        if (e.altKey && e.keyCode == 78)
+        {
             $("#btnCreate").click();
         }
     });

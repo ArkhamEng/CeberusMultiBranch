@@ -12,16 +12,49 @@ using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Mvc.Html;
 using System.Web.UI;
 
 namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+        public static string GetTitle(string title)
+        {
+           return "<h1>Refaccionaria Autobien<h1><h2>"+title+"<h2/><h5>Sims 1.5 by ArkhamNet<h5/>";
+        }
+
+        public static MvcHtmlString DisplayUpperFor<TModel, TValue>(this HtmlHelper<TModel> helper, Expression<Func<TModel, TValue>> expression)
+        {
+            StringBuilder html = new StringBuilder();
+            TagBuilder bold = new TagBuilder("b");
+            //bold.InnerHtml = helper.DisplayNameFor(expression).ToString().ToUpper();
+            //html.Append(bold);
+            var upperValue = helper.DisplayFor(expression).ToString().ToUpper();
+            html.Append(upperValue);
+            //return MvcHtmlString.Create(html.ToString());
+
+            return MvcHtmlString.Create(upperValue);
+        }
+
+        public static MvcHtmlString DisplayLowerFor<TModel, TValue>(this HtmlHelper<TModel> helper, Expression<Func<TModel, TValue>> expression)
+        {
+            StringBuilder html = new StringBuilder();
+            TagBuilder bold = new TagBuilder("b");
+            //bold.InnerHtml = helper.DisplayNameFor(expression).ToString().ToUpper();
+            //html.Append(bold);
+            var upperValue = helper.DisplayFor(expression).ToString().ToLower();
+            html.Append(upperValue);
+            //return MvcHtmlString.Create(html.ToString());
+
+            return MvcHtmlString.Create(upperValue);
+        }
+
         public static bool IsValid(this IPrincipal user)
         {
             if(user.IsInRole("Administrador"))
@@ -103,6 +136,11 @@ namespace CerberusMultiBranch.Support
         public static SelectList ToSelectList(this IEnumerable data)
         {
             return new SelectList(data, nameof(ISelectable.Id), nameof(ISelectable.Name));
+        }
+
+        public static SelectList ToSelectList(this IEnumerable data, object selectedValue)
+        {
+            return new SelectList(data, nameof(ISelectable.Id), nameof(ISelectable.Name), selectedValue);
         }
 
         public static byte[] ToCompressedFile(this HttpPostedFileBase stream)

@@ -1,60 +1,63 @@
 ﻿@model CerberusMultiBranch.Models.Entities.Config.PartSystem
 
-<script src="~/Scripts/jquery.validate.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+@Scripts.Render("~/bundles/jqueryval")
 
 <form id="sysForm">
-    <div id="ModalSystem" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content panel panel-primary">
-                <div class="modal-header panel-heading">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">
-                        <i class="fa fa-book"></i>
-                        Edición de Sistemas 
-                    </h4>
-                </div>
-                <div class="modal-body panel-body">
-                    @Html.HiddenFor(model => model.PartSystemId)
 
-                    <div class="form-group col-md-8">
-                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
-                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-capitalize", placeholder = "Nombre del sistema" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
-                    </div>
+    <div class="modal-content panel panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="panel-title">
+                <i class="fa fa-book"></i>
+                Edición de Sistemas
+            </h4>
+        </div>
+        <div class="modal-body panel-body">
+            @Html.HiddenFor(model => model.PartSystemId)
 
-                    <div class="form-group  col-md-4">
-                        @Html.LabelFor(model => model.Commission, htmlAttributes: new { @class = "control-label" })
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                            @Html.EditorFor(model => model.Commission, new { htmlAttributes = new { @class = "form-control  text-capitalize", placeholder = "Comisión" } })
-                        </div>
-                        @Html.ValidationMessageFor(model => model.Commission, "", new { @class = "text-danger" })
-                    </div>
+            <div class="form-group col-md-8">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-capitalize", placeholder = "Nombre del sistema" } })
+                </div>
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
 
-                    @if (Model.PartSystemId > 0)
-                    {
-                        <div id="divSystemCategory">
-                        </div>
-                    }
+            <div class="form-group  col-md-4">
+                @Html.LabelFor(model => model.Commission, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                    @Html.EditorFor(model => model.Commission, new { htmlAttributes = new { @class = "form-control  text-capitalize", placeholder = "Comisión" } })
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" onclick="SaveSystem()" id="btnSaveSystem">
-                        <span class="glyphicon glyphicon-floppy-disk"></span>
-                        <u>G</u>uardar                        
-                    </button>
+                @Html.ValidationMessageFor(model => model.Commission, "", new { @class = "text-danger" })
+            </div>
+
+            @if (Model.PartSystemId > 0)
+            {
+                <div id="divSystemCategory">
                 </div>
+            }
+        </div>
+        <div class="modal-footer">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary" onclick="SaveSystem()" id="btnSaveSystem">
+                    <span class="fa fa-save"></span>
+                    Guardar
+                </button>
+
+                <button type="button" class="btn btn-danger" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
+
 </form>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         GetAssignedCategories();
 
         var form = $("#sysForm");
@@ -62,26 +65,12 @@
 
         $("#ModalSystem").modal("show");
 
-    }).keydown(function (e)
-    {
-        if ($("#ModalSystem").hasClass('in'))
-        {
-            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71))
-            {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                $("#btnSaveSystem").click();
-            }
-        }
     });
 
-    function GetAssignedCategories()
-    {
-        if($("#PartSystemId").val() != 0)
-        {
+    function GetAssignedCategories() {
+        if ($("#PartSystemId").val() != 0) {
             ExecuteAjax('@Url.Action("GetSystemConfig", "Configuration")', { id: $("#PartSystemId").val() },
-                function (response)
-                {
+                function (response) {
                     $("#divSystemCategory").html(response);
                 });
         }
@@ -91,32 +80,27 @@
     {
         var form = $("#sysForm");
 
-        if (!form.valid())
-        {
+        if (!form.valid()) {
+            ShowNotify("Error de validación", 'warning', "Existen errores en los datos capturado, por favor verifique", 3000);
             return;
         }
 
-        $("#ModalSystem").on("hidden.bs.modal", function ()
-        {
-            ShowLoading();
-            var sys =
-          {
-              PartSystemId: $("#PartSystemId").val(),
-              Name: $("#Name").val(),
-              Commission: $("#Commission").val()
-          }
+        ShowModLoading();
 
-            ExecuteAjax('@Url.Action("SaveSystem","Configuration")', { system: sys }, function (response)
+
+        var sys = {
+          PartSystemId: $("#PartSystemId").val(),
+          Name: $("#Name").val(),
+          Commission: $("#Commission").val() }
+
+        ExecuteAjax('@Url.Action("SaveSystem","Configuration")', { system: sys }, function (response)
+        {
+            HideModal(function ()
             {
-                HideLoading();
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Result, response.Message, 'warning');
-                else
-                    $("#divSystems").html(response);
-            });
+                $("#divSystems").html(response);
+            }, true);
         });
 
-        $("#ModalSystem").modal("hide");
     }
 
 </script>

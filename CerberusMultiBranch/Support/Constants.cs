@@ -7,6 +7,29 @@ namespace CerberusMultiBranch.Support
 {
     public static class Cons
     {
+        public struct Responses
+        {
+            public const string  Success = "success";
+
+            public const string Warning = "warning";
+
+            public const string Danger = "danger";
+
+            public const string Info = "info";
+
+            public struct Codes
+            {
+                public const int ErroSaving     = -3;
+                public const int RecordNotFound = -2;
+                public const int RecordLocked = -1;
+                public const int Success = 200;
+                public const int ServerError = 500;
+                public const int UnAuthorized = 401;
+                
+
+            }
+        }
+
         public const int Zero = 0;
         public const int One = 1;
         public const int Two = 2;

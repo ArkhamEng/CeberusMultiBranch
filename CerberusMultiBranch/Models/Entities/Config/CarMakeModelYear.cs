@@ -1,8 +1,10 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Config
 {
@@ -14,10 +16,27 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Marca")]
         public string Name { get; set; }
 
+        [MaxLength(100)]
+        [Display(Name="Editado por")]
+        public string UpdUser { get; set; }
+
+        [Display(Name = "Editado")]
+        public DateTime UpdDate { get; set; }
+
+        [Display(Name = "Activo")]
+        public bool  IsActive { get; set; }
+
         public ICollection<CarModel> Models { get; set; }
 
         [NotMapped]
         public int Id { get { return this.CarMakeId; } }
+
+        public CarMake()
+        {
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.IsActive = true;
+        }
      
     }
 
@@ -36,10 +55,27 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [Display(Name = "Modelo")]
         public string Name { get; set; }
 
+        [MaxLength(100)]
+        [Display(Name = "Editado por")]
+        public string UpdUser { get; set; }
+
+        [Display(Name = "Editado")]
+        public DateTime UpdDate { get; set; }
+
+        [Display(Name = "Activo")]
+        public bool IsActive { get; set; }
+
         public virtual CarMake CarMake { get; set; }
 
         [Display(Name = "Años")]
         public ICollection<CarYear> CarYears { get; set; }
+
+        public CarModel()
+        {
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.IsActive = true;
+        }
     }
 
     [Table("CarYear", Schema = "Config")]

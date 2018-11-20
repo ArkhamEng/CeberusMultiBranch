@@ -1,0 +1,49 @@
+﻿@model SystemAndCategoryViewModel
+
+@using CerberusMultiBranch.Models.ViewModels.Config
+
+@{
+    ViewBag.Title = "Clasificaciones y tipos";
+    ViewBag.Class = "fa fa-folder-open";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<hr />
+
+
+
+
+<ul class="nav nav-tabs">
+    <li id="liSystem" class="active">
+        <a data-toggle="tab" href="#Systems">
+            <span class="fa fa-list-alt"></span> Tipos de producto (Sistemas)
+        </a>
+    </li>
+    <li id="liCategory">
+        <a data-toggle="tab" href="#Categories">
+            <span class="fa fa-black-tie"></span> Categorias SAT
+        </a>
+    </li>
+    <li id="liWithdrawal">
+        <a data-toggle="tab" href="#Withdrawals">
+            <span class="fa fa-money"></span> Causas de retiro (en caja)
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="Systems" class="tab-pane fade in active">
+        @Html.Partial("_Systems", Model.Systems)
+    </div>
+    <div id="Categories" class="tab-pane fade">
+        @Html.Partial("_Categories", Model.Categories)
+    </div>
+
+    <div id="Withdrawals" class="tab-pane fade">
+        @Html.Partial("_WithdrawalCause", Model.WithdrawalCauses)
+    </div>
+</div>
+
+
+
+
+

@@ -3,6 +3,7 @@ using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
@@ -19,12 +20,66 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList Types { get; set; }
 
+        public SelectList PersonTypes { get; set; }
+
         public int StateId { get; set; }
+
+        [Display(Name = "Dirección")]
+        public string StringAddress
+        {
+            get
+            {
+                return Addresses.First().ToString();
+            }
+        }
+
+        [Display(Name = "Teléfonos")]
+        public string Phones
+        {
+            get
+            {
+                return string.Format("Tel 1: {0} | Tel 2: {1}",
+                    string.IsNullOrEmpty(this.Phone) ? "No Asignado" : this.Phone,
+                    string.IsNullOrEmpty(this.Phone2) ? "No Asignado" : this.Phone2);
+            }
+        }
+
+        [Display(Name = "Edición")]
+        public string Edition
+        {
+            get
+            {
+                return string.Format("{0} por  el usuario {1}",
+                    this.UpdDate.ToString("dddd, dd MMMM yyyy h:mm tt"), this.UpdUser);
+            }
+        }
+
+
+        public bool IsLocked
+        {
+            get
+            {
+                return (LockEndDate != null && LockUser != HttpContext.Current.User.Identity.Name);
+            }
+        }
+     
+        public bool EditionDisabled
+        {
+            get { return !(HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Vendedor"));    }
+        }
+
+        public bool DeleteDisabled
+        {
+            get { return !(HttpContext.Current.User.IsInRole("Supervisor")); }
+        }
+
 
         public ClientViewModel()
         {
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
+            this.Addresses = new List<Address>();
+            this.Addresses.Add(new Address());
             FillTypes();
         }
 
@@ -36,7 +91,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             types.Add(new City { CityId = 1, Name = "Distribuidor" });
             types.Add(new City { CityId = 2, Name = "Mayorista" });
 
+            var Ptypes = new List<SelectListItem>();
+            Ptypes.Add(new SelectListItem { Text ="Fisica", Value ="Fisica" });
+            Ptypes.Add(new SelectListItem { Text = "Moral", Value = "Moral" });
+
             this.Types = types.ToSelectList();
+            this.PersonTypes = new SelectList(Ptypes, nameof(SelectListItem.Value), nameof(SelectListItem.Text));
         }
 
         public ClientViewModel(Client client)
@@ -59,8 +119,14 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Type         = client.Type;
             this.CreditDays   = client.CreditDays;
             this.CreditComment = client.CreditComment;
+            this.LockEndDate = client.LockEndDate;
+            this.LockUser    = client.LockUser;
+
+
             this.States = new List<State>().ToSelectList();
             this.Cities = new List<City>().ToSelectList();
+            this.Addresses = client.Addresses;
+            
             FillTypes();
         }
     }

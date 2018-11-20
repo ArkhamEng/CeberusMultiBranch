@@ -81,8 +81,10 @@
     </div>
     <input id="IsGrid" type="hidden" value="false" />
 
-    <div id="divProducts">
-        @Html.Partial("_List", Model.Products)
+    <div class="panel panel-default">
+        <div id="divProducts" class="panel-body dtContainer">
+            @Html.Partial("_List", Model.Products)
+        </div>
     </div>
 
     <div id="divModals">

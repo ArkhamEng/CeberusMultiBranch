@@ -5,58 +5,93 @@
     Layout = "~/Views/Shared/MainLayout.cshtml";
 }
 
+<div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
+    <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
+        <div class="col-xs-6 col-sm-4 col-md-12">
+            @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
+            {
+                <img src="~/Content/Images/logoAb.png" class="img-responsive" id="sidebarCollapse"
+                     onmouseover="SetPointer(this)" style="max-height:60px" />
+            }
+            else
+            {
+                <div class="col-xs-10">
+                    <img src="~/Content/Images/rebilogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
+                </div>
+            }
 
-    <div class="wrapper">
-        @Html.Partial("_BranchSelector")
-
-        @Html.Partial("_SideBar")
-
-        @Html.Partial("_Confirm")
-
-        @Html.Partial("_ConfirmPopOver")
-
-        <div id="divModalCart">
         </div>
-
-        <div id="divPrintBudget">
-        </div>
-
-        <div id="divPriceSelector"></div>
-
-        @Html.Partial("_QuickClient")
-
-
-        <div id="content" class="container-fluid">
-            @RenderBody()
-        </div>
-
     </div>
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+
+            <p style="color:whitesmoke !important; font-size:18pt;" class="nav navbar-nav">
+                <span class="@ViewBag.Class"></span>
+                @ViewBag.Title
+            </p>
+
+            @Html.Partial("_LoginPartial")
+        </div>
+    </div>
+</div>
+
+<div class="wrapper">
+    @Html.Partial("_BranchSelector")
+
+    @Html.Partial("_SideBar")
+
+
+    @Html.Partial("_ConfirmPopOver")
+
+    <div id="divModalCart">
+    </div>
+
+    <div id="divPrintBudget">
+    </div>
+
+    <div id="divPriceSelector"></div>
+
+    @Html.Partial("_QuickClient")
+
+
+    <div id="content" class="container-fluid">
+        @RenderBody()
+    </div>
+
+</div>
 
 
 <div id="AccessBlock" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content panel-danger">
             <div class="modal-header panel-heading">
-                <h4  class="modal-title">
+                <h4 class="modal-title">
                     Ingreso fuera de Horario
                 </h4>
             </div>
             <div class="modal-body panel-body">
                 <div class="col-md-2 col-xs-4 col-sm-2">
-                    <img  class="img-responsive" src="~/Content/Images/warning.png" />
+                    <img class="img-responsive" src="~/Content/Images/warning.png" />
                 </div>
                 <div class="col-md-10 col-xs-8 col-sm-10">
                     <p>
                         Estas intentando ingresar al sistema fuera del horario laboral,
-                        este privilegio es solo para el administardor, ingresos no autorizados pueden ser penalizados 
+                        este privilegio es solo para el administardor, ingresos no autorizados pueden ser penalizados
                         severamente.
                     </p>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-warning" onclick="Cerrar()" >
+                <button type="button" class="btn btn-warning" onclick="Cerrar()">
                     <span class="glyphicon glyphicon-log-out"></span>
-                    Cerrar session 
+                    Cerrar session
                 </button>
             </div>
         </div>
@@ -68,18 +103,14 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
-        if ('@User.IsValid()' != 'True')
-        {
+    $(document).ready(function () {
+        if ('@User.IsValid()' != 'True') {
             $("#AccessBlock").modal({ backdrop: 'static' });
         }
     });
 
-    function Cerrar()
-    {
-        ExecuteAjax('@Url.Action("LogOut","Account")', {}, function ()
-        {
+    function Cerrar() {
+        ExecuteAjax('@Url.Action("LogOut","Account")', {}, function () {
             window.location = '@Url.Action("LogIn","Account")'
         });
     }

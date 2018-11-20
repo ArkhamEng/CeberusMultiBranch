@@ -1,0 +1,74 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.WithdrawalCause
+
+@Scripts.Render("~/bundles/jqueryval")
+
+<form id="SaveCauseForm">
+
+    <div class="modal-content panel panel-primary">
+        <div class="modal-header panel-heading">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="panel-title">
+                <i class="fa fa-book"></i>
+                Edición de Causa de retiro
+            </h4>
+        </div>
+        <div class="modal-body panel-body">
+            @Html.HiddenFor(model => model.WithdrawalCauseId)
+
+            <div class="form-group col-md-8">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-capitalize", placeholder = "Nombre de la causa" } })
+                </div>
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary" onclick="SaveCause()">
+                    <span class="fa fa-save"></span>
+                    Guardar
+                </button>
+
+                <button type="button" class="btn btn-danger" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+</form>
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#SaveCauseForm");
+        form.validate();
+    });
+
+    function SaveCause()
+    {
+        var form = $("#SaveCauseForm");
+
+        if (!form.valid()) {
+            ShowNotify("Error de validación", 'warning', "Existen errores en los datos capturado, por favor verifique", 3000);
+            return;
+        }
+
+        ShowModLoading();
+
+        var cause ={ Name: $("#Name").val(), WithdrawalCauseId: $("#WithdrawalCauseId").val() };
+
+        ExecuteAjax('@Url.Action("SaveCause","Configuration")', {cause: cause} , function (response)
+        {
+            HideModal(function ()
+            {
+                $("#divCauses").html(response);
+            }, true);
+        });
+
+    }
+
+</script>

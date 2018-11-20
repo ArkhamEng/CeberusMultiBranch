@@ -192,6 +192,7 @@
     <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\ConfigurationController.cs" />
     <Compile Include="Controllers\Config\CarMakesController.cs" />
+    <Compile Include="Controllers\Config\DataTablesPostObject.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
@@ -342,9 +343,22 @@
     <Compile Include="Migrations\201808210430422_PathLengthImage1.Designer.cs">
       <DependentUpon>201808210430422_PathLengthImage1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811150627197_AddressesForPersons.cs" />
+    <Compile Include="Migrations\201811150627197_AddressesForPersons.Designer.cs">
+      <DependentUpon>201811150627197_AddressesForPersons.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811161713069_removeAddresFromEntities.cs" />
+    <Compile Include="Migrations\201811161713069_removeAddresFromEntities.Designer.cs">
+      <DependentUpon>201811161713069_removeAddresFromEntities.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811192055216_AuditConfig.cs" />
+    <Compile Include="Migrations\201811192055216_AuditConfig.Designer.cs">
+      <DependentUpon>201811192055216_AuditConfig.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Entities\Catalog\Address.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
     <Compile Include="Models\Entities\Catalog\Compatibility.cs" />
     <Compile Include="Models\Entities\Catalog\Employee.cs" />
@@ -371,6 +385,7 @@
     <Compile Include="Models\Entities\Finances\FinancialOperation.cs" />
     <Compile Include="Models\Entities\Finances\PurchasePayment.cs" />
     <Compile Include="Models\Entities\Finances\Receivable.cs" />
+    <Compile Include="Models\Entities\Config\JobPosition.cs" />
     <Compile Include="Models\Entities\Operative\Budget.cs" />
     <Compile Include="Models\Entities\Operative\BudgetDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
@@ -394,11 +409,9 @@
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
-    <Compile Include="Models\ViewModels\Catalog\SearchClientViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\SearchPersonViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
-    <Compile Include="Models\ViewModels\Catalog\SearchEmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
-    <Compile Include="Models\ViewModels\Catalog\SearchProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\TransferViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
@@ -423,10 +436,12 @@
     <Compile Include="Support\Extension.cs" />
     <Compile Include="Support\FileManager.cs" />
     <Compile Include="Support\GzipWrapper.cs" />
+    <Compile Include="Support\JResponse.cs" />
     <Compile Include="Support\record.cs" />
     <Compile Include="Support\Shift.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Global.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -592,17 +607,23 @@
     <Content Include="Content\font-awesome.css" />
     <Content Include="Content\font-awesome.min.css" />
     <Content Include="Content\Images\autobienlogo.png" />
+    <Content Include="Content\Images\background.jpg" />
+    <Content Include="Content\Images\background.png" />
     <Content Include="Content\Images\header.png" />
     <Content Include="Content\Images\loading.gif" />
     <Content Include="Content\Images\logo1.png" />
     <Content Include="Content\Images\logo2.png" />
     <Content Include="Content\Images\logoAb.png" />
+    <Content Include="Content\Images\question.png" />
     <Content Include="Content\Images\rebilogo.png" />
     <Content Include="Content\Images\rebilogo2.png" />
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
     <Content Include="Content\bootstrap-slider.min.css" />
+    <Content Include="Content\pnotify\pnotify.buttons.css" />
+    <Content Include="Content\pnotify\pnotify.css" />
+    <Content Include="Content\pnotify\pnotify.nonblock.css" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -750,6 +771,11 @@
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
+    <Content Include="Scripts\jquery.maskedinput.min.js" />
+    <Content Include="Scripts\jszip\jszip.min.js" />
+    <Content Include="Scripts\pnotify\pnotify.buttons.js" />
+    <Content Include="Scripts\pnotify\pnotify.js" />
+    <Content Include="Scripts\pnotify\pnotify.nonblock.js" />
     <Content Include="Scripts\Table2Excel.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
@@ -811,9 +837,9 @@
     <Content Include="Views\Configuration\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
-    <Content Include="Views\Clients\Create.cshtml" />
+    <Content Include="Views\Clients\_ClientEdition.cshtml" />
     <Content Include="Views\Clients\Index.cshtml" />
-    <Content Include="Views\Employees\Create.cshtml" />
+    <Content Include="Views\Employees\_EmployeeEdition.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
     <Content Include="Views\CarMakes\Create.cshtml" />
     <Content Include="Views\CarMakes\Edit.cshtml" />
@@ -822,7 +848,7 @@
     <Content Include="Views\CarModels\Index.cshtml" />
     <Content Include="Views\CarModels\Create.cshtml" />
     <Content Include="Views\CarModels\_YearList.cshtml" />
-    <Content Include="Views\Providers\Create.cshtml" />
+    <Content Include="Views\Providers\_ProviderEdition.cshtml" />
     <Content Include="Views\Providers\Index.cshtml" />
     <Content Include="Views\Providers\_List.cshtml" />
     <Content Include="Views\Employees\_List.cshtml" />
@@ -835,16 +861,13 @@
     <Content Include="Views\Configuration\_BranchList.cshtml" />
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
-    <Content Include="Views\Shared\_QuickUser.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
     <Content Include="Views\Purchases\History.cshtml" />
-    <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Products\_ProductList.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
     <Content Include="Views\Purchases\_PurchaseList.cshtml" />
     <Content Include="Views\Products\Detail.cshtml" />
-    <Content Include="Views\Shared\_MessageBox.cshtml" />
     <Content Include="Views\Shared\_Progress.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Sales\_Cart.cshtml" />
@@ -880,9 +903,8 @@
     <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
     <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
     <Content Include="Views\Purchases\_InternalProductList.cshtml" />
-    <Content Include="Views\Providers\UpdateCatalog.cshtml" />
+    <Content Include="Views\Providers\_ProviderCatalogEdition.cshtml" />
     <Content Include="Views\Shared\MainLayout.cshtml" />
-    <Content Include="Views\Shared\_Layout - Copy.cshtml" />
     <Content Include="Views\Shared\PageLayout.cshtml" />
     <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
@@ -902,12 +924,10 @@
     <Content Include="Views\Configuration\_Systems.cshtml" />
     <Content Include="Views\Configuration\_SystemList.cshtml" />
     <Content Include="Views\Configuration\_SystemEdition.cshtml" />
-    <Content Include="Views\Configuration\SystemCategory.cshtml" />
+    <Content Include="Views\Configuration\Clasifications.cshtml" />
     <Content Include="Views\Configuration\_SystemCategory.cshtml" />
     <Content Include="Views\Products\_GeneralData.cshtml" />
-    <Content Include="Views\Clients\_ClientEdition.cshtml" />
     <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
-    <Content Include="Views\Shared\_ConfirmPopOver.cshtml" />
     <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
     <Content Include="Views\CashRegister\_PrintTicket.cshtml" />
     <Content Include="Views\Sales\Detail.cshtml" />
@@ -933,6 +953,13 @@
     <Content Include="Views\Sales\_BudgetDetail.cshtml" />
     <Content Include="Views\Sales\_BudgetList.cshtml" />
     <Content Include="Views\Sales\_ChangeQuantity.cshtml" />
+    <Content Include="Views\Shared\_ChildModal.cshtml" />
+    <Content Include="Views\Shared\_Loading.cshtml" />
+    <Content Include="Views\Shared\_Message.cshtml" />
+    <Content Include="Views\Shared\_Modal.cshtml" />
+    <Content Include="Views\Shared\_QuickProduct.cshtml" />
+    <Content Include="Views\Configuration\SystemTest.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCauseEdition.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1053,6 +1080,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201808210430422_PathLengthImage1.resx">
       <DependentUpon>201808210430422_PathLengthImage1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811150627197_AddressesForPersons.resx">
+      <DependentUpon>201811150627197_AddressesForPersons.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811161713069_removeAddresFromEntities.resx">
+      <DependentUpon>201811161713069_removeAddresFromEntities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811192055216_AuditConfig.resx">
+      <DependentUpon>201811192055216_AuditConfig.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

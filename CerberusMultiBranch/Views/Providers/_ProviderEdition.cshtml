@@ -1,0 +1,290 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProviderViewModel
+@using CerberusMultiBranch.Support
+
+@Scripts.Render("~/bundles/jqueryval")
+
+
+@using (Html.BeginForm("Save", "Providers", FormMethod.Post, new { id = "SaveForm" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(m => m.ProviderId)
+
+    @Html.HiddenFor(m => m.IsActive)
+
+
+    <div class="panel panel-primary">
+        <div class="panel-heading text-strong">
+            <span class="fa fa-handshake-o"></span>
+            Datos de Proveedor
+        </div>
+        <div class="panel-body  small">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#General">Datos Generales</a></li>
+                <li><a data-toggle="tab" href="#Addresses">Dirección y crédito</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div id="General" class="tab-pane fade in active">
+                    <br />
+                    <div class="row">
+                        <div class="form-group col-md-3">
+                            @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                                @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control input-sm", disabled = "disabled" } })
+                            </div>
+                        </div>
+
+                     
+                        <div class="form-group col-md-7 col-md-offset-2">
+                            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+
+                    
+                        <div class="form-group col-md-7">
+                            @Html.LabelFor(model => model.BusinessName, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-black-tie"></i></span>
+                                @Html.EditorFor(model => model.BusinessName, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.BusinessName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-4 col-md-push-1">
+                            @Html.LabelFor(model => model.FTR, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
+                                @Html.EditorFor(model => model.FTR, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group  col-md-6">
+                            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-at"></i></span>
+                                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control text-lowercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group  col-md-6">
+                            @Html.LabelFor(model => model.Email2, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-at"></i></span>
+                                @Html.EditorFor(model => model.Email2, new { htmlAttributes = new { @class = "form-control text-lowercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Email2, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="form-group col-md-4">
+                            @Html.LabelFor(model => model.Phone2, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                                @Html.EditorFor(model => model.Phone2, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Phone2, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-4">
+                            @Html.LabelFor(model => model.Phone3, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-phone"></i></span>
+                                @Html.EditorFor(model => model.Phone3, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Phone3, "", new { @class = "text-danger" })
+                        </div>
+
+
+                        <div class="form-group col-md-7">
+                            @Html.LabelFor(model => model.Agent, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user-secret"></i></span>
+                                @Html.EditorFor(model => model.Agent, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Agent, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-5">
+                            @Html.LabelFor(model => model.Line, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-trademark"></i></span>
+                                @Html.EditorFor(model => model.Line, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.Line, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            @Html.LabelFor(model => model.AgentPhone, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-mobile-phone"></i></span>
+                                @Html.EditorFor(model => model.AgentPhone, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.AgentPhone, "", new { @class = "text-danger" })
+                        </div>
+
+
+                        <div class="form-group col-md-7 col-md-offset-2">
+                            @Html.LabelFor(model => model.WebSite, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                @Html.EditorFor(model => model.WebSite, new { htmlAttributes = new { @class = "form-control text-lowercase input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.WebSite, "", new { @class = "text-danger" })
+                        </div>
+
+                    </div>
+                </div>
+                <div id="Addresses" class="tab-pane fade">
+                    <br />
+                    <div class="row">
+                        @foreach (var Address in Model.Addresses)
+                        {
+                            @Html.HiddenFor(model => Address.AddressId)
+                            @Html.HiddenFor(model => Address.ProviderId)
+                            <div class="form-group col-md-5">
+                                @Html.LabelFor(model => Address.City.StateId, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                                    @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                                </div>
+                            </div>
+
+
+                            <div class="form-group  col-md-7">
+                                @Html.LabelFor(model => Address.CityId, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-o"></i></span>
+                                    @Html.DropDownListFor(mode => Address.CityId, Model.Cities, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.CityId, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                @Html.LabelFor(model => Address.Location, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    @Html.EditorFor(model => Address.Location, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.Location, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                @Html.LabelFor(model => Address.Street, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    @Html.EditorFor(model => Address.Street, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.Street, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="form-group col-md-3">
+                                @Html.LabelFor(model => Address.ZipCode, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-signs"></i></span>
+                                    @Html.EditorFor(model => Address.ZipCode, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.ZipCode, "", new { @class = "text-danger" })
+                            </div>
+
+
+                            <div class="form-group col-md-9">
+                                @Html.LabelFor(model => Address.Reference, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    @Html.EditorFor(model => Address.Reference, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.Reference, "", new { @class = "text-danger" })
+                            </div>
+
+                        }
+                    </div>
+
+                    <hr />
+
+                    <div class="row">
+                        <div class="form-group col-md-2">
+                            @Html.LabelFor(model => model.CreditLimit, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+                                @Html.EditorFor(model => model.CreditLimit, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CreditLimit, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            @Html.LabelFor(model => model.CreditLimit, htmlAttributes: new { @class = "control-label" })
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-credit-card-alt"></i></span>
+                                @Html.EditorFor(model => model.CreditLimit, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", type = "number", autocomplete = "off" } })
+                            </div>
+                            @Html.ValidationMessageFor(model => model.CreditLimit, "", new { @class = "text-danger" })
+                        </div>
+
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+
+                <button type="submit" class="btn btn-primary">
+                    <span class="fa fa-save"></span>
+                    Guardar
+                </button>
+
+                <button type="button" class="btn btn-danger" id="EditCancel" >
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+
+}
+
+<script>
+
+    $(document).ready(function ()
+    {
+        SetCascade("#StateId", "#Address_CityId", '@Url.Action("GetCities", "Json")');
+
+        $("#Name").keyup(function ()
+        {
+            $("#BusinessName").val($("#Name").val());
+        });
+
+        $("#Phone").mask("(999) 999 99 99");
+
+        $("#Phone2").mask("(999) 999 99 99");
+
+        $("#Phone3").mask("(999) 999 99 99");
+
+        $("#AgentPhone").mask("(999) 999 99 99");
+
+        $("#FTR").mask("aaa*99999****");
+    });
+
+
+</script>
+
+

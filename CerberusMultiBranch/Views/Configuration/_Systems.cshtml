@@ -1,81 +1,66 @@
-﻿
-<div id="divSystemEdition"></div>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.PartSystem>
 
-<div class="panel panel-danger">
-    <div class="panel-body">
-        <div class="col-md-10">
-            <div class="input-group ">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                @Html.TextBox("FilterSystem", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre del sistema" })
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="btnSearchSystem" onclick="SearchSystem()">
-                        <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
-                    </button>
-                    <button type="button" class="btn btn-success" id="btnCreateSystem" onclick="CreateSystem()">
-                        <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>uevo
-                    </button>
-                </span>
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtons" class="col-md-6"></div>
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("FilterSystem", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre del sistema" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchSystem()" title="Buscar tipos de producto (sistemas)">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateSystem()" title="Agregar nueva tipo de producto (sistema)">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+
+
+    <div class="panel panel-default">
+        <div id="divSystems" class="panel-body dtContainer">
+            @Html.Partial("_SystemList", Model)
+        </div>
+    </div>
+
 </div>
 
-<div>
-    <div id="divSystems">
-        @Html.Partial("_SystemList",new List<CerberusMultiBranch.Models.Entities.Config.PartSystem>())
-    </div>
-</div>
+
 
 
 
 <script>
-    $(document).ready(function () {}).keydown(function (e)
-    {
-        if ($("#liSystem").hasClass('active'))
-        {
-            if ($("#ModalSystem").hasClass('in') && e.which == 13)
-            {
-                console.log("system tab no se hace nada en system");
-            }
-            else
-            {
-                if (e.which == 13 || (e.altKey && e.which == 66))
-                {
-                    console.log("enter for search categories");
-                    $("#btnSearchSystem").click();
-                }
-
-                if (e.altKey && e.keyCode == 78)
-                {
-                    $("#btnCreateSystem").click();
-                }
-                e.stopImmediatePropagation();
-            }
-        }
-    });
-
     function CreateSystem()
     {
-        ExecuteAjax('@Url.Action("NewSystem", "Configuration")', {}, function (response) {
-            $("#divSystemEdition").html(response);
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditSystem", "Configuration")', {}, function (response) {
+            HideLoading(function () {
+                ShowModal(response, 'static');
+            });
         });
     }
 
     function SearchSystem()
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("SearchSystems","Configuration")',
-            { filter: $("#FilterSystem").val() }, function (response)
-            {
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Result, response.Message, 'warning');
-                else
-                    $("#divSystems").html(response);
+        ShowLoading('static');
 
-                HideLoading();
+        ExecuteAjax('@Url.Action("SearchSystems","Configuration")', { filter: $("#FilterSystem").val() }, function (response) {
+            HideLoading(function () {
+                $("#divSystems").html(response);
+
             });
+        });
     }
 
 </script>

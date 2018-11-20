@@ -17,6 +17,8 @@ namespace CerberusMultiBranch.Models
         #region Config
         public DbSet<Variable> Variables { get; set; }
 
+        public DbSet<JobPosition> JobPositions { get; set; }
+
         public DbSet<WithdrawalCause> WithdrawalCauses { get; set; }
 
         public DbSet<Category> Categories { get; set; }

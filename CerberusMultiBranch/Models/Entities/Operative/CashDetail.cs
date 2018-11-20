@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -48,40 +49,36 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     }
 
- /*   public class Withdrawal : CashDetail
-    {
-        [Display(Name = "Comentario")]
-        [Required]
-        [MaxLength(100)]
-        public string Comment { get; set; }
 
-        [ForeignKey("Cause")]
-        public int WithdrawalCauseId { get; set; }
-
-        public virtual WithdrawalCause Cause { get; set; }
-    }
-
-    public class Income : CashDetail
-    {
-        public PaymentType Type { get; set; }
-        
-        public string SaleFolio { get; set; }    
-    }*/
 
     [Table("WithdrawalCause", Schema = "Operative")]
     public class WithdrawalCause:ISelectable
     {
         public int WithdrawalCauseId { get; set; }
 
+        [MaxLength(50)]
         public string Name { get; set; }
 
-        public string UserAdd { get; set; }
+        [Display(Name = "Editado")]
+        public DateTime UpdDate { get; set; }
 
-        public DateTime InsDate { get; set; }
+        [Display(Name = "Editado por")]
+        [MaxLength(100)]
+        public string UpdUser { get; set; }
+
+        [Display(Name ="Activo")]
+        public bool IsActive { get; set; }
 
         public ICollection<CashDetail> Withdrawals { get; set; }
 
         public int Id { get { return this.WithdrawalCauseId; } }
-       
+
+        public WithdrawalCause()
+        {
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.IsActive = true;
+        }
+
     }
 }

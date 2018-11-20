@@ -1,0 +1,181 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProviderCatalogViewModel
+
+@using (Html.BeginForm("UpdateCatalog", "Providers", FormMethod.Post, new { id="FormUpdateCatalog", enctype = "multipart/form-data" }))
+{
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <div class="panel-title">
+                <span class="fa fa-file-excel-o"></span>
+                Carga de catalogo de proveedor
+            </div>
+        </div>
+
+        <div class="panel-body">
+
+            <h3 class="text-center text-danger">
+                @Model.ProviderName.ToUpper()
+            </h3>
+            <h3 class="text-center text-danger">
+                Productos en catálogo:&nbsp;&nbsp;@Model.ProductsCount
+            </h3>
+            <h3 class="text-center text-danger">
+                Productos a procesar :&nbsp;&nbsp; <a id="pendingCount">@Model.PendingCount</a>
+            </h3>
+
+            @Html.HiddenFor(model => model.ProviderKey)
+            @Html.HiddenFor(model => model.ProviderName)
+
+
+            <label id="lblFile" class="text-danger"></label>
+
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <label id="upload" class="btn btn-primary btn-file hidden">
+                    <span class="fa fa-file-excel-o"></span>
+                    Seleccionar
+                    <input type="file" name="file" style="display: none;" accept="text/xml" onchange="FileChanged(this)">
+                </label>
+
+                <button id="btnSubmitCatalog" type="submit" class="btn btn-warning hidden" >
+                    <span class="fa fa-cloud-upload"></span>
+                    Cargar Archivo
+                </button>
+
+                <button id="btnProcess" type="button" class="btn btn-success hidden" onclick="Process()">
+                    <span class="fa fa-cogs"></span>
+                    Procesar
+                </button>
+
+                <button type="button" class="btn btn-danger" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function()
+    {
+        if ('@Model.CanProcess' =='True')
+            $("#btnProcess").removeClass("hidden");
+        else
+        {
+            $("#upload").removeClass("hidden");
+            $("#btnSubmitCatalog").addClass("hidden");
+        }
+
+        SubmitCatalog();
+    });
+
+    function Process()
+    {
+        ShowNotify("Procesamiento Iniciado", "info", "El procesamiento ha comenzado, esta operación puede tardar " +
+            "varios minutos dependiendo de la cantidad de productos", 3000);
+
+        ShowModLoading();
+
+        ExecuteAjax('@Url.Action("ProcessCatalog","Providers")', { providerId: $("#ProviderKey").val() }, function (response)
+        {
+            HideModal(function ()
+            {
+                SearchProviders();
+                ShowNotify(response.Header, response.Result, response.Body, 3000);
+                
+            }, true);
+        });
+    }
+
+    function FileChanged(input)
+    {
+        var files = input.files;
+
+        var size = (parseFloat(files[0].size) / 1000000).toFixed(2) + " MB";
+        var text = "Archivo: " + files[0].name + "     " + "tamaño:" + size
+        $("#lblFile").text(text);
+
+        $("#btnSubmitCatalog").removeClass("hidden");
+    }
+
+    function SubmitCatalog()
+    {
+        var form = "#FormUpdateCatalog";
+        $(form).off('submit').on('submit', function (e)
+        {
+            e.preventDefault();
+
+            var $form = $(e.target),
+            formData = new FormData(),
+            params = $form.serializeArray(),
+            files = [];
+
+
+            var inputF = $(form).find('[type="file"]');
+
+            if (inputF[0] != 'undefined' && inputF[0] != null)
+            {
+                var file = inputF[0].files[0];
+
+                if (file != 'undefined' && file != null)
+                    formData.append('file', file);
+                else
+                {
+                    ShowNotify("No hay archivo", "warning", "Debe seleccionar un archivo", 3000);
+                    return;
+                }
+            }
+            else
+            {
+                ShowNotify("No hay archivo", "warning", "Debe seleccionar un archivo", 3000);
+                return;
+            }
+
+            //agrego todos los campos del formulario
+            $.each(params, function (i, val) {
+                formData.append(val.name, val.value);
+            });
+
+            ShowModLoading();
+
+            $.ajax({
+                url: $form.attr('action'),
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                type: 'POST',
+                success: function (response)
+                {
+                    HideModLoading();
+
+                    if ($.isPlainObject(response) && response.Code != 200)
+                    {
+                        ShowNotify(response.Header, response.Result, response.Body, 3500);
+
+                        switch (response.Code)
+                        {
+                            case 401:
+                                window.location = data.LogOnUrl;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        $("#upload").addClass("hidden");
+                        $("#btnSubmitCatalog").addClass("hidden");
+                        $("#btnProcess").removeClass("hidden");
+                        HideModLoading();
+
+                        $("#pendingCount").html(response.Extra);
+
+                       ShowNotify(response.Header, response.Result, response.Body,3000);
+                    }
+                },
+                error: function () { HideModLoading(); }
+            });
+        });
+    }
+</script>

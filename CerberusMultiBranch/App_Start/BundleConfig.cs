@@ -10,14 +10,21 @@ namespace CerberusMultiBranch
         {
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                 "~/Scripts/_jquery-ui-1.12.1.min.js",
-                        "~/Scripts/jquery-3.1.1.js"));
+                        "~/Scripts/jquery-3.1.1.js",
+                        "~/Scripts/jquery.maskedinput.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/pnotify").Include(
+                "~/Scripts/pnotify/pnotify.js",
+                "~/Scripts/pnotify/pnotify.buttons.js",
+                "~/Scripts/pnotify/pnotify.nonblock.js"));
 
             bundles.Add(new ScriptBundle("~/bundles/jqueryval").Include(
                         "~/Scripts/jquery.validate*"));
 
             bundles.Add(new ScriptBundle("~/bundles/common").Include(
                     "~/Scripts/Common.js",
-                    "~/AppScripts/Global.js"));
+                    "~/AppScripts/Global.js",
+                    "~/AppScripts/Catalog.js"));
 
 
           // Use the development version of Modernizr to develop with and learn from. Then, when you're
@@ -33,6 +40,11 @@ namespace CerberusMultiBranch
                       "~/Content/bootstrap.css",
                       "~/Content/site.css",
                       "~/Content/font-awesome.css"));
+
+            bundles.Add(new StyleBundle("~/Content/pnotifycss").Include(
+                   "~/Content/pnotify/pnotify.css",
+                   "~/Content/pnotify/pnotify.buttons.css",
+                   "~/Content/pnotify/pnotify.nonblock.css"));
 
         }
     }

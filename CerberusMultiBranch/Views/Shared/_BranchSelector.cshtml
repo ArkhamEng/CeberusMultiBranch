@@ -39,17 +39,21 @@
     {
         $("#ddBranchSelector").empty();
 
-         ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (result)
+         ExecuteAjax('@Url.Action("GetAvailableBranches", "Json")', {}, function (response)
          {
-            $.each(result, function (i, item)
+            $("#ddBranchSelector").empty();
+
+            $.each(response.Extra, function (i, item)
             {
                 var option = "<option value='" + item.BranchId + "'>" + item.Name + "</option>";
 
                 $("#ddBranchSelector").append(option);
             });
 
-            if (result.length > 1)
+            if (response.Extra.length > 1)
+            {
                 $("#divModalBranchSelector").modal({ backdrop: 'static', keyboard: false });
+            }
             else
                 BeginBranchSession();
         });
@@ -57,15 +61,16 @@
 
     function GetBranchSession()
     {
-        ExecuteAjax('@Url.Action("GetBranchSession", "Json")', {}, function (result)
+        ExecuteAjax('@Url.Action("GetBranchSession", "Json")', {}, function (response)
         {
-            if (result.Id == 0)
+
+            if (response.Extra.Id == 0)
             {
                 LoadBranches();
             }
             else
             {
-                $("#lblBrachSelector").text(result.Name);
+                $("#lblBrachSelector").text(response.Extra.Name);
             }
         });
     }
@@ -74,16 +79,22 @@
     {
         var data = { branchId: $("#ddBranchSelector").val(), name: $("#ddBranchSelector option:selected").text() }
 
-        ExecuteAjax('@Url.Action("BeginBranchSession", "Json")', data, function (result)
+
+        $("#divModalBranchSelector").off("hidden.bs.modal").on("hidden.bs.modal", function (e)
         {
-          
-            if (result)
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("BeginBranchSession", "Json")', data, function (response)
             {
-                $("#divModalBranchSelector").modal('hide');
-                $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
-                window.location = '@Url.Action("Index","Products")';
-            }
+                if (response.Extra)
+                {
+                    $("#lblBrachSelector").text($("#ddBranchSelector option:selected").text());
+                    window.location = window.location;// '@Url.Action("Index","Products")';
+                }
+            });
         });
+
+        $("#divModalBranchSelector").modal('hide');
     }
 </script>
 

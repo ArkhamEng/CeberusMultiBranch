@@ -25,167 +25,275 @@ namespace CerberusMultiBranch.Controllers.Catalog
         // GET: Employees
         public ActionResult Index()
         {
-            var model = new SearchEmployeeViewModel();
-            model.Employees = db.Employees.OrderBy(e=> e.Name).Include(e => e.City).Where(e=> e.IsActive);
-            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
+            var model = new SearchPersonViewModel<EmployeeViewModel>();
+            model.Persons = LookFor(null, null, null, null, null);
 
             return View(model);
         }
 
-
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string name, string phone)
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone, int? id)
+        {
+            var model = LookFor(stateId, cityId, name, phone, id);
+            return PartialView("_List", model);
+        }
+
+
+        
+        private List<EmployeeViewModel> LookFor(int? stateId, int? cityId, string name, string phone, int? id)
         {
             string[] arr = new List<string>().ToArray();
 
             if (name != null && name != string.Empty)
                 arr = name.Trim().Split(' ');
 
-            var model = (from c in db.Employees
+            var model = (from employee in db.Employees.Where(e=> e.IsActive).Include(e=> e.Addresses)
                          where
-                             (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
-                             (stateId == null || c.City.StateId == stateId) &&
-                             (cityId == null || c.CityId == cityId) &&
-                             (phone == null || phone == string.Empty || c.Phone == phone) 
-                         select c).OrderBy(e=> e.Name).ToList();
+                             (id == null || employee.EmployeeId == id) &&
+                             (name == null || name == string.Empty || arr.Any(n => (employee.Code + " " + employee.Name).Contains(name))) &&
+                             //(stateId == null || employee.City.StateId == stateId) &&
+                             //(cityId == null || employee.CityId == cityId) &&
+                             (phone == null || phone == string.Empty || employee.Phone == phone) &&
+                             (employee.IsActive)
+                         select new EmployeeViewModel
+                         {
+                             EmployeeId = employee.EmployeeId,
+                             Code = employee.Code,
+                             Email = employee.Email,
+                             Entrance = employee.Entrance,
+                             FTR = employee.FTR,
+                             IsActive = employee.IsActive,
+                             Name = employee.Name,
+                             Phone = employee.Phone,
 
-            return PartialView("_List", model);
+                             PictureType = employee.PictureType,
+                             Picture = employee.Picture,
+                             UserId = employee.UserId,
+                             NSS = employee.NSS,
+                             EmergencyPhone = employee.EmergencyPhone,
+                             Salary = employee.Salary,
+                             ComissionForSale = employee.ComissionForSale,
+
+                             JobPosition = employee.JobPosition,
+
+                             LockUser = employee.LockUser,
+                             LockEndDate = employee.LockEndDate,
+                             Addresses = employee.Addresses,
+                         }).OrderBy(e => e.Name).ToList();
+
+            return model;
         }
 
-        // GET: Employees/Create
-        public ActionResult Create(int? id)
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista,Supervisor")]
+        public ActionResult BeginAdd(int? id)
         {
             EmployeeViewModel model;
 
             if (id != null)
             {
-                model = new EmployeeViewModel(db.Employees.FirstOrDefault(e=> e.EmployeeId==id));
+                var employee = db.Employees.Include(e => e.Addresses).FirstOrDefault(e => e.EmployeeId == id);
+                model = new EmployeeViewModel(employee);
 
-                model.StateId = db.Cities.Find(model.CityId).StateId;
-                model.Cities = db.Cities.OrderBy(c=> c.Name).Where(c => c.StateId == model.StateId).ToSelectList();
+                if (model.IsLocked)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordLocked,
+                        Header = "Registro bloqueado",
+                        Body = "Este cliente " + employee.Name.ToUpper() + " se encuentra bloqueado por " + model.LockUser + " y no puede ser editado hasta ser liberado",
+                    });
+                }
+
+                //bloqueo del registro
+                try
+                {
+                    employee.LockEndDate = DateTime.Now.ToLocal().AddMinutes(Cons.LockTimeOut);
+                    employee.LockUser = HttpContext.User.Identity.Name;
+                    model.LockEndDate = employee.LockEndDate;
+                    model.LockUser = employee.LockUser;
+
+                    db.Entry(employee).State = EntityState.Modified;
+
+                    db.SaveChanges();
+                }
+                catch (Exception)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Danger,
+                        Code = Cons.Responses.Codes.ServerError,
+                        Header = "Error al bloquear",
+                        Body = "Ocurrio un error al bloquear el empleado " + employee.Name.ToUpper()
+                    });
+                }
+
+                var stateId = model.Addresses.First().City.StateId;
+                model.StateId = stateId;
+                model.Cities = db.Cities.Where(c => c.StateId == model.StateId).OrderBy(c => c.Name).ToSelectList(model.Addresses.First().CityId);
+                
             }
             else
                 model = new EmployeeViewModel();
 
-            model.States = db.States.OrderBy(s=> s.Name).ToSelectList();
+            model.States = db.States.OrderBy(s => s.Name).ToSelectList();
+            model.JobPositions = db.JobPositions.OrderBy(j => j.Name).ToSelectList();
 
-            return View(model);
+            return PartialView("_EmployeeEdition", model);
         }
 
-    
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Employee employee)
+        [CustomAuthorize(Roles = "Capturista,Supervisor")]
+        public ActionResult Save(Employee employee)
         {
-            if (ModelState.IsValid)
+            try
             {
-                try
+                var response = new JResponse
                 {
-                    employee.UpdUser = User.Identity.Name;
-                    employee.UpdDate = DateTime.Now.ToLocal();
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success
+                };
 
-                    if (employee.EmployeeId == Cons.Zero)
+                if (employee.EmployeeId == Cons.Zero)
+                {
+                    if (employee.PostedFile != null)
                     {
-                        if (employee.PostedFile != null)
-                        {
-                            employee.PictureType = employee.PostedFile.ContentType;
-                            employee.Picture = employee.PostedFile.ToCompressedFile();
-                        }
-
-                        employee.Code = db.Employees.Max(c => c.Code).ToCode();
-                        db.Employees.Add(employee);
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-                        if (employee.PostedFile != null)
-                        {
-                            employee.PictureType = employee.PostedFile.ContentType;
-                            employee.Picture = employee.PostedFile.ToCompressedFile();
-                        }
-
-                        db.Entry(employee).State = EntityState.Modified;
-
-                        if (employee.PostedFile == null)
-                        {
-                            db.Entry(employee).Property(e => e.Picture).IsModified = false;
-                            db.Entry(employee).Property(e => e.PictureType).IsModified = false;
-                        }
-
-                        db.SaveChanges();
+                        employee.PictureType = employee.PostedFile.ContentType;
+                        employee.Picture = employee.PostedFile.ToCompressedFile();
                     }
 
-                    return RedirectToAction("Create", new { id = employee.EmployeeId });
+                    employee.Code = db.Employees.Max(c => c.Code).ToCode();
+                    db.Employees.Add(employee);
+
+                    response.Id = employee.EmployeeId;
+                    response.Header = "Nuevo Empleado registrado";
+                    response.Body = "Empleado " + employee.Name.ToUpperInvariant() +
+                        " fue agregado correctamente, si requiere el uso de sistema deberas configurarle un usuario";
                 }
-                
-                catch (Exception ex)
+                else
                 {
-                    ViewBag.Header = "Error al guardar los datos";
-                    ViewBag.Message = "Ocurrio un error al guardar los datos del empleador detail:"+ex.Message;
+                    if (employee.PostedFile != null)
+                    {
+                        employee.PictureType = employee.PostedFile.ContentType;
+                        employee.Picture = employee.PostedFile.ToCompressedFile();
+                    }
+
+                    db.Entry(employee).State = EntityState.Modified;
+                    db.Entry(employee).Property(c => c.IsActive).IsModified = false;
+                    db.Entry(employee).Property(c => c.Code).IsModified = false;
+
+                    if (employee.PostedFile == null)
+                    {
+                        db.Entry(employee).Property(e => e.Picture).IsModified = false;
+                        db.Entry(employee).Property(e => e.PictureType).IsModified = false;
+                    }
+
+                    foreach (var address in employee.Addresses)
+                        db.Entry(address).State = EntityState.Modified;
+
+                    response.Id = employee.EmployeeId;
+                    response.Header = "Empleado actualizado!";
+                    response.Body = "Se registraron las modificaciones del empleado " + employee.Name.ToUpperInvariant() +
+                        " y se liberaron bloqueos sobre el registro";
                 }
-            }
 
-            return RedirectToAction("Create", new { id = employee.EmployeeId });
-        }
-
-        // GET: Employees/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Code", employee.CityId);
-            return View(employee);
-        }
-
-        // POST: Employees/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "EmployeeId,Code,Name,BusinessName,FTR,TaxAddress,Address,ZipCode,Entrance,Email,Phone,CityId,Picture,IsActive,InsDate,UpdDate")] Employee employee)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(employee).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Index");
+
+                return Json(response);
             }
-            ViewBag.CityId = new SelectList(db.Cities, "CityId", "Code", employee.CityId);
-            return View(employee);
+
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al guardar",
+                    Body = "Ocurrio un error al guardar los datos del empleado " +
+                            employee.Name.ToUpperInvariant() + " Detalle:" + ex.Message
+                });
+            }
+
         }
 
-        // GET: Employees/Delete/5
-        public ActionResult Delete(int? id)
+        [HttpPost]
+        public ActionResult UnLock(int id)
         {
-            if (id == null)
+            try
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                var employee = db.Employees.Find(id);
+                employee.LockEndDate = null;
+                employee.LockUser    = null;
+
+                db.Entry(employee).Property(p => p.LockUser).IsModified = true;
+                db.Entry(employee).Property(p => p.LockEndDate).IsModified = true;
+
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Empleado desbloqueado!",
+                    Body = "Se libero el bloque del empleado: " +
+                          employee.Name.ToUpperInvariant()
+                });
             }
-            Employee employee = db.Employees.Find(id);
-            if (employee == null)
+            catch (Exception)
             {
-                return HttpNotFound();
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al desbloquear",
+                    Body = "Ocurrio un error al desbloquear el registro del Empleado"
+                });
             }
-            return View(employee);
+
         }
 
-        // POST: Employees/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        [HttpPost]
+        public ActionResult Deactivate(int id)
         {
-            Employee employee = db.Employees.Find(id);
-            db.Employees.Remove(employee);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            try
+            {
+                var employee = db.Employees.Find(id);
+
+                employee.UpdDate = DateTime.Now.ToLocal();
+                employee.UpdUser = HttpContext.User.Identity.Name;
+                employee.IsActive = false;
+
+                db.Entry(employee).Property(p => p.IsActive).IsModified = true;
+                db.Entry(employee).Property(p => p.UpdUser).IsModified = true;
+                db.Entry(employee).Property(p => p.UpdDate).IsModified = true;
+
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Empleado Eliminado",
+                    Body = "Se elimino el empleado: " +
+                          employee.Name.ToUpperInvariant() + " del catálogo"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al Eliminar",
+                    Body = "Ocurrio un error al eliminar el registro de empleado"
+                });
+            }
         }
+
+     
 
         protected override void Dispose(bool disposing)
         {

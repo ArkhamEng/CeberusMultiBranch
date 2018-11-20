@@ -3,7 +3,7 @@
 
 @{ int i = Model.FirstOrDefault() != null ? Model.FirstOrDefault().Count : 1; }
 
-<table id="tbProducts" class="table  text-uppercase">
+<table id="tbProducts" class="table  text-uppercase" style="width:100%">
     <thead class="panel-heading">
         <tr hidden="hidden">
             @for (var j = 0; j < i; j++)
@@ -170,8 +170,9 @@
 <div id="divMovement"></div>
 
 <script>
-    $(document).ready(function () {
-        SetDataTable("#tbProducts", "#txtName");
+    $(document).ready(function ()
+    {
+        Paginate("#tbProducts", false, "#txtName", false);
     });
 
     function Detail(id, isActive) {

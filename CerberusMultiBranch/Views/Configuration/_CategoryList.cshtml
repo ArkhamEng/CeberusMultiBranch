@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
+@using CerberusMultiBranch.Support
 
-    <table id="tbCategories" class="table table-striped ">
+    <table id="tbCategories" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
         <thead>
             <tr>
                 <th>
@@ -10,10 +11,10 @@
                     @Html.DisplayNameFor(model => model.SatCode)
                 </th>
                 <th>
-                    @Html.DisplayName("Fecha Mod")
+                    @Html.DisplayName("Ultima Modificación")
                 </th>
                 <th>
-                    @Html.DisplayName("Usuario Mod")
+                    @Html.DisplayName("Modificado por")
                 </th>
                 <th></th>
             </tr>
@@ -35,12 +36,14 @@
                         @Html.DisplayFor(modelItem => item.UpdUser)
                     </td>
                     <td>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditCategory(@item.CategoryId)">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-warning btn-sm" title="Editar" onclick="EditCategory(@item.CategoryId)">
+                                <span class="fa fa-edit"></span>
+                                Editar
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" title="Eliminar" onclick="BeginDeleteCategory(@item.CategoryId)">
-                                <span class="glyphicon glyphicon-trash"></span>
+                            <button type="button" class="btn btn-danger btn-sm" title="Eliminar" onclick="DeleteCategory(@item.CategoryId)">
+                                <span class="fa fa-times"></span>
+                                Eliminar
                             </button>
                         </div>
                     </td>
@@ -48,46 +51,34 @@
             }
         </tbody>
     </table>
-<input type="hidden" id="hdnCategoryDel" />
+
+
 <script>
-    $(document).ready(function () 
+    $(document).ready(function ()
     {
-        Paginate("#tbCategories",10);
+        var printOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Categorías"))', Columns: [0, 1, 2, 3] };
+
+        $("#tbCategories").removeClass("hidden");
+
+        Paginate("#tbCategories", 10, false, "#FilterCategory", false, "#tbButtonsCategories", printOp);
     });
 
-    function EditCategory(id) 
+    function EditCategory(id)
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("GetCategory","Configuration")', { categoryId: id }, function (response)
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditCategory","Configuration")', { id: id }, function (response)
         {
-            HideLoading();
-            if ($.isPlainObject(response)){}
-            else
-                $("#divCategoryEdition").html(response);
+            HideLoading(function ()
+            {
+               ShowModal(response, 'static');
+            });
         });
     }
 
-    function BeginDeleteCategory(id)
+    function DeleteCategory(id)
     {
-        $("#hdnCategoryDel").val(id);
-        ShowConfirm("¿Estas seguro de borrar esta categoría?",
-            "una vez eliminada no se podra agregar a ningun sistema o producto", true, DeleteCategory);
+        ShowConfirm("¿Estas seguro de querer eliminar esta categoría?", '@Url.Action("DeleteCategory","Configuration")', id, function () { SearchCategory(); });
     }
 
-    function DeleteCategory()
-    {
-        console.log("deleting category");
-        var id = $("#hdnCategoryDel").val();
-        ShowLoading();
-
-        ExecuteAjax("@Url.Action("DeleteCategory", "Configuration")", { id: id }, function (response) {
-            HideLoading();
-            if ($.isPlainObject(response))
-                ShowMessage(response.Result, response.Message, 'warning');
-            else {
-                $("#divCategories").html(response);
-                ShowMessage("Operación exitosa", "La categoría  fue eliminada", "success");
-            }
-        });
-    }
 </script>

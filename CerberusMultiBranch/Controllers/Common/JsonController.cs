@@ -53,14 +53,10 @@ namespace CerberusMultiBranch.Controllers.Common
             return picture;
         }
 
-
-
-      
-
         [HttpPost]
-        public JsonResult GetCities(int parentId)
+        public JsonResult GetCities(int id)
         {
-            var list = db.Cities.Where(c => c.StateId == parentId).OrderBy(c=> c.Name).ToSelectList();
+            var list = db.Cities.Where(c => c.StateId == id).OrderBy(c=> c.Name).ToSelectList();
             return Json(list);
         }
 
@@ -146,7 +142,7 @@ namespace CerberusMultiBranch.Controllers.Common
             var userId = User.Identity.GetUserId();
             var list = db.UserBranches.Include(e => e.Branch).Where(e => e.UserId == userId).Select(e => e.Branch).OrderBy(b=> b.Name).ToList();
 
-            return Json(list);
+            return Json(new { Code = Cons.Responses.Codes.Success, Extra = list});
         }
 
         [HttpPost]
@@ -166,13 +162,15 @@ namespace CerberusMultiBranch.Controllers.Common
             var s = branchId + "," + name;
             var result = await um.AddClaimAsync(User.Identity.GetUserId(), new Claim(Cons.BranchSession, s));
 
-            return Json(true);
+            return Json(new {Code = Cons.Responses.Codes.Success, Extra = result });
         }
 
+        [HttpPost]
         public JsonResult GetBranchSession()
         {
             var session = User.Identity.GetBranchSession();
-            return Json(session);
+
+            return Json(  new { Code = Cons.Responses.Codes.Success, Extra = session });
         }
 
         protected override void Dispose(bool disposing)

@@ -16,9 +16,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public int ProviderId { get; set; }
 
         [Display(Name = "Ciudad/Municipio")]
-        [Index("IDX_CityId", IsUnique = false)]
-        [Required]
-        public int CityId { get; set; }
+        public int? CityId { get; set; }
 
         [Display(Name = "Clave")]
         [Required]
@@ -52,8 +50,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
      
         [Display(Name = "Dirección")]
         [DataType(DataType.MultilineText)]
-        [MaxLength(150)]
-        [Required]
+        [MaxLength(150)]        
         public string Address { get; set; }
 
         [Display(Name = "C.P.")]
@@ -63,16 +60,30 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
 
         [Display(Name = "E-mail")]
-        [DataType(DataType.EmailAddress)]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Ingresa una dirección de correo válida ej. nombre@tudominio.com")]
         [MaxLength(100)]
         [Index("IDX_Email", IsUnique = false)]
         public string Email { get; set; }
 
-        [Display(Name = "Teléfono")]
+        [Display(Name = "E-mail 2")]
+        [DataType(DataType.EmailAddress, ErrorMessage = "Ingresa una dirección de correo válida ej. nombre@tudominio.com")]
+        [MaxLength(100)]
+        public string Email2 { get; set; }
+
+        [Display(Name = "Teléfono 1")]
         [DataType(DataType.PhoneNumber)]
-        [Required]
         [MaxLength(20)]
         public string Phone { get; set; }
+
+        [Display(Name = "Teléfono 2")]
+        [DataType(DataType.PhoneNumber)]
+        [MaxLength(20)]
+        public string Phone2 { get; set; }
+
+        [Display(Name = "Teléfono 3")]
+        [DataType(DataType.PhoneNumber)]        
+        [MaxLength(20)]
+        public string Phone3 { get; set; }
 
         [Display(Name = "Telefono Representante")]
         [DataType(DataType.PhoneNumber)]
@@ -89,30 +100,38 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public bool IsActive { get; set; }
 
-     
         [Required]
         public DateTime UpdDate { get; set; }
 
         [MaxLength(100)]
-        public string UdpUser { get; set; }
+        public string UpdUser { get; set; }
+
+        public DateTime? LockEndDate { get; set; }
+
+        [MaxLength(100)]
+        public string LockUser { get; set; }
 
         [Display(Name="Limite de Credito")]
         public double CreditLimit { get; set; }
 
         public int DaysToPay { get; set; }
 
+        [Display(Name ="Productos")]
         public int Catalog { get; set; }
 
-        public virtual City City { get; set; }
-
+    
        public ICollection<Purchase> Purchases { get; set; }
 
         public ICollection<ExternalProduct> ExternalProducts { get; set; }
 
+        
+        public ICollection<Address> Addresses { get; set; }
+
         public Provider()
         {
             this.IsActive = true;
-            this.UpdDate  = DateTime.Now;
+            this.UpdDate  = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
             this.Code     = Cons.CodeSeqFormat;
         }
 

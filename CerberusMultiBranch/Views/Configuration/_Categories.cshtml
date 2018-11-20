@@ -1,80 +1,62 @@
-﻿
-<div id="divCategoryEdition"></div>
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.Category>
 
-<div class="panel panel-danger">
-    <div class="panel-body">
-        <div class="col-md-10">
-            <div class="input-group ">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-                @Html.TextBox("FilterCategory", "", htmlAttributes: new { @class = "form-control", placeholder = "Descripción o clave SAT" })
-                <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchCategory()">
-                        <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
-                    </button>
-                    <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateNew()">
-                        <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>ueva
-                    </button>
-                </span>
+    <div class="panel-group">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="row">
+                    <div id="tbButtonsCategories" class="col-md-6"></div>
+
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            @Html.TextBox("FilterCategory", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre o clave sat" })
+
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchCategory()" title="Buscar catergorias">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                    Buscar
+                                </button>
+                                <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateNew()" title="Agregar nueva categoría SAT">
+                                    <span class="glyphicon  glyphicon-file"></span>
+                                    Agregar
+                                </button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="panel panel-default">
+            <div id="divCategories" class="panel-body dtContainer">
+                @Html.Partial("_CategoryList", Model)
             </div>
         </div>
     </div>
-</div>
-
-<div>
-    <div id="divCategories">
-        @Html.Partial("_CategoryList", new List<CerberusMultiBranch.Models.Entities.Config.Category>())
-    </div>
-</div>
 
 
-
-<script>
-    $(document).ready().keydown(function (e)
-    {
-        if ($("#liCategory").hasClass('active'))
+    <script>
+        function CreateNew()
         {
-            if ($("#ModalCategory").hasClass('in'))
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("EditCategory", "Configuration")', {}, function (response)
             {
-                console.log("category tab no hace nada")
-            }
-            else
-            {
-                if (e.which == 13 || (e.altKey && e.which == 66))
-                {
-                    console.log("enter for search categories");
-                    $("#btnSearchCategory").click();
-                }
-
-                if (e.altKey && e.keyCode == 78)
-                {
-                    $("#btnCreateCategory").click();
-                }
-                e.stopImmediatePropagation();
-            }
-        }
-    });
-
-    function CreateNew() {
-        ExecuteAjax('@Url.Action("NewCategory", "Configuration")', {}, function (response) {
-            $("#divCategoryEdition").html(response);
-        });
-    }
-
-    function SearchCategory()
-    {
-        ShowLoading();
-
-        ExecuteAjax('@Url.Action("SearchCategories","Configuration")',
-            { filter: $("#FilterCategory").val() }, function (response) {
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Result, response.Message, 'warning');
-                else
-                    $("#divCategories").html(response);
-
-                HideLoading();
+                HideLoading(function () {
+                    ShowModal(response, 'static');
+                });
             });
-    }
+        }
 
-</script>
+        function SearchCategory()
+        {
+            ShowLoading('static')
+
+            ExecuteAjax('@Url.Action("SearchCategories","Configuration")', { filter: $("#FilterCategory").val() }, function (response) {
+                HideLoading(function () {
+                    $("#divCategories").html(response);
+                });
+            });
+        }
+
+    </script>

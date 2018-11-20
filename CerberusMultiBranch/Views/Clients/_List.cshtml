@@ -1,89 +1,140 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Client>
+﻿@model IEnumerable<ClientViewModel>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
 
 
+@using CerberusMultiBranch.Support
 
-<table id="tbClients" class="table  table-striped small">
-    <thead>
-        <tr>
-            <th class="col-md-1">
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th class="col-md-2">
-                @Html.DisplayNameFor(model => model.FTR)
-            </th>
-            <th class="col-md-3">
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th class="col-md-3">
-                @Html.DisplayNameFor(model => model.Address)
-            </th>
-          
-            <th class="col-md-2">
-                @Html.DisplayNameFor(model => model.Phone)
-            </th>
-            <th class="col-md-1"></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.Code)
-                </td>
-                <td class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.FTR)
-                </td>
-                <td  class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td  class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.Address)
-                </td>
-               
-                <td  class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.Phone)
-                </td>
-                <td align="right">
-                    <div class="btn-group">
+    <table id="tbClients" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+        <thead>
+            <tr class="panel panel-danger panel-heading ">
+                <th>
+                    @Html.DisplayNameFor(model => model.Code)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FTR)
+                </th>
 
-                        @if (User.IsInRole("Capturista") || User.IsInRole("Vendedor"))
-                        {
-                            <button class="btn btn-primary" title="Ver detalle y editar"
-                                    onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ClientId})'">
-                                <span class="fa fa-edit" />
-                            </button>
-                        }
-                     
-                    </div>
-                </td>
+           
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Phones)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreditLimit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreditAvailable)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CreditComment)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StringAddress)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email2)
+                </th>
+
+                <th>
+                    @Html.DisplayNameFor(model => model.Edition)
+                </th>
+
+                <th></th>
             </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+        {
+                <tr>
+                    <td class="text-uppercase">
+                        @Html.DisplayFor(modelItem => item.Code)
+                    </td>
+                    <td class="text-uppercase">
+                        @Html.DisplayUpperFor(modelItem => item.Name)
+                    </td>
+                    <td class="text-uppercase">
+                        @Html.DisplayUpperFor(modelItem => item.FTR)
+                    </td>
+
+                    <td class="text-lowercase">
+                        @Html.DisplayLowerFor(modelItem => item.Email)
+                    </td>
+                    <td >
+                        @Html.DisplayFor(modelItem => item.Phones)
+                    </td>
+
+                    <td class="text-uppercase">
+                        @Html.DisplayFor(modelItem => item.CreditLimit)
+                    </td>
+                    <td class="text-uppercase">
+                        @Html.DisplayFor(modelItem => item.CreditAvailable)
+                    </td>
+                    <td class="text-uppercase">
+                        @Html.DisplayUpperFor(modelItem => item.CreditComment)
+                    </td>
+
+                    <td>
+                        @Html.DisplayUpperFor(modelItem => item.StringAddress)
+                    </td>
+                    <td class="text-lowercase">
+                        @Html.DisplayLowerFor(modelItem => item.Email2)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Edition)
+                    </td>
+
+                    <td>
+                        <button class="btn btn-warning  btn-sm" title="Editar cliente" onclick="BeginEdit('@item.ClientId')" disabled="@item.EditionDisabled">
+                            <span class="fa fa-edit"></span>
+                            Editar
+                        </button>
+
+                        <button class="btn btn-danger  btn-sm" title="Eliminar cliente" disabled="@item.DeleteDisabled" onclick="BeginDelete('@item.ClientId','@item.Name')">
+                            <span class="fa fa-trash-o"></span>
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
 
 <script>
 
-    $(document).ready(function () {
-        SetDataTable("#tbClients", "#txtName");
-        console.log("Client List Loaded");
+    $(document).ready(function ()
+    {
+        $("#tbClients").removeClass("hidden");
+
+        var printOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Clientes"))', Columns: [0, 1, 2, 3, 4,5,6] };
+
+        Paginate("#tbClients", 10, true, "#txtName", false, "#tbButtons",printOp);
     });
 
 
+    function BeginEdit(id)
+    {
+        ShowCatalogModal(SearchById, null, 'Client', id);
+    }
 
-    function RowCreated() {
-        function RowCreated(row) {
-            var id = $(row).find('td:eq(0)').text();
-            var options = {
-                title: "Quieres borrar el registro?", placement: "left", buttons: [
-             { label: "Si", class: 'btn btn-primary', icon: 'glyphicon glyphicon-ok', onClick: function () { Delete(id, row); } },
-             { label: "No", class: 'btn btn-danger', icon: 'glyphicon glyphicon-remove' }]
-            }
+    function BeginDelete(id, name)
+    {
+        var text = "Estas a punto de eliminar al cliente <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
 
-            $(row).find('td:eq(6)').children("button").confirmation(options);
-            $(row).dblclick(Select);
-        }
+        ShowConfirm(text, '@Url.Action("Deactivate","Clients")', id, function ()
+        {
+            ExecuteAjax('@Url.Action("Search")', {}, function (view)
+            {
+                $("#divClients").html(view);
+            });
+        });
     }
 
 </script>

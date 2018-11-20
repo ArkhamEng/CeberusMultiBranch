@@ -1,26 +1,60 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Provider>
+﻿@model IEnumerable<ProviderViewModel>
 
 
-<table id="tbProviders" class="table table-striped">
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
+
+<table id="tbProviders" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
-            <th class="col-md-1">
-                @Html.DisplayName("Clave")
+            <th>
+                @Html.DisplayNameFor(model => model.Code)
             </th>
-            <th class="col-md-4">
-                @Html.DisplayName("Clave")
+        
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
             </th>
-            <th class="col-md-3">
-                @Html.DisplayName("Página")
+            <th>
+                @Html.DisplayNameFor(model => model.BusinessName)
             </th>
-            <th class="col-md-2">
-                @Html.DisplayNameFor(model => model.Phone)
+            <th>
+                @Html.DisplayNameFor(model => model.FTR)
             </th>
-            <th class="col-md-1">
-                @Html.DisplayName("Productos")
+          
+            <th>
+                @Html.DisplayNameFor(model => model.WebSite)
             </th>
-  
-            <th class="col-md-1"></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Catalog)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Credit)
+            </th>
+             
+            <th>
+                @Html.DisplayNameFor(model => model.Phones)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AgentData)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Line)
+            </th>
+        
+            <th>
+               @Html.DisplayNameFor(model => model.StringAddress)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Edition)
+            </th>           
+            <th></th>
         </tr>
     </thead>
 
@@ -28,31 +62,68 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td class="text-center">
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+               
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.Name)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.BusinessName)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.FTR)
                 </td>
                 <td class="text-lowercase">
-                    @Html.DisplayFor(modelItem => item.WebSite)                 
+                    @Html.DisplayLowerFor(modelItem => item.WebSite)
                 </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.Phone)
+                <td class="text-lowercase">
+                    @Html.DisplayLowerFor(modelItem => item.Catalog)
                 </td>
-                <td class="text-center">
-                    @item.Catalog
+                <td class="text-lowercase">
+                    @Html.DisplayLowerFor(modelItem => item.Email)
+                </td>
+                <td class="text-lowercase">
+                    @Html.DisplayLowerFor(modelItem => item.Email2)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.Credit)
+                </td>
+                
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Phones)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.AgentData)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.Line)
+                </td>
+             
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.StringAddress)
+                </td>
+            
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Edition)
                 </td>
               
-                <td class="col-md-1" align="right">
-                    <div class="btn-group">
-                        <button class="btn btn-warning  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("Create", new {id = item.ProviderId})'" title="Editar datos de provedor">
-                            <span class="glyphicon glyphicon-pencil" />
-                        </button>
-                        <button class="btn btn-default  btn-xs" onclick="ShowLoading(); window.location = '@Url.Action("UpdateCatalog", new {id = item.ProviderId})'" title="subir lista de productos">
-                            <span class="fa fa-upload" />
-                        </button>
-                    </div>
+                <td>
+                    <button class="btn btn-warning btn-sm" title="Editar cliente" onclick="BeginEdit('@item.ProviderId')" disabled="@item.EditionDisabled">
+                        <span class="fa fa-edit"></span>
+                        Editar
+                    </button>
+
+                    <button class="btn btn-danger  btn-sm" title="Eliminar cliente" disabled="@item.DeleteDisabled" onclick="BeginDelete('@item.ProviderId','@item.Name')">
+                        <span class="fa fa-trash-o"></span>
+                        Eliminar
+                    </button>
+
+                    <button class="btn btn-primary btn-sm" title="Cargar productos" onclick="BeginUpdateCatalog('@item.ProviderId')" disabled="@item.UpdateCatalogDisabled">
+                        <span class="fa fa-upload"></span>
+                        Carga Productos
+                    </button>
                 </td>
             </tr>
         }
@@ -63,7 +134,36 @@
 <script>
     $(document).ready(function ()
     {
-        SetDataTable("#tbProviders","#txtName");
-        
+        $("#tbProviders").removeClass("hidden");
+
+        Paginate("#tbProviders", 10, true, "#txtName", false, "#tbButtons");
     });
+
+    function BeginEdit(id)
+    {
+        ShowCatalogModal(SearchById, null, 'Provider', id);
+    }
+
+    function BeginUpdateCatalog(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("BeginUpdateCatalog", "Providers")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static');
+            });
+        });
+    }
+
+    function BeginDelete(id, name)
+    {
+        var text = "Estas a punto de eliminar al proveedor <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
+
+        ShowConfirm(text, '@Url.Action("Deactivate","Providers")', id, function ()
+        {
+            SearchProviders();
+        });
+    }
 </script>

@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,11 +27,16 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public string SatCode { get; set; }
 
         [Required]
+        [Display(Name = "Editado")]
         public DateTime UpdDate { get; set; }
 
         [Required]
         [MaxLength(100)]
+        [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
+
+        [Display(Name = "Activo")]
+        public bool IsActive { get; set; }
 
 
         public int Id { get { return CategoryId; } }
@@ -38,5 +44,12 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public ICollection<Product> Products { get; set; }
 
         public ICollection<SystemCategory> SystemCategories { get; set; }
+
+        public Category()
+        {
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.IsActive = true;
+        }
     }
 }

@@ -1,12 +1,9 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
-using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
@@ -17,14 +14,16 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Key]
         public int EmployeeId { get; set; }
 
-        [Display(Name = "Ciudad/Municipio")]
-        [Required]
-        [Index("IDX_CityId", IsUnique = false)]
-        public int CityId { get; set; }
+        [Display(Name = "Ciudad ó Municipio")]
+        public int? CityId { get; set; }
 
+
+        [Display(Name = "Puesto")]
+        public int? JobPositionId { get; set; }
 
         [MaxLength(128)]
         [Index("IDX_UserId", IsUnique = false)]
+        [Display(Name = "Nombre de Usuario")]
         public string UserId { get; set; }
 
         [Display(Name = "Clave")]
@@ -49,7 +48,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string NSS { get; set; }
 
         [Display(Name = "Dirección")]
-        [Required]
         [MaxLength(100)]
         public string Address { get; set; }
 
@@ -83,24 +81,64 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public bool IsActive { get; set; }
 
         [Required]
+        [Display(Name = "Fecha Edición")]
+        [DataType(DataType.DateTime)]
         public DateTime UpdDate { get; set; }
 
         [MaxLength(100)]
+        [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
+
+
+        public DateTime? LockEndDate { get; set; }
+
+        [MaxLength(100)]
+        public string LockUser { get; set; }
 
         public byte[] Picture { get; set; }
 
         [MaxLength(20)]
         public string PictureType { get; set; }
 
+        [Display(Name="Comisión")]
+        public int ComissionForSale { get; set; }
+
+
+        [Display(Name = "Salario")]
+        public double Salary { get; set; }
+
+
         [NotMapped]
         public HttpPostedFileBase PostedFile { get; set; }
 
+
         #region Navigation Properties
-        public virtual City City { get; set; }
+        //public virtual City City { get; set; }
+
+        public virtual JobPosition JobPosition { get; set; }
 
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
+
+        public ICollection<Address> Addresses { get; set; }
+
+        [NotMapped]
+        public string ImageFormated
+        {
+            get
+            {
+                if (this.Picture != null)
+                {
+                    var base64 = Convert.ToBase64String(Support.GzipWrapper.Decompress(this.Picture));
+                    var imgSrc = String.Format("data:{0};base64,{1}", this.PictureType, base64);
+                    return imgSrc;
+                }
+                else
+                {
+                    return "/Content/Images/sinimagen.jpg";
+                }
+            }
+        }
 
 
         #endregion
@@ -109,6 +147,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.IsActive = true;
             this.Entrance = DateTime.Now;
             this.UpdDate = DateTime.Now;
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
             this.Code    = Cons.CodeSeqFormat;
         }
     }

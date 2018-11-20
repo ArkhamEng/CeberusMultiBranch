@@ -549,7 +549,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //busco la venta a pagar
                 var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).
                             Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
-                            Include(s => s.Client.City).Include(s => s.Client.City.State).
+                          //  Include(s => s.Client.City).Include(s => s.Client.City.State).
                             Include(s => s.SaleDetails.Select(td => td.Product)).
                             Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).

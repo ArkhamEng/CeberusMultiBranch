@@ -1,45 +1,67 @@
-﻿
+﻿@model IEnumerable<WithdrawalCause>
 
-<h4>Motivos de Retiro</h4>
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
-<div class="form-group col-md-6">
-    <div class="input-group">
-        <span class="input-group-addon"><i class="glyphicon glyphicon-filter"></i></span>
-        @Html.TextBox("CauseName", "", htmlAttributes: new { @class = "form-control" })
-        <span class="input-group-btn">
-            <button class="btn btn-warning" type="button" onclick="AddCause()">
-                <span class="glyphicon glyphicon-plus" />
-            </button>
-        </span>
+@using CerberusMultiBranch.Models.Entities.Operative
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtonsWithDrawal" class="col-md-6"></div>
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("CauseName", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de la causa" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button"  onclick="SearchCauses()" title="Buscar causas de retiro">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="CreateCause()" title="Agregar nueva causa de retiro">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div id="divCauses" class="panel-body dtContainer">
+            @Html.Partial("_WithdrawalCauseList",Model)
+        </div>
     </div>
 </div>
 
-@Html.Hidden("CauseUpdUser")
-
-@Html.Hidden("CauseUpdDate")
-
-
-<div id="divCauses">
-</div>
 
 <script>
-    
-    $(document).ready(function ()
-    {
-        ExecuteAjax('@Url.Action("GetCauses", "Configuration")', {}, function (view) {
-            $("#divCauses").html(view);
-        });
-    });
 
-    function AddCause()
+    function CreateCause()
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("SaveCause")', { name: $("#CauseName").val() }, function (view)
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditCause", "Configuration")', {}, function (response)
         {
-            $("#CauseName").val('');
-            $("#divCauses").html(view);
-            HideLoading();
-        })
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static');
+            });
+        });
+    }
+
+    function SearchCauses()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("SearchCauses", "Configuration")', { filter: $("#CauseName").val() }, function (response)
+        {
+            HideLoading(function ()
+            {
+                $("#divCauses").html(response);
+            });
+        });
     }
 
 </script>

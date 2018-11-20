@@ -1,9 +1,14 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Employee>
+﻿@model IEnumerable<EmployeeViewModel>
 
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
 
-<table id="tbEmployees"  class="table  table-striped">
+<table id="tbEmployees"  class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
+            <th class="col-md-1">
+             
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.Code)
             </th>
@@ -11,11 +16,40 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Address)
+                @Html.DisplayNameFor(model => model.FTR)
             </th>
-          
+
             <th>
-                @Html.DisplayNameFor(model => model.Phone)
+                @Html.DisplayNameFor(model => model.NSS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Salary)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ComissionForSale)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Phones)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.User.UserName)
+            </th>
+        
+         
+            <th>
+                @Html.DisplayNameFor(model => model.StringAddress)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Entrance)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Edition)
             </th>
 
             <th></th>
@@ -27,24 +61,59 @@
         {
             <tr>
                 <td>
+                    <img id="imgEmployee" src="@item.ImageFormated" class="img-rounded img-responsive" />
+                </td>
+                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.Name)
                 </td>
-                <td>
-                    @item.Address, @item.City.Name, @item.City.State.Name
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.FTR)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.NSS)
                 </td>
               
-                <td>
-                    @Html.DisplayFor(modelItem => item.Phone)
+                <td class="text-lowercase">
+                    @Html.DisplayLowerFor(modelItem => item.Email)
                 </td>
-                <td align="right">
-                    <div class="btn-group">
-                        <button class="btn btn-warning  btn-xs" onclick="window.location = '@Url.Action("Create", new {id = item.EmployeeId})'">
-                            <span class="glyphicon glyphicon-pencil" />
-                        </button>
-                    </div>
+                <td class="text-lowercase">
+                    @Html.DisplayFor(modelItem => item.Salary)
+                </td>
+                <td class="text-lowercase">
+                    @Html.DisplayFor(modelItem => item.ComissionForSale)
+                </td>
+            
+                <td >
+                    @Html.DisplayFor(modelItem => item.Phones)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.User.UserName)
+                </td>
+
+                <td class="text-uppercase">
+                    @Html.DisplayUpperFor(modelItem => item.StringAddress)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Entrance)
+                </td>
+               
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => item.Edition)
+                </td>
+
+                <td>
+                    <button class="btn btn-warning btn-sm" title="Editar cliente" onclick="BeginEdit('@item.EmployeeId')" disabled="@item.EditionDisabled">
+                        <span class="fa fa-edit"></span>
+                        Editar
+                    </button>
+
+                    <button class="btn btn-danger  btn-sm" title="Eliminar cliente" disabled="@item.DeleteDisabled"  onclick="BeginDelete('@item.EmployeeId','@item.Name')">
+                        <span class="fa fa-trash-o"></span>
+                        Eliminar
+                    </button>
                 </td>
             </tr>
         }
@@ -52,9 +121,29 @@
 </table>
 
 <script>
-    $(document).ready(function () 
+    $(document).ready(function ()
     {
-        HideLoading();
-        SetDataTable("#tbEmployees","#txtName");
+        $("#tbEmployees").removeClass("hidden");
+        var printOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Empleados"))', Columns: [2, 3, 4, 5, 6, 7, 8] };
+
+
+        Paginate("#tbEmployees", 10, true, "#txtName", false, "#tbButtons", printOp);
     });
+
+    function BeginEdit(id)
+    {
+        ShowCatalogModal(SearchById, null, 'Employee', id);
+    }
+
+    function BeginDelete(id, name)
+    {
+        var text = "Estas a punto de eliminar al empleado <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
+
+        ShowConfirm(text, '@Url.Action("Deactivate","Employees")', id, function ()
+        {
+            ExecuteAjax('@Url.Action("Search")', {}, function (view) {
+                $("#divEmployees").html(view);
+            });
+        });
+    }
 </script>

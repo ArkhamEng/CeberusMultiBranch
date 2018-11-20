@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.PartSystem>
+@using CerberusMultiBranch.Support
 
-
-    <table id="tbSystems" class="table table-striped ">
+    <table id="tbSystems" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
         <thead>
             <tr>
                 <th>
@@ -17,7 +17,7 @@
                     @Html.DisplayName("Ultima Modificación")
                 </th>
                 <th>
-                    @Html.DisplayName("Usuario Modifico")
+                    @Html.DisplayName("Modificado por")
                 </th>
                 <th></th>
             </tr>
@@ -42,12 +42,14 @@
                         @Html.DisplayFor(modelItem => item.UpdUser)
                     </td>
                     <td>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-warning btn-xs" title="Editar" onclick="EditSystem(@item.PartSystemId)">
-                                <span class="glyphicon glyphicon-pencil"></span>
+                        <div class="pull-right">
+                            <button type="button" class="btn btn-warning btn-sm" title="Editar sistema" onclick="EditSystem(@item.PartSystemId)">
+                                <span class="fa fa-edit"></span>
+                                Editar
                             </button>
-                            <button type="button" class="btn btn-danger btn-xs" id="btnDeleteSystem" title="Eliminar" onclick="BeginDeleteSystem(@item.PartSystemId)">
-                                <span class="glyphicon glyphicon-trash"></span>
+                            <button type="button" class="btn btn-danger btn-sm" title="Eliminar sistema" onclick="DeleteSystem(@item.PartSystemId)">
+                                <span class="fa fa-times"></span>
+                                Eliminar
                             </button>
                         </div>
                     </td>
@@ -55,49 +57,33 @@
             }
         </tbody>
     </table>
-<input hidden id="hdnSystemDel" />
+
 <script>
     $(document).ready(function () 
     {
-        Paginate("#tbSystems", 10);
+        var printSysOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Sistemas"))', Columns: [0, 1, 2, 3, 4] };
+
+        $("#tbSystems").removeClass("hidden");
+
+        Paginate("#tbSystems", 10, false, "#FilterCategory", false, "#tbButtons", printSysOp);
     });
 
     function EditSystem(id) 
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("GetSystem","Configuration")', { partSystemId: id }, function (response)
+
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditSystem","Configuration")', { id: id }, function (response)
         {
-            HideLoading();
-            if ($.isPlainObject(response)){ }
-            else
-                $("#divSystemEdition").html(response);
-        });
-    }
-
-    function BeginDeleteSystem(id)
-    {
-        $("#hdnSystemDel").val(id);
-
-        ShowConfirm("¿Quieres eliminar el sistema?", "Al realizar esta acción no se podra recuperar el registro",
-            true,DeleteSystem);
-    }
-
-    function DeleteSystem()
-    {
-        console.log("Deleting system");
-        var id =  $("#hdnSystemDel").val();
-        ShowLoading();
-
-        ExecuteAjax("@Url.Action("DeleteSystem", "Configuration")", { id: id }, function (response)
-        {
-            HideLoading();
-            if ($.isPlainObject(response))
-                ShowMessage(response.Result, response.Message, 'warning');
-            else
+            HideLoading(function ()
             {
-                $("#divSystems").html(response);
-                ShowMessage("Operación exitosa","El Sistema seleccionado fue eliminado","success")
-            }
+                ShowModal(response, 'static');
+            });
         });
+    }
+
+    function DeleteSystem(id)
+    {
+        ShowConfirm("¿Estas seguro de querer eliminar este sistema?",'@Url.Action("DeleteSystem","Configuration")', id, function () { SearchSystem(); });
     }
 </script>

@@ -6,28 +6,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Refaccionaria AutoBien</title>
     @Styles.Render("~/Content/css")
-    @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/pnotifycss")
+   
+    
+    <link href="~/Content/DataTables/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    @*<link href="~/Content/DataTables/css/responsive.dataTables.min.css" rel="stylesheet" />*@
+
+    <link href="~/Content/DataTables/css/buttons.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/buttons.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/DataTables/css/responsive.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/DataTables/css/scroller.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/DataTables/css/fixedHeader.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedHeader.bootstrap.min.css" rel="stylesheet" />
+
+    <link href="~/Content/DataTables/css/fixedColumns.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/DataTables/css/fixedColumns.bootstrap.min.css" rel="stylesheet" />
+
+  
+
+     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/pnotify")
     @Scripts.Render("~/bundles/common")
     
-
-    @*<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
-    <script type="text/javascript" language="javascript" src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>*@
-    <link href="~/Content/DataTables/css/jquery.dataTables.min.css" rel="stylesheet" />
+   
     <script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.bootstrap.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedHeader.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.fixedColumns.min.js"></script>
+    <script src="~/Scripts/jszip/jszip.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.buttons.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.bootstrap.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.flash.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.html5.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.colVis.min.js"></script>
+    <script src="~/Scripts/DataTables/buttons.print.min.js"></script>
+
+    <script src="~/Scripts/DataTables/dataTables.responsive.min.js"></script>
+    <script src="~/Scripts/DataTables/responsive.bootstrap.min.js"></script>
+    <script src="~/Scripts/DataTables/dataTables.scroller.min.js"></script>
 
 </head>
-<body >
-    @RenderBody()
-
-    @Html.Partial("_Progress")
-
-    @Html.Partial("_MessageBox")
-
+<body>
    
-    @*style="background-color:#960202"*@
-    <div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
+   
+    @*<div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
         <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
             <div class="col-xs-6 col-sm-4 col-md-12">
                 @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
@@ -62,10 +89,14 @@
                 @Html.Partial("_LoginPartial")
             </div>
         </div>
-    </div>
+    </div>*@
 
+    @RenderBody()
 
-
+    @Html.Partial("_Confirm")
+    @Html.Partial("_Loading")
+    @Html.Partial("_Modal")
+    @Html.Partial("_ChildModal")
 
     @RenderSection("scripts", required: false)
 </body>
