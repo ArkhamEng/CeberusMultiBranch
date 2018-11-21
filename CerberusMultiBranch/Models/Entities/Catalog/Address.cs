@@ -65,10 +65,16 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public override string ToString()
         {
-           return string.Format("{0}, {1}  {2}, {3}  CP. {4} | Referencia {5}",
-                   this.Street, this.Location, this.City.State.Name, this.City.Name, this.ZipCode, this.Reference);
+            return string.Format("{0}, {1}  {2}, {3}  CP. {4}",
+                this.Street, this.Location, this.City.State.Name, this.City.Name, this.ZipCode);
         }
 
+        public  string WithReference()
+        {
+
+            return string.Format("{0}, {1}  {2}, {3}  CP. {4} | Referencia {5}",
+                  this.Street, this.Location, this.City.State.Name, this.City.Name, this.ZipCode, this.Reference);
+        }
     }
     
 }

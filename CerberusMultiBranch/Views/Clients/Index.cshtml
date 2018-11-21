@@ -59,10 +59,7 @@
 
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
-                HideLoading(function ()
-                {
-                    $("#divClients").html(view);
-                });
+                $("#divClients").html(view);
             });
         });
     });

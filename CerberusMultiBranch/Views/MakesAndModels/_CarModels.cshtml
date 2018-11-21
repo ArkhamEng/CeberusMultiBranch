@@ -1,0 +1,66 @@
+﻿
+@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.CarModel>
+
+<div class="panel-group">
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtonsModel" class="col-md-6"></div>
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("FilterModels", "", htmlAttributes: new { @class = "form-control", placeholder = "Modelo o armadora" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchModels()" title="Buscar modelos">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateModel()" title="Agregar nuevo model">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div id="divModels" class="panel-body dtContainer">
+            @Html.Partial("_CarModelList", Model)
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+
+
+    function CreateModel() {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditModel", "MakesAndModels")', {}, function (response) {
+            HideLoading(function () {
+                ShowModal(response, 'static');
+            });
+        });
+    }
+
+    function SearchModels()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("SearchModels", "MakesAndModels")', { filter: $("#FilterModels").val() }, function (response)
+        {
+            $("#divModels").html(response);
+
+        });
+    }
+
+
+</script>
+

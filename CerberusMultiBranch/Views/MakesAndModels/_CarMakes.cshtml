@@ -1,0 +1,64 @@
+﻿
+@model IEnumerable<CerberusMultiBranch.Models.Entities.Config.CarMake>
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtonsMake" class="col-md-6"></div>
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("FilterMakes", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de la Armadora" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="btnSearchCategory" onclick="SearchMakes()" title="Buscar Armadoras">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnCreateCategory" onclick="CreateMake()" title="Agregar nueva Armadora">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div id="divMakes" class="panel-body dtContainer">
+            @Html.Partial("_CarMakeList", Model)
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    function CreateMake()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditMake", "MakesAndModels")', {}, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static');
+            });
+        });
+    }
+
+    function SearchMakes()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("SearchMakes", "MakesAndModels")', { filter: $("#FilterMakes").val() }, function (response)
+        {
+              $("#divMakes").html(response);
+        });
+    }
+
+
+</script>

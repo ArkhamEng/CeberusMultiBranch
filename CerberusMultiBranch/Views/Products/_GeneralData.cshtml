@@ -182,9 +182,9 @@
             allowLock = true;
         
         if(parseInt('@Model.ProductId') > 0)
-            $("#StockRequired").attr("disabled", true);
+            $("#StockRequired").attr("readonly", true);
 
-        $("#StockLocked").attr("disabled", !allowLock);
+        $("#StockLocked").attr("readonly", !allowLock);
         
 
         $("#StockLocked").change(function (a) {
@@ -200,18 +200,18 @@
 
         var checked = $("#StockRequired").is(':checked');
 
-        $("#Quantity").attr("disabled", isLocked);
-        $("#BuyPrice").attr("disabled", isLocked);
-        $("#Code").attr("disabled", isLocked);
+        $("#Quantity").attr("readonly", isLocked);
+        $("#BuyPrice").attr("readonly", isLocked);
+        $("#Code").attr("readonly", isLocked);
 
 
         if (!isLocked)
-            $("#Quantity").attr("disabled", !checked);
+            $("#Quantity").attr("readonly", !checked);
 
 
-        $("#Ledge").attr("disabled", !checked);
-        $("#Row").attr("disabled", !checked);
-        $("#MaxQuantity").attr("disabled", !checked);
-        $("#MinQuantity").attr("disabled", !checked);
+        $("#Ledge").attr("readonly", !checked);
+        $("#Row").attr("readonly", !checked);
+        $("#MaxQuantity").attr("readonly", !checked);
+        $("#MinQuantity").attr("readonly", !checked);
     }
 </script>

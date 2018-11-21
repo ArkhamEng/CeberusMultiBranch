@@ -8,7 +8,7 @@
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
-        <div class="col-md-11">
+        <div class="col-md-12">
             <div class="input-group ">
                 @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:25% !important" })
                 @Html.TextBox("Folio", "", htmlAttributes: new
@@ -26,46 +26,43 @@
            })
 
                 <span class="input-group-btn">
-                    <button class="btn btn-primary" type="button" title="Buscar cotizaciones, usando los filtros" onclick="SearchBudgets()">
+                    <button class="btn btn-primary" type="button" title="Buscar cotizaciones" onclick="SearchBudgets()">
                         <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
+                        Buscar
                     </button>
                 </span>
             </div>
         </div>
 
-        <div class="col-md-8" style="margin-top:10px">
-            <div class="input-group">
-                <span class="input-group-addon"><a>Fecha Inicial</a></span>
-                @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
+        <div class="col-md-12" style="margin-top:10px">
+            <div class="col-md-8 row">
+                <div class="input-group">
+                    <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                    @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
 
-                <span class="input-group-addon"><a>Fecha final</a></span>
-                @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
-                <span class="input-group-btn">
-                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear" title="Limpiar la busqueda y los filtros">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                        <u>L</u>impiar
-                    </button>
-                </span>
+                    <span class="input-group-addon"><a>Fecha final</a></span>
+                    @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+
+            <div id="tbButtonsBudget">
+
             </div>
         </div>
     </div>
 </div>
 
 <div class="panel panel-default">
-    <div id="divBudgets" class="panel-body">
+    <div id="divBudgets" class="panel-body dtContainer">
         @Html.Partial("_BudgetList", Model.Budgets)
     </div>
 </div>
 
 
-<div id="divBudgetDetails"></div>
-
-
 <script>
     function SearchBudgets()
     {
-        ShowLoading();
+        ShowLoading('static');
 
         var param =
             {
@@ -78,12 +75,7 @@
 
         ExecuteAjax('@Url.Action("SearchBudgets", "Sales")', param, function (response)
         {
-            HideLoading();
-
-            if (!$.isPlainObject(response))
-                $("#divBudgets").html(response)
-            else
-                ShowMessage(response.Header, response.Message, 'warning', true);
+            $("#divBudgets").html(response)
         });
     }
 </script>

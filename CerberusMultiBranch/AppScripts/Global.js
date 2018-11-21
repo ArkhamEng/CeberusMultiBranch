@@ -127,17 +127,22 @@ function LoadPopOver(button, callback) {
 
 
 //AJAX CALL
-function ExecuteAjax(url, parameters, callback) {
+function ExecuteAjax(url, parameters, callback)
+{
     $.ajax({
         url: url,
         type: "POST",
         data: parameters,
-        success: function (response) {
-            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200) {
+        success: function (response)
+        {
+            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200)
+            {
                 HideLoading();
+                HideModLoading();
                 ShowNotify(response.Header, response.Result, response.Body, 3500);
 
-                switch (response.Code) {
+                switch (response.Code)
+                {
                     case 401:
                         window.location = response.Extra;
                         break;
@@ -148,9 +153,10 @@ function ExecuteAjax(url, parameters, callback) {
                 callback(response);
             }
         },
-        error: function (err) {
-            console.log(err);
+        error: function (err)
+        {
             HideLoading();
+            HideModLoading();
             ShowNotify("Error Inesperado!", "dark", "ocurrio un error, quiza has perdido la conexion a internet!", 3500);
         }
     });
@@ -305,11 +311,22 @@ function HideModal(callback, removeContent) {
 }
 
 //Show Child Modal 
-function ShowChildModal(content) {
-    $("#ChildModal").off("shown.bs.modal").on('shown.bs.modal', function () {
+function ShowChildModal(content, openCallBack, size)
+{
+    $("#ChildModal").off("shown.bs.modal").on('shown.bs.modal', function ()
+    {
         $('#SiteModal').css('opacity', .7);
         $('#SiteModal').unbind();
+
+        if (openCallBack != null && openCallBack != 'undefined')
+            openCallBack();
     });
+
+    if (size == 'lg')
+        $("#ChildModalContent").addClass('modal-lg');
+
+    if (size == 'sm')
+        $("#ChildModalContent").addClass('modal-sm');
 
     $("#ChildModalContent").html(content);
     $("#ChildModal").css("margin-top", "100px");

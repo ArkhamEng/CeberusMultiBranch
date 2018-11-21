@@ -57,6 +57,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public int WithdrawalCauseId { get; set; }
 
         [MaxLength(50)]
+        [Required(ErrorMessage = "Se requier un nombre")]
         public string Name { get; set; }
 
         [Display(Name = "Editado")]

@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Budget>
 @using CerberusMultiBranch.Support
 
-<table id="tbBudgets" class="table table-striped small">
+<table id="tbBudgets" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
             <th>
@@ -23,6 +23,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.UserName)
             </th>
+            <th>
+                @Html.DisplayName("Monto")
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -31,13 +34,13 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Branch.Name)
+                    @Html.DisplayUpperFor(modelItem => item.Branch.Name)
                 </td>
                 <td>
                     @item.BudgetId.ToString(Cons.BudgetFormat)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Client.Name)
+                    @Html.DisplayUpperFor(modelItem => item.Client.Name)
                 </td>
                
                 <td>
@@ -47,17 +50,21 @@
                     @item.DueDate.ToString("dd/MM/yyyy")
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.UserName)
+                    @Html.DisplayUpperFor(modelItem => item.UserName)
                 </td>
-                <td class="pull-right">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-success" onclick="ViewBudgetDetail('@item.BudgetId')">
+             
+                <td>
+                    @item.BudgetDetails.Sum(d=> d.TaxedAmount).ToMoney()
+                </td>
+                <td >
+                    <div class="pull-right">
+                        <button type="button" class="btn btn-warning btn-sm" onclick="ViewBudgetDetail('@item.BudgetId')">
                             <span class="fa fa-eye"></span>
-                            Ver
+                            Detalles
                         </button>
-                        <button type="button" class="btn btn-primary" onclick="ApplyBudget('@item.BudgetId')">
-                            <span class="fa fa-cart-plus"></span>
-                            Aplicar
+                        <button type="button" class="btn btn-info btn-sm" onclick="PrintBudget('@item.BudgetId')">
+                            <span class="fa fa-print"></span>
+                            Imprimir
                         </button>
                     </div>
                 </td>
@@ -69,39 +76,44 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbBudgets",10)
+
+        $("#tbBudgets").removeClass("hidden");
+
+        var printBudgetOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Cotizaciones"))', Columns: [0, 1, 2, 3, 4, 5,6] };
+
+        Paginate("#tbBudgets", 10, true, "#Client", false, "#tbButtonsBudget", printBudgetOp);
+
+        HideLoading();
     });
 
     function ViewBudgetDetail(id)
     {
-        ShowLoading();
+        ShowLoading('static');
 
         ExecuteAjax('@Url.Action("GetBudgeDetail", "Sales")', { budgetId: id }, function (response)
         {
-            HideLoading();
-
-            if (!$.isPlainObject(response))
-                $("#divBudgetDetails").html(response)
-            else
-                ShowMessage(response.Header, response.Message, 'warning', true);
-        });
-    }
-
-    function ApplyBudget(id)
-    {
-        ShowLoading();
-
-        ExecuteAjax('@Url.Action("ApplyBudget", "Sales")', { budgetId: id }, function (response)
-        {
-            HideLoading();
-
-            if (response.Result == 'OK')
+            HideLoading(function ()
             {
-                CheckCart();
-                ShowMessage(response.Header, response.Message, 'success', true);
-            }
-            else
-                ShowMessage(response.Header, response.Message, 'warning', true);
+                $("#divBudgetDetails").html(response)
+
+                ShowModal(response, 'static', 'lg');
+            });
         });
     }
+
+    function PrintBudget(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("PrintBudget", "Sales")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                $("#divPrintBudget").html(response);
+            });
+        });
+    }
+
+
+  
 </script>

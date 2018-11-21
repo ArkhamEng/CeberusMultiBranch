@@ -1,12 +1,9 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 @using CerberusMultiBranch.Support
 
-@section Scripts
-{
-    @Scripts.Render("~/bundles/jqueryval")
-}
-<script src="~/Scripts/jquery.validate.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+@Scripts.Render("~/bundles/jqueryval")
+
 
 @{
     var pnlClass = "modal-content panel panel-primary panel-group";
@@ -124,13 +121,13 @@
 <script>
     $(document).ready(function ()
     {
-        SetCascade("#PartSystemId", "#CategoryId", 'GetCategories');
+        SetCascade("#PartSystemId", "#CategoryId", '@Url.Action("GetCategories", "Json")');
 
         $("#ModalQuickAddProduct").on("hidden.bs.modal", function ()
         {
             ExecuteAjax('@Url.Action("UnLock","Products")', { productId: $("#ProductId").val() }, function (response)
             {
-                console.log(response);
+                
             });
         });
 
@@ -153,8 +150,10 @@
 
     }).keydown(function (e)
     {
-        if ($("#ModalQuickAddProduct").hasClass('in')) {
-            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71)) {
+        if ($("#ModalQuickAddProduct").hasClass('in'))
+        {
+            if (e.keyCode == 13 || (e.altKey && e.keyCode == 71))
+            {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 $("#btnQuickSave").click();
@@ -162,7 +161,7 @@
         }
     });
 
-   
+
     function SetPrice()
     {
         var sp = (1 + $("#StorePercentage").val() / 100);
@@ -222,7 +221,8 @@
         else {
             var param = { product: product };
 
-            ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response) {
+            ExecuteAjax('@Url.Action("QuickSave","Products")', param, function (response)
+            {
                 HideLoading();
                 if ($.isPlainObject(response)) {
                     $("#ModalQuickAddProduct").modal("hide");

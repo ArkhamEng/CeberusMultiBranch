@@ -23,12 +23,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = GetCart(User.Identity.GetUserId(), User.Identity.GetBranchId());
 
             if (model != null)
-            {
-                return Json(new { Result = "OK", Message = (model.Sum(td => td.Quantity)).ToString() });
-            }
-
+                return Json(new JResponse { Result = Cons.Responses.Success, Code = Cons.Responses.Codes.Success, Extra = (model.Sum(td => td.Quantity)).ToString() }); 
             else
-                return Json(new { Result = "OK", Message = Cons.Zero.ToString() });
+                return Json(new JResponse { Result = Cons.Responses.Success, Code = Cons.Responses.Codes.Success, Extra = (Cons.Zero).ToString() });
         }
 
         [CustomAuthorize(Roles = "Vendedor")]
@@ -384,9 +381,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return PartialView("_CartDetails", model);
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { Result = "Error al cambiar el costo!", Message = "Ocurrio un error al actualizar el precio detail " + ex.Message });
+                return Json(new JResponse{ Header = "Error al modificar el costo!", Result  = Cons.Responses.Danger,
+                    Body = "Ocurrio un error al actualizar el precio  de ventar", Code = Cons.Responses.Codes.ServerError });
             }
         }
 
@@ -394,26 +392,40 @@ namespace CerberusMultiBranch.Controllers.Operative
         [CustomAuthorize(Roles = "Vendedor")]
         public ActionResult SetQuantity(int productId, double quantity)
         {
-            var userId = User.Identity.GetUserId();
-            var branchId = User.Identity.GetBranchId();
+            try
+            {
+                var userId = User.Identity.GetUserId();
+                var branchId = User.Identity.GetBranchId();
 
-            var model = GetCart(userId, branchId);
+                var model = GetCart(userId, branchId);
 
-            var i = model.FirstOrDefault(s => s.ProductId == productId);
+                var i = model.FirstOrDefault(s => s.ProductId == productId);
 
-            i.Quantity    = quantity;
-            i.Amount      = (quantity * i.Price).RoundMoney();
-            i.TaxedAmount = (quantity * i.TaxedPrice).RoundMoney();
-            i.TaxAmount   = (i.TaxedAmount - i.Amount).RoundMoney();
+                i.Quantity = quantity;
+                i.Amount = (quantity * i.Price).RoundMoney();
+                i.TaxedAmount = (quantity * i.TaxedPrice).RoundMoney();
+                i.TaxAmount = (i.TaxedAmount - i.Amount).RoundMoney();
 
-            db.Entry(i).Property(p => p.Quantity).IsModified = true;
-            db.Entry(i).Property(p => p.Amount).IsModified = true;
-            db.Entry(i).Property(p => p.TaxedAmount).IsModified = true;
-            db.Entry(i).Property(p => p.TaxAmount).IsModified = true;
+                db.Entry(i).Property(p => p.Quantity).IsModified = true;
+                db.Entry(i).Property(p => p.Amount).IsModified = true;
+                db.Entry(i).Property(p => p.TaxedAmount).IsModified = true;
+                db.Entry(i).Property(p => p.TaxAmount).IsModified = true;
 
-            db.SaveChanges();
+                db.SaveChanges();
 
-            return PartialView("_CartDetails", model);
+                return PartialView("_CartDetails", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Header = "Error al modificar la cantidad!",
+                    Result = Cons.Responses.Danger,
+                    Body = "Ocurrio un error al actualizar el la cantidad de unidades",
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
+          
         }
 
         [HttpPost]
@@ -463,22 +475,24 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var userId    = User.Identity.GetUserId();
-                var branchId  = User.Identity.GetBranchId();
+                var userId = User.Identity.GetUserId();
+                var branchId = User.Identity.GetBranchId();
 
                 var cartItems = GetCart(userId, branchId);
 
                 var client = cartItems.First().Client;
 
                 #region Validaciones para preventas y ventas a credito
-                
+
                 //validación de cliente valido
                 if (type != TransactionType.Contado && client.ClientId == Cons.Zero)
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Venta sin cliente asignado",
-                        Message = "Los apartados, preventas y ventas a crédito requieren que asigne un cliente",
+                        Result = Cons.Responses.Info,
+                        Header = "Venta sin cliente asignado",
+                        Body = "Los apartados, preventas y ventas a crédito requieren que asigne un cliente",
+                        Code = Cons.Responses.Codes.ConditionMissing
                     });
                 }
 
@@ -491,20 +505,24 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     if (amount > client.CreditAvailable)
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Limite de crédito excedido",
-                            Message = string.Format("El costo total de esta venta {0} excede el crédito disponible {1} del cliente {2}",
-                                               amount.ToMoney(), client.CreditAvailable.ToMoney(), client.Name.ToUpper())
+                            Result = Cons.Responses.Danger,
+                            Header = "Limite de crédito excedido",
+                            Body = string.Format("El costo total de esta venta {0} excede el crédito disponible {1} del cliente {2}",
+                                               amount.ToMoney(), client.CreditAvailable.ToMoney(), client.Name.ToUpper()),
+                            Code = Cons.Responses.Codes.ConditionMissing
                         });
                     }
 
                     else if (client.CreditDays <= Cons.Zero)
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Sin dias de crédito",
-                            Message = string.Format("No se han configurado días de crédito para el cliente {0}", client.Name.ToUpper())
+                            Result = Cons.Responses.Danger,
+                            Header = "Sin Prorroga de pago",
+                            Body = string.Format("No se han configurado días de crédito para el cliente {0}", client.Name.ToUpper()),
+                            Code = Cons.Responses.Codes.ConditionMissing
                         });
                     }
                     else
@@ -523,11 +541,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (item != null)
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Producto con existencia",
-                            Message = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
-                            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper())
+                            Result = Cons.Responses.Info,
+                            Header = "Producto en Inventario",
+                            Body = string.Format("No es posible generar preventa con productos que aun tienen existencia, " +
+                            "el inventario cuenta con {0} {1}(s) del producto {2}", item.InStock, item.Product.Unit.ToUpper(), item.Product.Code.ToUpper()),
+                            Code = Cons.Responses.Codes.InvalidData
                         });
                     }
                 }
@@ -537,18 +557,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //creo la venta
                 Sale sale = new Sale
                 {
-                    Year        = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
-                    BranchId    = User.Identity.GetBranchId(),
-                    UserId      = User.Identity.GetUserId(),
+                    Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
+                    BranchId = User.Identity.GetBranchId(),
+                    UserId = User.Identity.GetUserId(),
                     SendingType = sending,
                     ClientId = cartItems.FirstOrDefault().ClientId,
                     LastStatus = TranStatus.InProcess,
                     Status = TranStatus.Reserved,
                     TransactionType = type,
-                    Expiration = type == TransactionType.Contado? DateTime.Now.ToLocal(): DateTime.Now.ToLocal().AddDays(days)
+                    Expiration = type == TransactionType.Contado ? DateTime.Now.ToLocal() : DateTime.Now.ToLocal().AddDays(days)
                 };
 
-                
+
 
                 int sortOrder = Cons.One;
                 List<StockMovement> movements = new List<StockMovement>();
@@ -558,11 +578,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //se valida que los productos tengan existencias suficiente, salvo para preventa
                     if (type != TransactionType.Preventa && !item.CanSell)
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Cantidad insuficiente",
-                            Message = string.Format("Estas requiriendo {0} {1}(s) del Producto {2}! Cantidad en inventario {3} {1}(s)",
-                            item.Quantity, item.Product.Unit, item.Product.Code, item.InStock)
+                            Result = Cons.Responses.Danger,
+                            Header = "Cantidad  insuficiente",
+                            Body = string.Format("Estas requiriendo {0} {1}(s) del Producto {2}! Cantidad en inventario {3} {1}(s)",
+                            item.Quantity, item.Product.Unit, item.Product.Code, item.InStock),
+                            Code = Cons.Responses.Codes.InvalidData
                         });
                     }
 
@@ -582,7 +604,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     detail.SortOrder = sortOrder;
 
                     if (item.Product.System.Commission > Cons.Zero)
-                        detail.Commission = Math.Round(detail.TaxedAmount * (item.Product.System.Commission / Cons.OneHundred), Cons.Two);
+                        detail.Commission = Math.Round(detail.TaxedAmount * (item.Product.System.Commission / Cons.OneHundred), Cons.Decimals);
 
                     //agrego el detalle a la venta
                     sale.SaleDetails.Add(detail);
@@ -590,15 +612,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //las preventas no generan movimiento de inventario al ser creadas
                     //if (type != TransactionType.Preventa)
                     //{
-                        var bp = item.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                    var bp = item.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
 
-                        //actualizo stock de sucursal
-                        bp.LastStock = bp.Stock;
-                        bp.Stock -= detail.Quantity;
-                        bp.UpdDate = DateTime.Now.ToLocal();
-                        bp.UpdUser = User.Identity.Name;
+                    //actualizo stock de sucursal
+                    bp.LastStock = bp.Stock;
+                    bp.Stock -= detail.Quantity;
+                    bp.UpdDate = DateTime.Now.ToLocal();
+                    bp.UpdUser = User.Identity.Name;
 
-                        db.Entry(bp).State = EntityState.Modified;
+                    db.Entry(bp).State = EntityState.Modified;
                     //}
 
 
@@ -642,17 +664,17 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //las preventas no generan movimiento de inventario al ser creadas
                     //if (type != TransactionType.Preventa)
                     //{
-                        //agrego el moviento al inventario
-                        StockMovement sm = new StockMovement
-                        {
-                            ProductId = item.ProductId,
-                            BranchId = branchId,
-                            MovementType = MovementType.Exit,
-                            User = User.Identity.Name,
-                            MovementDate = DateTime.Now.ToLocal(),
-                            Quantity = detail.Quantity
-                        };
-                        movements.Add(sm);
+                    //agrego el moviento al inventario
+                    StockMovement sm = new StockMovement
+                    {
+                        ProductId = item.ProductId,
+                        BranchId = branchId,
+                        MovementType = MovementType.Exit,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now.ToLocal(),
+                        Quantity = detail.Quantity,
+                    };
+                    movements.Add(sm);
                     //}
                     sortOrder++;
                 }
@@ -666,14 +688,20 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var comTot = sale.SaleDetails.Sum(td => td.Commission);
 
                     if (comTot > Cons.Zero)
-                        sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Two);
+                        sale.ComAmount = Math.Round(comTot * (sale.ComPer / Cons.OneHundred), Cons.Decimals);
                 }
 
-                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount);
-                sale.TotalTaxAmount = sale.SaleDetails.Sum(d => d.TaxAmount);
+                //monto antes de Iva
+                sale.TotalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
 
-                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount);
-                sale.FinalAmount = sale.SaleDetails.Sum(d => d.Amount);
+                //monto de Iva
+                sale.TotalTaxAmount = sale.SaleDetails.Sum(d => d.TaxAmount).RoundMoney();
+
+                //monto despues de Iva
+                sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
+
+                //Monto final (si hay descuentos varia del anterior)
+                sale.FinalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
 
                 //obtengo la utima venta para generar unel folio siguiente
                 var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
@@ -696,16 +724,23 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.SaveChanges();
 
 
-                return Json(new { Result = "OK", Message = "Se ha generado la venta con folio:" + sale.Folio });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Body = "Se ha generado la venta con folio:" + sale.Folio,
+                    Code = Cons.Responses.Codes.Success,
+                    Header ="Venta Concluida"
+                });
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error",
-                    Header = "Ocurrio un error al generar la venta",
-                    Message = "Detalle del error desconocido: " + ex.Message
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al generar la venta",
+                    Body = "Ocurrio un error inesperado al generar la venta",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
         }
@@ -744,19 +779,45 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                var model = db.Budgets.Include(b => b.Branch).
+                var model = db.Budgets.Include(b=> b.Branch).Include(b => b.Client.Addresses).
                     Include(b => b.BudgetDetails.Select(d => d.Product)).Include(b => b.Client).FirstOrDefault(b => b.BudgetId == budget.BudgetId);
 
                 return PartialView("_PrintBudget", model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error al imprimir el presupuesto",
-                    Message = "Ocurrion un error mientras se generaba el presupuesto " + ex.Message
+                    Result = Cons.Responses.Danger,
+                    Body = "Ocurrio un error mientras se generaba el presupuesto",
+                    Header="Error al Generar!",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
+        }
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Vendedor")]
+        public ActionResult PrintBudget(int id)
+        {
+            try
+            {
+                var model = db.Budgets.Include(b => b.Branch).Include(b=> b.Client.Addresses).
+             Include(b => b.BudgetDetails.Select(d => d.Product)).Include(b => b.Client).FirstOrDefault(b => b.BudgetId == id);
+
+                return PartialView("_PrintBudget", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Body = "Ocurrio un error al obtener el presupuesto",
+                    Header = "Error al Imprimir!",
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
+        
         }
 
         #endregion
@@ -774,14 +835,14 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult SearchSoldItems(DailyBillViewModel model)
         {
 
-            var SoldItems = (from sd in db.SaleDetails.Include(sd => sd.Product.Images).Include(sd => sd.Product.Category)
+            var SoldItems = (from sd in db.SaleDetails.Include(sd => sd.Product.Category)
                              where (sd.Sale.TransactionDate >= model.Date) &&
                                    (sd.Sale.TransactionDate < model.EndDate) &&
                                    (sd.Sale.TransactionType == model.TransType) &&
                                    (sd.Sale.Status == TranStatus.Compleated) && //solo las ventas pagadas en su totalidad
                                    (sd.Sale.BranchId == model.BranchId) &&
-                                   (model.Client == null || sd.Sale.Client.Name == model.Client) &&
-                                   (model.Folio == null || sd.Sale.Folio == model.Folio)
+                                   (string.IsNullOrEmpty(model.Client) || sd.Sale.Client.Name == model.Client) &&
+                                   (string.IsNullOrEmpty(model.Folio)  ||  sd.Sale.Folio == model.Folio)
                              select sd).ToList();
 
 

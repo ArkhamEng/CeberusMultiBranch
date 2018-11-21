@@ -42,16 +42,34 @@
                         if (User.IsInRole("Administrador"))
                         {
                             <li><a href="/Catalog/Clasifications" onclick="ShowLoading()">&nbsp;Clasificaciones<span class="fa fa-folder-open" style="float:left" /></a></li>
-                            <li><a href="/CarMakes/" onclick="ShowLoading()">&nbsp;Marcas<span class="glyphicon glyphicon-registration-mark" style="float:left" /></a></li>
-                            <li><a href="/CarModels/" onclick="ShowLoading()">&nbsp;Modelos<span class="fa fa-car" style="float:left" /></a></li>
+                            <li><a href="/Catalog/MakesAndModels" onclick="ShowLoading()">&nbsp;Armadoras y Modelos<span class="fa fa-car" style="float:left" /></a></li>
                         }
                     }
                 </ul>
             </li>
 
-            @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
+         
+            @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor") || User.IsInRole("Cajero"))
             {
-                <li><a href="/Sales/DailyBill" onclick="ShowLoading()">&nbsp;Factura del día<span class="fa fa-file-excel-o" style="float:left" /></a></li>
+                <li>
+                    <a href="#salesSm" data-toggle="collapse" aria-expanded="false">&nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" /></a>
+                    <ul class="collapse list-unstyled" id="salesSm">
+                        
+                        @if (User.IsInRole("Supervisor"))
+                        {
+                            <li><a href="/Sales/Report/" onclick="ShowLoading()">&nbsp;Reporte de ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
+                        }
+
+                        @if (User.IsInRole("Cajero") || User.IsInRole("Supervisor"))
+                        {
+                            <li><a href="/Sales/DailyBill" onclick="ShowLoading()">&nbsp;Factura del día<span class="fa fa-file-excel-o" style="float:left" /></a></li>
+                        }
+
+                        <li>
+                            <a href="/Sales/Budget" onclick="ShowLoading()">&nbsp;Cotizaciones<span class="fa fa-dollar" style="float:left" /></a>
+                        </li>
+                    </ul>
+                </li>
             }
 
             @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
@@ -62,16 +80,6 @@
                     </a>
 
                     <ul class="collapse list-unstyled" id="HistorySubMenu">
-                        <li>
-                            <a href="/Sales/History" onclick="ShowLoading()">
-                                &nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" />
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/Sales/Budget" onclick="ShowLoading()">
-                                &nbsp;Cotizaciones<span class="fa fa-dollar" style="float:left" />
-                            </a>
-                        </li>
                         <li>
                             <a href="/Products/StockMovement" onclick="ShowLoading()">
                                 &nbsp;Movimientos<span class="fa fa-cubes" style="float:left" />

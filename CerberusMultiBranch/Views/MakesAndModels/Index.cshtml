@@ -1,0 +1,34 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Config.MakesAndModelsViewModel
+@{
+    ViewBag.Title = "Armadoras y Modelos";
+    ViewBag.Class = "fa fa-car";
+}
+
+<hr />
+
+
+<ul class="nav nav-tabs">
+    <li id="liMakes" class="active">
+        <a data-toggle="tab" href="#Makes">
+            <span class="fa fa-registered"></span> Armadoras
+        </a>
+    </li>
+    <li id="liModels" onclick="SearchModels()">
+        <a data-toggle="tab" href="#Models">
+            <span class="fa fa-car"></span> Modelos
+        </a>
+    </li>
+   
+</ul>
+
+<div class="tab-content">
+    <div id="Makes" class="tab-pane fade in active">
+        @Html.Partial("_CarMakes", Model.CarMakes)
+    </div>
+    <div id="Models" class="tab-pane fade">
+        @Html.Partial("_CarModels", Model.CarModels)
+    </div>
+
+</div>
+
+

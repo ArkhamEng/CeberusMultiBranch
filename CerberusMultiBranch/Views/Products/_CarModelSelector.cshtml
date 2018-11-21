@@ -53,7 +53,7 @@
     var ModelCount = 0;
     $(document).ready(function ()
     {
-        SetCascade("#CarMakeFilter", "#CarModelFilter", "GetModels");
+        SetCascade("#CarMakeFilter", "#CarModelFilter", '@Url.Action("GetModels", "Json")');
 
         $("#Ini").attr("readonly", true);
         $("#End").attr("readonly", true);

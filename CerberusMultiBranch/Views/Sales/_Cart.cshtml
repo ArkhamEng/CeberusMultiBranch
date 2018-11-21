@@ -1,84 +1,67 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.ShoppingCart>
 
 
-<div id="ModalCart" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content panel panel-primary panel-group">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title text-uppercase">
-                    <span class="fa fa-shopping-cart" style="float:left">
-                    </span>
-                    &nbsp;<a id="ModalCartHeader"></a>
-                </h4>
-            </div>
-            <div class="modal-body panel-body panel-group">
-                <div id="divCartDetails" class="row">
-                    @Html.Partial("_CartDetails", Model)
-                </div>
-            </div>
 
-
-
-            <div class="modal-footer">
-                <div class="col-md-3" >
-                    <select class="form-control" style="font-family: 'FontAwesome', 'Second Font name'" id="CartSending">
-                        <option value="0"><text class="fa fa-building"> &#xf0f7; Recoge en sucursal</text></option>
-                        <option value="1"><text class="fa fa-truck">&#xf0d1; Envío a domicilio</text></option>
-                    </select>
-                </div>
-
-                @*<div class="col-md-2">
-                    <select class="form-control" style="font-family: 'FontAwesome', 'Second Font name'" id="SaleType">
-                        <option value="0"><text class="fa fa-money"> &#xf0d6; Contado</text></option>
-                        <option value="1"><text class="fa fa-credit-card-alt">&#xf09d; Crédito</text></option>
-                        <option value="2"><text class="fa fa-paypal">&#xf0d1; Preventa</text></option>
-                    </select>
-                </div>*@
-
-                <button id="btnShowClients" class="btn btn-default btnCart" type="button">
-                    <span class="fa fa-user-plus"></span>
-                    Cliente
-                </button>
-
-                <button class="btn btn-success btnCart" type="button"  onclick="CreateBudget()">
-                    <span class="fa fa-print"></span>
-                    Cotización
-                </button>
-
-                <button class="btn btn-info btnCart" type="button"  onclick="CompleateSale(2)">
-                    <span class="fa fa-calendar"></span>
-                    Preventa
-                </button>
-
-                <button class="btn btn-warning btnCart" type="button" onclick="CompleateSale(3)">
-                    <span class="fa fa-clock-o"></span>
-                    Apartado
-                </button>
-
-                <button class="btn btn-danger btnCart" type="button" onclick="CompleateSale(1)">
-                    <span class="fa fa-credit-card-alt"></span>
-                    Credito
-                </button>
-
-                <button class="btn btn-primary btnCart" type="button"  onclick="CompleateSale(0)">
-                    <span class="fa fa-money"></span>
-                    Contado
-                </button>
-
-            </div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h4 class="panel-title text-uppercase">
+            <button class="close" type="button" onclick="HideModal(null,true)"><span class="fa fa-times"></span></button>
+            <span class="fa fa-shopping-cart" style="float:left">
+            </span>
+            &nbsp;<a id="ModalCartHeader"></a>
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div id="divCartDetails" class="row">
+            @Html.Partial("_CartDetails", Model)
         </div>
+    </div>
+
+    <div class="panel-footer clearfix">
+        <div class="col-md-3">
+            <select class="form-control btnCart" style="font-family: 'FontAwesome', 'Second Font name'" id="CartSending">
+                <option value="0"><text class="fa fa-building"> &#xf0f7; Recoge en sucursal</text></option>
+                <option value="1"><text class="fa fa-truck">&#xf0d1; Envío a domicilio</text></option>
+            </select>
+        </div>
+
+        <button id="btnShowClients" class="btn btn-default btnCart" type="button">
+            <span class="fa fa-user-plus"></span>
+            Cliente
+        </button>
+
+        <button class="btn btn-success btnCart" type="button" onclick="CreateBudget()">
+            <span class="fa fa-print"></span>
+            Cotización
+        </button>
+
+        <button class="btn btn-info btnCart" type="button" onclick="CompleateSale(2)">
+            <span class="fa fa-calendar"></span>
+            Preventa
+        </button>
+
+        <button class="btn btn-warning btnCart" type="button" onclick="CompleateSale(3)">
+            <span class="fa fa-clock-o"></span>
+            Apartado
+        </button>
+
+        <button class="btn btn-danger btnCart" type="button" onclick="CompleateSale(1)">
+            <span class="fa fa-credit-card-alt"></span>
+            Credito
+        </button>
+
+        <button class="btn btn-primary btnCart" type="button" onclick="CompleateSale(0)">
+            <span class="fa fa-money"></span>
+            Contado
+        </button>
     </div>
 </div>
 
 
 <script>
-    $(document).ready(function ()
-    {
-        $("#btnShowClients").click(function ()
-        {
-            $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-            {
+    $(document).ready(function () {
+        $("#btnShowClients").click(function () {
+            $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function () {
                 $("#ModalQuickClient").modal('show');
             });
 
@@ -90,38 +73,31 @@
 
     function CompleateSale(type)
     {
-        var param =
-        {
-            sending: $("#CartSending").val(),
-            type: type
-        };
-        
+        var param = { sending: $("#CartSending").val(), type: type };
+
+        ShowModLoading();
+
         ExecuteAjax('@Url.Action("CompleateSale", "Sales")', param, function (response)
         {
-            $("#ModalCart").modal("hide");
-            CheckCart();
-            if (response.Result == "OK")
+            HideModal(function ()
             {
-                $(".prodRow").removeClass("info");
-                ShowMessage("Venta concluida", response.Message, 'success');
-            }
-            else
-                ShowMessage(response.Result, response.Message, 'warning');
+                CheckCart();
+
+                ShowNotify(response.Header, response.Result, response.Body, 3000);
+
+            }, true);
+
         });
     }
 
-    function CreateBudget()
-    {
-        $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-        {
+    function CreateBudget() {
+        $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function () {
             ShowLoading();
-            ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response)
-            {
+            ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response) {
                 HideLoading();
                 CheckCart();
 
-                if (!$.isPlainObject(response))
-                {
+                if (!$.isPlainObject(response)) {
                     $(".prodRow").removeClass("info");
                     $("#divPrintBudget").html(response);
                 }
@@ -129,8 +105,6 @@
                     ShowMessage(response.Result, response.Message, 'warning');
             });
         }).modal("hide");
-
-       
     }
 
 </script>

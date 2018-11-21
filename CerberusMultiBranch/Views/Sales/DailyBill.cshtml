@@ -8,11 +8,11 @@
 }
 
 
-<h4 id="hAmount" class="alert alert-danger col-md-3 col-md-offset-5">
+<h4 id="hAmount" class="alert alert-success col-md-3 col-md-offset-6">
     Total $ 0.0
 </h4>
 
-<h4 id="hItems" class="alert alert-info col-md-3  col-md-offset-1">
+<h4 id="hItems" class="alert alert-info col-md-2  col-md-offset-1">
     Articulos 0
 </h4>
 <hr />
@@ -44,21 +44,21 @@
         <div class="col-md-8">
             <div class="input-group">
                 @Html.EditorFor(model => model.Folio, new { htmlAttributes = new { @class = "form-control", placeholder = "Folio de venta" } })
-                <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                <span class="input-group-addon"><a>Fecha</a></span>
                 @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control", list = "Clients" } })
-                <div class="input-group-btn">
-                    <button type="button" class="btn btn-success" onclick="ExportToExcel()">
-                        <span class="fa fa-file-excel-o"></span>
-                        Exportar
-                    </button>
-                </div>
             </div>
+        </div>
+        <div id="divButtons">
+         
         </div>
     </div>
 </div>
-<div id="divDetails">
-    @Html.Partial("_SoldItemsDetails",Model.SoldItems)
+<div class="panel panel-default">
+    <div id="divDetails" class="panel-body dtContainer">
+        @Html.Partial("_SoldItemsDetails", Model.SoldItems)
+    </div>
 </div>
+
 
 
 
@@ -82,7 +82,6 @@
         ExecuteAjax('@Url.Action("SearchSoldItems", "Sales")', { model: model }, function (response)
         {
             $("#divDetails").html(response);
-            HideLoading();
         });
     }
 </script>

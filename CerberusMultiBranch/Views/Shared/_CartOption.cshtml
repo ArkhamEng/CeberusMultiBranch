@@ -1,12 +1,12 @@
 ﻿
 
-<a  onclick="OpenCart()" class="btn btn-danger" style="color:whitesmoke !important;">
+<a onclick="OpenCart()" class="btn btn-danger" style="color:whitesmoke !important;">
     <span class="fa fa-shopping-cart" style="float:left">
     </span>
     &nbsp;Carrito
     <span id="spShopingCart" class="badge bg-info">
-</span>
-    
+    </span>
+
 </a>
 
 
@@ -16,35 +16,53 @@
     {
         CheckCart();
     }
+
     function CheckCart()
     {
-        ExecuteAjax('@Url.Action("CheckCart","Sales")', {}, function (j)
+        ExecuteAjax('@Url.Action("CheckCart","Sales")', {}, function (response)
         {
-            if (j.Result != "OK")
-                ShowMessage(j.Result, j.Message, 'warning');
-            else
-                $("#spShopingCart").text(j.Message);
+            $("#spShopingCart").text(response.Extra);
         });
     }
 
     function OpenCart()
     {
-        ShowLoading();
+        ShowLoading('static');
+
         ExecuteAjax('@Url.Action("OpenCart", "Sales")', {}, function (response)
         {
-            HideLoading();
-           
-            if ($.isPlainObject(response))
+            HideLoading(function ()
             {
-                console.error("Error");
-                ShowMessage(response.Result, response.Message, 'warning');
-            }
-            else
-            {
-                $("#divModalCart").html(response);
-                $("#ModalCart").modal("show");
-
-            }
+                ShowModal(response, 'static', 'lg');
+            });
         });
     }
+
+    function SetValues()
+    {
+        var cPrice = parseFloat($("#CPrice").val());
+        var sPrice = parseFloat($("#SPrice").val());
+        var dPrice = parseFloat($("#DPrice").val());
+        var wPrice = parseFloat($("#WPrice").val());
+
+        $("#txtPriceSelected").val(cPrice);
+
+        $('#txtPriceSelector').bootstrapSlider({
+            value: cPrice,
+            ticks: [wPrice, dPrice, sPrice],
+            ticks_labels: [GetCurrency(wPrice), GetCurrency(dPrice), GetCurrency(sPrice)],
+
+            ticks_snap_bounds: 1
+        });
+
+
+        $("#txtPriceSelector").on("slide", function (slideEvt) {
+            $("#txtPriceSelected").val(slideEvt.value);
+        });
+
+        $("#txtPriceSelector").on("change", function (response) {
+            $("#txtPriceSelected").val(response.value.newValue);
+        });
+    }
+
 </script>

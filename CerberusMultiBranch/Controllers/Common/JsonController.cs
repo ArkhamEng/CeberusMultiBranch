@@ -61,9 +61,9 @@ namespace CerberusMultiBranch.Controllers.Common
         }
 
         [HttpPost]
-        public JsonResult GetCategories(int parentId)
+        public JsonResult GetCategories(int id)
         {
-            var list = db.SystemCategories.Where(sc => sc.PartSystemId == parentId).
+            var list = db.SystemCategories.Where(sc => sc.PartSystemId == id).
                 Select(sc=> sc.Category).OrderBy(c=> c.Name).OrderBy(sc=> sc.Name).ToList();
 
             list.ForEach(c => c.Name = c.Name + " | " + c.SatCode);
@@ -72,16 +72,16 @@ namespace CerberusMultiBranch.Controllers.Common
         }
 
         [HttpPost]
-        public JsonResult GetModels(int parentId)
+        public JsonResult GetModels(int id)
         {
-            var list = db.CarModels.Where(m => m.CarMakeId == parentId).OrderBy(m=> m.Name).ToSelectList();
+            var list = db.CarModels.Where(m => m.CarMakeId == id).OrderBy(m=> m.Name).ToSelectList();
             return Json(list);
         }
 
         [HttpPost]
-        public JsonResult GetYears(int parentId)
+        public JsonResult GetYears(int id)
         {
-            var list = db.CarYears.Where(m => m.CarModelId == parentId).OrderBy(y=> y.Year).ToSelectList();
+            var list = db.CarYears.Where(m => m.CarModelId == id).OrderBy(y=> y.Year).ToSelectList();
             return Json(list);
         }
 

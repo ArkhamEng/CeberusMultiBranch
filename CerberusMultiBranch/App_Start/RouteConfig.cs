@@ -19,9 +19,14 @@ namespace CerberusMultiBranch
              defaults: new { controller = "Clients", action = "Index", id = UrlParameter.Optional });
 
             routes.MapRoute(
-                name: "Clasifications",
-                url: "Catalog/Clasifications",
-                defaults: new { controller = "Configuration", action = "Clasifications", id = UrlParameter.Optional });
+                name: "MakesAndModels",
+                url: "Catalog/MakesAndModels",
+                defaults: new { controller = "MakesAndModels", action = "Index", id = UrlParameter.Optional });
+
+            routes.MapRoute(
+            name: "Clasifications",
+            url: "Catalog/Clasifications",
+            defaults: new { controller = "Configuration", action = "Clasifications", id = UrlParameter.Optional });
 
             routes.MapRoute(
              name: "Employees",

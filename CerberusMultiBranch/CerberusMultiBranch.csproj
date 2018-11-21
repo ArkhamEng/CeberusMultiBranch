@@ -191,7 +191,7 @@
     <Compile Include="Controllers\Common\JsonController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\ConfigurationController.cs" />
-    <Compile Include="Controllers\Config\CarMakesController.cs" />
+    <Compile Include="Controllers\Config\MakesAndModelsController.cs" />
     <Compile Include="Controllers\Config\DataTablesPostObject.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
@@ -355,6 +355,14 @@
     <Compile Include="Migrations\201811192055216_AuditConfig.Designer.cs">
       <DependentUpon>201811192055216_AuditConfig.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811202232024_RequiredMakeModelFields.cs" />
+    <Compile Include="Migrations\201811202232024_RequiredMakeModelFields.Designer.cs">
+      <DependentUpon>201811202232024_RequiredMakeModelFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811202235096_RequiredMakeModelFields1.cs" />
+    <Compile Include="Migrations\201811202235096_RequiredMakeModelFields1.Designer.cs">
+      <DependentUpon>201811202235096_RequiredMakeModelFields1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -415,6 +423,7 @@
     <Compile Include="Models\ViewModels\Catalog\TransferViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
     <Compile Include="Models\ViewModels\Config\JCatalogEntity.cs" />
+    <Compile Include="Models\ViewModels\Config\MakesAndModelsViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
@@ -841,13 +850,10 @@
     <Content Include="Views\Clients\Index.cshtml" />
     <Content Include="Views\Employees\_EmployeeEdition.cshtml" />
     <Content Include="Views\Employees\Index.cshtml" />
-    <Content Include="Views\CarMakes\Create.cshtml" />
-    <Content Include="Views\CarMakes\Edit.cshtml" />
-    <Content Include="Views\CarMakes\Index.cshtml" />
     <Content Include="Views\Clients\_List.cshtml" />
-    <Content Include="Views\CarModels\Index.cshtml" />
-    <Content Include="Views\CarModels\Create.cshtml" />
-    <Content Include="Views\CarModels\_YearList.cshtml" />
+    <Content Include="Views\MakesAndModels\Index.cshtml" />
+    <Content Include="Views\MakesAndModels\Create.cshtml" />
+    <Content Include="Views\MakesAndModels\_YearList.cshtml" />
     <Content Include="Views\Providers\_ProviderEdition.cshtml" />
     <Content Include="Views\Providers\Index.cshtml" />
     <Content Include="Views\Providers\_List.cshtml" />
@@ -874,7 +880,7 @@
     <Content Include="Views\Sales\_CartDetails.cshtml" />
     <Content Include="Views\Clients\_QuickClientList.cshtml" />
     <Content Include="Views\CashRegister\_ChoosePayment.cshtml" />
-    <Content Include="Views\Sales\History.cshtml" />
+    <Content Include="Views\Sales\Report.cshtml" />
     <Content Include="Views\Sales\_SaleList.cshtml" />
     <Content Include="Views\Configuration\_VariableList.cshtml" />
     <Content Include="Views\Configuration\_Variables.cshtml" />
@@ -947,7 +953,7 @@
     <Content Include="Views\CashRegister\_PrintElements.cshtml" />
     <Content Include="Views\Products\StockMovement.cshtml" />
     <Content Include="Views\Products\_MovementList.cshtml" />
-    <Content Include="Views\Shared\_PrintBudget.cshtml" />
+    <Content Include="Views\Sales\_PrintBudget.cshtml" />
     <Content Include="Views\CashRegister\_PrintRefund.cshtml" />
     <Content Include="Views\Sales\Budget.cshtml" />
     <Content Include="Views\Sales\_BudgetDetail.cshtml" />
@@ -960,6 +966,12 @@
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
     <Content Include="Views\Configuration\SystemTest.cshtml" />
     <Content Include="Views\Configuration\_WithdrawalCauseEdition.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModels.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModelList.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakes.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakeList.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakeEdition.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModelEdition.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1089,6 +1101,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811192055216_AuditConfig.resx">
       <DependentUpon>201811192055216_AuditConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811202232024_RequiredMakeModelFields.resx">
+      <DependentUpon>201811202232024_RequiredMakeModelFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811202235096_RequiredMakeModelFields1.resx">
+      <DependentUpon>201811202235096_RequiredMakeModelFields1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -27,14 +27,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         #region Sale History
         [CustomAuthorize(Roles = "Supervisor,Vendedor")]
-        public ActionResult History()
+        public ActionResult Report()
         {
             //obtengo las sucursales configuradas para el empleado
             var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null);
+            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null,100);
 
             return View(model);
         }
@@ -137,7 +137,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client,
-            string user, TranStatus? status, string userId)
+            string user, TranStatus? status, string userId, int top = 10000)
         {
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
@@ -152,7 +152,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                          && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                          && (userId == null || userId == string.Empty || p.UserId == userId)
                          && (status == null || p.Status == status)
-                         select p).OrderByDescending(p => p.TransactionDate).ToList();
+                         select p).Take(top).OrderByDescending(p => p.TransactionDate).ToList();
 
             return sales;
         }
@@ -220,7 +220,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             int? fol = (folio != null && folio != string.Empty)? Convert.ToInt32(folio):new Nullable<int>();
 
-            var model = (from p in db.Budgets.Include(p => p.Client).Include(p => p.Branch)
+            var model = (from p in db.Budgets.Include(b=> b.BudgetDetails)
                          where
                          (branchId == null || p.BranchId == branchId)
                          && (beginDate == null || p.BudgetDate >= beginDate)
@@ -246,11 +246,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (cartItems.Count > Cons.Zero)
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Error",
+                        Result = Cons.Responses.Warning,
                         Header = "Carrito lleno",
-                        Message = "Antes de aplicar una cotización es necesario vaciar el carrito"
+                        Body = "Antes de aplicar una cotización es necesario vaciar el carrito",
+                        Code = Cons.Responses.Codes.ConditionMissing
                     });
                 }
                 else
@@ -262,11 +263,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (budget.DueDate < DateTime.Now.ToLocal())
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Error",
-                            Header = "Cotización invalida",
-                            Message = "Esta cotización ya exipiro!"
+                            Result = Cons.Responses.Danger,
+                            Header = "Cotizacion Expirada",
+                            Body = "Esta cotización expiro en "+budget.DueDate.ToString("dddd, dd MMMM yyyy h:mm tt"),
+                            Code = Cons.Responses.Codes.InvalidData
                         });
                     }
 
@@ -294,22 +296,24 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     db.SaveChanges();
 
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "OK",
-                        Header = "Cotizacón aplicada",
-                        Message = "Los productos en la cotización fueron aplicados al carrito"
+                        Result = Cons.Responses.Success,
+                        Header = "Cotizacón aplicada!",
+                        Body = "Los productos en la cotización fueron aplicados al carrito",
+                        Code  = Cons.Responses.Codes.Success
                     });
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error",
+                    Result = Cons.Responses.Danger,
                     Header = "Error al aplicar la cotización",
-                    Message = "Ocurrio un error al cargar la cotizacion " + ex.Message
+                    Body = "Ocurrio un error inesperado al cargar la cotizacion ",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
         }

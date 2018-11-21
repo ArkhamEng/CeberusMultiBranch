@@ -93,7 +93,7 @@
                     @Html.DisplayFor(modelItem => item.User.UserName)
                 </td>
 
-                <td class="text-uppercase">
+                <td class="text-uppercase" >
                     @Html.DisplayUpperFor(modelItem => item.StringAddress)
                 </td>
                 <td class="text-uppercase">
@@ -126,8 +126,9 @@
         $("#tbEmployees").removeClass("hidden");
         var printOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Empleados"))', Columns: [2, 3, 4, 5, 6, 7, 8] };
 
-
         Paginate("#tbEmployees", 10, true, "#txtName", false, "#tbButtons", printOp);
+
+        HideLoading();
     });
 
     function BeginEdit(id)

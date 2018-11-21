@@ -30,7 +30,7 @@ namespace CerberusMultiBranch.Controllers.Config
             {
                 try
                 {
-                    var model = db.WithdrawalCauses.Find(id);
+                    var model = db.WithdrawalCauses.FirstOrDefault(m => m.WithdrawalCauseId == id && m.IsActive);
 
                     if (model != null)
                         return PartialView("_WithDrawalCauseEdition", model);
@@ -50,7 +50,7 @@ namespace CerberusMultiBranch.Controllers.Config
                         Result = Cons.Responses.Danger,
                         Header = "Error al obtener datos",
                         Code = Cons.Responses.Codes.ServerError,
-                        Body = "Ocurrio un error al obtener lo causa de retiro"
+                        Body = "Ocurrio un error al obtener la causa de retiro"
                     });
                 }
             }
@@ -120,23 +120,34 @@ namespace CerberusMultiBranch.Controllers.Config
         {
             try
             {
-                var cause = db.WithdrawalCauses.Find(id);
+                var cause = db.WithdrawalCauses.FirstOrDefault(m => m.IsActive && m.WithdrawalCauseId == id);
                 var count = db.CashDetails.Where(d => d.WithdrawalCauseId == id).Count();
-                
+
                 JResponse response = null;
 
-                if (cause != null && count == Cons.Zero)
+                if (cause != null)
                 {
-                        db.WithdrawalCauses.Remove(cause);
-                        db.SaveChanges();
 
-                        response = new JResponse
-                        {
-                            Result = Cons.Responses.Success,
-                            Header = "Registro eliminado",
-                            Code = Cons.Responses.Codes.Success,
-                            Body = string.Format("Se elimino la causa de retiro {0} ", cause.Name)
-                        };
+                    if (count > Cons.Zero)
+                    {
+                        cause.UpdDate = DateTime.Now.ToLocal();
+                        cause.UpdUser = HttpContext.User.Identity.Name;
+                        cause.IsActive = false;
+
+                        db.Entry(cause).State = EntityState.Modified;
+                    }
+                    else
+                        db.WithdrawalCauses.Remove(cause);
+
+                    db.SaveChanges();
+
+                    response = new JResponse
+                    {
+                        Result = Cons.Responses.Success,
+                        Header = "Registro eliminado",
+                        Code = Cons.Responses.Codes.Success,
+                        Body = string.Format("Se elimino la causa de retiro {0} ", cause.Name)
+                    };
                 }
                 else
                 {

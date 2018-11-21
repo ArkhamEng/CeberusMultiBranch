@@ -101,9 +101,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public bool IsActive { get; set; }
 
         [Required]
+        [Display(Name = "Editado")]
         public DateTime UpdDate { get; set; }
 
         [MaxLength(100)]
+        [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
 
         public DateTime? LockEndDate { get; set; }
@@ -114,6 +116,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Display(Name="Limite de Credito")]
         public double CreditLimit { get; set; }
 
+        [Display(Name = "Días de Credito")]
         public int DaysToPay { get; set; }
 
         [Display(Name ="Productos")]

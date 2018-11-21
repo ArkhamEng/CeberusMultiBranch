@@ -53,7 +53,17 @@
 
             <th>
                 @Html.DisplayNameFor(model => model.Edition)
-            </th>           
+            </th>  
+            <th class="hidden">
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th class="hidden">
+                @Html.DisplayNameFor(model => model.CreditLimit)
+            </th>
+            <th class="hidden">
+                @Html.DisplayNameFor(model => model.DaysToPay)
+            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -87,11 +97,11 @@
                 <td class="text-lowercase">
                     @Html.DisplayLowerFor(modelItem => item.Email2)
                 </td>
-                <td class="text-uppercase">
+                <td class="text-uppercase" style="max-width:100px !important">
                     @Html.DisplayUpperFor(modelItem => item.Credit)
                 </td>
                 
-                <td class="text-uppercase">
+                <td class="text-uppercase" style="max-width:100px !important">
                     @Html.DisplayFor(modelItem => item.Phones)
                 </td>
                 <td class="text-uppercase">
@@ -101,12 +111,21 @@
                     @Html.DisplayUpperFor(modelItem => item.Line)
                 </td>
              
-                <td class="text-uppercase">
+                <td class="text-uppercase" style="max-width:150px">
                     @Html.DisplayUpperFor(modelItem => item.StringAddress)
                 </td>
             
                 <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Edition)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.CreditLimit)
+                </td>
+                <td class="hidden">
+                    @Html.DisplayFor(modelItem => item.DaysToPay)
                 </td>
               
                 <td>
@@ -136,7 +155,10 @@
     {
         $("#tbProviders").removeClass("hidden");
 
-        Paginate("#tbProviders", 10, true, "#txtName", false, "#tbButtons");
+        var printOp = { Title: '@Html.Raw(Extension.GetTitle("Catálogo de Proveedores"))', Columns: [1, 2, 3, 4, 5, 6, 14,15,16] };
+        Paginate("#tbProviders", 10, true, "#txtName", false, "#tbButtons", printOp);
+
+        HideLoading();
     });
 
     function BeginEdit(id)

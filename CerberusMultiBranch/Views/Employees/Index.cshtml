@@ -42,11 +42,9 @@
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
 
-        $("#btnCreate").click(function ()
-        {
+        $("#btnCreate").click(function () {
             ShowCatalogModal(SearchById, null, 'Employee', 0);
         });
 
@@ -59,10 +57,7 @@
 
             ExecuteAjax('@Url.Action("Search")', data, function (response)
             {
-                HideLoading(function ()
-                {
-                    $("#divEmployees").html(response);
-                });
+                $("#divEmployees").html(response);
             });
         });
     });
@@ -76,7 +71,8 @@
     }
 
     $(document).keydown(function (e) {
-        if (e.which == 13 || (e.altKey && e.which == 66)) {
+        if (e.which == 13 || (e.altKey && e.which == 66))
+        {
             $("#btnSearch").click();
         }
 

@@ -53,10 +53,7 @@
 
         ExecuteAjax('@Url.Action("Search")', data, function (response)
         {
-            HideLoading(function ()
-            {
-                $("#divProviders").html(response);
-            });
+            $("#divProviders").html(response);
         });
     }
 

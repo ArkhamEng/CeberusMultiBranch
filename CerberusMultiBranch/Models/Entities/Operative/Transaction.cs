@@ -25,7 +25,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         [Display(Name = "Fecha de Operación")]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
 
@@ -63,7 +63,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Display(Name = "Vencimiento")]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
         public DateTime Expiration { get; set; }
 
 

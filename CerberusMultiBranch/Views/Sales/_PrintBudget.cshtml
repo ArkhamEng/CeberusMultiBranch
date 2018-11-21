@@ -66,7 +66,7 @@
                         </tr>
                         <tr>
                             <td colspan="2" class="text-center">
-                              COTIZACIÓN NO. <label>@Model.BranchId.ToString(Cons.BudgetFormat)</label>
+                              COTIZACIÓN NO. <label>@Model.BudgetId.ToString(Cons.BudgetFormat)</label>
                             </td>
                         </tr>
                         <tr>
@@ -126,7 +126,7 @@
                                 @Model.Client.Name
                             </td>
                             <td valign="top" class="text-uppercase">
-                                @Model.Client.ToString()<br />
+                                @Model.Client.Addresses.FirstOrDefault().ToString()<br />
                             </td>
                             <td valign="top" class="text-center text-uppercase">
                                 @Model.Client.FTR

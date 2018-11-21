@@ -386,11 +386,23 @@ ul ul a {
     border-color: rgba(243, 156, 18, 0.88);
 }
 
+.alert-attention{
+    color: #E9EDEF;
+    background-color: rgba(179, 119, 0, 0.88);
+    border-color: rgba(179, 119, 0, 0.88);
+}
+
 .alert-danger,
 .alert-error {
     color: #E9EDEF;
     background-color: rgba(231, 76, 60, 0.88);
     border-color: rgba(231, 76, 60, 0.88);
+}
+
+.alert-dark {
+    color: #E9EDEF;
+    background-color: rgba(52, 73, 94, 0.88);
+    border-color: rgba(52, 73, 94, 0.88);
 }
 
 .ui-pnotify.dark .ui-pnotify-container {
@@ -447,3 +459,41 @@ ul.notifications {
     .image img {
         position: absolute;
     }
+
+    /*******DATATABLES ROW STYLES*****/
+
+.bgDataTable-success {
+    color: #ffffff !important;
+    background-color: rgba(38, 185, 154, 0.88)  !important;
+    border-color: rgba(38, 185, 154, 0.88)  !important;
+}
+
+.bgDataTable-info {
+    color: #E9EDEF  !important;
+    background-color: rgba(52, 152, 219, 0.88)  !important;
+    border-color: rgba(52, 152, 219, 0.88)  !important;
+}
+
+.bgDataTable-attention{
+    color: #E9EDEF  !important;
+    background-color: rgba(179, 119, 0, 0.88)  !important;
+    border-color: rgba(179, 119, 0, 0.88)  !important;
+}
+
+.bgDataTable-warning {
+    color: #E9EDEF;
+    background-color: rgba(243, 156, 18, 0.88)  !important;
+    border-color: rgba(243, 156, 18, 0.88);
+}
+
+.bgDataTable-danger{
+    color: #E9EDEF  !important;
+    background-color: rgba(231, 76, 60, 0.88)  !important;
+    border-color: rgba(231, 76, 60, 0.88)  !important;
+}
+
+.bgDataTable-dark {
+    color: #E9EDEF;
+    background-color: rgba(52, 73, 94, 0.88)  !important;
+    border-color: rgba(52, 73, 94, 0.88)  !important;
+}

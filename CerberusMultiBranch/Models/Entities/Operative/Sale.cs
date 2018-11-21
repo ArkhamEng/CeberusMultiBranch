@@ -22,10 +22,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Folio { get; set; }
 
+        [Display(Name ="Comisión")]
         public int ComPer { get; set; }
 
+        [Display(Name = "Monto de Comisión")]
         public double ComAmount { get; set; }
 
+        [Display(Name = "Entrega")]
         public int SendingType { get; set; }
 
         [Index("IDX_Year")]
@@ -45,14 +48,81 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public virtual SaleCreditNote SaleCreditNote { get; set; }
         #endregion
 
+
+        public string StatusStyle
+        {
+            get
+            {
+                var style = string.Empty;
+
+                switch (this.Status)
+                {
+                    case TranStatus.Compleated:
+                        style = "alert-success";
+                        break;
+                    case TranStatus.Revision:
+                        style = "alert-attention";
+                        break;
+                    case TranStatus.Reserved:
+                        style = "alert-info";
+                        break;
+                    case TranStatus.Canceled:
+                        style = "alert-danger";
+                        break;
+
+                    case TranStatus.PreCancel:
+                        style = "alert-warning";
+                        break;
+                }
+
+                return style;
+            }
+        }
+
+        public string Delivery
+        {
+            get { return this.SendingType == Cons.Zero ? "En Sucursal" : "A Domicilio"; }
+        }
+
+        public string SaleStatus
+        {
+            get
+            {
+                var name = string.Empty;
+
+                switch (this.Status)
+                {
+                    case TranStatus.Compleated:
+                        name = "Pagado";
+                        break;
+                    case TranStatus.Revision:
+                        name = "Pago Pendiente";
+                        break;
+                    case TranStatus.Reserved:
+                        name = "Reservado";
+                        break;
+                    case TranStatus.Canceled:
+                        name = "Cancelado";
+                        break;
+
+                    case TranStatus.PreCancel:
+                        name = "Por Cancelar";
+                        break;
+                }
+
+                return name;
+            }
+        }
+
+
         public Sale()
         {
-            this.SaleDetails     = new List<SaleDetail>();
+            this.SaleDetails = new List<SaleDetail>();
             this.TransactionDate = DateTime.Now.ToLocal();
-            this.UpdUser         = HttpContext.Current.User.Identity.Name;
-            this.UpdDate         = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.UpdDate = DateTime.Now.ToLocal();
         }
     }
 
-   
+
 }

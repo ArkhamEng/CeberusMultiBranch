@@ -19,6 +19,8 @@ namespace CerberusMultiBranch.Support
 
             public struct Codes
             {
+                public const int ConditionMissing = -5;
+                public const int InvalidData = -4;
                 public const int ErroSaving     = -3;
                 public const int RecordNotFound = -2;
                 public const int RecordLocked = -1;

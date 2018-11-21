@@ -13,7 +13,8 @@ namespace CerberusMultiBranch.Models.Entities.Config
     {
         public int CarMakeId { get; set; }
 
-        [Display(Name = "Marca")]
+        [Display(Name = "Armadora")]
+        [Required(ErrorMessage = "Se requiere un nombre de Armadora")]
         public string Name { get; set; }
 
         [MaxLength(100)]
@@ -37,7 +38,6 @@ namespace CerberusMultiBranch.Models.Entities.Config
             this.UpdUser = HttpContext.Current.User.Identity.Name;
             this.IsActive = true;
         }
-     
     }
 
     [Table("CarModel", Schema = "Config")]
@@ -53,6 +53,7 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public int CarModelId { get; set; }
 
         [Display(Name = "Modelo")]
+        [Required(ErrorMessage = "Se requiere un Nombre de modelo")]
         public string Name { get; set; }
 
         [MaxLength(100)]

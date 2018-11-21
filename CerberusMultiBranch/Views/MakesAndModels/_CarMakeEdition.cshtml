@@ -1,0 +1,76 @@
+﻿@model CerberusMultiBranch.Models.Entities.Config.CarMake
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm("SaveCarMake", "MakesAndModels", FormMethod.Post, new { id = "SaveMakeForm" }))
+{
+    <div class="modal-content panel panel-primary">
+        <div class="modal-header panel-heading">
+            <h4 class="panel-title">
+                <i class="fa fa-registered"></i>
+                Edición de Armadoras
+            </h4>
+        </div>
+        <div class="modal-body panel-body">
+            @Html.HiddenFor(model => model.CarMakeId)
+
+            <div class="form-group col-md-12">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+                    @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-capitalize", placeholder = "Nombre de la armadora" } })
+                </div>
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="modal-footer">
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary" onclick="SaveCarMake()">
+                    <span class="fa fa-save"></span>
+                    Guardar
+                </button>
+
+                <button type="button" class="btn btn-danger" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#SaveMakeForm");
+        form.validate();
+    });
+
+ 
+    function SaveCarMake()
+    {
+        var form = $("#SaveMakeForm");
+
+        if (!form.valid())
+        {
+            ShowNotify("Error de validación", 'warning', "Existen errores en los datos capturado, por favor verifique", 3000);
+            return;
+        }
+
+        ShowModLoading();
+
+        var carMake = { CarMakeId: $("#CarMakeId").val(), Name: $("#Name").val() }
+
+        ExecuteAjax('@Url.Action("SaveCarMake","MakesAndModels")', { carMake: carMake }, function (response)
+        {
+            HideModal(function ()
+            {
+                $("#divMakes").html(response);
+            }, true);
+        });
+
+    }
+
+</script>
