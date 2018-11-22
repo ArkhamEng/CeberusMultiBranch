@@ -1,12 +1,13 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.Client>
+﻿@model IEnumerable<ClientViewModel>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
 
 
-<table id="tbQuickClient" class="table table-hover">
+
+<table id="tbClientQuickSearch" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
-            <th class="col-md-1">
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
             <th class="col-md-4">
                 @Html.DisplayNameFor(model => model.Name)
             </th>
@@ -27,9 +28,6 @@
         {
             <tr>
                 <td class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.Code)
-                </td>
-                <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Name)
                 </td>
                 <td class="text-uppercase">
@@ -41,9 +39,10 @@
                 <td class="text-uppercase">
                     @Html.DisplayFor(modelItem => item.Phone)
                 </td>
-                <td style="text-align:right">
-                    <button type="button" class="btn btn-warning btn-xs" onclick="ClientSelected('@item.ClientId','@item.Name','@item.FTR')">
-                        <span class="fa fa-plus-circle"></span>
+                <td >
+                    <button type="button" class="btn btn-primary btn-xs" onclick="ClientSelected('@item.ClientId','@item.Name','@item.FTR')">
+                        <span class="fa fa-check"></span>
+                        Seleccionar
                     </button>
                 </td>
             </tr>
@@ -54,24 +53,15 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbQuickClient", 8);
+        $("#tbClientQuickSearch").removeClass("hidden");
+        Paginate("#tbClientQuickSearch", 8, true, "#FClientName",false);
     });
+
+    var recordSelected;
 
     function ClientSelected(id, name, ftr)
     {
-        var param = { clientId: id, transactionId: $("#SaleId").val() }
-
-        ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (j)
-        {
-            if (j.Result != 'OK')
-            {               
-                ShowMessage(j.Result, j.Data, 'warning');
-            }
-            else
-            {
-                $("#ModalQuickClient").modal("hide");
-            }
-        });
+        HideModal(function () { recordSelected(id, name, ftr); }, true);
     }
 
    

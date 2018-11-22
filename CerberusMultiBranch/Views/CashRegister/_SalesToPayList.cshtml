@@ -1,7 +1,7 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
 @using CerberusMultiBranch.Support
 
-<table id="tbSales" class="table table-striped small">
+<table id="tbSales" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
             <th class="text-center">@Html.DisplayName("Folio")</th>
@@ -20,7 +20,7 @@
         {
             <tr>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
-                <td>@Html.DisplayFor(m => item.Client.Name)</td>
+                <td>@Html.DisplayUpperFor(m => item.Client.Name)</td>
 
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
 
@@ -45,37 +45,25 @@
                     </div>
                 </td>
 
-                <td class="col-xs-2" align="right">
-                    <div class="btn-group">
-                        @if (item.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.Revision)
-                        {
-                            <button class="btn btn-success" type="button" title="Registrar pago" onclick="RegistPayment(@item.SaleId)">
-                                <span class="fa fa-dollar"></span>
-                            </button>
-                        }
-                        <button class="btn btn-warning" type="button" title="Imprimir ticket" onclick="PrintDocument(@item.SaleId,1)">
-                            <span class="fa fa-ticket"></span>
+                <td>
+                    @if (item.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.Revision)
+                    {
+                        <button class="btn btn-success btn-sm" type="button" title="Registrar pago" onclick="RegistPayment(@item.SaleId)">
+                            <span class="fa fa-dollar"></span>
+                            Abonar
                         </button>
-                        <button class="btn btn-primary" type="button" title="Imprimir nota" onclick="PrintDocument(@item.SaleId,2)">
-                            <span class="fa fa-file"></span>
-                        </button>
-                    </div>
-
-                    @*<div class="dropdown">
-                            <button class="btn btn-primary  dropdown-toggle" type="button" data-toggle="dropdown" title="Imprimir comprobante">
-                                <span class="fa fa-print"></span>
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-header">Tipo de comprobante</li>
-                                <li><a onclick="PrintDocument(@item.SaleId,1)">Ticket</a></li>
-                                <li class="divider"></li>
-                                <li><a onclick="PrintDocument(@item.SaleId,2)">Nota</a></li>
-                            </ul>
-                        </div>*@
+                    }
+                    <button class="btn btn-warning  btn-sm" type="button" title="Imprimir ticket" onclick="PrintDocument(@item.SaleId,1)">
+                        <span class="fa fa-ticket"></span>
+                        Ticket
+                    </button>
+                    <button class="btn btn-primary  btn-sm" type="button" title="Imprimir nota" onclick="PrintDocument(@item.SaleId,2)">
+                        <span class="fa fa-file"></span>
+                        Nota
+                    </button>
                 </td>
             </tr>
-        }
+                        }
     </tbody>
     @{
         var totalQuantity = Model.Sum(sale => sale.SaleDetails.Sum(s => s.Quantity));
@@ -86,8 +74,10 @@
 
 
 <script>
-    $(document).ready(function () {
-        Paginate("#tbSales", 6);
+    $(document).ready(function ()
+    {
+        $("#tbSales").removeClass("hidden");
+        Paginate("#tbSales", 6, true, null, false);
 
         var tAmount = "Monto Total: " + GetCurrency(parseFloat('@totalAmount'));
 
@@ -97,24 +87,24 @@
         $("#lblTotalQuantity").text(tQuantity);
     });
 
-    function RegistPayment(id) {
-        $("#ModalNotes").off('hidden.bs.modal').on('hidden.bs.modal', function () {
+    function RegistPayment(id)
+    {
+        HideModal(function ()
+        {
             ShowPaymentModal(id);
-        });
 
-        $("#ModalNotes").modal('hide');
+        }, true);
     }
 
     function PrintDocument(saleId, printType)
     {
-        $("#ModalNotes").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-            ShowLoading();
-            ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response)
-            {
-                HideLoading();
-                $("#divNotes").html(response);
-            });
+        ShowModLoading('static');
+
+        ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response)
+        {
+            HideModLoading();
+
+            $("#divPrinter").html(response);
         });
-        $("#ModalNotes").modal('hide');
     }
 </script> 

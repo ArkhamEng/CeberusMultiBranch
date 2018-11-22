@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var model = new SearchPersonViewModel<ClientViewModel>();
 
-            model.Persons = LookFor(null, null, null, null, null);
+            model.Persons = LookFor(null, null, null, null, null,Cons.MaxResults);
 
             return View(model);
         }
@@ -37,14 +37,29 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string name, string ftr, int? id)
+        public ActionResult Search(int? stateId, int? cityId, string name, string ftr, int? id, bool quickSearch = false)
         {
-            var model = LookFor(stateId, cityId, name, ftr, id);
-            return PartialView("_List", model);
+            var top = quickSearch ? Cons.QuickResults : Cons.MaxResults;
+
+            var model = LookFor(stateId, cityId, name, ftr, id, top);
+
+            if (!quickSearch)
+                return PartialView("_List", model);
+            else
+                return PartialView("_ClientQuickSearchList", model);
         }
 
 
-        private List<ClientViewModel> LookFor(int? stateId, int? cityId, string name, string ftr, int? id)
+        [HttpPost]
+        public ActionResult ShowQuickSearch()
+        {
+            var model = LookFor(null, null, null, null, null, Cons.QuickResults);
+
+            return PartialView("_ClientQuickSearch", model);
+        }
+
+
+        private List<ClientViewModel> LookFor(int? stateId, int? cityId, string name, string ftr, int? id, int top)
         {
             string[] arr = new List<string>().ToArray();
 
@@ -55,10 +70,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                          where
                              (id == null || c.ClientId == id) &&
                              (name == null || name == string.Empty || arr.Any(n => (c.Code + " " + c.Name).Contains(name))) &&
-                             //(stateId == null || c.City.StateId == stateId) &&
-                             //(cityId == null || c.CityId == cityId) &&
                              (ftr == null || ftr == string.Empty || c.FTR == ftr) &&
-                             (c.ClientId > Cons.Zero) && (c.IsActive)
+                             (c.IsActive)
                          select new ClientViewModel
                          {
                              Address = c.Address,
@@ -81,7 +94,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              LockEndDate = c.LockEndDate,
                              LockUser = c.LockUser,
                              Addresses = c.Addresses,
-                         }).OrderBy(c => c.Name).ToList();
+                         }).Take(top).OrderBy(c => c.Name).ToList();
 
             return model;
         }
@@ -119,7 +132,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.RecordLocked,
                         Header = "Registro bloqueado",
-                        Body = "Este cliente "+ client.Name.ToUpper() +" se encuentra bloqueado por " + model.LockUser + " y no puede ser editado hasta ser liberado",
+                        Body = "Este cliente " + client.Name.ToUpper() + " se encuentra bloqueado por " + model.LockUser + " y no puede ser editado hasta ser liberado",
                     });
                 }
 
@@ -160,7 +173,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ClientEdition", model);
         }
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         [CustomAuthorize(Roles = "Capturista,Vendedor")]
@@ -190,15 +203,15 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     db.Entry(client).State = EntityState.Modified;
 
                     db.Entry(client).Property(c => c.UsedAmount).IsModified = false;
-                    db.Entry(client).Property(c => c.Code).IsModified       = false;
-                    db.Entry(client).Property(c => c.IsActive).IsModified   = false;
+                    db.Entry(client).Property(c => c.Code).IsModified = false;
+                    db.Entry(client).Property(c => c.IsActive).IsModified = false;
 
                     foreach (var address in client.Addresses)
                         db.Entry(address).State = EntityState.Modified;
 
-                    response.Id     = client.ClientId;
+                    response.Id = client.ClientId;
                     response.Header = "Datos del cliente actualizados!";
-                    response.Body   = "Se registraron las modificaciones del Cliente " + client.Name.ToUpperInvariant() +
+                    response.Body = "Se registraron las modificaciones del Cliente " + client.Name.ToUpperInvariant() +
                         " y se libero el bloqueo sobre el registro";
                 }
 

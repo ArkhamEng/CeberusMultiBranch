@@ -297,7 +297,8 @@ function ShowModal(html, backdrop, size)
 }
 
 //Hide Main Modal
-function HideModal(callback, removeContent) {
+function HideModal(callback, removeContent)
+{
     $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
         if (callback != null)
             callback();
@@ -313,6 +314,9 @@ function HideModal(callback, removeContent) {
 //Show Child Modal 
 function ShowChildModal(content, openCallBack, size)
 {
+    $("#ChildModalDialog").removeClass('modal-sm');
+    $("#ChildModalDialog").removeClass('modal-lg');
+
     $("#ChildModal").off("shown.bs.modal").on('shown.bs.modal', function ()
     {
         $('#SiteModal').css('opacity', .7);
@@ -323,10 +327,10 @@ function ShowChildModal(content, openCallBack, size)
     });
 
     if (size == 'lg')
-        $("#ChildModalContent").addClass('modal-lg');
+        $("#ChildModalDialog").addClass('modal-lg');
 
     if (size == 'sm')
-        $("#ChildModalContent").addClass('modal-sm');
+        $("#ChildModalDialog").addClass('modal-sm');
 
     $("#ChildModalContent").html(content);
     $("#ChildModal").css("margin-top", "100px");
@@ -347,12 +351,14 @@ function HideChildModal() {
 
 
 //Loading In Modal
-function ShowModLoading() {
+function ShowModLoading()
+{
     $("#ModalContent").children().hide();
     $("#ModalLoading").children().show();
 }
 
-function HideModLoading() {
+function HideModLoading()
+{
     $("#ModalLoading").children().hide();
     $("#ModalContent").children().show();
 }

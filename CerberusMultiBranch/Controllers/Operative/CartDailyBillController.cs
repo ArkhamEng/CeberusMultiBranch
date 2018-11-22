@@ -23,7 +23,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = GetCart(User.Identity.GetUserId(), User.Identity.GetBranchId());
 
             if (model != null)
-                return Json(new JResponse { Result = Cons.Responses.Success, Code = Cons.Responses.Codes.Success, Extra = (model.Sum(td => td.Quantity)).ToString() }); 
+                return Json(new JResponse { Result = Cons.Responses.Success, Code = Cons.Responses.Codes.Success, Extra = (model.Sum(td => td.Quantity)).ToString() });
             else
                 return Json(new JResponse { Result = Cons.Responses.Success, Code = Cons.Responses.Codes.Success, Extra = (Cons.Zero).ToString() });
         }
@@ -79,12 +79,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = db.ShoppingCarts.Include(s => s.Product.Images).Include(s => s.Client).
                             Include(s => s.Product.BranchProducts).Include(s => s.Product.PackageDetails).
                             Where(s => s.UserId == userId && s.BranchId == branchId).OrderBy(s => s.InsDate)
-                            .OrderByDescending(s=> s.InsDate).ToList();
+                            .OrderByDescending(s => s.InsDate).ToList();
 
             model.ForEach(m =>
             {
-                var bp    = m.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-                m.InStock = bp!= null? bp.Stock:Cons.Zero;
+                var bp = m.Product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                m.InStock = bp != null ? bp.Stock : Cons.Zero;
                 m.Product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
                 m.Product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
                 m.Product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
@@ -116,14 +116,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(j);
                 }
 
-                if(bp.Product.IsLocked && bp.Product.UserLock == User.Identity.Name)
+                if (bp.Product.IsLocked && bp.Product.UserLock == User.Identity.Name)
                 {
                     if (bp == null)
                     {
                         var j = new
                         {
                             Result = "Producto no bloqueado temporalmente",
-                            Message = "Bloqueado por "+bp.Product.UserLock+" hora de bloqueo "+bp.Product.LockDate.Value.ToString("dd/MM/yyyy hh:mm")
+                            Message = "Bloqueado por " + bp.Product.UserLock + " hora de bloqueo " + bp.Product.LockDate.Value.ToString("dd/MM/yyyy hh:mm")
                         };
                         return Json(j);
                     }
@@ -314,11 +314,23 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK" });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Header = "Cliente Asignado",
+                    Body = "Se asigno el cliente " + client.Name.ToUpper() + " a la venta",
+                    Code = Cons.Responses.Codes.Success
+                });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { Result = "Error Al asignar el cliente", Data = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al Asignar Cliente",
+                    Body = "Ocurrio un error inesperado al asignar el cliente a la venta",
+                    Code = Cons.Responses.Codes.Success
+                });
             }
         }
 
@@ -383,8 +395,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
             catch (Exception)
             {
-                return Json(new JResponse{ Header = "Error al modificar el costo!", Result  = Cons.Responses.Danger,
-                    Body = "Ocurrio un error al actualizar el precio  de ventar", Code = Cons.Responses.Codes.ServerError });
+                return Json(new JResponse
+                {
+                    Header = "Error al modificar el costo!",
+                    Result = Cons.Responses.Danger,
+                    Body = "Ocurrio un error al actualizar el precio  de ventar",
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 
@@ -425,7 +442,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Code = Cons.Responses.Codes.ServerError
                 });
             }
-          
+
         }
 
         [HttpPost]
@@ -434,11 +451,11 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var userId = User.Identity.GetUserId();
             var branchId = User.Identity.GetBranchId();
-            var prod = db.ShoppingCarts.Include(s=> s.Product).FirstOrDefault(s => s.ProductId == productId && 
-                                        s.UserId == userId && s.BranchId == branchId);
+            var prod = db.ShoppingCarts.Include(s => s.Product).FirstOrDefault(s => s.ProductId == productId &&
+                                         s.UserId == userId && s.BranchId == branchId);
 
             QuantityChangeViewModel model = new QuantityChangeViewModel
-            { cqProductId = productId, cqCode = prod.Product.Code, cqQuantity = prod.Quantity , cqUnit = prod.Product.Unit};
+            { cqProductId = productId, cqCode = prod.Product.Code, cqQuantity = prod.Quantity, cqUnit = prod.Product.Unit };
 
             return PartialView("_ChangeQuantity", model);
         }
@@ -729,7 +746,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Result = Cons.Responses.Success,
                     Body = "Se ha generado la venta con folio:" + sale.Folio,
                     Code = Cons.Responses.Codes.Success,
-                    Header ="Venta Concluida"
+                    Header = "Venta Concluida"
                 });
 
             }
@@ -779,7 +796,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                var model = db.Budgets.Include(b=> b.Branch).Include(b => b.Client.Addresses).
+                var model = db.Budgets.Include(b => b.Branch).Include(b => b.Client.Addresses).
                     Include(b => b.BudgetDetails.Select(d => d.Product)).Include(b => b.Client).FirstOrDefault(b => b.BudgetId == budget.BudgetId);
 
                 return PartialView("_PrintBudget", model);
@@ -790,7 +807,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Body = "Ocurrio un error mientras se generaba el presupuesto",
-                    Header="Error al Generar!",
+                    Header = "Error al Generar!",
                     Code = Cons.Responses.Codes.ServerError
                 });
             }
@@ -802,7 +819,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var model = db.Budgets.Include(b => b.Branch).Include(b=> b.Client.Addresses).
+                var model = db.Budgets.Include(b => b.Branch).Include(b => b.Client.Addresses).
              Include(b => b.BudgetDetails.Select(d => d.Product)).Include(b => b.Client).FirstOrDefault(b => b.BudgetId == id);
 
                 return PartialView("_PrintBudget", model);
@@ -817,7 +834,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Code = Cons.Responses.Codes.ServerError
                 });
             }
-        
+
         }
 
         #endregion
@@ -842,7 +859,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                                    (sd.Sale.Status == TranStatus.Compleated) && //solo las ventas pagadas en su totalidad
                                    (sd.Sale.BranchId == model.BranchId) &&
                                    (string.IsNullOrEmpty(model.Client) || sd.Sale.Client.Name == model.Client) &&
-                                   (string.IsNullOrEmpty(model.Folio)  ||  sd.Sale.Folio == model.Folio)
+                                   (string.IsNullOrEmpty(model.Folio) || sd.Sale.Folio == model.Folio)
                              select sd).ToList();
 
 

@@ -18,7 +18,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
 
         [Required]
         [Display(Name = "Fecha de pago")]
-        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
         public DateTime PaymentDate { get; set; }
 
         [MaxLength(100, ErrorMessage = "Solo se permiten 100 caractéres")]

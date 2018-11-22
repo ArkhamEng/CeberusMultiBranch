@@ -7,34 +7,38 @@
 
 @if (!Model.IsOpen)
 {
-    <div class="col-md-12 panel-danger">
-        <h4 class="text-uppercase text-center panel-heading">
-            @Model.OpeningDate.ToString("dddd dd MMMM yyyy")
-        </h4>
-    </div>
+    <hr />
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <h4 class="text-uppercase text-center panel-title">
+                @Model.OpeningDate.ToString("dddd dd MMMM yyyy")
+            </h4>
+        </div>
+        <div class="panel-body dtContainer">
+            <div class="btn-group-vertical text-center col-md-4  col-md-push-4">
+                <label class="control-label">
+                    Monto Inicial
+                </label>
+                <input id="txtInitialAmount" class="form-control input-lg text-center" type="number" />
 
-    <div class="col-md-12">
-        <div class="btn-group-vertical text-center col-md-4  col-md-push-4">
-            <label class="control-label">
-                Monto Inicial
-            </label>
-            <input id="txtInitialAmount" class="form-control" type="number" />
-
-            <button id="btnStart" class="btn-danger btn" type="button" onclick="OpenCashRegister()">
-                <span class="glyphicon glyphicon-log-out"></span>
-                Abrir Caja
-            </button>
+                <button id="btnStart" class="btn-success btn" type="button" onclick="OpenCashRegister()">
+                    <span class="glyphicon glyphicon-log-out"></span>
+                    Abrir Caja
+                </button>
+            </div>
         </div>
     </div>
+
 }
 else
-{ <br />
+{   <hr />
     <div class="col-md-12">
         <div class="panel panel-success">
             <div class="panel-heading">
                 <h4 class="text-uppercase text-center panel-title">
                     <a data-toggle="collapse" href="#collapse1">
-                    @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToMoney()</a>
+                        @Model.OpeningDate.ToString("dddd dd MMMM yyyy")  monto de apertura @Model.InitialAmount.ToMoney()
+                    </a>
                 </h4>
             </div>
             <div id="collapse1" class="panel-collapse collapse">
@@ -62,7 +66,7 @@ else
             </div>
 
         </div>
-     
+
     </div>
 
     <div class="col-md-3">
@@ -93,7 +97,8 @@ else
             </div>
         }
 
-        <div class="text-center col-md-12  alert  btn-warning" onmouseover="SetPointer(this)" id="btnTerminate" title="Cerrar caja" >
+        <div class="text-center col-md-12  alert  btn-warning" onclick="CloseCashRegister()"
+             onmouseover="SetPointer(this)"  title="Cerrar caja">
             <h3>
                 <span class="fa fa-power-off"></span>
                 Cierre de Caja<br />
@@ -105,18 +110,14 @@ else
 
     <div id="divPending" class="col-md-9">
     </div>
+    
     <div id="divRefunding" class="col-md-9">
     </div>
-
-    <div id="divDetails">
-    </div>
+   
     <div id="Close">
     </div>
-     
-    <div id="divPrinter"></div>
 
-     <div id="divNotes">
-     </div>
+     <div id="divPrinter"></div>
 }
 
 <script>
@@ -130,35 +131,34 @@ else
         {
             CheckPendingPayments();
             CheckRefunding();
+
         }, 10000);
-
-      
-
-        $("#btnTerminate").click(function ()
-        {
-            ShowLoading();
-            ExecuteAjax('@Url.Action("BeginClose")', {}, function (response)
-            {
-                HideLoading();
-
-                $("#Close").html(response);
-
-                $("#ModalCloseCash").modal("show");
-            });
-        });
     });
 
+    //Realiza el corte de caja
+    function CloseCashRegister()
+    {
+        ShowLoading('static');
+        ExecuteAjax('@Url.Action("BeginClose")', {}, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static');
+            });
+        });
+    }
 
+    //Inicia la ventana de cobro
     function ShowPaymentModal(id)
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response) {
-            HideLoading();
+        ShowLoading('static');
 
-            if ($.isPlainObject(response))
-                ShowMessage(response.Result, response.Message, 'warning', true);
-            else
-                $("#divDetails").html(response);
+        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static', 'lg');
+            });
         });
     }
 
@@ -176,36 +176,41 @@ else
         });
     }
 
-
+    //Abre la ventana de tickets y notas
     function OpenNotes()
     {
-        ShowLoading();
+        ShowLoading('static');
+
         ExecuteAjax('@Url.Action("TicketsAndNotes")', {}, function (response)
         {
-            HideLoading();
-            $("#divNotes").html(response);
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static', 'lg');
+            });
         });
     }
 
+    //Abre la ventana de retiros
     function OpenWithdrawal()
     {
-        ShowLoading();
-        $("#hTitle").text("Detalle de retiros");
-
-        ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (view)
+        ShowLoading('static');
+     
+        ExecuteAjax('@Url.Action("GetWithdrawals", "CashRegister")', {}, function (response)
         {
-            HideLoading();
-            $("#divDetails").html(view);
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static','lg');
+            });
         });
     }
 
+    //inicia la operación en caja
     function OpenCashRegister()
     {
-        ShowLoading();
+        ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("OpenCashRegister","CashRegister")', { initialAmount: $("#txtInitialAmount").val() }, function (data) {
-            HideLoading();
-
+        ExecuteAjax('@Url.Action("OpenCashRegister","CashRegister")', { initialAmount: $("#txtInitialAmount").val() }, function (data)
+        {
             if (data == "OK")
                 window.location = '@Url.Action("Index")';
             else
@@ -213,34 +218,27 @@ else
         });
     }
 
+    //Obtiene las ventas por cobrar
     function CheckPendingPayments()
     {
-        ExecuteAjax('@Url.Action("OpenPending","CashRegister")', {},
-           function (response)
-           {
-               if (!$.isPlainObject(response))
-                   $("#divPending").html(response);
-           });
+        ExecuteAjax('@Url.Action("OpenPending","CashRegister")', {}, function (response)
+        {
+            $("#divPending").html(response);
+         });
     }
 
+    //obtiene los rembolsos por aplicar
     function CheckRefunding()
     {
-        ExecuteAjax('@Url.Action("OpenRefunding", "CashRegister")', {},
-           function (response)
-           {
-               if (!$.isPlainObject(response))
-               {
-                   console.log("Muestro las devoluciones pendientes");
-                   $("#divRefunding").html(response);
-               }
-                   
-           });
-    }
+        ExecuteAjax('@Url.Action("OpenRefunding", "CashRegister")', {}, function (response)
+        {
+           $("#divRefunding").html(response);
+        });
+      }
 
     function Cancel()
     {
-        $("#ModalCancel").off('hidden.bs.modal').on('hidden.bs.modal', function ()
-        {
+        $("#ModalCancel").off('hidden.bs.modal').on('hidden.bs.modal', function () {
             ShowLoading();
 
             var param = { saleId: $("#TransId").val(), comment: $("#txtComment").val() }
@@ -248,12 +246,10 @@ else
             $("#TransId").val("");
             $("#txtComment").val("");
 
-            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j)
-            {
+            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
                 HideLoading();
 
-                if (j.Result == 'OK')
-                {
+                if (j.Result == 'OK') {
                     CheckPendingPayments();
                     ShowMessage("Cancelación exitosa", j.Message, 'success');
                 }
@@ -264,8 +260,4 @@ else
 
         $("#ModalCancel").modal("hide");
     }
-
-
-   
-
 </script>

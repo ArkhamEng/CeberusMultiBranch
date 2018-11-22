@@ -25,7 +25,7 @@
             </select>
         </div>
 
-        <button id="btnShowClients" class="btn btn-default btnCart" type="button">
+        <button id="btnShowClients" class="btn btn-default btnCart" type="button" onclick="ShowClientQuickSearch()">
             <span class="fa fa-user-plus"></span>
             Cliente
         </button>
@@ -59,17 +59,31 @@
 
 
 <script>
-    $(document).ready(function () {
-        $("#btnShowClients").click(function () {
-            $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-                $("#ModalQuickClient").modal('show');
-            });
-
-            $("#ModalCart").modal('hide');
-        });
-
+    $(document).ready(function ()
+    {
         $("#lblTotalAmount").val('@Model.Sum(s=> s.TaxedAmount)');
     });
+
+    function ShowClientQuickSearch()
+    {
+        HideModal(function ()
+        {
+            ShowQuickSearch('@Url.Action("ShowQuickSearch", "Clients")', function (id, name, ftr)
+            {
+                var param = { clientId: id, transactionId: $("#SaleId").val() }
+
+                ExecuteAjax('@Url.Action("SetClient","Sales")', param, function (response)
+                {
+                    OpenCart();
+
+                    ShowNotify(response.Header, response.Result, response.Body, 3000);
+
+                });
+
+            }, OpenCart);
+
+        }, true);
+    }
 
     function CompleateSale(type)
     {
@@ -82,29 +96,26 @@
             HideModal(function ()
             {
                 CheckCart();
-
+                $(".prodRow").removeClass("info");
                 ShowNotify(response.Header, response.Result, response.Body, 3000);
 
             }, true);
-
         });
     }
 
-    function CreateBudget() {
-        $("#ModalCart").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-            ShowLoading();
-            ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response) {
-                HideLoading();
-                CheckCart();
+    function CreateBudget()
+    {
+        ShowModLoading();
 
-                if (!$.isPlainObject(response)) {
-                    $(".prodRow").removeClass("info");
-                    $("#divPrintBudget").html(response);
-                }
-                else
-                    ShowMessage(response.Result, response.Message, 'warning');
-            });
-        }).modal("hide");
+        ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response)
+        {
+            HideModal(function ()
+            {
+                CheckCart();
+                $(".prodRow").removeClass("info");
+                $("#divPrinter").html(response);
+            }, true);
+        });
     }
 
 </script>

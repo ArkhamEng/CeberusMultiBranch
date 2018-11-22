@@ -2,7 +2,7 @@
 @using CerberusMultiBranch.Support
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
-<table class="table table-striped small">
+<table id="tbSaleDetails" class="table dt-responsive nowrap table-bordered small"  style="width:100%">
     <thead>
         <tr>
             <th class="col-md-1"></th>
@@ -24,7 +24,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.First().Amount)
             </th>
-           
+           <td></td>
         </tr>
     </thead>
     <tbody>
@@ -97,6 +97,9 @@
 <script>
     $(document).ready(function ()
     {
+
+        Paginate("#tbSaleDetails", 20, true, null, false);
+
         if ('@Model.Count' > 0)
             $("#btnCompleate").show();
         else
@@ -110,7 +113,8 @@
     {
         var param = { productId: prodId, saleId: transId, isCart:false }
 
-        ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response) {
+        ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response)
+        {
 
             if ($.isPlainObject(response)) {
                 ShowMessage(response.Result, response.Message, 'warning');

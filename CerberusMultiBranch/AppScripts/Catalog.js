@@ -50,32 +50,27 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
     ExecuteAjax(url, param, function (response) {
         HideLoading(function () {
-            if (!$.isPlainObject(response))
-            {
+            if (!$.isPlainObject(response)) {
                 ShowModal(response, 'static', 'lg');
 
                 //si se recibe un id
-                if (typeof (param.id) != 'undefined')
-                {
+                if (typeof (param.id) != 'undefined') {
                     //si se recibe un callback de deshabilitación.. entro a modo visualización
                     if (typeof (disableCallBack) != 'undefined')
                         disableCallBack();
                         //de lo contrario, entro a modo edición y bloqueo el registro
                     else {
-                        ShowNotify("Registro bloqueado!", "warning", "Dispones de 5 min para realizar cambios, sobre este registro",4000);
+                        ShowNotify("Registro bloqueado!", "warning", "Dispones de 5 min para realizar cambios, sobre este registro", 4000);
                     }
                 }
 
                 SubmitPerson(OnCompleate, form, personIdFileld);
 
                 //evento del boton cancel
-                $("#EditCancel").off('click').click(function (e)
-                {
-                    HideModal(function ()
-                    {
+                $("#EditCancel").off('click').click(function (e) {
+                    HideModal(function () {
                         //si el se tiene un id y no hay callback de deshabilitación remuevo el bloqueo
-                        if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined')
-                        {
+                        if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined') {
                             ExecuteAjax(unlockUrl, { id: param.id }, function (response) {
                                 ShowNotify(response.Header, response.Result, response.Body, 3000);
                             });
@@ -94,10 +89,8 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
 
-function SubmitPerson(SuccessCallBack, form, idField)
-{
-    $(form).off('submit').on('submit', function (e)
-    {
+function SubmitPerson(SuccessCallBack, form, idField) {
+    $(form).off('submit').on('submit', function (e) {
         e.preventDefault();
 
         var $form = $(e.target),
@@ -107,15 +100,14 @@ function SubmitPerson(SuccessCallBack, form, idField)
         addresses = [];
 
         var inputF = $(form).find('[type="file"]');
-   
-        if (inputF[0] != 'undefined' && inputF[0] != null)
-        {
+
+        if (inputF[0] != 'undefined' && inputF[0] != null) {
             var file = inputF[0].files[0];
 
             if (file != 'undefined' && file != null)
                 formData.append('PostedFile', file);
         }
-       
+
 
         if (!$form.valid()) {
             ShowNotify("Error de validación", "danger", "Existen errores en lo datos capturados, por favor verifica", 3500);
@@ -124,11 +116,10 @@ function SubmitPerson(SuccessCallBack, form, idField)
 
 
         //agrego todos los campos del formulario
-        $.each(params, function (i, val)
-        {
+        $.each(params, function (i, val) {
             formData.append(val.name, val.value);
         });
-       
+
         formData.append('Addresses[0].' + idField, $("#Address_" + idField).val());
         formData.append('Addresses[0].AddressId', $("#Address_AddressId").val());
 
@@ -173,34 +164,27 @@ function SubmitPerson(SuccessCallBack, form, idField)
 
 
 
-function ShowConfirm(text, url, id, CompleatedCallBack)
-{
-    
+function ShowConfirm(text, url, id, CompleatedCallBack) {
+
     $("#ConfirmText").html(text);
 
-    $("#ConfirmAccept").off('click').click(function ()
-    {
-        HideConfirm(function ()
-        {
+    $("#ConfirmAccept").off('click').click(function () {
+        HideConfirm(function () {
             ShowLoading();
 
-            ExecuteAjax(url, { id: id }, function (response)
-            {
-                HideLoading(function ()
-                {
-                    if (CompleatedCallBack != null && CompleatedCallBack != 'undefined' && response.Code == 200)
-                    {
+            ExecuteAjax(url, { id: id }, function (response) {
+                HideLoading(function () {
+                    if (CompleatedCallBack != null && CompleatedCallBack != 'undefined' && response.Code == 200) {
                         CompleatedCallBack();
                     }
-                    
+
                     ShowNotify(response.Header, response.Result, response.Body, 3000);
                 });
             });
         });
     });
 
-    $("#ConfirmCancel").off('click').click(function ()
-    {
+    $("#ConfirmCancel").off('click').click(function () {
         HideConfirm();
     });
 
@@ -216,4 +200,22 @@ function HideConfirm(callback)
     });
 
     $("#ModalConfirm").modal('hide');
+}
+
+
+function ShowQuickSearch(url, onRecordSelected, onClosed)
+{
+    ShowLoading('static');
+
+    ExecuteAjax(url, { quickSearch: true }, function (response)
+    {
+        HideLoading(function ()
+        {
+            recordSelected = onRecordSelected;
+
+            onCloseQuickSearch = onClosed;
+
+            ShowModal(response, 'static', 'lg');
+        });
+    });
 }

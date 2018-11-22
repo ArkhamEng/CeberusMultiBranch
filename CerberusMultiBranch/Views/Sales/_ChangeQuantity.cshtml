@@ -1,9 +1,11 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.QuantityChangeViewModel
 
 
-<div class="panel panel-info">
+<div class="panel panel-danger">
     <div class="panel-heading">
-        <button type="button" class="close" onclick="HideChildModal()">&times;</button>
+        <button type="button" class="close" onclick="HideChildModal()">
+            <span class="fa fa-times"></span>
+        </button>
         <div class="modal-title">
             <span class="fa fa-cubes" style="float:left">
             </span>
@@ -20,7 +22,7 @@
         </h4>
 
         <div class="col-md-12">
-            <div class="input-group col-md-10 col-md-offset-1">
+            <div class="input-group col-md-12">
                 @Html.EditorFor(model => model.cqQuantity, new { htmlAttributes = new { @class = "form-control input-lg", type = "number", max = "999", min = "0" } })
                 <span class="input-group-btn">
                     <button id="btnChangeQuantity" class="btn btn-primary btn-lg" type="button" onclick="SetQuantity()">

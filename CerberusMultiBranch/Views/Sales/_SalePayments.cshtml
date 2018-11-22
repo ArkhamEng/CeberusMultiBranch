@@ -3,59 +3,56 @@
 @using CerberusMultiBranch.Support
 
 
-<div class="panel panel-default">
-    <div class="panel-body">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Amount)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PaymentDate)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Comment)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Reference)
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.PaymentMethod)
-                    </th>
-                    <th>
-                        @Html.DisplayName("Capturo")
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
+
+<table id="tbSalePayments" class="table dt-responsive nowrap table-bordered small" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reference)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentMethod)
+            </th>
+            <th>
+                @Html.DisplayName("Capturo")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
                 {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Amount)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.PaymentDate)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Comment)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Reference)
-                        </td>
-                        <td>
-                            @item.PaymentMethod.ToString()
-                        </td>
-                        <td>
-                            @item.UpdUser
-                        </td>
-                    </tr>
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PaymentDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Comment)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Reference)
+                    </td>
+                    <td>
+                        @item.PaymentMethod.ToString()
+                    </td>
+                    <td>
+                        @item.UpdUser
+                    </td>
+                </tr>
                 }
-            </tbody>
-        </table>
-    </div>
-</div>
+    </tbody>
+</table>
 
 
 
@@ -63,9 +60,11 @@
     $(document).ready(function ()
     {
 
-        //var totalAmount = $("#TotalAmount").val();
+        Paginate("#tbSalePayments", 10, true, null,false);
 
-        var debt =(totalAmount - @Model.Sum(p => p.Amount));
+        var finalAmount = parseFloat($("#FinalAmount").val());
+
+        var debt =(finalAmount - @Model.Sum(p => p.Amount));
 
         $("#TotalPayments").text(GetCurrency( @Model.Sum(p => p.Amount)));
 

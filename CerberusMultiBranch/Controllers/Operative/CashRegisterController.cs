@@ -171,14 +171,28 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult GetWithdrawals()
         {
-            var cr = GetCashRegister();
+            try
+            {
+                var cr = GetCashRegister();
 
-            var list = db.CashDetails.Include(w => w.Cause).
-                        Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
+                var list = db.CashDetails.Include(w => w.Cause).
+                            Where(w => w.CashRegisterId == cr.CashRegisterId && w.DetailType == Cons.Zero).ToList();
 
-            ViewBag.Causes = db.WithdrawalCauses.Where(c => c.WithdrawalCauseId != Cons.RefundId).ToSelectList();
+                ViewBag.Causes = db.WithdrawalCauses.Where(c => c.WithdrawalCauseId != Cons.RefundId).ToSelectList();
 
-            return PartialView("_Withdrawals", list);
+                return PartialView("_Withdrawals", list);
+
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener los retiros de caja",
+                    Header = "Error General"
+                });
+            }
         }
 
         [HttpPost]
@@ -208,47 +222,120 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult BeginClose()
         {
-            var cr = GetCashRegister();
+            try
+            {
+                var cr = GetCashRegister();
 
-            var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
-            var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
+                var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
+                var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
 
-            var total = 0.0;
+                var total = 0.0;
 
 
-            if (i > o)
-                total = cr.InitialAmount + (i - o);
-            else
-                total = cr.InitialAmount + (o - i);
+                if (i > o)
+                    total = cr.InitialAmount + (i - o);
+                else
+                    total = cr.InitialAmount + (o - i);
 
-            return PartialView("_CloseCash", total);
+                return PartialView("_CloseCash", total);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener el cierre de caja",
+                    Header = "Errro al obtener datos"
+                });
+            }
         }
 
         [HttpPost]
         public ActionResult Close(double amount, string comment)
         {
-            var cr = GetCashRegister();
+            try
+            {
+                var cr = GetCashRegister();
 
-            var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
-            var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
-            var total = 0.0;
+                var branchId = User.Identity.GetBranchId();
 
 
-            if (i > o)
-                total = cr.InitialAmount + (i - o);
-            else
-                total = cr.InitialAmount + (o - i);
+                var salesCount = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved).Count();
 
-            cr.FinalAmount = total.RoundMoney();
-            cr.UserClose = User.Identity.Name;
-            cr.ClosingDate = DateTime.Now.ToLocal();
-            cr.CloseComment = comment;
-            cr.IsOpen = false;
+                if(salesCount > Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Aun tienes "+salesCount+" venta(s) pendiente(s) de cobro, no puedes dejar pendientes al cerrar caja",
+                        Header = "Corte no permitido"
+                    });
+                }
 
-            db.Entry(cr).State = EntityState.Modified;
-            db.SaveChanges();
+                var refunding = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.PreCancel).Count();
 
-            return Json("OK");
+
+                if (refunding > Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Aun tienes " + refunding + "reembolsos(s) pendiente(s) de aplicar, no puedes dejar pendientes al cerrar caja",
+                        Header = "Corte no permitido"
+                    });
+                }
+
+
+                var i = cr.CashDetails.Where(cd => cd.DetailType == Cons.One).Sum(cd => cd.Amount);
+                var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
+                var total = 0.0;
+
+                if(!cr.IsOpen)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Body = "Esta sesión de caja ya no se encuentra activa",
+                        Header = "Caja cerrada"
+                    });
+                }
+
+                if (i > o)
+                    total = cr.InitialAmount + (i - o);
+                else
+                    total = cr.InitialAmount + (o - i);
+
+                cr.FinalAmount = total.RoundMoney();
+                cr.UserClose = User.Identity.Name;
+                cr.ClosingDate = DateTime.Now.ToLocal();
+                cr.CloseComment = comment;
+                cr.IsOpen = false;
+
+                db.Entry(cr).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Body ="El corete de caja se efectuo exitosamente",
+                    Header ="Corte realizado"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener el cierre de caja",
+                    Header = "Errro al obtener datos"
+                });
+            }
         }
 
         [Authorize(Roles = "Cajero")]
@@ -263,49 +350,96 @@ namespace CerberusMultiBranch.Controllers.Operative
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult OpenPending()
         {
-            var branchId = User.Identity.GetBranchId();
+            try
+            {
+                var branchId = User.Identity.GetBranchId();
 
-            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
-                .Include(s => s.User).Include(s => s.Client).ToList();
+                var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
+                    .Include(s => s.User).Include(s => s.Client).ToList();
 
-            return PartialView("_PendingPayment", model);
+                return PartialView("_PendingPayment", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener las ventas pendientes de cobro",
+                    Header ="Errro al obtener datos"
+                });
+            }
         }
 
         [HttpPost]
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult OpenRefunding()
         {
-            var branchId = User.Identity.GetBranchId();
+            try
+            {
+                var branchId = User.Identity.GetBranchId();
 
-            var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.PreCancel)
-                .Include(s => s.User).Include(s => s.Client).Include(s => s.SalePayments).ToList();
+                var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.PreCancel)
+                    .Include(s => s.User).Include(s => s.Client).Include(s => s.SalePayments).ToList();
 
-            return PartialView("_PendingRefundment", model);
+                return PartialView("_PendingRefundment", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener las las cancelaciones pendientes",
+                    Header = "Errro al obtener datos"
+                });
+            }
         }
 
         [HttpPost]
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult BeginRefund(int saleId)
         {
-            var branchId = User.Identity.GetBranchId();
-
-            var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
-                FirstOrDefault(s => s.SaleId == saleId && s.Status == TranStatus.PreCancel);
-
-            if (sale == null)
-                return Json(new { Result = "Error", Message = "Esta venta ya no esta disponible para reembolso" });
-
-            var model = new RefundViewModel
+            try
             {
-                RefundSaleId = sale.SaleId,
-                RefundClient = sale.Client.Name,
-                RefundCash = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount),
-                RefundCredit = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount),
-                RefundClientId = sale.ClientId,
+                var branchId = User.Identity.GetBranchId();
 
-            };
+                var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
+                    FirstOrDefault(s => s.SaleId == saleId && s.Status == TranStatus.PreCancel);
 
-            return PartialView("_Refundment", model);
+                if (sale == null)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Body = "Esta venta ya no esta disponible para reembolso",
+                        Header = "No se encontro registro"
+                    });
+                }
+                    
+
+                var model = new RefundViewModel
+                {
+                    RefundSaleId   = sale.SaleId,
+                    RefundClient   = sale.Client.Name,
+                    RefundCash     = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
+                    RefundCredit   = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
+                    RefundClientId = sale.ClientId
+                };
+
+                return PartialView("_Refundment", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener la ´venta para reembolso",
+                    Header = "Errro al obtener datos"
+                });
+            }
         }
 
         [HttpPost]
@@ -410,9 +544,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 return PartialView("_PrintRefund", printRefund);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { Result = "Error", Message = "Ocurrio un error al generar al devolución, detalle:" + ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener aplicar el rembolso",
+                    Header = "Errro al interno"
+                });
             }
         }
 
@@ -432,9 +572,22 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult TicketsAndNotes()
         {
-            var model = new TransactionViewModel();
-            model.Sales = LookForNotes(DateTime.Today, null, null, null, null);
-            return PartialView("_TicketsAndNotes", model);
+            try
+            {
+                var model = new TransactionViewModel();
+                model.Sales = LookForNotes(DateTime.Today, null, null, null, null);
+                return PartialView("_TicketsAndNotes", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body ="Ocurrio un error al Obtener los datos de ticket y notas",
+                    Header ="Error General"
+                });
+            }
         }
 
         [HttpPost]
@@ -486,38 +639,59 @@ namespace CerberusMultiBranch.Controllers.Operative
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult BeginRegistPayment(int id)
         {
-            var branchId = User.Identity.GetBranchId();
-
-            //obtengo los detalles de la venta, incluyendo imagenes y pagos
-            var details = db.SaleDetails.Include(sd => sd.Sale.SalePayments).Include(sd => sd.Product.Images).
-                       Where(sd => sd.SaleId == id && (sd.Sale.Status == TranStatus.Reserved || sd.Sale.Status == TranStatus.Revision)
-                       && sd.Sale.BranchId == branchId).ToList();
-
-            //si no encuentro detalles de venta, envío un error
-            if (details == null || details.Count == Cons.Zero)
-                return Json(new { Result = "Error", Message = "no se encontro la venta para cobrar" });
-
-            //construyo el modelo para recibir el pago
-            var model = new ChoosePaymentViewModel
+            try
             {
-                Details = details,
-                AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
-                PaymentMethod = PaymentMethod.Efectivo,
-                SaleId = id,
-                CanCancel = (details.First().Sale.Status == TranStatus.Reserved)
-            };
+                var branchId = User.Identity.GetBranchId();
 
-            //si la venta es a crédito establesco el moto en efectivo como el total de la venta
-            if (details.First().Sale.TransactionType == TransactionType.Contado)
-                model.CashAmount = details.Sum(d => d.TaxedAmount);
+                //obtengo los detalles de la venta, incluyendo imagenes y pagos
+                var details = db.SaleDetails.Include(sd => sd.Sale.SalePayments).Include(sd => sd.Sale.User).Include(sd => sd.Product.Images).
+                           Where(sd => sd.SaleId == id && (sd.Sale.Status == TranStatus.Reserved || sd.Sale.Status == TranStatus.Revision)
+                           && sd.Sale.BranchId == branchId).ToList();
 
-            if (details.First().Sale.TransactionType == TransactionType.Preventa)
-                model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
+                //si no encuentro detalles de venta, envío un error
+                if (details == null || details.Count == Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Body = "no se encontro la venta para cobrar",
+                        Header = "Registro no encontrado"
+                    });
+                }
 
-            if (details.First().Sale.TransactionType == TransactionType.Apartado)
-                model.CashAmount = (details.Sum(d => d.TaxedAmount) * 0.1).RoundMoney();
+                //construyo el modelo para recibir el pago
+                var model = new ChoosePaymentViewModel
+                {
+                    Details = details,
+                    AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
+                    PaymentMethod = PaymentMethod.Efectivo,
+                    SaleId = id,
+                    CanCancel = (details.First().Sale.Status == TranStatus.Reserved)
+                };
 
-            return PartialView("_RegistPayment", model);
+                //si la venta es a crédito establesco el moto en efectivo como el total de la venta
+                if (details.First().Sale.TransactionType == TransactionType.Contado)
+                    model.CashAmount = details.Sum(d => d.TaxedAmount);
+
+                if (details.First().Sale.TransactionType == TransactionType.Preventa)
+                    model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
+
+                if (details.First().Sale.TransactionType == TransactionType.Apartado)
+                    model.CashAmount = (details.Sum(d => d.TaxedAmount) * 0.1).RoundMoney();
+
+                return PartialView("_RegistPayment", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener iniciar el cobro",
+                    Header = "Errro al obtener datos"
+                });
+            }
         }
 
         [HttpPost]
@@ -569,31 +743,93 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var hasFolio = (payment.CreditNoteAmount > Cons.Zero);
 
-                if (toPay < wholePayment)
-                    return Json(new { Result = "Error", Message = "El monto ingresado supera el total de la venta!" });
-
 
                 if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
-                    return Json(new { Result = "Error", Message = "Esta venta ha sido cancelada!!" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
 
+                        Header = "Venta cancelada"
+                    });
+                }
+             
                 if (toPay == Cons.Zero)
-                    return Json(new { Result = "Error", Message = "Esta venta ya ha sido cobrada en su totalidad" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta ya ha sido cobrada en su totalidad",
+
+                        Header = "Cobro no requerido"
+                    });
+                }
 
                 //si hay valores negativos
                 if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
-                    return Json(new { Result = "Error", Message = "No puede ingresar montos negativos, en el pago de una venta" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "No puede ingresar montos negativos, en el pago de una venta",
+
+                        Header = "Datos incorrectos!"
+                    });
+                }
 
                 if (wholePayment > toPay)
-                    return Json(new { Result = "Error", Message = "El monto ingresado excede la deuda total, por favor verifique" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
+
+                        Header = "Pago excedente!"
+                    });
+                }
+
 
                 if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
-                    return Json(new { Result = "Error", Message = "El monto del pago es menor que el  monto de la deuda, por favor verifique" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "El monto del pago es menor que el  monto de la deuda, las ventas de contado deben ser liquidades en su totalidad",
+
+                        Header = "Pago Insuficiente!"
+                    });
+                }
 
                 if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
-                    return Json(new { Result = "Error", Message = "La preventa requiere por lo menos un 20% de anticipo" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "La preventa requiere por lo menos un 20% de anticipo",
 
+                        Header = "Anticipo requerido!"
+                    });
+                }
+             
                 if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
-                    return Json(new { Result = "Error", Message = "Los apartados requieren un anticipo de 10% por lo menos" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Los apartados requieren un anticipo de 10% por lo menos",
+
+                        Header = "Anticipo requerido!"
+                    });
+                }
+
 
                 #region Logica para el uso de folio
                 SaleCreditNote note = null;
@@ -608,24 +844,45 @@ namespace CerberusMultiBranch.Controllers.Operative
                     if (note != null)
                     {
                         if (note.ExplirationDate < DateTime.Now.ToLocal())
-                            return Json(new { Result = "Error", Message = "El vale que intentas aplicar ya ha caducado y no se puede aplicar como pago" });
+                        {
+                            return Json(new JResponse
+                            {
+                                Result = Cons.Responses.Warning,
+                                Code = Cons.Responses.Codes.InvalidData,
+                                Body = "El vale que intentas aplicar ya ha caducado y no se puede aplicar como pago",
 
+                                Header = "Vale cáduco!"
+                            });
+
+                        }
+                    
                         if (note.Amount != payment.CreditNoteAmount)
-                            return Json(new
+                        {
+                            return Json(new JResponse
                             {
-                                Result = "Error",
-                                Message = "El monto aplicado en el vale, no conicide con el monto " +
-                                "en base de datos, intente asignarlo nuevamente para reflejar los cambios"
+                                Result = Cons.Responses.Warning,
+                                Code = Cons.Responses.Codes.InvalidData,
+                                Body = "El monto aplicado en el vale, no conicide con el monto " +
+                                "en base de datos, intente asignarlo nuevamente para reflejar los cambios",
+
+                                Header = "Discrepancia de datos!"
                             });
 
+                        }
+                     
                         if (payment.CreditNoteAmount >= toPay && money > Cons.Zero)
-                            return Json(new
+                        {
+                            return Json(new JResponse
                             {
-                                Result = "Error",
-                                Message = "El monto aplicado en el vale, ya cubre el total de la deuda " +
-                                "no es necesario la aplicación de otro tipo de pago"
-                            });
+                                Result = Cons.Responses.Info,
+                                Code = Cons.Responses.Codes.InvalidData,
+                                Body = "El monto aplicado en el vale, ya cubre el total de la deuda " +
+                                "no es necesario la aplicación de otro tipo de pago",
 
+                                Header = "Pago inecesario"
+                            });
+                        }
+                        
                         //agrego el historico
                         var history = new CreditNoteHistory
                         {
@@ -653,7 +910,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                         db.Entry(note).State = EntityState.Modified;
                     }
                     else
-                        return Json(new { Result = "Error", Message = "El vale que intentas aplicar ya fue usado o ha caducado" });
+                    {
+                        return Json(new JResponse
+                        {
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.InvalidData,
+                            Body = "El vale que intentas aplicar ya fue usado o ha caducado",
+                            Header = "Vale No admitido!"
+                        });
+                    }
                 }
 
           
@@ -751,10 +1016,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (cr == null)
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Error al registrar el pago!",
-                        Message = "El modulo de caja no ha sido abierto"
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "No hay una sesión de caja activa",
+                        Header = "Error al cobrar!"
                     });
                 }
                 //por cada registro de pago agrego una registro de entrada a la caja
@@ -789,13 +1056,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 return PartialView("_PrintElements", model);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error al registrar el pago!",
-                    Message = "Detalle de la excepción " + ex.Message + " "
-                    + ex.InnerException != null ? ex.InnerException.Message : string.Empty
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al registrar el pago de la venta",
+                    Header = "Error al cobrar!"
                 });
             }
         }

@@ -32,6 +32,10 @@ namespace CerberusMultiBranch.Support
             }
         }
 
+        public const int QuickResults = 300;
+
+        public const int MaxResults  = 30000;
+
         public const int Zero = 0;
         public const int One = 1;
         public const int Two = 2;
@@ -48,7 +52,7 @@ namespace CerberusMultiBranch.Support
 
         public const double OneHundred = 100;
 
-        public const int QuickResults = 300;
+        
 
         public const string CodeSeqFormat = "000000";
 

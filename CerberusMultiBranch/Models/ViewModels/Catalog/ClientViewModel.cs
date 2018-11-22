@@ -65,12 +65,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
      
         public bool EditionDisabled
         {
-            get { return !(HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Vendedor"));    }
+            get { return  this.ClientId == Cons.Zero ? true : !(HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Vendedor"));    }
         }
 
         public bool DeleteDisabled
         {
-            get { return !(HttpContext.Current.User.IsInRole("Supervisor")); }
+            get { return this.ClientId == Cons.Zero ? true : !(HttpContext.Current.User.IsInRole("Supervisor")); }
         }
 
 

@@ -16,8 +16,8 @@
                     <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
                     <th class="col-md-5 text-center">@Html.DisplayName("Cliente")</th>
 
-                    <th class="col-md-2 text-center">@Html.DisplayName("Fecha venta")</th>
-                    <th class="col-md-1 text-center">@Html.DisplayName("Envío")</th>
+                    <th class="col-md-2 text-center">@Html.DisplayName("Agente")</th>
+                    <th class="col-md-1 text-center">@Html.DisplayName("Entrega")</th>
                     <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
 
                     <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
@@ -29,9 +29,13 @@
                 {
                     <tr>
                         <td class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
-                        <td class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
+                        <td>
+                           @Html.DisplayUpperFor(m => item.Client.Name)
+                        </td>
 
-                        <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td align="center">
+                            @Html.DisplayUpperFor(m => item.User.UserName)
+                        </td>
                         <td align="center">
                             @{ var sending = "Mostrador"; }
 
@@ -44,7 +48,7 @@
                         </td>
                         <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
 
-                        <td align="center">
+                        @*<td align="center">
                             @{
                                 var alr = "alert-success";
 
@@ -64,10 +68,14 @@
                             <div class="form-control input-sm @alr">
                                 @item.TransactionType.ToString()
                             </div>
+                        </td>*@
+                        <td align="center">
+                            @item.TransactionType.ToString()
                         </td>
                         <td align="center">
-                            <button class="btn btn-success" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
+                            <button class="btn btn-primary btn-sm" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
                                 <span class="fa fa-dollar" />
+                                Cobrar
                             </button>
                         </td>
                     </tr>

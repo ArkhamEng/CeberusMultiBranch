@@ -36,6 +36,10 @@
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
+
+                            @Html.HiddenFor(model => model.FinalAmount)
+                            @Html.HiddenFor(model => model.TransactionType)
+
                             <div class="col-md-6 form-group">
                                 @Html.Label("Cliente", htmlAttributes: new { @class = "control-label small" })
                                 <div class="input-group">
@@ -113,12 +117,11 @@
 
                     <div class="panel-footer">
                         <button type="button" class="btn btn-primary" title="Nueva búsqueda"
-                                onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                                onclick="ShowLoading(); window.location='@Url.Action("Report")'">
                             <span class="fa fa-backward"></span>
                             Volver
                         </button>
-                        @*@if (!(Model.TransactionType == TransactionType.Contado && Model.Status == TranStatus.InProcess))
-                        {*@
+                     
                             <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?">
                                 <span class="fa fa-cubes"></span>
                                 Terminar
@@ -127,8 +130,7 @@
                                 <span class="glyphicon glyphicon-plus-sign"></span>
                                 Agregar
                             </button>
-                        @*}*@
-                       
+                      
                         @if (Model.CanCancel)
                         {
                             <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
@@ -145,9 +147,9 @@
                         }
                     </div>
                 </div>
-                @Html.HiddenFor(model => model.TotalAmount)
+
                 <div class="panel panel-default">
-                    <div id="divDetails" class="panel-body">
+                    <div id="divDetails" class="panel-body dtContainer">
                         @Html.Partial("_Details", Model.SaleDetails)
                     </div>
                 </div>
@@ -165,8 +167,6 @@
 </div>
 
 
-@Html.HiddenFor(model => model.TotalAmount)
-@Html.HiddenFor(model => model.TransactionType)
 
 
 @Html.Partial("_Cancelation")
@@ -192,16 +192,16 @@
     });
 
 
-    function SubmitCompleate() {
-        ShowLoading();
+    function SubmitCompleate()
+    {
+        ShowLoading('static');
 
         ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response)
         {
-            HideLoading();
-            if (response.Result != 'OK')
-                ShowMessage(response.Header, response.Message, 'warning', true);
-            else
-                window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
+            HideLoading(function ()
+            {
+                 window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
+            });
         });
     }
 
