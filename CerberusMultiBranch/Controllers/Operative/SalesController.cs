@@ -40,6 +40,58 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
+        public ActionResult BeginCancel(int id)
+        {
+            try
+            {
+              var sale =  db.Sales.Include(s=> s.SalePayments).FirstOrDefault(s => s.SaleId == id);
+
+                if(sale == null)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Header = "Registro no encontrado",
+                        Body = "No se encontro la venta solicitada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
+
+              if(sale.Status == TranStatus.Canceled || sale.Status == TranStatus.PreCancel)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Header = "Venta cancelada",
+                        Body = "Esta venta ya ha sido cancelada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
+
+                var model = new SaleCancelViewModel
+                {
+                    SaleFolio = sale.Folio,
+                    SaleCancelId = sale.SaleId,
+                    PaymentCard = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Tarjeta).Sum(s => s.Amount),
+                    PaymentCash = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Efectivo).Sum(s => s.Amount),
+                    PaymentCreditNote = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Vale).Sum(s => s.Amount),
+                };
+
+                return PartialView("_CancelSale", model);
+           
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al obtener datos",
+                    Body = "Ocurrio un error inesperado al iniciar la cancelación",
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
+        }
+
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor, Cajero")]
         public JsonResult Cancel(int saleId, string comment)
@@ -58,11 +110,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //agrego movimiento al inventario
                     StockMovement sm = new StockMovement
                     {
-                        BranchId = bp.BranchId,
-                        ProductId = bp.ProductId,
-                        User = User.Identity.Name,
+                        BranchId     = bp.BranchId,
+                        ProductId    = bp.ProductId,
+                        User         = User.Identity.Name,
                         MovementDate = DateTime.Now.ToLocal(),
-                        Quantity = detail.Quantity
+                        Quantity     = detail.Quantity
                     };
 
                     //se  regresa al inventario todo producto de la venta
@@ -100,25 +152,37 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.UpdDate = DateTime.Now.ToLocal();
                 sale.Comment = comment;
 
-                var message = "Venta Cancelada, el producto ha sido regreado al stock";
+                var message = string.Format("Se cancelo la venta {0}, el producto ha sido regreado al inventario",sale.Folio);
 
                 //si la venta tiene pagos, coloco el status como precancel para que pase por caja para generar 
                 //una devolución
                 if (payments > Cons.Zero)
                 {
                     sale.Status = TranStatus.PreCancel;
-                    message = "Venta Cancelada, podra realizar la devolución de efectivo desde el modulo de caja";
+                    message = string.Format("Se cancelo la venta {0}, para concluir el proceso, se debe aplicar un rembolso desde la caja",sale.Folio.ToUpper());
                 }
 
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Header = "Cancelación exitosa",
+                    Body   = message,
+                    Code = Cons.Responses.Codes.Success
+                });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { Result = "Error al cancelar la venta", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al cancelar",
+                    Body = "Ocurrio un error inesperado al realizar la cancelación",
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 

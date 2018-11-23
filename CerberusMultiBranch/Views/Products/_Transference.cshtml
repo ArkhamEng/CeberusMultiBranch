@@ -1,88 +1,82 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.TransferViewModel
 
 
-<div id="ModalTransference" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content panel panel-danger panel-group">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Transferencia de producto</h4>
-            </div>
-            <div class="modal-body panel-body text-uppercase">
-                <label>Tranferencia a sucursal @Model.TransBranch</label><br />
-                <div class="col-md-12">
-                    <div class="col-md-4">
-                        <img class="img-responsive"  src="@Model.TransImage" style="max-height:130px" />
-                    </div>
-                    <div class="col-md-8">
-                        <h5><label>@Model.TransCode</label></h5>
-                        <h5>
-                            @Model.TransName
-                        </h5>
-                    </div>
 
-                </div>
-                <div class="col-md-12 text-center">
-                    <h5>
-                        <span class="badge bg-info">
-                            @Model.TransStock
-                        </span>
-                        disponibles
-                        <span class="fa fa-cubes"></span>
-                        Unidad @Model.TransUnit
-                    </h5>
-                </div>
-                <div class="col-md-6 col-md-offset-4 text-center">
-                    @Html.Label("Cantidad a transferir", htmlAttributes: new { @class = "control-label" })
-                    <div class="input-group">
-                        <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
-                        <input id="txtQuantityTransfer" class="form-control"
-                               type="number" max='@Model.TransStock' min="1" value="1" />
-
-                        <span class="input-group-btn">
-                            <button class="btn btn-danger" type="button" title="Realizar transferencia"
-                                    onclick="Transfer('@Model.TransBranchId','@Model.TransProductId')">
-                                <span class="glyphicon glyphicon-ok" />
-                                Autorizar 
-                            </button>
-                        </span>
-                    </div>
-                </div>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button type="button" class="close" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+        </button>
+        <h4 class="panel-title">
+            <span class="fa fa-exchange"></span>
+            Transferencia de producto
+        </h4>
+    </div>
+    <div class="panel-body text-uppercase">
+        <label>Tranferencia a sucursal @Model.TransBranch</label><br />
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <img class="img-responsive" src="@Model.TransImage" style="max-height:130px" />
             </div>
+            <div class="col-md-8">
+                <h5><label>@Model.TransCode</label></h5>
+                <h5>
+                    @Model.TransName
+                </h5>
+            </div>
+
+        </div>
+        <div class="col-md-12 text-center">
+            <h5>
+                <span class="badge bg-info">
+                    @Model.TransStock
+                </span>
+                disponibles
+                <span class="fa fa-cubes"></span>
+                Unidad @Model.TransUnit
+            </h5>
+        </div>
+        <div class="col-md-6 col-md-offset-4 text-center">
+            @Html.Label("Cantidad a transferir", htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                <input id="txtQuantityTransfer" class="form-control"
+                       type="number" max='@Model.TransStock' min="1" value="1" />
+
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button class="btn btn-primary" type="button" title="Realizar transferencia" onclick="Transfer('@Model.TransBranchId','@Model.TransProductId')">
+                <span class="fa fa-check" />
+                Autorizar
+            </button>
+            <button class="btn btn-danger" type="button" title="Realizar transferencia" onclick="HideModal(null,true)">
+                <span class="fa fa-times" />
+                Cancelar
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
-        $("#ModalTransference").modal("show");
-    });
 
     function Transfer(branchId, productId)
     {
-        $("#ModalTransference").modal("hide");
-        ShowLoading();
-
-        var param = { detsBranchId: branchId, productId: productId, quantity: $("#txtQuantityTransfer").val() }
-
-        ExecuteAjax('@Url.Action("Transfer")', param, function (j)
+        HideModal(function ()
         {
-            if (j.Result == 'OK')
-            {
-                ExecuteAjax('@Url.Action("Search")', { name: j.Code, isGrid: false }, function (view)
-                {
-                    HideLoading();
-                    $("#divProducts").html(view);
+            ShowLoading('static');
 
-                    ShowMessage(j.Result, j.Message, 'success');
-                });
-            }
-            else
+            var param = { detsBranchId: branchId, productId: productId, quantity: $("#txtQuantityTransfer").val() };
+
+            ExecuteAjax('@Url.Action("Transfer")', param, function (response)
             {
-                HideLoading();
-                ShowMessage(j.Result, j.Message, 'warning');
-            }
-        });
+                HideLoading(function ()
+                {
+                    LookFor();
+                });
+            });
+        }, true);
     }
 </script>

@@ -114,6 +114,15 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             }
         }
 
+        public bool CancelDisabled
+        {
+            get
+            {
+                return !(HttpContext.Current.User.IsInRole("Supervisor") && 
+                   ( (this.Status == TranStatus.Revision || this.Status == TranStatus.Compleated) &&
+                   DateTime.Now.ToLocal().Subtract(this.TransactionDate).Days < Cons.DaysToCancel) );
+            }
+        }
 
         public Sale()
         {

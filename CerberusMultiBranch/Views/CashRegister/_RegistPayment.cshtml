@@ -50,35 +50,35 @@
                     <tbody>
                         @foreach (var item in Model.Details)
                         {
-                        <tr>
-                            <td class="col-md-1" align="center">
-                                @if (item.Product.Images.Count > 0)
+                            <tr>
+                                <td class="col-md-1" align="center">
+                                    @if (item.Product.Images.Count > 0)
                                     {
-                                    <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
+                                        <img class="img-responsive" src="@item.Product.Images.FirstOrDefault().Path" style="max-height:50px" />
                                     }
                                     else
                                     {
-                                    <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
+                                        <img class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="max-height:50px" />
                                     }
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.Product.Code)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.Product.Name)<br />
-                                <label>Por </label>  @Html.DisplayFor(m => item.Product.TradeMark)
-                                <label>  Unidad </label>  @Html.DisplayFor(m => item.Product.Unit)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.TaxedPrice)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.Quantity)
-                            </td>
-                            <td>
-                                @Html.DisplayFor(m => item.TaxedAmount)
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Product.Code)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Product.Name)<br />
+                                    <label>Por </label>  @Html.DisplayFor(m => item.Product.TradeMark)
+                                    <label>  Unidad </label>  @Html.DisplayFor(m => item.Product.Unit)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.TaxedPrice)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.TaxedAmount)
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -167,29 +167,28 @@
     <div class="panel-footer clearfix">
         <div class="pull-right">
 
-            <button class="btn btn-primary btn-sm" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)" this.onclick=null>
+            <button class="btn btn-primary" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)" this.onclick=null>
                 <span class="fa fa-file"></span>
                 Imprimir Nota
             </button>
 
-            <button class="btn btn-info btn-sm" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)" this.onclick=null>
+            <button class="btn btn-info" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)" this.onclick=null>
                 <span class="fa fa-ticket"></span>
                 Imprimir Ticket
             </button>
 
-            @if (Model.CanCancel)
-            {
-                <button class="btn btn-danger btn-sm" type="button" onclick="ShowCancel()" this.onclick=null>
-                    <span class="fa fa-trash-o"></span>
-                    Cancelar Venta
-                </button>
-            }
+
+            <button class="btn btn-danger" type="button" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+                Cerrar
+            </button>
+
         </div>
     </div>
-
+    @Html.HiddenFor(m => m.CreditNoteId)
 </div>
 
-@Html.HiddenFor(m => m.CreditNoteId)
+
 <script>
     $(document).ready(function () {
         SetInputEvents();
@@ -201,112 +200,7 @@
         SumAmount();
     });
 
-
-
-    function OnFolioSelected(id, value) {
-        $("#CreditNoteId").val(id);
-
-        $("#Folio").removeClass('alert-info');
-
-        ExecuteAjax('@Url.Action("GetFolioAmount")', { id: id }, function (response) {
-            if (response.Result = 'OK') {
-                $("#CreditNoteAmount").val(response.Amount);
-                $("#Expiration").val(response.Expiration);
-                $("#Folio").val(response.Label);
-
-                $("#Folio").addClass('alert-info');
-
-                var tot = parseFloat($("#AmountToPay").val());
-
-                //si el monto del vale excede o es igual a la cantidad  pagar, inhibo el ingreso de otra forma de pago
-                if (response.Amount > tot || response.Amount == tot) {
-                    $("#CashAmount").val(0);
-                    $("#CashAmount").attr("disabled", true);
-
-                    $("#CardAmount").val(0);
-                    $("#CardAmount").attr("disabled", true);
-
-                    $("#Reference").val('');
-                    $("#Reference").attr("disabled", true);
-                }
-
-                    //de otra forma si la venta es de contado, recalculo el monto a pagar
-                else if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
-                    var cash = parseFloat($("#AmountToPay").val()) - response.Amount;
-                    $("#CashAmount").val(cash);
-                    $("#CardAmount").val(0);
-                    $("#Reference").val('');
-                }
-                else {
-                    $("#CashAmount").val(0);
-                    $("#CardAmount").val(0);
-                    $("#Reference").val('');
-                }
-            }
-
-            SumAmount();
-        });
-    }
-
-    function SumAmount() {
-        var amount = parseFloat($("#CashAmount").val()) + parseFloat($("#CardAmount").val()) + parseFloat($("#CreditNoteAmount").val());
-        $("#total").text(amount.toFixed(2));
-    }
-
-    function Calculate(val) {
-        var total = parseFloat($("#AmountToPay").val()) - parseFloat($("#CreditNoteAmount").val());
-
-        var result = (total - parseFloat(val));
-
-        if (result < 0)
-            result = 0;
-
-        return result;
-    }
-
-    function RegisterPayment(printType)
-    {
-        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
-            ShowNotify("Cantidad Incorrecta!", "warning",
-                "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 3000);
-            return;
-        }
-
-
-        ShowModLoading();
-
-        var param = {
-            SaleId: $("#SaleId").val(),
-            CashAmount: $("#CashAmount").val(),
-            CardAmount: $("#CardAmount").val(),
-            Reference: $("#Reference").val(),
-            CreditNoteId: $("#CreditNoteId").val(),
-            CreditNoteAmount: $("#CreditNoteAmount").val(),
-            PrintType: printType
-        };
-
-        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response)
-        {
-            HideModal(function ()
-            {
-                CheckPendingPayments();
-                $("#divPrinter").html(response);
-
-            }, true);
-        });
-    }
-
-    function ShowCancel() {
-        $("#ModalRegistPayment").off("hidden.bs.modal").on('hidden.bs.modal', function () {
-            $('#ModalCancel').modal('show');
-            $("#TransId").val($("#SaleId").val());
-        });
-
-        $("#ModalRegistPayment").modal('hide');
-    }
-
     function SetInputEvents() {
-
         $("#CashAmount").off('keyup').keyup(function () {
             if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
                 var val = $("#CashAmount").val();
@@ -362,4 +256,101 @@
             SumAmount();
         });
     }
+
+
+    function OnFolioSelected(id, value)
+    {
+        $("#CreditNoteId").val(id);
+
+        $("#Folio").removeClass('alert-info');
+
+        ExecuteAjax('@Url.Action("GetFolioAmount")', { id: id }, function (response)
+        {
+            console.log(response);
+            $("#CreditNoteAmount").val(response.Extra);
+            $("#Expiration").val(response.Body);
+            $("#Folio").val(response.Header);
+
+            $("#Folio").addClass('alert-info');
+
+            var tot = parseFloat($("#AmountToPay").val());
+
+            //si el monto del vale excede o es igual a la cantidad  pagar, inhibo el ingreso de otra forma de pago
+            if (response.Extra > tot || response.Extra == tot) {
+                $("#CashAmount").val(0);
+                $("#CashAmount").attr("disabled", true);
+
+                $("#CardAmount").val(0);
+                $("#CardAmount").attr("disabled", true);
+
+                $("#Reference").val('');
+                $("#Reference").attr("disabled", true);
+            }
+
+                //de otra forma si la venta es de contado, recalculo el monto a pagar
+            else if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
+                var cash = parseFloat($("#AmountToPay").val()) - response.Extra;
+                $("#CashAmount").val(cash);
+                $("#CardAmount").val(0);
+                $("#Reference").val('');
+            }
+            else
+            {
+                $("#CashAmount").val(0);
+                $("#CardAmount").val(0);
+                $("#Reference").val('');
+            }
+
+            SumAmount();
+        });
+    }
+
+    function SumAmount()
+    {
+        var amount = parseFloat($("#CashAmount").val()) + parseFloat($("#CardAmount").val()) + parseFloat($("#CreditNoteAmount").val());
+        $("#total").text(amount.toFixed(2));
+    }
+
+    function Calculate(val) {
+        var total = parseFloat($("#AmountToPay").val()) - parseFloat($("#CreditNoteAmount").val());
+
+        var result = (total - parseFloat(val));
+
+        if (result < 0)
+            result = 0;
+
+        return result;
+    }
+
+    function RegisterPayment(printType)
+    {
+        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
+            ShowNotify("Cantidad Incorrecta!", "warning",
+                "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 3000);
+            return;
+        }
+
+        ShowModLoading();
+
+        var param = {
+            SaleId: $("#SaleId").val(),
+            CashAmount: $("#CashAmount").val(),
+            CardAmount: $("#CardAmount").val(),
+            Reference: $("#Reference").val(),
+            CreditNoteId: $("#CreditNoteId").val(),
+            CreditNoteAmount: $("#CreditNoteAmount").val(),
+            PrintType: printType
+        };
+
+        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response) {
+            HideModal(function () {
+                CheckPendingPayments();
+                $("#divPrinter").html(response);
+
+            }, true);
+        });
+    }
+
+
 </script>

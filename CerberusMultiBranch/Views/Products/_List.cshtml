@@ -172,22 +172,23 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbProducts", false, "#txtName", false);
+        Paginate("#tbProducts",20, false, "#txtName", false);
     });
 
-    function Detail(id, isActive) {
+    function Detail(id, isActive)
+    {
         if (!isActive)
-            ShowMessage("Producto Desactivado", "Este producto ha sido desactivado, contacte a un supervisor para solicitar una activación", 'warning');
-        else {
-            ShowLoading();
+            ShowNotify("Producto Desactivado","info", "Este producto ha sido desactivado, contacte a un supervisor para solicitar una activación", 3000);
+        else
+        {
+            ShowLoading('static');
 
-            ExecuteAjax('@Url.Action("Detail", "Products")', { id: id }, function (response) {
-                HideLoading();
-
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Result, response.Message, 'warning');
-                else
-                    $("#divModals").html(response);
+            ExecuteAjax('@Url.Action("ShowDetail", "Products")', { id: id }, function (response)
+            {
+                HideLoading(function ()
+                {
+                    ShowModal(response, 'static', "lg");
+                });
             });
         }
 

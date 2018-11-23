@@ -3,16 +3,8 @@
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
-<div class="panel panel-danger">
-    <div class="panel-heading">
-        <h4 class="panel-title text-uppercase">
-            <span class="fa fa-eye-slash" style="float:left">
-            </span>
-            &nbsp;Devoluciones pendientes
-        </h4>
-    </div>
-    <div class="panel-body">
-        <table id="tbPendingPayment" class="table table-bordered small">
+
+<table id="tbPendingRefundment" class="table dt-responsive nowrap table-bordered small" style="width:100%">
             <thead>
                 <tr>
                     <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
@@ -23,14 +15,15 @@
                     <th class="col-md-2 text-center">@Html.DisplayName("Cancelo")</th>
                     <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
                     <th class="col-md-1 text-center" />
+                    <th class="col-md-1 text-center">@Html.DisplayName("Comentario")</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td  class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
-                        <td  class="text-uppercase">@Html.DisplayFor(m => item.Client.Name)</td>
+                        <td  class="text-uppercase">@Html.DisplayUpperFor(m => item.Folio)</td>
+                        <td  class="text-uppercase">@Html.DisplayUpperFor(m => item.Client.Name)</td>
 
                         <td align="center">
                         @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToMoney()
@@ -42,7 +35,7 @@
 
                         <td align="center">@Html.DisplayFor(m => item.UpdUser)</td>
 
-                        <td align="center">
+                        @*<td align="center">
                             @{
                                 var alr = "alert-success";
 
@@ -62,15 +55,41 @@
                             <div class="form-control input-sm @alr">
                                 @item.TransactionType.ToString()
                             </div>
+                        </td>*@
+                        <td align="center">
+                            @Html.DisplayFor(m => item.TransactionType)
                         </td>
                         <td align="center">
-                            <button class="btn btn-danger" title="Generar devoluciones" onclick="ShowRefundmentModal('@item.SaleId')">
-                                <span class="fa fa-exchange" />
+                            <button class="btn btn-danger btn-sm" title="Generar devoluciones" onclick="BeginRefund('@item.SaleId')">
+                                <span class="fa fa-check-square-o" />
+                                Aplicar
                             </button>
                         </td>
+                        <td align="center">
+                            @Html.DisplayFor(m => item.Comment)
+                        </td>
+                       
                     </tr>
                }
             </tbody>
         </table>
-    </div>
-</div>
+   
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbPendingRefundment", 3, true, null, false);
+    });
+
+    function BeginRefund(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("BeginRefund","CashRegister")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response,'static');
+            });
+        });
+    }
+</script>

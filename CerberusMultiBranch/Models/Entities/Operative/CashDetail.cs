@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Finances;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;

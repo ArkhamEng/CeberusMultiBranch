@@ -39,27 +39,40 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult BeginTransference(int destBranchId, int productId)
         {
-            var branchId = User.Identity.GetBranchId();
-
-            var branchP = db.BranchProducts.Include(bp => bp.Product).
-                Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                 FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
-
-            var destBranch = db.Branches.Find(destBranchId);
-
-            TransferViewModel transfer = new TransferViewModel
+            try
             {
-                TransBranch = destBranch.Name,
-                TransBranchId = destBranch.BranchId,
-                TransCode = branchP.Product.Code,
-                TransImage = branchP.Product.Images.Count > Cons.Zero ? branchP.Product.Images.First().Path : "/Content/Images/sinimagen.jpg",
-                TransName = branchP.Product.Name,
-                TransProductId = productId,
-                TransStock = branchP.Stock,
-                TransUnit = branchP.Product.Unit
-            };
+                var branchId = User.Identity.GetBranchId();
 
-            return PartialView("_Transference", transfer);
+                var branchP = db.BranchProducts.Include(bp => bp.Product).
+                    Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                     FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+                var destBranch = db.Branches.FirstOrDefault(p=> p.BranchId == destBranchId);
+
+                TransferViewModel transfer = new TransferViewModel
+                {
+                    TransBranch = destBranch.Name,
+                    TransBranchId = destBranch.BranchId,
+                    TransCode = branchP.Product.Code,
+                    TransImage = branchP.Product.Images.Count > Cons.Zero ? branchP.Product.Images.First().Path : "/Content/Images/sinimagen.jpg",
+                    TransName = branchP.Product.Name,
+                    TransProductId = productId,
+                    TransStock = branchP.Stock,
+                    TransUnit = branchP.Product.Unit
+                };
+
+                return PartialView("_Transference", transfer);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Code = Cons.Responses.Codes.ServerError,
+                    Result = Cons.Responses.Danger,
+                    Header="Errro al Transferir",
+                    Body ="Ocurrio un error inesperado al realizar la transferencia"
+                });
+            }
         }
 
 
@@ -239,6 +252,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [CustomAuthorize(Roles = "Supervisor")]
         public JsonResult Transfer(int detsBranchId, int productId, double quantity)
         {
+       
             var branchId = User.Identity.GetBranchId();
 
             var orBP = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
@@ -246,10 +260,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             if (orBP.Stock < quantity)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Imposible realizar la transferencia",
-                    Message = "La cantidad solicitada es mayor a la disponible en sucursal"
+                    Result =Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.InvalidData,
+                    Header = "Imposible realizar la transferencia",
+                    Body = "La cantidad solicitada es mayor a la disponible en sucursal"
                 });
             }
 
@@ -262,10 +278,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 //si no existe la creo de lo contrario la actualizo
                 if (destBp == null)
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Imposible realizar la transferencia",
-                        Message = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Header = "Imposible realizar la transferencia",
+                        Body = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
                     });
                 }
                 else
@@ -322,19 +340,22 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 db.SaveChanges();
 
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "OK",
-                    Message = "Transferencia exitosa!",
-                    Code = orBP.Product.Code
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Transferencia exitosa!",
+                    Body = "Se transfirieron "+quantity+" unidades del producto " + orBP.Product.Code.ToUpper()+" a la sucursale "+destBp.Branch.Name.ToUpper()
                 });
             }
             catch (Exception ex)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error al transferir",
-                    Message = ex.Message
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al transferir",
+                    Body = "Ocurrio un error inesperado al transferir, detalle:"+ ex.Message
                 });
             }
         }
@@ -528,61 +549,77 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
         [HttpPost]
-        public ActionResult Detail(int id)
+        public ActionResult ShowDetail(int id)
         {
-            var branchId = User.Identity.GetBranchId();
-            var userId = User.Identity.GetUserId();
+            try
+            {
+                var userId = User.Identity.GetUserId();
+                var branchId = User.Identity.GetBranchId();
 
+                //obtengo el producto con imagenes, compatibilidades (modelos de auto), y equivalencias (productos de proveedor
+                var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
+                            Include(p => p.BranchProducts).Include(p => p.Equivalences).
+                            FirstOrDefault(p => p.ProductId == id);
 
-            //obtengo el producto con imagenes, compatibilidades (modelos de auto), y equivalencias (productos de proveedor
-            var product = db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
-                        Include(p => p.BranchProducts).Include(p => p.Equivalences).
-                        FirstOrDefault(p => p.ProductId == id);
-
-            if (product.IsLocked && User.Identity.Name != product.UserLock)
-                return Json(new
+                if (product.IsLocked && User.Identity.Name != product.UserLock)
                 {
-                    Result = "Producto bloqueado",
-                    Message = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
-                    product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.RecordLocked,
+                        Header = "Producto bloqueado",
+                        Body = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                      product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
+                    });
+                }
+
+
+                //reviso si el producto ya cuenta con una relación en la sucursal
+                var bProd = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
+
+                //si no existe relacion con sucursal, los precios y existencias seran 0
+                product.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
+                product.StorePercentage = bProd != null ? bProd.StorePercentage : Cons.Zero;
+                product.DealerPercentage = bProd != null ? bProd.DealerPercentage : Cons.Zero;
+                product.WholesalerPercentage = bProd != null ? bProd.WholesalerPercentage : Cons.Zero;
+                product.StorePrice = bProd != null ? bProd.StorePrice : Cons.Zero;
+                product.DealerPrice = bProd != null ? bProd.DealerPrice : Cons.Zero;
+                product.WholesalerPrice = bProd != null ? bProd.WholesalerPrice : Cons.Zero;
+
+                product.Ledge = bProd != null ? bProd.Ledge : string.Empty;
+                product.Row = bProd != null ? bProd.Row : string.Empty;
+
+                product.OrderCarModels();
+
+                //Obtengo existencias en otras sucursales
+                product.Branches = db.Branches.ToList();
+
+                foreach (var branch in product.Branches)
+                {
+                    var bpr = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == product.ProductId
+                    && bp.BranchId == branch.BranchId);
+
+                    branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
+                }
+
+                foreach (var eq in product.Equivalences)
+                {
+                    eq.ExternalProduct = db.ExternalProducts.Include(ep => ep.Provider).
+                        FirstOrDefault(ep => ep.ProviderId == eq.ProviderId && ep.Code == eq.Code);
+                }
+
+                return PartialView("_ProductDetail", product);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error Inesperado",
+                    Body = "Ocurrio un error al obtener el detalle del producto"
                 });
-
-
-            //reviso si el producto ya cuenta con una relación en la sucursal
-            var bProd = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
-
-            //si no existe relacion con sucursal, los precios y existencias seran 0
-            product.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
-            product.StorePercentage = bProd != null ? bProd.StorePercentage : Cons.Zero;
-            product.DealerPercentage = bProd != null ? bProd.DealerPercentage : Cons.Zero;
-            product.WholesalerPercentage = bProd != null ? bProd.WholesalerPercentage : Cons.Zero;
-            product.StorePrice = bProd != null ? bProd.StorePrice : Cons.Zero;
-            product.DealerPrice = bProd != null ? bProd.DealerPrice : Cons.Zero;
-            product.WholesalerPrice = bProd != null ? bProd.WholesalerPrice : Cons.Zero;
-
-            product.Ledge = bProd != null ? bProd.Ledge : string.Empty;
-            product.Row = bProd != null ? bProd.Row : string.Empty;
-
-            product.OrderCarModels();
-
-            //Obtengo existencias en otras sucursales
-            product.Branches = db.Branches.ToList();
-
-            foreach (var branch in product.Branches)
-            {
-                var bpr = db.BranchProducts.FirstOrDefault(bp => bp.ProductId == product.ProductId
-                && bp.BranchId == branch.BranchId);
-
-                branch.Quantity = bpr != null ? bpr.Stock : Cons.Zero;
             }
-
-            foreach (var eq in product.Equivalences)
-            {
-                eq.ExternalProduct = db.ExternalProducts.Include(ep => ep.Provider).
-                    FirstOrDefault(ep => ep.ProviderId == eq.ProviderId && ep.Code == eq.Code);
-            }
-
-            return PartialView("Detail", product);
         }
 
 

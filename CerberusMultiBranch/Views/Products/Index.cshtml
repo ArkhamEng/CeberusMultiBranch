@@ -159,7 +159,7 @@
     function LookFor()
     {
 
-        ShowLoading();
+        ShowLoading('static');
         var data =
         {
             categoryId: $("#FiltCategoryId").val(),
@@ -170,8 +170,8 @@
             isGrid: $("#IsGrid").val(),
             partSystemId: $("#SystemId").val()
         };
-        ExecuteAjax('@Url.Action("Search")', data, function (view) {
-
+        ExecuteAjax('@Url.Action("Search")', data, function (view)
+        {
             HideLoading();
 
             $("#divProducts").html(view);

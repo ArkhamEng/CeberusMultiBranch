@@ -8,16 +8,23 @@
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
-        <div class="col-md-7">
+        <div id="dtUserButtons" class="col-md-6">
+
+        </div>
+        <div class="col-md-6">
             <div class="input-group ">
 
                 @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control", placeholder = "Filtro de búsqueda" })
                 <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary" title="Buscar Usuarios" disabled="disabled">
+                        <span class="glyphicon  glyphicon-search"></span>
+                        Buscar
+                    </button>
                     <button type="button" class="btn btn-success"
                             onclick="ShowLoading(); window.location='@Url.Action("Register")'"
                             title="Registrar nuevo usuario">
                         <span class="glyphicon  glyphicon-file"></span>
-                        Nuevo
+                        Agregar
                     </button>
                 </span>
             </div>
@@ -25,90 +32,105 @@
     </div>
 </div>
 
+<div class="panel panel-default">
+    <div class="panel-body dtContainer">
+        <table id="tbUsers"  class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+            <thead>
+                <tr>
+                    <th />
+                    <th>
+                        @Html.DisplayName("Nombre de usuario")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Correo electrónico")
+                    </th>
 
-<table id="tbUsers" class="table  table-striped">
-    <thead>
-        <tr>
-            <th />
-            <th>
-                @Html.DisplayName("Nombre de usuario")
-            </th>
-            <th>
-                @Html.DisplayName("Correo electrónico")
-            </th>
+                    <th>
+                        @Html.DisplayName("Teléfono")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Comisión")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Roles")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Sucursales")
+                    </th>
 
-            <th>
-                @Html.DisplayName("Teléfono")
-            </th>
-            <th>
-                @Html.DisplayName("Comisión")
-            </th>
-            <th>
-                @Html.DisplayName("Roles")
-            </th>
-            <th>
-                @Html.DisplayName("Sucursales")
-            </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="col-md-1">
+                            <div class="col-md-12">
+                                @if (item.PicturePath != null && item.PicturePath != string.Empty)
+                                {
+                                    <img src="@item.PicturePath" class="img-responsive" />
+                                }
+                                else
+                                {
+                                    <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                                }
+                            </div>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
 
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td class="col-md-1">
-                    <div class="col-md-12">
-                        @if (item.PicturePath != null && item.PicturePath != string.Empty)
-                        {
-                            <img src="@item.PicturePath" class="img-responsive" />
-                        }
-                        else
-                        {
-                            <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
-                        }
-                    </div>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UserName)
-                </td>
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.Email)
-                </td>
+                        <td class="text-center">
+                            @Html.DisplayFor(modelItem => item.PhoneNumber)
+                        </td>
+                        <td class="text-center">
+                            @{ var com = (item.ComissionForSale / 100d).ToString("p1"); }
+                            @com
+                        </td>
+                        <td class="text-center">
+                            @item.Roles.Count.ToString()
+                        </td>
+                        <td class="text-center">
+                            @item.UserBranches.Count.ToString()
+                        </td>
 
-                <td class="text-center">
-                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                </td>
-                <td class="text-center">
-                    @{ var com = (item.ComissionForSale / 100d).ToString("p1"); }
-                    @com
-                </td>
-                <td class="text-center">
-                    @item.Roles.Count.ToString()
-                </td>
-                <td class="text-center">
-                    @item.UserBranches.Count.ToString()
-                </td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" title="Roles de usuario" onclick="ShowLoading(); window.location='@Url.Action("UserConfig",new {id=item.Id })'">
+                                <span class="fa fa-edit"></span>
+                                Editar
+                            </button>
 
-                <td class="col-md-1 btn-group text-right">
-                    <button class="btn btn-warning btn-xs" title="Roles de usuario"
-                            onclick="ShowLoading(); window.location='@Url.Action("UserConfig",new {id=item.Id })'">
-                        <span class="fa fa-edit"></span>
-                    </button>
-                    <button class="btn btn-danger btn-xs" title="Restaurar contraseña"
-                            onclick="BeginReset('@item.Id')">
-                        <span class="fa fa-refresh"></span>
-                    </button>
-                </td>
-            </tr>
-          }
-    </tbody>
-</table>
+                            @*<button class="btn btn-danger btn-sm" title="Restaurar contraseña">
+                                <span class="fa fa-trash-o"></span>
+                                Eliminar
+                            </button>*@
+
+                            <button class="btn btn-info btn-sm" title="Restaurar contraseña" onclick="BeginReset('@item.Id')">
+                                <span class="fa fa-refresh"></span>
+                                Reset
+                            </button>
+
+
+                        </td>
+                    </tr>
+                   }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
 <input hidden id="userId" />
 
 <script>
-    $(document).ready(function () {
-        SetDataTable("#tbUsers", "#txtName")
+    $(document).ready(function ()
+    {
+        $("#tbUsers").removeClass("hidden");
+        Paginate("#tbUsers", 10, true, "#txtName", false, "#dtUserButtons");
     });
 
     function BeginReset(id) {
@@ -118,8 +140,7 @@
     }
 
     function Reset() {
-        ExecuteAjax('@Url.Action("ResetPassword")', { userId: $("#userId").val() }, function (response)
-        {
+        ExecuteAjax('@Url.Action("ResetPassword")', { userId: $("#userId").val() }, function (response) {
             if (response.Result != "OK")
                 ShowMessage(response.Result, response.Message, 'warning');
             else

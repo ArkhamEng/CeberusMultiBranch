@@ -108,24 +108,26 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (bp == null)
                 {
-                    var j = new
+                    return Json(new JResponse
                     {
-                        Result = "Producto no inventariado",
-                        Message = "Este producto no ha sido inventariado en la sucursal, configuralo correctamente antes de intentar venderlo"
-                    };
-                    return Json(j);
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.ConditionMissing,
+                        Header = "Producto no inventariado",
+                        Body = "Este producto no ha sido inventariado en la sucursal, configuralo correctamente antes de intentar venderlo"
+                    });
                 }
 
                 if (bp.Product.IsLocked && bp.Product.UserLock == User.Identity.Name)
                 {
                     if (bp == null)
                     {
-                        var j = new
+                        return Json(new JResponse
                         {
-                            Result = "Producto no bloqueado temporalmente",
-                            Message = "Bloqueado por " + bp.Product.UserLock + " hora de bloqueo " + bp.Product.LockDate.Value.ToString("dd/MM/yyyy hh:mm")
-                        };
-                        return Json(j);
+                            Result = Cons.Responses.Info,
+                            Code = Cons.Responses.Codes.ConditionMissing,
+                            Header = "Producto bloqueado!",
+                            Body = "Bloqueado por " + bp.Product.UserLock + " hora de bloqueo " + bp.Product.LockDate.Value.ToString("dd/MM/yyyy hh:mm")
+                        });
                     }
                 }
 
@@ -133,30 +135,33 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //valido la configuración de precios
                 if (bp.StorePrice <= Cons.Zero)
                 {
-                    var j = new
+                    return Json(new JResponse
                     {
-                        Result = "Error en precio",
-                        Message = "El precio de mostrador debe ser mayor a $0, revisa la configuración"
-                    };
-                    return Json(j);
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.ConditionMissing,
+                        Header = "Error en el precio",
+                        Body = "El precio de mostrador debe ser mayor a $0, revisa la configuración"
+                    });
                 }
                 else if (bp.DealerPrice <= Cons.Zero)
                 {
-                    var j = new
+                    return Json(new JResponse
                     {
-                        Result = "Error en precio",
-                        Message = "El precio de distribuidor debe ser mayor a $0, revisa la configuración"
-                    };
-                    return Json(j);
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.ConditionMissing,
+                        Header = "Error en el precio",
+                        Body = "El precio de distribuidor debe ser mayor a $0, revisa la configuración"
+                    });
                 }
                 else if (bp.WholesalerPrice <= Cons.Zero)
                 {
-                    var j = new
+                    return Json(new JResponse
                     {
-                        Result = "Error en precio",
-                        Message = "El precio de mayorista debe ser mayor a $0, revisa la configuración"
-                    };
-                    return Json(j);
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.ConditionMissing,
+                        Header = "Error en el precio",
+                        Body = "El precio de mayorista debe ser mayor a $0, revisa la configuración"
+                    });
                 }
                 #endregion
 
@@ -240,31 +245,24 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.SaveChanges();
                 }
 
-                #region Lógica para impedir agregar producto sin stock
-                //verifico el stock y valido si es posible agregar mas producto a la venta
-                /*if (bp.Stock < detail.Quantity)
+                return Json(new JResponse
                 {
-                    var message = string.Format("Estas intentando vender {0} unidades del producto {1} ", detail.Quantity, bp.Product.Code);
-                    message += string.Format("el inventario solo contiene {1} unidades disponibles, revisa el carrito de venta! ", bp.Stock);
-                    message += "sólo puedes vender productos sin existencia en una preventa desde el módulo de ventas";
-
-                    var j = new
-                    {
-                        Result = "Cantidad insuficiente",
-                        Message = message
-                    };              
-                    return Json(j);
-                }*/
-                #endregion
-
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Producto agregado",
+                    Body = "Se agregaron "+quantity+" unidades del producto "+ bp.Product.Code+" a la venta"
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error el agregar",
+                    Body = "Ocurrio un error al agregar el producto al carrito"
+                });
             }
-
-            var js = new { Result = "OK" };
-            return Json(js);
         }
 
         [HttpPost]

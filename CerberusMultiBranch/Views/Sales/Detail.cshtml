@@ -24,9 +24,11 @@
 <ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#tabProducts">Detalle de Venta</a></li>
 
-    <li><a data-toggle="tab" href="#tabPayments">
-        Pagos <span id="TotalPayments" class="badge"></span>
-    </a></li>
+    <li>
+        <a data-toggle="tab" href="#tabPayments">
+            Pagos <span id="TotalPayments" class="badge"></span>
+        </a>
+    </li>
 </ul>
 
 <div class="tab-content">
@@ -117,34 +119,25 @@
 
                     <div class="panel-footer">
                         <button type="button" class="btn btn-primary" title="Nueva búsqueda"
-                                onclick="ShowLoading(); window.location='@Url.Action("Report")'">
+                                onclick="ShowLoading('static'); window.location='@Url.Action("Report")'">
                             <span class="fa fa-backward"></span>
                             Volver
                         </button>
-                     
-                            <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?">
-                                <span class="fa fa-cubes"></span>
-                                Terminar
-                            </button>
-                            <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
-                                <span class="glyphicon glyphicon-plus-sign"></span>
-                                Agregar
-                            </button>
-                      
-                        @if (Model.CanCancel)
-                        {
-                            <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
-                                <span class="glyphicon glyphicon-remove"></span>
-                                Cancelar
-                            </button>
-                        }
-                        else
-                        {
-                            <button id="btnCancel" class="btn btn-danger  pull-right" type="button" disabled>
-                                <span class="glyphicon glyphicon-remove"></span>
-                                Cancelar
-                            </button>
-                        }
+
+                        <button id="btnCompleate" type="button" class="btn btn-success Compleated" title="Terminar y Reservar?">
+                            <span class="fa fa-cubes"></span>
+                            Terminar
+                        </button>
+                        <button id="btnShowQuick" class="btn btn-warning Compleated" type="button">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            Agregar
+                        </button>
+
+
+                        <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()" disabled="@Model.CancelDisabled">
+                            <span class="glyphicon glyphicon-remove"></span>
+                            Cancelar
+                        </button>
                     </div>
                 </div>
 
@@ -159,7 +152,7 @@
 
     <div id="tabPayments" class="tab-pane">
         <div class="panel panel-default">
-            <div id="divSalePayments" class="panel-body">
+            <div id="divSalePayments" class="panel-body dtContainer">
                 @Html.Partial("_SalePayments", Model.SalePayments)
             </div>
         </div>
@@ -168,17 +161,11 @@
 
 
 
-
-@Html.Partial("_Cancelation")
-
-<div id="divAdd"></div>
-
 @Html.Partial("_SearchProduct")
 
 <script>
     $(document).ready(function () {
-        $("#btnShowQuick").click(function ()
-        {
+        $("#btnShowQuick").click(function () {
             $("#ModalProduct").modal('show');
         });
 
@@ -192,39 +179,22 @@
     });
 
 
-    function SubmitCompleate()
-    {
+    function SubmitCompleate() {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response)
+        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response) {
+            HideLoading(function () {
+                window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
+            });
+        });
+    }
+
+    function Cancel()
+    {
+        BeginCancelSale($("#SaleId").val(), function ()
         {
-            HideLoading(function ()
-            {
-                 window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
-            });
+            location.reload(true);
         });
-    }
-
-    function Cancel() {
-        $('#ModalCancel').modal('show');
-    }
-
-    function BeginCancel() {
-        $("#ModalCancel").off("hidden.bs.modal").on("hidden.bs.modal", function () {
-            ShowLoading();
-
-            var param = { SaleId: $("#SaleId").val(), comment: $("#txtComment").val() }
-
-            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
-                if (j.Result = 'OK')
-                    location.reload(true);
-                else
-                    ShowMessage(j.Result, j.Message, 'warning');
-            });
-        });
-
-        $("#ModalCancel").modal("hide");
-
     }
 </script>
 

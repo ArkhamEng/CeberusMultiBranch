@@ -20,22 +20,23 @@
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar">
                         <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
-                    </button>
-                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                        <u>L</u>impiar
+                        Buscar
                     </button>
                 </span>
             </div>
         </div>
+        <div class="col-md-12" id="divCashButtons" style="margin-top:10px">
+
+        </div>
     </div>
 </div>
 
-
-<div id="divCashRegisterList">
-    @Html.Partial("_CashRegisterList", Model.CashRegisters)
+<div class="panel panel-default">
+    <div id="divCashRegisterList" class="panel-body dtContainer">
+        @Html.Partial("_CashRegisterList", Model.CashRegisters)
+    </div>
 </div>
+
 
 <script>
     $(document).ready(function ()

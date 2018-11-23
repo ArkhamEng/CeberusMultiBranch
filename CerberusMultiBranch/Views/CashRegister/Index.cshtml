@@ -31,9 +31,8 @@
 
 }
 else
-{   <hr />
-    <div class="col-md-12">
-        <div class="panel panel-success">
+{  
+  <div class="panel panel-success" style="margin-top:10px">
             <div class="panel-heading">
                 <h4 class="text-uppercase text-center panel-title">
                     <a data-toggle="collapse" href="#collapse1">
@@ -41,83 +40,104 @@ else
                     </a>
                 </h4>
             </div>
-            <div id="collapse1" class="panel-collapse collapse">
-                <div class="panel-body">
-                    <div class="col-md-5  text-center  alert bg-primary">
-                        <h3>
-                            @{
-                                var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToMoney();
-                            }
-                            Ventas Efectivo<br />
-                            @cash
-                        </h3>
-                    </div>
-                    <div class="col-md-5 col-md-offset-1 text-center  alert alert-warning">
-                        <h3>
-                            Ventas Tarjeta<br />
-                            @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToMoney()
-                        </h3>
-                    </div>
 
-                    <div class="col-md-11">
+            <div id="collapse1" class="panel-collapse collapse">
+                <div class="panel-body dtContainer">
+                    <div class="col-md-12">
+                        <div class="col-md-5  text-center  alert bg-primary">
+                            <h3>
+                                @{
+                                var cash = Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Efectivo).Sum(d => d.Amount).ToMoney();
+                                }
+                                Ventas Efectivo<br />
+                                @cash
+                            </h3>
+                        </div>
+                        <div class="col-md-5 pull-right text-center  alert alert-warning">
+                            <h3>
+                                Ventas Tarjeta<br />
+                                @Model.Incomes.Where(d => d.Type == CerberusMultiBranch.Models.Entities.Operative.PaymentMethod.Tarjeta).Sum(d => d.Amount).ToMoney()
+                            </h3>
+                        </div>
+                    </div>
+                    <div class="col-md-11 hidden">
                         <img class="img-responsive" src="@Model.ChartSource" />
                     </div>
                 </div>
             </div>
 
-        </div>
 
-    </div>
+            <div class="panel-body dtContainer">
 
-    <div class="col-md-3">
-        <div class="col-md-12  btn btn-info alert text-center" onclick="OpenNotes()" title="Buscar notas">
-            <h3>
-                Anticipos <br />
-                y comprobantes
-            </h3>
-        </div>
+                <div class="col-md-3">
+                    <div class="col-md-12  btn btn-info alert text-center" onclick="OpenNotes()" title="Buscar notas">
+                        <h3>
+                            Anticipos <br />
+                            y comprobantes
+                        </h3>
+                    </div>
 
-        @if (User.IsInRole("Cajero"))
-        {
-            <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
-                 onmouseover="SetPointer(this)" title="Ver y agregar retiros">
-                <h3>
-                    Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
-                </h3>
+                    @if (User.IsInRole("Cajero"))
+                    {
+                        <div class="text-center col-md-12 alert btn-danger" onclick="OpenWithdrawal()"
+                             onmouseover="SetPointer(this)" title="Ver y agregar retiros">
+                            <h3>
+                                Retiros<br />
+                                @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
+                            </h3>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center col-md-12 alert btn-danger disabled">
+                            <h3>
+                                Retiros<br />
+                                @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
+                            </h3>
+                        </div>
+                    }
+
+                    <div class="text-center col-md-12  alert  btn-warning" onclick="CloseCashRegister()"
+                         onmouseover="SetPointer(this)" title="Cerrar caja">
+                        <h3>
+                            <span class="fa fa-power-off"></span>
+                            Cierre de Caja<br />
+                        </h3>
+                    </div>
+                </div>
+
+
+                <div class="panel-group col-md-9">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h4 class="panel-title text-uppercase">
+                                <span class="fa fa-credit-card" style="float:left">
+                                </span>
+                                &nbsp;Cobros pendientes
+                            </h4>
+                        </div>
+
+                        <div id="divPending" class="panel-body">
+                        </div>
+
+                    </div>
+
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h4 class="panel-title text-uppercase">
+                                <span class="fa fa-eye-slash" style="float:left">
+                                </span>
+                                &nbsp;Reembolsos pendientes
+                            </h4>
+                        </div>
+                        <div id="divRefunding" class="panel-body">
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        }
-        else
-        {
-            <div class="text-center col-md-12 alert btn-danger disabled">
-                <h3>
-                    Retiros<br />
-                    @Model.Withdrawals.Sum(w => w.Amount).ToMoney()
-                </h3>
-            </div>
-        }
-
-        <div class="text-center col-md-12  alert  btn-warning" onclick="CloseCashRegister()"
-             onmouseover="SetPointer(this)"  title="Cerrar caja">
-            <h3>
-                <span class="fa fa-power-off"></span>
-                Cierre de Caja<br />
-            </h3>
         </div>
-    </div>
-
-    @Html.Partial("_Cancelation")
-
-    <div id="divPending" class="col-md-9">
-    </div>
     
-    <div id="divRefunding" class="col-md-9">
-    </div>
-   
-    <div id="Close">
-    </div>
-
-     <div id="divPrinter"></div>
 }
 
 <script>
@@ -132,7 +152,7 @@ else
             CheckPendingPayments();
             CheckRefunding();
 
-        }, 10000);
+        }, 60000);
     });
 
     //Realiza el corte de caja
@@ -148,33 +168,6 @@ else
         });
     }
 
-    //Inicia la ventana de cobro
-    function ShowPaymentModal(id)
-    {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
-        {
-            HideLoading(function ()
-            {
-                ShowModal(response, 'static', 'lg');
-            });
-        });
-    }
-
-    function ShowRefundmentModal(id)
-    {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("BeginRefund")', { saleID: id }, function (response)
-        {
-            HideLoading();
-
-            if ($.isPlainObject(response))
-                ShowMessage(response.Result, response.Message, 'warning', true);
-            else
-                $("#divDetails").html(response);
-        });
-    }
 
     //Abre la ventana de tickets y notas
     function OpenNotes()
@@ -223,6 +216,7 @@ else
     {
         ExecuteAjax('@Url.Action("OpenPending","CashRegister")', {}, function (response)
         {
+            $("#divPending").html("");
             $("#divPending").html(response);
          });
     }
@@ -232,32 +226,8 @@ else
     {
         ExecuteAjax('@Url.Action("OpenRefunding", "CashRegister")', {}, function (response)
         {
+            $("#divRefunding").html("");
            $("#divRefunding").html(response);
         });
-      }
-
-    function Cancel()
-    {
-        $("#ModalCancel").off('hidden.bs.modal').on('hidden.bs.modal', function () {
-            ShowLoading();
-
-            var param = { saleId: $("#TransId").val(), comment: $("#txtComment").val() }
-
-            $("#TransId").val("");
-            $("#txtComment").val("");
-
-            ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (j) {
-                HideLoading();
-
-                if (j.Result == 'OK') {
-                    CheckPendingPayments();
-                    ShowMessage("Cancelación exitosa", j.Message, 'success');
-                }
-                else
-                    ShowMessage(j.Result, j.Message, 'warning');
-            });
-        });
-
-        $("#ModalCancel").modal("hide");
-    }
+      }    
 </script>

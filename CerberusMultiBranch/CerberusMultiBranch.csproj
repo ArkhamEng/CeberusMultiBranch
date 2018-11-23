@@ -435,6 +435,7 @@
     <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\SaleCancelViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\WithdrawalViewModel.cs" />
@@ -453,6 +454,7 @@
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Global.js" />
+    <Content Include="AppScripts\Operative.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -697,6 +699,7 @@
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\semanticui.scss" />
+    <Content Include="Models\Entities\Operative\SalePayment.cd" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Properties\PublishProfiles\SimsTrial.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -874,13 +877,12 @@
     <Content Include="Views\Products\_ProductList.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
     <Content Include="Views\Purchases\_PurchaseList.cshtml" />
-    <Content Include="Views\Products\Detail.cshtml" />
+    <Content Include="Views\Products\_ProductDetail.cshtml" />
     <Content Include="Views\Shared\_Progress.cshtml" />
     <Content Include="Views\Shared\_SideBar.cshtml" />
     <Content Include="Views\Sales\_Cart.cshtml" />
     <Content Include="Views\Sales\_CartDetails.cshtml" />
     <Content Include="Views\Clients\_ClientQuickSearchList.cshtml" />
-    <Content Include="Views\CashRegister\_ChoosePayment.cshtml" />
     <Content Include="Views\Sales\Report.cshtml" />
     <Content Include="Views\Sales\_SaleList.cshtml" />
     <Content Include="Views\Configuration\_VariableList.cshtml" />
@@ -915,7 +917,7 @@
     <Content Include="Views\Shared\PageLayout.cshtml" />
     <Content Include="Views\Shared\_CartOption.cshtml" />
     <Content Include="Views\Products\_Transference.cshtml" />
-    <Content Include="Views\Shared\_Cancelation.cshtml" />
+    <Content Include="Views\Sales\_CancelSale.cshtml" />
     <Content Include="Views\Products\_Movement.cshtml" />
     <Content Include="Views\Products\_SearchInternalProduct.cshtml" />
     <Content Include="Views\Products\_ListForPackage.cshtml" />

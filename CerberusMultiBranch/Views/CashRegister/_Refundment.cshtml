@@ -1,65 +1,69 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.RefundViewModel
 @using CerberusMultiBranch.Support
 
-@section Scripts
-{
-    @Scripts.Render("~/bundles/jqueryval")
-}
-<script src="~/Scripts/jquery.validate.js"></script>
-<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
 
+@Scripts.Render("~/bundles/jqueryval")
 
 <form id="formRefund">
-    <div id="ModalRefundment" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content panel panel-danger panel-group">
-                <div class="modal-header panel-heading">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">
-                       Aplicación de rembolso, monto total @Model.TotalRefund.ToMoney()
-                    </h4>
-                </div>
-                <div class="modal-body panel-body">
-                    <div class="col-md-12 text-center">
-                        <label class="text-uppercase bg-success">
-                            Se aplicara la devolucíon por cancelación para  <u>@Model.RefundClient</u>, ¿deseas continuar?
-                        </label>
-                    </div>
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <button type="button" class="close" data-dismiss="modal">
+                <span class="fa fa-times"></span>
+            </button>
+            <h3 class="panel-title">
+                Aplicación de rembolso, monto total @Model.TotalRefund.ToMoney()
+            </h3>
+        </div>
 
-                    <div class="col-md-12">
-                        <div class="form-group col-md-5">
-                            <label>En efectivo</label>
-                            @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control input-lg", type="number" } })
-                        </div>
-                        <div class="form-group col-md-offset-2 col-md-5 pull-right">
-                            <label>En vale</label>
-                            @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control input-lg", type = "number" } })
-                        </div>
+        <div class="panel-body">
+            <div class="col-md-12 text-center">
+                <h4 class="bg-danger">
+                    Se aplicara la devolucíon por cancelación para  <u class="text-uppercase">@Model.RefundClient</u>, ¿deseas continuar?
+                </h4>
+            </div>
 
-                        <div class="form-group col-md-7 center-block">
-                            <label>Recibido por</label>
-                            @Html.EditorFor(model => model.ReceivedBy, new { htmlAttributes = new { @class = "form-control text-uppercase", autocomplete = "off" } })
-                            @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
-                        </div>
+            <div class="col-md-12 small">
+                <div class="form-group col-md-3">
+                    <label>En efectivo</label>
+                    @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
+                </div>
+                <div class="form-group col-md-3">
+                    <label>En vale</label>
+                    @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
+                </div>
 
-                        <div class="form-group col-md-5 center-block">
-                            <label>Numero IFE (solo para vale)</label>
-                            @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control", autocomplete = "off" } })
-                            @Html.ValidationMessageFor(model=> model.Ident, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
+                <div class="form-group col-md-6 center-block">
+                    <label>IFE (solo para vale)</label>
+                    @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                    @Html.ValidationMessageFor(model => model.Ident, "", new { @class = "text-danger" })
                 </div>
-                <div class="modal-footer panel-footer">
-                    <button class="btn btn-success pull-left" type="button" onclick="ApplyRefund()">
-                        <span class="glyphicon glyphicon-ok"></span>
-                        Aplicar devolución
-                    </button>
+
+                <div class="form-group col-md-12">
+                    <label>Recibido por</label>
+                    @Html.EditorFor(model => model.ReceivedBy, new { htmlAttributes = new { @class = "form-control text-uppercase  input-sm", autocomplete = "off" } })
+                    @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
                 </div>
+
+               
+            </div>
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <button class="btn btn-primary" type="button" onclick="ApplyRefund()">
+                    <span class="fa fa-check"></span>
+                    Aplicar
+                </button>
+
+                <button class="btn btn-danger" type="button" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
             </div>
         </div>
     </div>
 </form>
-@Html.HiddenFor(m=> m.RefundClientId)
+@Html.HiddenFor(m => m.RefundClientId)
 @Html.HiddenFor(m => m.RefundSaleId)
 @Html.HiddenFor(m => m.TotalRefund)
 
@@ -68,8 +72,6 @@
     {
         var form = $("#formRefund");
         form.validate();
-
-        $("#ModalRefundment").modal('show');
 
         $("#RefundCash").off('keyup').keyup(function ()
         {
@@ -80,7 +82,8 @@
 
             $("#RefundCredit").val(result);
 
-            if (result < 0) {
+            if (result < 0)
+            {
                 $("#RefundCredit").val(0);
                 $("#RefundCash").val($("#TotalRefund").val());
             }
@@ -133,10 +136,10 @@
 
         if (!form.valid())
             return;
-       
-        $("#ModalRefundment").off("hidden.bs.modal").on("hidden.bs.modal", function ()
+
+        HideModal(function()
         {
-            ShowLoading();
+            ShowLoading('static');
 
             var ref = {
                 RefundClientId: $("#RefundClientId").val(),
@@ -147,32 +150,23 @@
                 ReceivedBy: $("#ReceivedBy").val()
             }
 
-            ExecuteAjax('@Url.Action("CreateRefund")', { refund: ref }, function (response)
+            ExecuteAjax('@Url.Action("CreateRefund","CashRegister")', { refund: ref }, function (response)
             {
-              
-                HideLoading();
-                if ($.isPlainObject(response))
-                {
-                    HideLoading();
-                    ShowMessage("Error al generar el rembolso", response.Message, 'warning');
-                } 
-                else
+                HideLoading(function ()
                 {
                     CheckRefunding();
                     $("#divPrinter").html(response);
-                }
+                });
             });
-        });
 
-        $("#ModalRefundment").modal("hide");
+        },true);
     }
 
     function GetCreditNote(id)
     {
         ExecuteAjax('@Url.Action("PrintCreditNote")', { noteId: id }, function (response)
         {
-            if (!$.isPlainObject(response))
-            {
+            if (!$.isPlainObject(response)) {
                 $("#divPrinter").html(response);
                 PrintCreditNote();
             }

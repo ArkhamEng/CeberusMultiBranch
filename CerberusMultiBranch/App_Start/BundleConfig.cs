@@ -24,7 +24,8 @@ namespace CerberusMultiBranch
             bundles.Add(new ScriptBundle("~/bundles/common").Include(
                     "~/Scripts/Common.js",
                     "~/AppScripts/Global.js",
-                    "~/AppScripts/Catalog.js"));
+                    "~/AppScripts/Catalog.js",
+                    "~/AppScripts/Operative.js"));
 
 
           // Use the development version of Modernizr to develop with and learn from. Then, when you're

@@ -263,13 +263,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var salesCount = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved).Count();
 
-                if(salesCount > Cons.Zero)
+                if (salesCount > Cons.Zero)
                 {
                     return Json(new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Aun tienes "+salesCount+" venta(s) pendiente(s) de cobro, no puedes dejar pendientes al cerrar caja",
+                        Body = "Aun tienes " + salesCount + " venta(s) pendiente(s) de cobro, no puedes dejar pendientes al cerrar caja",
                         Header = "Corte no permitido"
                     });
                 }
@@ -293,7 +293,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var o = cr.CashDetails.Where(cd => cd.DetailType == Cons.Zero).Sum(cd => cd.Amount);
                 var total = 0.0;
 
-                if(!cr.IsOpen)
+                if (!cr.IsOpen)
                 {
                     return Json(new JResponse
                     {
@@ -322,8 +322,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Success,
                     Code = Cons.Responses.Codes.Success,
-                    Body ="El corete de caja se efectuo exitosamente",
-                    Header ="Corte realizado"
+                    Body = "El corete de caja se efectuo exitosamente",
+                    Header = "Corte realizado"
                 });
             }
             catch (Exception ex)
@@ -366,7 +366,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
                     Body = "Ocurrio un error al obtener las ventas pendientes de cobro",
-                    Header ="Errro al obtener datos"
+                    Header = "Errro al obtener datos"
                 });
             }
         }
@@ -398,14 +398,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [CustomAuthorize(Roles = "Cajero")]
-        public ActionResult BeginRefund(int saleId)
+        public ActionResult BeginRefund(int id)
         {
             try
             {
                 var branchId = User.Identity.GetBranchId();
 
                 var sale = db.Sales.Include(s => s.Client).Include(s => s.SalePayments).
-                    FirstOrDefault(s => s.SaleId == saleId && s.Status == TranStatus.PreCancel);
+                    FirstOrDefault(s => s.SaleId == id && s.Status == TranStatus.PreCancel);
 
                 if (sale == null)
                 {
@@ -417,14 +417,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Header = "No se encontro registro"
                     });
                 }
-                    
+
 
                 var model = new RefundViewModel
                 {
-                    RefundSaleId   = sale.SaleId,
-                    RefundClient   = sale.Client.Name,
-                    RefundCash     = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
-                    RefundCredit   = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
+                    RefundSaleId = sale.SaleId,
+                    RefundClient = sale.Client.Name,
+                    RefundCash = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
+                    RefundCredit = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
                     RefundClientId = sale.ClientId
                 };
 
@@ -448,7 +448,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var model = db.SaleCreditNotes.Where(p => p.Ident.Contains(filter) || p.Folio.Contains(filter) && p.IsActive).Take(20).
                 Select(p =>
-                    new { Id = p.SaleCreditNoteId, Label = p.Folio, Value = "IFE " + p.Ident });
+                    new { Id = p.SaleCreditNoteId, Label = p.Folio, Value = "IFE " + p.Ident, Response = Cons.Responses.Success, Code = Cons.Responses.Codes.Success });
 
             return Json(model);
         }
@@ -467,7 +467,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                     FirstOrDefault(s => s.SaleId == refund.RefundSaleId && s.Status == TranStatus.PreCancel);
 
                 if (sale == null)
-                    return Json(new { Result = "Error", Message = "Esta venta ya no esta disponible para reembolso" });
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Body = "Esta venta ya no esta disponible para reembolso",
+                        Header = "Registro no disponible"
+                    });
+                }
+
 
                 printRefund.Branch = sale.Branch;
                 printRefund.Client = refund.ReceivedBy;
@@ -481,11 +490,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var cr = GetCashRegister();
 
-                var message = "Se ha registrado correctamente el rembolso ";
+                var message = "El rembolso se aplico correctamente.";
 
                 if (refund.RefundCash > Cons.Zero)
                 {
-                    message += "Efectivo devuelto " + refund.RefundCash.ToMoney();
+                    message += " Efectivo devuelto " + refund.RefundCash.ToMoney();
                     var cd = new CashDetail
                     {
                         CashRegisterId = cr.CashRegisterId,
@@ -524,7 +533,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
                     };
 
-                    message += "Cantidad en Vale " + refund.RefundCredit.ToMoney() + " Folio del vale " + nc.Folio;
+                    message += " Monto en Vale " + refund.RefundCredit.ToMoney() + " Folio del vale " + nc.Folio;
                     printRefund.HasNote = true;
 
                     db.SaleCreditNotes.Add(nc);
@@ -584,8 +593,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body ="Ocurrio un error al Obtener los datos de ticket y notas",
-                    Header ="Error General"
+                    Body = "Ocurrio un error al Obtener los datos de ticket y notas",
+                    Header = "Error General"
                 });
             }
         }
@@ -666,8 +675,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Details = details,
                     AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
                     PaymentMethod = PaymentMethod.Efectivo,
-                    SaleId = id,
-                    CanCancel = (details.First().Sale.Status == TranStatus.Reserved)
+                    SaleId = id
                 };
 
                 //si la venta es a crédito establesco el moto en efectivo como el total de la venta
@@ -701,15 +709,25 @@ namespace CerberusMultiBranch.Controllers.Operative
             var note = db.SaleCreditNotes.Find(id);
 
             if (note != null && note.IsActive)
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "OK",
-                    Amount = note.Amount,
-                    Expiration = note.ExplirationDate.ToString("dd/MM/yyyy"),
-                    Label = "Folio " + note.Folio + " IFE " + note.Ident
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Extra = note.Amount.ToString(),
+                    Body = note.ExplirationDate.ToString("dd/MM/yyyy"),
+                    Header = "Folio " + note.Folio + " IFE " + note.Ident
                 });
             else
-                return Json(new { Result = "NO OK", Amount = note.Amount });
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Body = "No se encontro una nota de creidito activa",
+                    Code = Cons.Responses.Codes.RecordNotFound,
+                    Header = "No se encontro el registro"
+                });
+            }
+
         }
 
 
@@ -723,7 +741,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //busco la venta a pagar
                 var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).
                             Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
-                          //  Include(s => s.Client.City).Include(s => s.Client.City.State).
+                            //  Include(s => s.Client.City).Include(s => s.Client.City.State).
                             Include(s => s.SaleDetails.Select(td => td.Product)).
                             Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
@@ -744,91 +762,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var hasFolio = (payment.CreditNoteAmount > Cons.Zero);
 
 
-                if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Info,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
+                var valResponse = ValidatePayment(sale, payment, toPay, wholePayment);
 
-                        Header = "Venta cancelada"
-                    });
-                }
-             
-                if (toPay == Cons.Zero)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Info,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Esta venta ya ha sido cobrada en su totalidad",
-
-                        Header = "Cobro no requerido"
-                    });
-                }
-
-                //si hay valores negativos
-                if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "No puede ingresar montos negativos, en el pago de una venta",
-
-                        Header = "Datos incorrectos!"
-                    });
-                }
-
-                if (wholePayment > toPay)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
-
-                        Header = "Pago excedente!"
-                    });
-                }
-
-
-                if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "El monto del pago es menor que el  monto de la deuda, las ventas de contado deben ser liquidades en su totalidad",
-
-                        Header = "Pago Insuficiente!"
-                    });
-                }
-
-                if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "La preventa requiere por lo menos un 20% de anticipo",
-
-                        Header = "Anticipo requerido!"
-                    });
-                }
-             
-                if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Los apartados requieren un anticipo de 10% por lo menos",
-
-                        Header = "Anticipo requerido!"
-                    });
-                }
+                //si la respueste es diferente de null, algo falló
+                if (valResponse != null)
+                    return valResponse;
 
 
                 #region Logica para el uso de folio
@@ -838,7 +776,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //si se registro un vale, hago validaciones de este
                 if (payment.CreditNoteId > Cons.Zero)
                 {
-                    note = db.SaleCreditNotes.Include(s => s.Sale).Include(s => s.Sale.Client).
+                    note = db.SaleCreditNotes.Include(s => s.Sale).Include(s => s.Sale.Client.Addresses).
                         FirstOrDefault(n => n.SaleCreditNoteId == payment.CreditNoteId && n.IsActive);
 
                     if (note != null)
@@ -855,7 +793,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             });
 
                         }
-                    
+
                         if (note.Amount != payment.CreditNoteAmount)
                         {
                             return Json(new JResponse
@@ -869,7 +807,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             });
 
                         }
-                     
+
                         if (payment.CreditNoteAmount >= toPay && money > Cons.Zero)
                         {
                             return Json(new JResponse
@@ -882,7 +820,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 Header = "Pago inecesario"
                             });
                         }
-                        
+
                         //agrego el historico
                         var history = new CreditNoteHistory
                         {
@@ -921,7 +859,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }
                 }
 
-          
+
                 #endregion
 
 
@@ -1068,23 +1006,141 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+        private JsonResult ValidatePayment(Sale sale, ChoosePaymentViewModel payment, double toPay, double wholePayment)
+        {
+            try
+            {
+                if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
+
+                        Header = "Venta cancelada"
+                    });
+                }
+
+                if (toPay == Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta ya ha sido cobrada en su totalidad",
+
+                        Header = "Cobro no requerido"
+                    });
+                }
+
+                //si hay valores negativos
+                if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "No puede ingresar montos negativos, en el pago de una venta",
+
+                        Header = "Datos incorrectos!"
+                    });
+                }
+
+                //si se excede el monto de la deuda y se esa usando efectivo o tarjeta se envía un aviso (se puede exceder el monto si y solo si se usa vale)
+                if (wholePayment > toPay && (payment.CashAmount > Cons.Zero || payment.CashAmount > Cons.Zero))
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
+
+                        Header = "Pago excedente!"
+                    });
+                }
+
+
+                if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "El monto del pago es menor que el  monto de la deuda, las ventas de contado deben ser liquidades en su totalidad",
+
+                        Header = "Pago Insuficiente!"
+                    });
+                }
+
+                if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "La preventa requiere por lo menos un 20% de anticipo",
+
+                        Header = "Anticipo requerido!"
+                    });
+                }
+
+                if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Los apartados requieren un anticipo de 10% por lo menos",
+
+                        Header = "Anticipo requerido!"
+                    });
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error mientras se validaban los datos",
+                    Header = "Error al validar!"
+                });
+            }
+        }
+
         [HttpPost]
         public ActionResult PrintDocument(int saleId, int printType)
         {
-            var sale = db.Sales.Where(s => s.SaleId == saleId).Include(s => s.SalePayments).
-                           Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
-                           Include(s => s.SaleDetails.Select(td => td.Product)).
-                           Include(s => s.SaleDetails.Select(td => td.Product.Images)).
-                           Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
-                           Include(s => s.Branch).FirstOrDefault();
+            try
+            {
+                var sale = db.Sales.Where(s => s.SaleId == saleId).Include(s => s.SalePayments).
+                         Include(s => s.SaleDetails).Include(s => s.Client.Addresses).Include(s => s.User).
+                         Include(s => s.SaleDetails.Select(td => td.Product)).
+                         Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                         Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
+                         Include(s => s.Branch).FirstOrDefault();
 
-            sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
+                sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
 
-            if (printType == Cons.One)
-                return PartialView("_PrintTicket", sale);
-            else
-                return PartialView("_PrintNote", sale);
+                if (printType == Cons.One)
+                    return PartialView("_PrintTicket", sale);
+                else
+                    return PartialView("_PrintNote", sale);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = "Ocurrio un error al obtener los datos para impresión",
+                    Header = "Error obtener datos"
+                });
+            }
         }
     }
 }

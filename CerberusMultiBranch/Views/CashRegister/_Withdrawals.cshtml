@@ -61,12 +61,12 @@
 
         <div class="panel panel-default">
             <div class="panel-body">
-                <table id="tbWithdrawals" class="table dt-responsive nowrap table-bordered small" style="width:100%">
-                    <thead>
+                <table id="tbWithdrawals" class="table table-bordered small" style="width:100%">
+                    <thead style="white-space:nowrap">
                         <tr>
-                            <th>@Html.DisplayName("Causa de retiro")</th>
-                            <th>@Html.DisplayNameFor(m => m.InsDate)</th>
-                            <th>@Html.DisplayNameFor(m => m.Amount)</th>
+                            <th class="col-md-4">@Html.DisplayName("Causa de retiro")</th>
+                            <th  class="col-md-3">@Html.DisplayNameFor(m => m.InsDate)</th>
+                            <th  class="col-md-3">@Html.DisplayNameFor(m => m.Amount)</th>
                             <th>@Html.DisplayNameFor(m => m.Comment)</th>
                         </tr>
                     </thead>
@@ -74,13 +74,13 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td>
+                                <td  style="white-space:nowrap">
                                     @Html.DisplayFor(m => item.Cause.Name)
                                 </td>
-                                <td>
+                                <td  style="white-space:nowrap">
                                     @Html.DisplayFor(m => item.InsDate)
                                 </td>
-                                <td>
+                                <td  style="white-space:nowrap">
                                     @Html.DisplayFor(m => item.Amount)
                                 </td>
                                 <td>

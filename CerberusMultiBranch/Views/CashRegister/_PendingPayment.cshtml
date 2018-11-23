@@ -1,87 +1,101 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Sale>
 @using CerberusMultiBranch.Support
 
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h4 class="panel-title text-uppercase">
-            <span class="fa fa-credit-card" style="float:left">
-            </span>
-            &nbsp;Cobros pendientes
-        </h4>
-    </div>
-    <div class="panel-body">
-        <table id="tbPendingPayment" class="table table-bordered small">
-            <thead>
-                <tr>
-                    <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
-                    <th class="col-md-5 text-center">@Html.DisplayName("Cliente")</th>
 
-                    <th class="col-md-2 text-center">@Html.DisplayName("Agente")</th>
-                    <th class="col-md-1 text-center">@Html.DisplayName("Entrega")</th>
-                    <th class="col-md-1 text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
+<table id="tbPendingPayment" class="table dt-responsive nowrap table-bordered small" style="width:100%">
+    <thead>
+        <tr>
+            <th class="text-center">@Html.DisplayName("Folio")</th>
+            <th class="text-center">@Html.DisplayName("Cliente")</th>
 
-                    <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
-                    <th class="col-md-1 text-center" />
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
-                        <td>
-                           @Html.DisplayUpperFor(m => item.Client.Name)
-                        </td>
+            <th class="text-center">@Html.DisplayName("Agente")</th>
+            <th class="text-center">@Html.DisplayName("Entrega")</th>
+            <th class="text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
 
-                        <td align="center">
-                            @Html.DisplayUpperFor(m => item.User.UserName)
-                        </td>
-                        <td align="center">
-                            @{ var sending = "Mostrador"; }
+            <th class="text-center">@Html.DisplayName("Tipo")</th>
+            <th class="text-center" />
+            <th class="text-center">@Html.DisplayName("Fecha")</th>
+            <th class="text-center" />
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
+                <td>
+                    @Html.DisplayUpperFor(m => item.Client.Name)
+                </td>
 
-                            @if (item.SendingType != 0)
-                            {
-                                sending = "Domicilio";
-                            }
+                <td align="center">
+                    @Html.DisplayUpperFor(m => item.User.UserName)
+                </td>
+                <td align="center">
+                    @{ var sending = "Mostrador"; }
 
-                            @Html.DisplayFor(m => sending)
-                        </td>
-                        <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
+                    @if (item.SendingType != 0)
+                    {
+                        sending = "Domicilio";
+                    }
 
-                        @*<td align="center">
-                            @{
-                                var alr = "alert-success";
+                    @Html.DisplayFor(m => sending)
+                </td>
+                <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
 
-                                switch (item.TransactionType)
-                                {
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                                        alr = "alert-danger";
-                                        break;
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
-                                        alr = "alert-info";
-                                        break;
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Apartado:
-                                        alr = "alert-warning";
-                                        break;
-                                }
-                            }
-                            <div class="form-control input-sm @alr">
-                                @item.TransactionType.ToString()
-                            </div>
-                        </td>*@
-                        <td align="center">
-                            @item.TransactionType.ToString()
-                        </td>
-                        <td align="center">
-                            <button class="btn btn-primary btn-sm" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
-                                <span class="fa fa-dollar" />
-                                Cobrar
-                            </button>
-                        </td>
-                    </tr>
-                   }
-            </tbody>
-        </table>
-    </div>
-</div>
+                <td align="center">
+                    @item.TransactionType.ToString()
+                </td>
+            
+                <td align="center">
+                    <button class="btn btn-primary btn-sm" title="Recibir pago" onclick="ShowPaymentModal('@item.SaleId')">
+                        <span class="fa fa-dollar" />
+                        Cobrar
+                    </button>
+                </td>
+                <td align="center">
+                    @Html.DisplayFor(m => item.TransactionDate)
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm" type="button" onclick="BeginCancel('@item.SaleId')">
+                        <span class="fa fa-trash-o"></span>
+                        Cancelar
+                    </button>
+                </td>
+            </tr>
+    }
+    </tbody>
+</table>
 
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbPendingPayment", 3, true, null, false);
+    });
+
+    //Inicia la ventana de cobro
+    function ShowPaymentModal(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static', 'lg');
+            });
+        });
+    }
+
+    function BeginCancel(id)
+    {
+        BeginCancelSale(id, function ()
+        {
+            CheckPendingPayments();
+
+            CheckRefunding();
+            console.log("Se recarga");
+        });
+    }
+
+</script>
