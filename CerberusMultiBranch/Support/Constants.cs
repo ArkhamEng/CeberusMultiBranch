@@ -81,6 +81,8 @@ namespace CerberusMultiBranch.Support
         public const int DescriptionLength = 300;
 
         public const string LogingUrl = "/Account/Login";
+
+        public const string NoImagePath = "/Content/Images/sinimagen.jpg";
     }
 
     public struct FileStruct

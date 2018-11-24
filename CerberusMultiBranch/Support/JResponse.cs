@@ -17,6 +17,8 @@ namespace CerberusMultiBranch.Support
 
         public string Extra { get; set; }
 
+        public object JProperty { get; set; }
+
         public int Code { get; set; }
     }
 }

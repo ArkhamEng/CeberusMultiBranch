@@ -20,41 +20,41 @@
             <div class="panel-body">
                 @if (Model.Images != null && Model.Images.Count > 0)
                 {
-                    <div id="divCarousel" class="carousel slide" data-ride="carousel">
-                        <div id="imgContainer" class="carousel-inner">
-                            @foreach (var file in Model.Images)
+                <div id="divCarousel" class="carousel slide" data-ride="carousel">
+                    <div id="imgContainer" class="carousel-inner">
+                        @foreach (var file in Model.Images)
                             {
                                 var imgSrc = file.Path;
                                 var a = imgIndex == Decimal.Zero ? "active" : "";
 
-                                <div id="div+@file.ProductImageId" class="item @a">
-                                    <img src="@imgSrc" style="max-height:300px" />
-                                </div>
+                            <div id="div+@file.ProductImageId" class="item @a">
+                                <img src="@imgSrc" style="max-height:300px" />
+                            </div>
                                 imgIndex++;
                             }
 
-                            @if (imgIndex == 0)
+                        @if (imgIndex == 0)
                             {
-                                <div class="item active thumbnail">
-                                    <img src="~/Content/Images/sinimagen.jpg" />
-                                </div>
+                            <div class="item active thumbnail">
+                                <img src="~/Content/Images/sinimagen.jpg" />
+                            </div>
                             }
-                        </div>
-
-                        <a class="left carousel-control" href="#divCarousel" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left"></span>
-                            <span class="sr-only">Previous</span>
-                        </a>
-
-                        <a class="right carousel-control" href="#divCarousel" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                            <span class="sr-only">Next</span>
-                        </a>
                     </div>
+
+                    <a class="left carousel-control" href="#divCarousel" data-slide="prev">
+                        <span class="glyphicon glyphicon-chevron-left"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+
+                    <a class="right carousel-control" href="#divCarousel" data-slide="next">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
                 }
                 else
                 {
-                    <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
+                <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
                 }
             </div>
         </div>
@@ -68,10 +68,10 @@
                 </h4>
                 @if (Model.TradeMark != null)
                 {
-                    <h5>
-                        Por @Model.TradeMark
-                        <span class="fa fa-registered"></span>
-                    </h5>
+                <h5>
+                    Por @Model.TradeMark
+                    <span class="fa fa-registered"></span>
+                </h5>
                 }
 
                 <h4>
@@ -87,25 +87,25 @@
                 </h5>
                 @if (User.IsInRole("Vendedor"))
                 {
-                    <div class="col-md-8 row input-group">
-                        @Html.TextBox("txtDetailQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
-                        <span class="input-group-btn">
-                            @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
+                <div class="col-md-8 row input-group">
+                    @Html.TextBox("txtDetailQuantity", "", htmlAttributes: new { @class = "form-control", type = "number", min = "1" })
+                    <span class="input-group-btn">
+                        @if (Model.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
                             {
-                                <button class="btn btn-warning" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.StorePrice')">
-                                    <span class="fa fa-cart-plus"></span>
-                                    Agregar al carrito
-                                </button>
+                            <button class="btn btn-warning" onclick="AddToCart('@Model.ProductId','@Model.Quantity','@Model.StorePrice')">
+                                <span class="fa fa-cart-plus"></span>
+                                Agregar al carrito
+                            </button>
                             }
                             else
                             {
-                                <button class="btn btn-primary" onclick="AddToCart('@Model.ProductId','@Model.Quantity')">
-                                    <span class="fa fa-cart-plus"></span>
-                                    Agregar al carrito
-                                </button>
+                            <button class="btn btn-primary" onclick="AddToCart('@Model.ProductId','@Model.Quantity')">
+                                <span class="fa fa-cart-plus"></span>
+                                Agregar al carrito
+                            </button>
                             }
-                        </span>
-                    </div>
+                    </span>
+                </div>
                 }
             </div>
         </div>
@@ -119,60 +119,49 @@
 
             <div class="tab-content">
                 <div id="information" class="tab-pane fade in active">
-                    <div class="panel panel-danger">
-                        <div class="panel-body text-uppercase">
-                            <table class="table table-condensed">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <table class="table table-bordered small">
                                 <thead>
                                     <tr>
-                                        <th>@Html.DisplayName("Sucursal")</th>
-                                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
-                                        <th></th>
-                                        <th>@Html.DisplayName("Sucursal")</th>
-                                        <th style="text-align:center">@Html.DisplayName("Disponibles")</th>
+                                        <th>
+                                            @Html.DisplayName("Sucursal")
+                                        </th>
+                                        <th style="text-align:center">
+                                            @Html.DisplayName("Disponibles")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Precio Mostrador")
+                                        </th>
                                         <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @{
-                                        int rows = (Model.Branches.Count % 2 == 0) ? (Model.Branches.Count / 2) : ((Model.Branches.Count + 1) / 2);
-                                        var limit = 2;
-                                        var begin = 0;
-                                    }
-
-                                    @for (int i = 0; i < rows; i++)
+                                    @foreach (var item in Model.Branches.Where(b=> b.BranchId != User.Identity.GetBranchId()))
                                     {
-                                        <tr>
-                                            @for (int j = begin; j < limit; j++)
-                                            {
-                                                if (j < Model.Branches.Count)
-                                                {
-                                                    <td class="col-md-4 danger">
-                                                        @Html.DisplayFor(modelItem => Model.Branches[j].Name)
-                                                    </td>
-                                                    <td class="col-md-2" align="center">
-                                                        <span class="badge bg-danger"> @Model.Branches[j].Quantity</span>
-                                                    </td>
-                                                    <td>
-                                                        @if (User.IsInRole("Supervisor") && Model.Quantity > 0 && Model.Branches[j].BranchId != User.Identity.GetBranchId())
-                                                        {
-                                                            <button class="btn btn-danger btn-xs" title="Enviar transferencia"
-                                                                    onclick="BeginTransference('@Model.Branches[j].BranchId','@Model.ProductId')">
-                                                                <span class="fa fa-send"></span>
-                                                            </button>
-                                                        }
-                                                    </td>
-                                                }
-                                                else
-                                                {
-                                                    <td class="col-md-4 danger"></td>
-                                                    <td class="col-md-2"></td>
-                                                    <td />
-                                                }
-                                            }
-                                        </tr>
-                                        limit = limit + 2;
-                                        begin = begin + 2;
+                                        var mod = Model.BranchProducts.FirstOrDefault(b => b.BranchId == item.BranchId);
+                                        var stock = mod != null ? mod.Stock.ToString() : "No Configurado";
+                                        var price = mod != null ? mod.StorePrice.ToMoney() : "No Configurado";
+                                        var transDisabled = !(Model.Quantity > Cons.Zero && User.IsInRole("Supervisor"));
 
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(m => item.Name)
+                                            </td>
+                                            <td class="text-center">
+                                                @Html.DisplayFor(m => stock)
+                                            </td>
+                                            <td class="text-center">
+                                                @Html.DisplayFor(m => price)
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm pull-right" title="Enviar transferencia" disabled="@transDisabled"
+                                                        onclick="BeginTransference('@item.BranchId','@Model.ProductId')">
+                                                    <span class="fa fa-send"></span>
+                                                    Transferir
+                                                </button>
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
@@ -259,29 +248,29 @@
 
     });
 
-    function BeginTransference(branchId, productId)
-    {
+    function BeginTransference(branchId, productId) {
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("BeginTransference")', { destBranchId: branchId, productId: productId }, function (response)
-        {
-            HideModal(function ()
-            {
+        ExecuteAjax('@Url.Action("BeginTransference","Products")', { destBranchId: branchId, productId: productId }, function (response) {
+            HideModal(function () {
                 ShowModal(response, "static");
             }, true);
         });
 
     }
 
-    function AddToCart(productId, available) {
+    function AddToCart(productId, available) 
+    {
         quantity = parseFloat($("#txtQuantity").val());
 
         var data = { productId: productId, quantity: $("#txtDetailQuantity").val() }
 
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("AddToCart", "Sales")', data, function (response) {
-            HideModal(function () {
+        ExecuteAjax('@Url.Action("AddToCart", "Sales")', data, function (response) 
+        {
+            HideModal(function () 
+            {
                 var rowId = '#prodRow' + productId;
                 $(rowId).addClass('info');
                 CheckCart();
@@ -289,4 +278,5 @@
             }, true);
         });
     }
+
 </script>

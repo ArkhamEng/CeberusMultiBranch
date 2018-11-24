@@ -75,6 +75,129 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
+        [HttpPost]
+        [CustomAuthorize(Roles = "Supervisor")]
+        public JsonResult Transfer(int detsBranchId, int productId, double quantity)
+        {
+
+            var branchId = User.Identity.GetBranchId();
+
+            var orBP = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
+                FirstOrDefault(br => br.BranchId == branchId && br.ProductId == productId);
+
+            if (orBP.Stock < quantity)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.InvalidData,
+                    Header = "Imposible realizar la transferencia",
+                    Body = "La cantidad solicitada es mayor a la disponible en sucursal"
+                });
+            }
+
+            //Obtengo la relacion producto sucursal destino
+            var destBp = db.BranchProducts.Include(b => b.Branch).
+                        FirstOrDefault(b => b.BranchId == detsBranchId && b.ProductId == productId);
+
+            try
+            {
+                //si no existe la creo de lo contrario la actualizo
+                if (destBp == null)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Header = "Imposible realizar la transferencia",
+                        Body = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
+                    });
+                }
+                else
+                {
+                    destBp.LastStock = destBp.Stock;
+                    destBp.Stock += quantity;
+                    destBp.UpdDate = DateTime.Now;
+                    destBp.UpdUser = User.Identity.Name;
+                }
+
+                db.Entry(destBp).Property(p => p.LastStock).IsModified = true;
+                db.Entry(destBp).Property(p => p.Stock).IsModified = true;
+                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
+
+                //agrego los movimientos de Stock en la sucursal destino
+                StockMovement smD = new StockMovement
+                {
+                    BranchId = destBp.BranchId,
+                    ProductId = destBp.ProductId,
+                    Comment = "Transferencia de sucursal " + orBP.Branch.Name,
+                    MovementType = MovementType.Entry,
+                    MovementDate = DateTime.Now,
+                    User = User.Identity.Name,
+                    Quantity = quantity
+                };
+
+                db.StockMovements.Add(smD);
+
+                //agrego los movimientos de Stock en la sucursal origen
+                StockMovement smO = new StockMovement
+                {
+                    BranchId = orBP.BranchId,
+                    ProductId = orBP.ProductId,
+                    Comment = "Transferencia a sucursal " + destBp.Branch.Name,
+                    MovementType = MovementType.Exit,
+                    MovementDate = DateTime.Now,
+                    User = User.Identity.Name,
+                    Quantity = quantity
+                };
+
+                db.StockMovements.Add(smO);
+
+                //actualizo stock en sucursal de origen
+                orBP.LastStock = orBP.Stock;
+                orBP.Stock -= quantity;
+                orBP.UpdUser = User.Identity.Name;
+                orBP.UpdDate = DateTime.Now.ToLocal();
+
+                db.Entry(orBP).Property(p => p.LastStock).IsModified = true;
+                db.Entry(orBP).Property(p => p.Stock).IsModified = true;
+                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
+                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
+
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Transferencia exitosa!",
+                    Body = "Se transfirieron " + quantity + " unidades del producto " + orBP.Product.Code.ToUpper() + " a la sucursale " + destBp.Branch.Name.ToUpper()
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al transferir",
+                    Body = "Ocurrio un error inesperado al transferir, detalle:" + ex.Message
+                });
+            }
+        }
+
+
+        public ActionResult GetProductImages(int id)
+        {
+           var list =  db.ProductImages.Where(pi => pi.ProductId == id).Select(pi => pi.Path).ToList();
+
+            if (list.Count == Cons.Zero)
+                list.Add(Cons.NoImagePath);
+
+            return PartialView("_ProductImages", list);
+        }
+
 
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor")]
@@ -100,7 +223,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             return PartialView("_Movement", branchP);
         }
-
 
 
 
@@ -248,117 +370,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         }
 
-        [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public JsonResult Transfer(int detsBranchId, int productId, double quantity)
-        {
-       
-            var branchId = User.Identity.GetBranchId();
-
-            var orBP = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
-                FirstOrDefault(br => br.BranchId == branchId && br.ProductId == productId);
-
-            if (orBP.Stock < quantity)
-            {
-                return Json(new JResponse
-                {
-                    Result =Cons.Responses.Warning,
-                    Code = Cons.Responses.Codes.InvalidData,
-                    Header = "Imposible realizar la transferencia",
-                    Body = "La cantidad solicitada es mayor a la disponible en sucursal"
-                });
-            }
-
-            //Obtengo la relacion producto sucursal destino
-            var destBp = db.BranchProducts.Include(b=> b.Branch).
-                        FirstOrDefault(b=> b.BranchId == detsBranchId && b.ProductId == productId);
-
-            try
-            {
-                //si no existe la creo de lo contrario la actualizo
-                if (destBp == null)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Header = "Imposible realizar la transferencia",
-                        Body = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
-                    });
-                }
-                else
-                {
-                    destBp.LastStock = destBp.Stock;
-                    destBp.Stock += quantity;
-                    destBp.UpdDate = DateTime.Now;
-                    destBp.UpdUser = User.Identity.Name;
-                }
-
-                db.Entry(destBp).Property(p => p.LastStock).IsModified = true;
-                db.Entry(destBp).Property(p => p.Stock).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-
-                //agrego los movimientos de Stock en la sucursal destino
-                StockMovement smD = new StockMovement
-                {
-                    BranchId = destBp.BranchId,
-                    ProductId = destBp.ProductId,
-                    Comment = "Transferencia de sucursal "+orBP.Branch.Name,
-                    MovementType = MovementType.Entry,
-                    MovementDate = DateTime.Now,
-                    User = User.Identity.Name,
-                    Quantity = quantity
-                };
-
-                db.StockMovements.Add(smD);
-
-                //agrego los movimientos de Stock en la sucursal origen
-                StockMovement smO = new StockMovement
-                {
-                    BranchId     = orBP.BranchId,
-                    ProductId    = orBP.ProductId,
-                    Comment      = "Transferencia a sucursal "+destBp.Branch.Name,
-                    MovementType = MovementType.Exit,
-                    MovementDate = DateTime.Now,
-                    User         = User.Identity.Name,
-                    Quantity     = quantity
-                };
-
-                db.StockMovements.Add(smO);
-
-                //actualizo stock en sucursal de origen
-                orBP.LastStock  = orBP.Stock;
-                orBP.Stock     -= quantity;
-                orBP.UpdUser    = User.Identity.Name;
-                orBP.UpdDate    = DateTime.Now.ToLocal();
-
-                db.Entry(orBP).Property(p => p.LastStock).IsModified = true;
-                db.Entry(orBP).Property(p => p.Stock).IsModified = true;
-                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
-
-                db.SaveChanges();
-
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Success,
-                    Code = Cons.Responses.Codes.Success,
-                    Header = "Transferencia exitosa!",
-                    Body = "Se transfirieron "+quantity+" unidades del producto " + orBP.Product.Code.ToUpper()+" a la sucursale "+destBp.Branch.Name.ToUpper()
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al transferir",
-                    Body = "Ocurrio un error inesperado al transferir, detalle:"+ ex.Message
-                });
-            }
-        }
+   
 
         [HttpPost]
         public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid)
@@ -444,7 +456,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 arr = name.Trim().Split(' ');
 
                 if (arr.Length == Cons.One)
-                    code = arr.FirstOrDefault();
+                    arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", ""); 
             }
 
             List<Product> products = new List<Product>();

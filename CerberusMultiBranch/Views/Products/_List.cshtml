@@ -31,10 +31,11 @@
                         <div class='@imgC' style="vertical-align:central">
                             @if (prod.Images.Count > 0)
                             {
-                                <img src="@prod.Images.First().Path" class="img-responsive img-rounded" style="max-height:150px" />
+                                    <img src="@prod.Images.First().Path" class="img-responsive img-rounded" onmouseover="SetPointer(this)" style="max-height:150px"
+                                         title="Haz click sobre la image para ver la galería" onclick="ShowImages('@prod.ProductId')" />
                             }
                             else
-                            { 
+                            {
                                 <img src="~/Content/Images/sinimagen.jpg" class="img-responsive" />
                             }
                         </div>
@@ -219,7 +220,8 @@
         });
     }
 
-    function Delete() {
+    function Delete()
+    {
         ShowLoading();
         ExecuteAjax('@Url.Action("Delete")', { id: $("#transId").val() }, function (response) {
             HideLoading();
@@ -254,5 +256,15 @@
         });
     }
 
+    function ShowImages(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("GetProductImages","Products")', { id: id }, function (response) {
+            HideLoading(function () {
+                ShowModal(response,true,'lg');
+            });
+        });
+    }
 
 </script>

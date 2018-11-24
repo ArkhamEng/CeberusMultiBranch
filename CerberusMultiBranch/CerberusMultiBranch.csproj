@@ -975,6 +975,7 @@
     <Content Include="Views\MakesAndModels\_CarMakeList.cshtml" />
     <Content Include="Views\MakesAndModels\_CarMakeEdition.cshtml" />
     <Content Include="Views\MakesAndModels\_CarModelEdition.cshtml" />
+    <Content Include="Views\Products\_ProductImages.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
