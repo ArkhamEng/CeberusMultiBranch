@@ -124,12 +124,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             }
         }
 
-        public Sale()
+        public Sale():base()
         {
             this.SaleDetails = new List<SaleDetail>();
             this.TransactionDate = DateTime.Now.ToLocal();
-            this.UpdUser = HttpContext.Current.User.Identity.Name;
-            this.UpdDate = DateTime.Now.ToLocal();
         }
     }
 

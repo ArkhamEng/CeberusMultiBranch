@@ -2,7 +2,7 @@
 @using CerberusMultiBranch.Support
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
-<table class="table table-striped small">
+<table id="tbPurchaseDetails" class="table dt-responsive nowrap table-bordered small"  style="width:100%">
     <thead>
         <tr>
             <th class="col-md-1"></th>
@@ -46,7 +46,7 @@
                     @Html.DisplayFor(modelItem => item.Product.Name)<br />
                 </td>
                 <td>
-                   @Html.DisplayFor(m=> item.Price)
+                   @Html.DisplayFor(m => item.Price)
                 </td>
                 <td align="center">
                     @Html.DisplayFor(modelItem => item.Quantity)
@@ -67,39 +67,40 @@
 </table>
 
 
-
 <script>
     $(document).ready(function ()
     {
+
+        Paginate("#tbPurchaseDetails", 20, true, null, false);
+
         if ('@Model.Count' > 0)
             $("#btnCompleate").show();
         else
             $("#btnCompleate").hide();
 
 
+        $("#divTotalAmount").text('@Model.First().Purchase.TotalAmount.ToMoney()');
 
+        $("#divTaxedAmount").text('@Model.First().Purchase.TotalTaxedAmount.ToMoney()');
 
-        $("#divTotalAmount").text('@Model.Sum(d => d.Amount).ToMoney()');
-
-        $("#divTaxedAmount").text('@Model.Sum(d => d.TaxedAmount).ToMoney()');
-
+        $("#divFinalAmount").text('@Model.First().Purchase.FinalAmount.ToMoney()');
 
     });
 
     function RemoveDetail(tid, pid)
     {
-        ShowLoading();
+        ShowLoading('static');
         var param = { transactionId: tid, productId: pid };
 
-        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view)
-        {
-            $("#divDetails").html(view);
-            HideLoading();
+        ExecuteAjax('@Url.Action("RemoveDetail", "Purchases")', param, function (view) {
+            HideLoading(function () {
+                $("#divDetails").html(view);
+            });
+
         });
     }
 
-    function LookFor()
-    {
+    function LookFor() {
         //este metodo es llamado por default cuando se termina el copiado
     }
 

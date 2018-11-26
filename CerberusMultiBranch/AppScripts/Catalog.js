@@ -48,13 +48,34 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
     }
     var form = "#SaveForm";
 
-    ExecuteAjax(url, param, function (response) {
-        HideLoading(function () {
-            if (!$.isPlainObject(response)) {
-                ShowModal(response, 'static', 'lg');
+    ExecuteAjax(url, param, function (response)
+    {
+        HideLoading(function ()
+        {
+            if (!$.isPlainObject(response))
+            {
+                //esto se debe hacer siempre que se oculte la ventana
+                var onHidden = function ()
+                {
+                    //si el se tiene un id y no hay callback de deshabilitación remuevo el bloqueo
+                    if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined')
+                    {
+                        ExecuteAjax(unlockUrl, { id: param.id }, function (response)
+                        {
+                            ShowNotify(response.Header, response.Result, response.Body, 3000);
+                        });
+                    }
+                    //si hay callback al cerrar lo ejecuto
+                    if (CloseCallBack != null)
+                        CloseCallBack();
+                };
+                ShowModal(response, 'static', 'lg', onHidden);
+
+
 
                 //si se recibe un id
-                if (typeof (param.id) != 'undefined') {
+                if (typeof (param.id) != 'undefined')
+                {
                     //si se recibe un callback de deshabilitación.. entro a modo visualización
                     if (typeof (disableCallBack) != 'undefined')
                         disableCallBack();
@@ -67,18 +88,20 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                 SubmitPerson(OnCompleate, form, personIdFileld);
 
                 //evento del boton cancel
-                $("#EditCancel").off('click').click(function (e) {
-                    HideModal(function () {
-                        //si el se tiene un id y no hay callback de deshabilitación remuevo el bloqueo
-                        if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined') {
-                            ExecuteAjax(unlockUrl, { id: param.id }, function (response) {
-                                ShowNotify(response.Header, response.Result, response.Body, 3000);
-                            });
-                        }
-                        //si hay callback al cerrar lo ejecuto
-                        if (CloseCallBack != null)
-                            CloseCallBack();
-                    }, true);
+                $("#EditCancel").off('click').click(function (e)
+                {
+                    HideModal(function ()
+                    {
+                        onHidden();
+                    }, true)
+                });
+
+                $("#btnCloseEdit").off('click').click(function (e)
+                {
+                    HideModal(function ()
+                    {
+                        onHidden();
+                    }, true)
                 });
             }
             else

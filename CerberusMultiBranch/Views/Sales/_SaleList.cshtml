@@ -1,4 +1,4 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Sale>
+﻿@model IEnumerable<Sale>
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
@@ -10,6 +10,9 @@
             </td>
             <td>
                 @Html.DisplayName("Tipo")
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.Branch.Name)
             </td>
             <th>
                 @Html.DisplayNameFor(model => model.Folio)
@@ -59,6 +62,9 @@
                 </td>
 
                 <td>
+                    @Html.DisplayUpperFor(m => item.Branch.Name)
+                </td>
+                <td>
                     @Html.DisplayUpperFor(m => item.Folio)
                 </td>
                 <td>
@@ -100,12 +106,12 @@
                     </button>
                 </td>
             </tr>
-                        }
+        }
     </tbody>
     @{
         var totalCommision = Model.Where(sale=> sale.Status == TranStatus.Compleated).Sum(sale => sale.ComAmount);
-        var totalAmount = Model.Sum(sale => sale.TotalTaxedAmount);
-        var payed = Model.Sum(sale => sale.SalePayments.Sum(s => s.Amount));
+        var totalAmount = Model.Where(sale => sale.Status != TranStatus.Canceled && sale.Status != TranStatus.PreCancel).Sum(sale => sale.TotalTaxedAmount);
+        var payed = Model.Where(sale => sale.Status != TranStatus.Canceled && sale.Status != TranStatus.PreCancel).Sum(sale => sale.SalePayments.Sum(s => s.Amount));
     }
 
 </table>
@@ -118,7 +124,7 @@
 
         var printSalesOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Ventas"))', Columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] };
 
-        Paginate("#tbSales", 10, true, "#txtFilter", false, "#tbButtonsSales", printSalesOp);
+        Paginate("#tbSales", 10, true, null, false, "#tbButtonsSales", printSalesOp);
 
         var tAmount = "Total Vendido: " + GetCurrency(parseFloat('@totalAmount'));
 

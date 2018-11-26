@@ -363,6 +363,10 @@
     <Compile Include="Migrations\201811202235096_RequiredMakeModelFields1.Designer.cs">
       <DependentUpon>201811202235096_RequiredMakeModelFields1.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811241956331_InsPropertiesTransaction.cs" />
+    <Compile Include="Migrations\201811241956331_InsPropertiesTransaction.Designer.cs">
+      <DependentUpon>201811241956331_InsPropertiesTransaction.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -872,7 +876,7 @@
     <Content Include="Views\Configuration\_Branches.cshtml" />
     <Content Include="Views\Shared\_BranchSelector.cshtml" />
     <Content Include="Views\Purchases\Detail.cshtml" />
-    <Content Include="Views\Purchases\History.cshtml" />
+    <Content Include="Views\Purchases\Report.cshtml" />
     <Content Include="Views\Purchases\_Details.cshtml" />
     <Content Include="Views\Products\_ProductList.cshtml" />
     <Content Include="Views\Products\_StockInBranches.cshtml" />
@@ -976,6 +980,8 @@
     <Content Include="Views\MakesAndModels\_CarMakeEdition.cshtml" />
     <Content Include="Views\MakesAndModels\_CarModelEdition.cshtml" />
     <Content Include="Views\Products\_ProductImages.cshtml" />
+    <Content Include="Views\Products\_ProductMovement.cshtml" />
+    <Content Include="Views\Purchases\_CancelPurchase.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1111,6 +1117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811202235096_RequiredMakeModelFields1.resx">
       <DependentUpon>201811202235096_RequiredMakeModelFields1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811241956331_InsPropertiesTransaction.resx">
+      <DependentUpon>201811241956331_InsPropertiesTransaction.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

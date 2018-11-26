@@ -15,9 +15,14 @@
 
 
     <div class="panel panel-primary">
-        <div class="panel-heading text-strong">
-            <span class="fa fa-user"></span>
-            Datos de cliente
+        <div class="panel-heading">
+            <button type="button" id="btnCloseEdit" class="close">
+                <span class="fa fa-times"></span>
+            </button>
+            <h4 class="panel-title">
+                <span class="fa fa-user"></span>
+                Datos de cliente
+            </h4>
         </div>
         <div class="panel-body  small">
             <ul class="nav nav-tabs">
@@ -137,32 +142,32 @@
                 {
                             @Html.HiddenFor(model => Address.AddressId)
                             @Html.HiddenFor(model => Address.ClientId)
-                        <div class="form-group col-md-5">
-                            @Html.LabelFor(model => Address.City.StateId, htmlAttributes: new { @class = "control-label" })
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-map"></i></span>
-                                @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                            <div class="form-group col-md-5">
+                                @Html.LabelFor(model => Address.City.StateId, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                                    @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                                </div>
                             </div>
-                        </div>
 
 
-                        <div class="form-group  col-md-7">
-                            @Html.LabelFor(model => Address.CityId, htmlAttributes: new { @class = "control-label" })
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-map-o"></i></span>
-                                @Html.DropDownListFor(mode => Address.CityId, Model.Cities, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                            <div class="form-group  col-md-7">
+                                @Html.LabelFor(model => Address.CityId, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-o"></i></span>
+                                    @Html.DropDownListFor(mode => Address.CityId, Model.Cities, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.CityId, "", new { @class = "text-danger" })
                             </div>
-                            @Html.ValidationMessageFor(model => Address.CityId, "", new { @class = "text-danger" })
-                        </div>
 
-                        <div class="form-group col-md-6">
-                            @Html.LabelFor(model => Address.Location, htmlAttributes: new { @class = "control-label" })
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
-                                @Html.EditorFor(model => Address.Location, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                            <div class="form-group col-md-6">
+                                @Html.LabelFor(model => Address.Location, htmlAttributes: new { @class = "control-label" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-map-marker"></i></span>
+                                    @Html.EditorFor(model => Address.Location, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                </div>
+                                @Html.ValidationMessageFor(model => Address.Location, "", new { @class = "text-danger" })
                             </div>
-                            @Html.ValidationMessageFor(model => Address.Location, "", new { @class = "text-danger" })
-                        </div>
 
                             <div class="form-group col-md-6">
                                 @Html.LabelFor(model => Address.Street, htmlAttributes: new { @class = "control-label" })
@@ -249,19 +254,17 @@
         </div>
 
     </div>
-    
+
 
 }
 
 
 <script>
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetCascade("#StateId", "#Address_CityId", '@Url.Action("GetCities", "Json")');
 
-        $("#Name").keyup(function ()
-        {
+        $("#Name").keyup(function () {
             $("#BusinessName").val($("#Name").val());
             $("#LegalRepresentative").val($("#Name").val());
         });
@@ -273,7 +276,7 @@
         $("#FTR").mask("aaa*99999****");
     });
 
- 
+
 </script>
 
 

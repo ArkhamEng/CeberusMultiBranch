@@ -5,7 +5,7 @@
 }
 
 <div class="panel panel-danger panel-group">
-    <div class="panel-heading">
+    <div id="divProductDetailHeading" class="panel-heading">
         <button type="button" class="close" onclick="HideModal(null,true)">
             <span class="fa fa-times"></span>
         </button>
@@ -241,17 +241,22 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#txtDetailQuantity").val(1);
 
         Paginate("#tbCompatibilities", 3)
 
+        $("#divProductDetailHeading").draggable();
+
     });
 
-    function BeginTransference(branchId, productId) {
+    function BeginTransference(branchId, productId)
+    {
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("BeginTransference","Products")', { destBranchId: branchId, productId: productId }, function (response) {
+        ExecuteAjax('@Url.Action("BeginTransference","Products")', { destBranchId: branchId, productId: productId }, function (response)
+        {
             HideModal(function () {
                 ShowModal(response, "static");
             }, true);

@@ -119,7 +119,7 @@
                                 @Html.Label("Monto Final", htmlAttributes: new { @class = "control-label small" })
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                                    <div class="form-control input-sm">
+                                    <div class="form-control input-sm" id="divFinalAmount">
                                         @Model.FinalAmount.ToMoney()
                                     </div>
                                 </div>
@@ -129,7 +129,7 @@
                     <div class="panel-footer">
 
                         <button type="button" class="btn btn-primary" title="Nueva búsqueda"
-                                onclick="ShowLoading(); window.location='@Url.Action("History")'">
+                                onclick="ShowLoading(); window.location='@Url.Action("Report","Purchases")'">
                             <span class="fa fa-backward"></span>
                             Volver
                         </button>
@@ -144,7 +144,7 @@
                             Agregar
                         </button>
 
-                        <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="Cancel()">
+                        <button id="btnCancel" class="btn btn-danger pull-right" type="button" onclick="ShowCancel()">
                             <span class="glyphicon glyphicon-remove"></span>
                             Cancelar
                         </button>
@@ -152,7 +152,7 @@
                 </div>
                 @Html.HiddenFor(model => model.TotalAmount)
                 <div class="panel panel-default">
-                    <div id="divDetails" class="panel-body">
+                    <div id="divDetails" class="panel-body  dtContainer">
                         @Html.Partial("_Details", Model.PurchaseDetails)
                     </div>
                 </div>
@@ -163,7 +163,7 @@
     {
         <div id="tabPayments" class="tab-pane fade">
             <div class="panel panel-danger">
-                <div id="divPurchasePayments" class="panel-body">
+                <div id="divPurchasePayments" class="panel-body dtContainer">
                     @Html.Partial("_PurchasePayments", Model.PurchasePayments)
                 </div>
             </div>
@@ -172,7 +172,7 @@
 
 </div>
 
-@Html.Partial("_Cancelation")
+
 
 <div id="divAdd"></div>
 
@@ -185,15 +185,18 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
 
         $("#btnNewSearch").hide();
 
-        $("#spShowQuick").click(function () {
+        $("#spShowQuick").click(function ()
+        {
             $("#ModalExternalProduct").modal('show');
         });
 
-        $("#btnCompleate").click(function () {
+        $("#btnCompleate").click(function ()
+        {
             ShowConfirm("Terminar e inventariar?", "Estas seguro que quieres inventariar esta compra?", 'static', SubmitCompleate);
         });
 
@@ -229,43 +232,23 @@
 
     function SubmitCompleate()
     {
-        ShowLoading();
+        ShowLoading('static');
 
         ExecuteAjax('@Url.Action("Compleate")', { purchaseId: $("#PurchaseId").val() }, function (response)
         {
-            HideLoading();
-            if (response.Result != 'OK')
-                ShowMessage(response.Header, response.Message, 'warning', true);
-            else
-                window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
-        });
-    }
-
-    function Cancel()
-    {
-        $('#ModalCancel').modal('show');
-    }
-
-    function BeginCancel()
-    {
-        $("#ModalCancel").off("hidden.bs.modal").on("hidden.bs.modal", function ()
-        {
-            ShowLoading();
-
-            var param = { PurchaseId: $("#PurchaseId").val(), comment: $("#txtComment").val() }
-
-            ExecuteAjax('@Url.Action("Cancel","Purchases")', param, function (j)
+            HideLoading(function ()
             {
-                if (j.Result = 'OK')
-                    location.reload(true);
-                else
-                    ShowMessage(j.Result, j.Message, 'warning');
+                window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
             });
         });
-
-        $("#ModalCancel").modal("hide");
-
     }
+
+    function ShowCancel()
+    {
+        BeginCancelPurchase('@Model.PurchaseId', function () { window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})'; });
+    }
+
+   
 
 </script>
 

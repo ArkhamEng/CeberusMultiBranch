@@ -30,4 +30,30 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [DataType(DataType.Currency)]
         public double PaymentCreditNote { get; set; }
     }
+
+
+    public class PurchaseCancelViewModel
+    {
+        public int PurchaseCancelId { get; set; }
+
+        [Display(Name = "Folio de venta")]
+        public string PurchaseBill { get; set; }
+
+        [Required(ErrorMessage = "Debes agregar un comentario")]
+        [Display(Name = "Comentario")]
+        public string CancelComment { get; set; }
+
+
+        [Display(Name = "Pagos Efectivo")]
+        [DataType(DataType.Currency)]
+        public double PaymentCash { get; set; }
+
+        [Display(Name = "Pagos Tarjeta")]
+        [DataType(DataType.Currency)]
+        public double PaymentCard { get; set; }
+
+        [Display(Name = "Pagos Vales")]
+        [DataType(DataType.Currency)]
+        public double PaymentCreditNote { get; set; }
+    }
 }

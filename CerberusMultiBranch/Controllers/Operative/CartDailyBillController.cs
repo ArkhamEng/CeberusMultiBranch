@@ -490,8 +490,23 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
+
+
+                if(!User.IsCashRegisterOpen())
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Header = "Caja Cerrada",
+                        Body = "No hay ninguna caja abierta en la sucursa, antes de vender la caja debe ser abierta",
+                        Code = Cons.Responses.Codes.ConditionMissing
+                    });
+                }
+
                 var userId = User.Identity.GetUserId();
                 var branchId = User.Identity.GetBranchId();
+
+                
 
                 var cartItems = GetCart(userId, branchId);
 
@@ -513,7 +528,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var amount = cartItems.Sum(i => i.TaxedAmount);
 
-                int days = 30;
+                int days = Cons.DaysToCancel;
 
                 //validaciones de crédito
                 if (type == TransactionType.Credito)
@@ -716,7 +731,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.TotalTaxedAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
 
                 //Monto final (si hay descuentos varia del anterior)
-                sale.FinalAmount = sale.SaleDetails.Sum(d => d.Amount).RoundMoney();
+                sale.FinalAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
 
                 //obtengo la utima venta para generar unel folio siguiente
                 var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&

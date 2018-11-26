@@ -72,22 +72,4 @@
             $("#divClients").html(view);
         });
     }
-
-    $(document).keydown(function (e)
-    {
-        if (e.which == 13 || (e.altKey && e.which == 66))
-        {
-            $("#btnSearch").click();
-        }
-
-        if (e.altKey && e.keyCode == 76)
-        {
-            $("#btnClear").click();
-        }
-        if (e.altKey && e.keyCode == 78)
-        {
-            $("#btnCreate").click();
-        }
-    });
-
 </script>

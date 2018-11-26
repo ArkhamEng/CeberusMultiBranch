@@ -47,7 +47,7 @@
     <label id="uplPicture" class="btn btn-primary">
         <span class="fa fa-upload"></span>
         Agregar Imagen al producto
-        <input type="file" id="imgUploader" onchange="ImageLoaded()" style="display: none;">
+        <input type="file" id="imgUploader" onchange="ImageLoaded()" style="display: none;" accept="image/*">
     </label>
 </div>
 <script>
@@ -56,7 +56,8 @@
     });
 
     function DeleteImage(id) {
-        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response) {
+        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response)
+        {
             $("#divImages").html(response);
         });
     }

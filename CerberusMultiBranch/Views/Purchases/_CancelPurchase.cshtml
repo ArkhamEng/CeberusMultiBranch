@@ -1,0 +1,116 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.PurchaseCancelViewModel
+@using CerberusMultiBranch.Support
+
+@Scripts.Render("~/bundles/jqueryval")
+
+
+<form id="CancelPurchaseForm">
+    <div class="panel panel-danger">
+        <div class="panel-heading">
+            <button type="button" class="close" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+            </button>
+            <h2 class="panel-title">
+                <span class="fa fa-shopping-basket"></span>
+                Cancelación de Compra  <a class="pull-rigth">@Model.PurchaseBill</a>
+            </h2>
+        </div>
+        <div class="panel-body">
+
+            <table class="panel panel-default table table-bordered small">
+                <thead class="panel-heading">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(m => m.PaymentCash)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(m => m.PaymentCard)
+                        </th>
+                        @*<th>
+                            @Html.DisplayNameFor(m => m.PaymentCreditNote)
+                        </th>*@
+                    </tr>
+                </thead>
+                <tbody class="panel-body">
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => m.PaymentCash)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => m.PaymentCard)
+                        </td>
+                        @*<td>
+                            @Html.DisplayFor(m => m.PaymentCreditNote)
+                        </td>*@
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="col-md-12 form-group row">
+                @Html.LabelFor(model => model.CancelComment, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
+                    @Html.TextAreaFor(model => model.CancelComment, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                </div>
+                @Html.ValidationMessageFor(model => model.CancelComment, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <button class="btn btn-primary btn-sm" type="button" id="btnConfirmCancel" title="Confirmar cancelación" onclick="CancelPurchase()">
+                    <span class="fa fa-trash-o"></span>
+                    Cancelar Compra
+                </button>
+
+                <button class="btn btn-danger btn-sm" type="button" title="cerra ventana" onclick="HideModal(null,true)">
+                    <span class="fa fa-times"></span>
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+@Html.HiddenFor(model => model.PurchaseCancelId)
+
+<script>
+    $(document).ready(function ()
+    {
+        var form = $("#CancelPurchaseForm");
+        form.validate();
+    });
+
+
+    var OnCancelCompleated = 'undefined';
+
+    //Cancela la venta
+    function CancelPurchase()
+    {
+        var form = $("#CancelPurchaseForm");
+
+        if (!form.valid())
+        {
+            ShowNotify("Faltan datos", "info", "Debes agregar un comentario para cancelar", 3000);
+            return;
+        }
+
+        HideModal(function ()
+        {
+            ShowLoading("static");
+
+            var param = { id: $("#PurchaseCancelId").val(), comment: $("#CancelComment").val() }
+
+            ExecuteAjax('@Url.Action("Cancel","Purchases")', param, function (response)
+            {
+                HideLoading(function ()
+                {
+                    ShowNotify(response.Header, response.Result, response.Body, 3000);
+
+                    if (OnCancelCompleated != 'undefined')
+                        OnCancelCompleated();
+                });
+            });
+
+        }, true);
+    }
+
+</script>

@@ -187,7 +187,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
-
+        [HttpPost]
         public ActionResult GetProductImages(int id)
         {
            var list =  db.ProductImages.Where(pi => pi.ProductId == id).Select(pi => pi.Path).ToList();
@@ -198,6 +198,42 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ProductImages", list);
         }
 
+        [HttpPost]
+        [CustomAuthorize(Roles = "Supervisor")]
+        public ActionResult GetProductMovements(int id)
+        {
+            try
+            {
+                int branchId = User.Identity.GetBranchId();
+
+                var model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m=> m.MovementDate).ToList();
+
+                if(model.Count == Cons.Zero)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Header = "Producto sin movimientos",
+                        Body = "El producto, aun no tiene movimientos registrados en esta sucursal"
+                    });
+                }
+
+
+                return PartialView("_ProductMovement", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al obtener datos",
+                    Body = "Ocurrio un error inesperado obtener los movimientos del producto"
+                });
+            }
+         
+        }
 
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor")]
@@ -445,7 +481,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_StockInBranches", branches);
         }
 
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int top = Cons.MaxProductResult)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -472,7 +508,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
                         && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
                         select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
-                        s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(400).ToList();
+                        s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(top).ToList();
             var userId = User.Identity.GetUserId();
             var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId == userId).Select(s => s.ProductId).ToArray();
 
@@ -738,10 +774,12 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     Include(p => p.PackageDetails).FirstOrDefault();
 
                 if (product.IsLocked && User.Identity.Name != product.UserLock)
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Producto bloqueado",
-                        Message = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Header = "Producto bloqueado",
+                        Body = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
                         product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
                     });
 
@@ -1335,7 +1373,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, false);
             }
 
-            return Json("OK");
+            return Json(new JResponse
+            {
+                Result = Cons.Responses.Info,
+                Code = Cons.Responses.Codes.Success,
+                Header = "Producto desbloqueado",
+                Body ="Se removio el bloque del producto"
+            });
         }
 
 
@@ -1451,31 +1495,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                         db.Entry(bp).State = EntityState.Modified;
                     }
-
-
-                    int i = Cons.Zero;
-
-                    /*
-                    //Guardado Imagenes
-                    foreach (var file in product.Files)
-                    {
-                        if (file != null)
-                        {
-                            ProductImage f = new ProductImage();
-
-                            f.Path = FileManager.SaveImage(file, product.ProductId.ToString(), ImageType.Products);
-                            f.ProductId = product.ProductId;
-                            f.Name = file.FileName;
-                            f.Type = file.ContentType;
-                            f.Size = file.ContentLength;
-
-                            db.ProductImages.Add(f);
-
-                            i++;
-                        }
-                    }*/
-
-                    //if (i > Cons.Zero)
                     db.SaveChanges();
                 }
                 catch (Exception ex)
@@ -1535,7 +1554,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al guardar los datos", Message = "Ocurrio un error al guardar la compatibilidad " + ex.Message });
+                return Json(new JResponse
+                {
+                    Header = "Error al guardar los datos",
+                    Body = "Ocurrio un error al guardar la compatibilidad " + ex.Message,
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 
@@ -1545,11 +1570,17 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             try
             {
-                var comp = db.Compatibilites.Find(yearId, productId);
+                var comp = db.Compatibilites.FirstOrDefault(c => c.CarYearId == yearId && c.ProductId == productId);
 
                 if (comp == null)
                 {
-                    return Json(new { Result = "No se encontraron datos!", Message = "la compatibilidad que se pretende eliminar ya no existe!" });
+                    return Json(new JResponse
+                    {
+                        Header = "No se encontraron datos!",
+                        Body = "la compatibilidad que se pretende eliminar ya no existe!",
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
                 }
                 else
                 {
@@ -1564,7 +1595,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al eliminar", Message = "Ocurrio un error al eliminar la compatibilidad " + ex.Message });
+                return Json(new JResponse
+                {
+                    Header = "Error al Eliminar",
+                    Body = "Ocurrio un error desconocido al eliminar la compatibilidad",
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 
@@ -1599,8 +1636,22 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult GetImages(int productId)
         {
-            var model = db.ProductImages.Where(pi => pi.ProductId == productId);
-            return PartialView("_ImagesLoaded", model);
+            try
+            {
+                var model = db.ProductImages.Where(pi => pi.ProductId == productId);
+                return PartialView("_ImagesLoaded", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al obtener datos",
+                    Body = "Ocurrio un error al obtener las imagenes"
+                });
+            }
+          
         }
 
         [HttpPost]
@@ -1650,19 +1701,31 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     {
                         if (bProd.Stock > Cons.Zero)
                         {
-                            return Json(new
+                            return Json(new JResponse
                             {
-                                Result = "Imposible eliminar",
-                                Message = "Esto producto tiene existencias en la sucursal " + bProd.Branch.Name
+                                Result = Cons.Responses.Warning,
+                                Code  = Cons.Responses.Codes.InvalidData,
+                                Header = "Imposible eliminar",
+                                Body = "Esto producto tiene existencias en la sucursal " + bProd.Branch.Name
                             });
                         }
                     }
 
                     //reviso si el producto ya se encuentra en alguna transacción,
                     //si es asi solo se desactiva
-                    var detail = db.SaleDetails.FirstOrDefault(td => td.ProductId == product.ProductId);
+                    var saleDetailCount = db.SaleDetails.Where(td => td.ProductId == product.ProductId).Count();
 
-                    if (detail != null)
+                    var purchaseDetailCount = db.PurchaseDetails.Where(td => td.ProductId == product.ProductId).Count();
+
+                    var response = new JResponse
+                    {
+                        Result = Cons.Responses.Success,
+                        Code = Cons.Responses.Codes.Success,
+                        Header = "Producto Eliminado",
+                        Body = "El producto ha sido eliminado peramanentemente"
+                    };
+
+                    if (saleDetailCount > Cons.Zero || purchaseDetailCount > Cons.Zero)
                     {
                         product.IsActive = false;
                         product.UpdDate = DateTime.Now.ToLocal();
@@ -1673,6 +1736,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         db.Entry(product).Property(p => p.UpdUser).IsModified = true;
 
                         db.Configuration.ValidateOnSaveEnabled = false;
+
+                        response.Header = "Producto desactivado!";
+                        response.Result = "El producto ha sido desactivado y no podrá ser usado en ninguna operación";
                     }
                     else
                     {
@@ -1691,30 +1757,44 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     db.SaveChanges();
 
-                    return Json(new { Result = "OK" });
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Success,
+                        Code = Cons.Responses.Codes.Success,
+                        Header = "Producto Desactivdao",
+                        Body ="El producto ha sido desactivado y no podra ser utiliado en ninguna operación"
+                    });
                 }
                 else
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "Datos no encontrados!",
-                        Message = "El producto seleccionado ya no esta disponible"
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Header = "Datos no encontrados!",
+                        Body = "El producto seleccionado ya no esta disponible"
                     });
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al eliminar el producto", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al eliminar",
+                    Body = "Ocurrio un error al intentar eliminar el producto"
+                });
             }
         }
 
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor")]
-        public ActionResult Activate(int id, bool isGrid)
+        public ActionResult Activate(int id)
         {
             try
             {
-                var product = db.Products.Find(id);
+                var product = db.Products.FirstOrDefault(p=> p.ProductId == id);
 
                 product.IsActive = true;
                 product.UpdDate = DateTime.Now.ToLocal();
@@ -1728,13 +1808,27 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK" });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Producto Reactivado",
+                    Body = "El Producto seleccionado ha sido reactivado"
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al eliminar el producto", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al Activar",
+                    Body = "Ocurrio un error al intentar reactivar el producto"
+                });
             }
         }
+
+
 
         [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult StockMovement()

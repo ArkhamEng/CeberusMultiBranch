@@ -36,6 +36,12 @@ namespace CerberusMultiBranch.Support
 
         public const int MaxResults  = 30000;
 
+        public const int MaxProductResult = 400;
+
+        public const int NoTopResults = 9999999;
+
+        public const int InitialRows = 100;
+
         public const int Zero = 0;
         public const int One = 1;
         public const int Two = 2;

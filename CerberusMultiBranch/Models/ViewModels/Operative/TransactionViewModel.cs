@@ -15,11 +15,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public SelectList Branches { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime? BeginDate { get; set; }
 
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd-MM-yyyy}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime? EndDate { get; set; }
 
         public ICollection<Purchase> Purchases { get; set; }
@@ -33,7 +33,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public TransactionViewModel()
         {
             BeginDate = DateTime.Now.TodayLocal();
-            EndDate = BeginDate.Value.AddDays(Cons.One);
+            EndDate = BeginDate.Value.AddHours(23);
         }
     }
 }

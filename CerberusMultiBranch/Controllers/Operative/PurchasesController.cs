@@ -25,56 +25,109 @@ namespace CerberusMultiBranch.Controllers.Operative
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        public ActionResult History()
+        public ActionResult Report()
         {
             //obtengo las sucursales configuradas para el empleado
             var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
+            model.BeginDate = null;
+            model.EndDate = null;
             model.Branches = branches.ToSelectList();
-            model.Purchases = LookFor(null, null, null, null, null, null, null, TranStatus.Reserved);
+            model.Purchases = LookFor(null, null, null, null, null, null, null, TranStatus.Reserved, Cons.InitialRows);
 
             return View(model);
         }
 
-        public ActionResult DetailOld(int id)
-        {
-            //obtengo las sucursales configuradas para el empleado
-            var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
-
-            var purchase = db.Purchases.Include(p => p.PurchaseDetails).Include(p => p.User).
-                   Include(p => p.PurchaseDetails.Select(td => td.Product.Images)).
-                   FirstOrDefault(p => p.PurchaseId == id && brancheIds.Contains(p.BranchId)
-                   && (userId == null || p.UserId == userId));
-
-            if (purchase == null)
-                return RedirectToAction("History");
-
-            return View(purchase);
-        }
 
         [HttpPost]
-        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
-            string bill, string provider, string user, TranStatus? status)
+        [CustomAuthorize(Roles = "Supervisor, Capturista")]
+        public ActionResult BeginCancel(int id)
         {
-            //si el usuario no es un supervisor, busco solo las comprar registradas por el 
-            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
+            try
+            {
+                var purchase = db.Purchases.Include(s => s.PurchasePayments).FirstOrDefault(s => s.PurchaseId == id);
 
-            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId, status);
-            return PartialView("_PurchaseList", model);
+                if (purchase == null)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Header = "Registro no encontrado",
+                        Body = "No se encontro la compra solicitada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
+
+                if (purchase.Status == TranStatus.Canceled || purchase.Status == TranStatus.PreCancel)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Header = "Compra cancelada",
+                        Body = "Esta compra ya ha sido cancelada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
+
+                var model = new PurchaseCancelViewModel
+                {
+                    PurchaseBill = purchase.Bill,
+                    PurchaseCancelId = purchase.PurchaseId,
+                    PaymentCard = purchase.PurchasePayments.Where(s => s.PaymentMethod == PaymentMethod.Tarjeta).Sum(s => s.Amount),
+                    PaymentCash = purchase.PurchasePayments.Where(s => s.PaymentMethod == PaymentMethod.Efectivo).Sum(s => s.Amount),
+                    PaymentCreditNote = purchase.PurchasePayments.Where(s => s.PaymentMethod == PaymentMethod.Vale).Sum(s => s.Amount),
+                };
+
+                return PartialView("_CancelPurchase", model);
+
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al obtener datos",
+                    Body = "Ocurrio un error inesperado al iniciar la cancelación",
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
         }
+
 
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor")]
-        public JsonResult Cancel(int transactionId, string comment)
+        public JsonResult Cancel(int id, string comment)
         {
             try
             {
                 //busco la venta a cancelar
                 var purchase = db.Purchases.Include(s => s.PurchaseDetails).
-                    FirstOrDefault(s => s.PurchaseId == transactionId);
+                    FirstOrDefault(s => s.PurchaseId == id);
+
+
+                if (purchase.Status == TranStatus.Canceled || purchase.Status == TranStatus.PreCancel)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Header = "Compra cancelada",
+                        Body = "Esta compra ya ha sido cancelada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
+
+                if (purchase.Status == TranStatus.Reserved || purchase.Status == TranStatus.Compleated) 
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Header = "Imposible cancelar",
+                        Body = "No es posible cancelar una compra inventariada",
+                        Code = Cons.Responses.Codes.RecordNotFound
+                    });
+                }
 
                 //regreso los productos al stock
                 foreach (var detail in purchase.PurchaseDetails)
@@ -83,15 +136,17 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (bp.Stock < detail.Quantity)
                     {
-                        return Json(new
+                        return Json(new JResponse
                         {
-                            Result = "Error al cancelar la compra",
-                            Message = "No hay producto suficiente para realizar la devolución"
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.RecordNotFound,
+                            Header = "Imposible cancelar",
+                            Body = "No hay suficiente producto en el inventario para realizar la cancelación"
                         });
                     }
 
                     bp.LastStock = bp.Stock;
-                    bp.Stock -= detail.Quantity;
+                    bp.Stock     -= detail.Quantity;
                     db.Entry(bp).State = EntityState.Modified;
 
                     //creo un movimiento de stock
@@ -99,11 +154,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         BranchId = bp.BranchId,
                         ProductId = bp.ProductId,
-                        MovementDate = DateTime.Now,
+                        MovementDate = DateTime.Now.ToLocal(),
                         User = User.Identity.Name,
                         MovementType = MovementType.Exit,
-                        Comment = string.Format("Cancelación de compra {0} comentarios {1}",
-                                                        purchase.Bill, comment),
+                        Comment = string.Format("Cancelación de compra: {0}", purchase.Bill, comment),
                         Quantity = detail.Quantity
                     };
 
@@ -112,31 +166,70 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
                 purchase.LastStatus = purchase.Status;
-                purchase.Status = TranStatus.Canceled;
-                purchase.UpdUser = User.Identity.Name;
-                purchase.UpdDate = DateTime.Now;
-                purchase.Comment = comment;
+                purchase.Status     = TranStatus.Canceled;
+                purchase.UpdUser    = User.Identity.Name;
+                purchase.UpdDate    = DateTime.Now.ToLocal();
+                purchase.Comment    = comment;
 
                 db.Entry(purchase).State = EntityState.Modified;
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Message = "Compra Cancelada, el producto ha sido regreado al stock" });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Cancelación exitosa!",
+                    Body = "Se ha cancelado la venta y el producto ha sido removido del inventario"
+                });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new { Result = "Error al cancelar la compra", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al cancelar",
+                    Body = "Ocurrio un error inesperado al realizar la cancelación",
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 
-        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, string userId, TranStatus? status)
+
+
+
+        [HttpPost]
+        public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, TranStatus? status)
+        {
+            //if (beginDate == null || endDate == null || (beginDate > endDate))
+            //{
+            //    return Json(new JResponse
+            //    {
+            //        Result = Cons.Responses.Warning,
+            //        Code = Cons.Responses.Codes.InvalidData,
+            //        Body = "Debes usar el filtro de fechas y asegurarte que la fecha final sea mayor ó igual que la fecha de inicio",
+            //        Header = "Fechas invalidas"
+            //    });
+            //}
+
+            //endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+            //si el usuario no es un supervisor, busco solo las comprar registradas por el 
+            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
+
+            var model = LookFor(branchId, beginDate, endDate, bill, provider, user, userId, status);
+            return PartialView("_PurchaseList", model);
+        }
+
+        private List<Purchase> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider,
+         string user, string userId, TranStatus? status, int top = Cons.NoTopResults)
         {
             //si el filtro de sucursal viene nulo
             //Busco las compras hechas en las sucursales asignadas del usuario
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
             var purchases = (from p in db.Purchases.Include(p => p.User).Include(p => p.User.Employees).
-                             Include(p => p.PurchaseDetails).Include(p=> p.PurchasePayments)
+                             Include(p => p.PurchaseDetails).Include(p => p.PurchasePayments)
                              where (branchId == null && branchIds.Contains(p.BranchId) || p.BranchId == branchId)
                              && (beginDate == null || p.TransactionDate >= beginDate)
                              && (endDate == null || p.TransactionDate <= endDate)
@@ -145,11 +238,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                              && (userId == null || p.UserId == userId)
                              && (user == null || user == string.Empty || p.User.UserName.Contains(user))
                              && (status == null || p.Status == status)
-                             select p).OrderByDescending(p=> p.TransactionDate).ToList();
+                             select p).Take(top).OrderByDescending(p => p.TransactionDate).ToList();
 
             return purchases;
         }
-        
+
         //this method is call when a new purchase is going to be registered
         [HttpPost]
         public ActionResult BeginPurchase()
@@ -178,8 +271,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     TransactionType = model.TransactionType,
                     ProviderId = model.ProviderId,
                     Status = TranStatus.InProcess,
-                    UpdUser = User.Identity.Name,
-                    UpdDate = DateTime.Now.ToLocal(),
                     DiscountPercentage = model.Discount
                 };
 
@@ -199,14 +290,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Purchases.Add(purchase);
                 db.SaveChanges();
 
-                return Json(new { Result = "OK", Id = purchase.PurchaseId });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Header = "Compra generada",
+                    Body = "La compra fue generada correctamente",
+                    Code = Cons.Responses.Codes.Success,
+                    Id = purchase.PurchaseId
+                });
 
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al registrar la compra", Message = "Ocurrio un error al crear la compra detalle " + ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Errror al crear",
+                    Body = "Ocurrio un error al generar la compra",
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
+
 
 
         [HttpPost]
@@ -225,19 +330,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             List<Product> products = new List<Product>();
 
-          /*  products = (from p in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
-                        where (p.Code == code) && (p.ProductType == ProductType.Single)
-                        select p).Take((int)Cons.OneHundred).ToList();
-
-            if (products.Count == Cons.Zero)
-            {*/
+       
                 products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
                             where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
                             && (ep.ProductType == ProductType.Single)
                             && (ep.IsActive)
                             select ep).Take((int)Cons.OneHundred).ToList();
-            //}
-
+     
             //obtengo el código del proveedor si es que tiene
             products.ForEach(p =>
             {
@@ -599,15 +698,22 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.Entry(model).State = EntityState.Modified;
                 db.SaveChanges();
 
-                return Json(new { Result = "OK" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error",
-                    Header = "Error al inventariar!!",
-                    Message = "Ocurrio un error al finalizar la compra detalle " + ex.Message
+                    Result = Cons.Responses.Success,
+                    Header = "Compra generada",
+                    Body = "Se genero la compra con factura "+ model .Bill+ ", los productos se agregaron al invetario",
+                    Code = Cons.Responses.Codes.Success
+                });
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error al completar",
+                    Body = "Ocurrio un error inesperado al realizar la completar la compra",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
         }
@@ -670,21 +776,23 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
                 else
                 {
-                    return Json(new
+                    return Json(new JResponse
                     {
-                        Result = "warning",
+                        Result = Cons.Responses.Warning,
                         Header = "Error al registrar el pago!!",
-                        Message = "La cantidad que intenta registrar supera lo permitido para esta cuenta"
+                        Body = "La cantidad que intenta registrar supera lo permitido para esta cuenta",
+                        Code = Cons.Responses.Codes.InvalidData
                     });
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error",
+                    Result = Cons.Responses.Danger,
                     Header = "Error al registrar el pago!!",
-                    Message = "Ocurrio un error inesperado detalle " + ex.Message
+                    Body = "Ocurrio un error inesperado al registra el pago",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
         }
@@ -715,11 +823,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
             catch (Exception ex)
             {
-                return Json(new
+                return Json(new JResponse
                 {
-                    Result = "Error",
+                    Result = Cons.Responses.Danger,
                     Header = "Error al remover el pago!!",
-                    Message = "Ocurrio un error inesperado al eliminar el pago detalle: " + ex.Message
+                    Body = "Ocurrio un error inesperado al remover el pago",
+                    Code = Cons.Responses.Codes.ServerError
                 });
             }
         }
@@ -809,11 +918,23 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                return Json(new { Result = "OK" });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Header = "Relación creada",
+                    Body = "La realción de productos se realizo correctamente",
+                    Code = Cons.Responses.Codes.Success
+                });
             }
             catch (Exception ex)
             {
-                return Json(new { Result = "Error al crear realción", Message = ex.Message });
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Header = "Error Desconocido",
+                    Body = "Ocurrio un error inesperado crear la realción de producto",
+                    Code = Cons.Responses.Codes.ServerError
+                });
             }
         }
 

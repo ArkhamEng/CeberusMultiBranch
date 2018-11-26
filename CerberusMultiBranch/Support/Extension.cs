@@ -82,6 +82,19 @@ namespace CerberusMultiBranch.Support
                 }
                 
             }
+
+        }
+
+        public static bool IsCashRegisterOpen(this IPrincipal user)
+        {
+            var brachId = user.Identity.GetBranchId();
+
+            using (var db = new ApplicationDbContext())
+            {
+                var countCr = db.CashRegisters.Where(cr => cr.BranchId == brachId && cr.IsOpen).Count();
+
+                return (countCr != Cons.Zero);
+            }
         }
 
         public static string GetServerDate()

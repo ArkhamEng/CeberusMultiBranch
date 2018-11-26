@@ -6,14 +6,14 @@
     ViewBag.Class = "fa fa-shopping-basket";
 }
 
-<h4 id="Debts" class="alert alert-danger col-md-offset-5 col-md-3"></h4>
+<h4 id="Debts" class="alert alert-warning col-md-offset-5 col-md-3"></h4>
 
-<h4 id="Total"class="alert alert-success col-md-offset-1 col-md-3">
+<h4 id="Total"class="alert alert-info col-md-offset-1 col-md-3">
 </h4>
 <hr />
 <div class="panel panel-danger">
     <div class="panel-body">
-        <div class="col-md-11">
+        <div class="col-md-12">
             <div class="input-group ">
             @Html.DropDownList("BranchId", Model.Branches, "Sucursal", new { @class = "form-control", style = "width:20% !important" })
             @Html.TextBox("BillF", "", htmlAttributes: new
@@ -32,49 +32,47 @@
 
                 <select id="Status" class="form-control" style="width:20% !important">
                     <option value="">Status</option>
-                    <option value="@TranStatus.InProcess">Procesando</option>
+                    <option value="@TranStatus.InProcess">En Captura</option>
                     <option value="@TranStatus.Reserved">Inventariado</option>
                     <option value="@TranStatus.Compleated">Pagado</option>
                     <option value="@TranStatus.Canceled">Cancelado</option>
                 </select>
+
+
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar compras a proveedores">
                         <span class="glyphicon glyphicon-search"></span>
-                        <u>B</u>uscar
+                        Buscar
                     </button>
                     <button type="button" class="btn btn-success" id="btnCreate" title="Crear nuevo registro de compra a un proveedor">
                         <span class="glyphicon  glyphicon-file"></span>
-                        <u>N</u>uevo
+                        Agregar
                     </button>
                 </span>
+         
             </div>
         </div>
 
-        <div class="col-md-10" style="margin-top:10px">
-            <div class="input-group">
-                @if (User.IsInRole("Supervisor"))
-                {
+        <div class="col-md-12 row" style="margin-top:10px">
+            <div class="col-md-9">
+                <div class="input-group">
                     @Html.TextBox("User", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre de usuario" })
-                }
-                <span class="input-group-addon"><a>Fecha Inicial</a></span>
-                @Html.EditorFor(m=> m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
+                    <span class="input-group-addon"><a>Fecha Inicial</a></span>
+                    @Html.EditorFor(m => m.BeginDate, new { htmlAttributes = new { @class = "form-control" } })
 
-                <span class="input-group-addon"><a>Fecha final</a></span>
-                @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
-                <span class="input-group-btn">
-                    <button class="btn btn-info" type="button" onclick="Reload()" id="btnClear" title="Limpiar busqueda y filtros">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                        <u>L</u>impiar
-                    </button>
-                </span>
+                    <span class="input-group-addon"><a>Fecha final</a></span>
+                    @Html.EditorFor(m => m.EndDate, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
             </div>
+            <div id="tbButtonsPurchases"></div>
+          
         </div>
     </div>
 </div>
 
-<div id="divNewPurchase"></div>
+
 <div class="panel panel-default">
-    <div id="divPurchases" class="panel-body">
+    <div id="divPurchases" class="panel-body dtContainer">
         @Html.Partial("_PurchaseList", Model.Purchases)
     </div>
 </div>
@@ -82,12 +80,9 @@
 <script>
     $(document).ready(function ()
     {
-        SetFilterControls("#divFilters", "#btnFilter", "#divPurchases");
-
-        
         $("#btnSearch").click(function ()
         {
-            ShowLoading();
+            ShowLoading('static');
 
             var data = {
                 branchId: $("#BranchId").val(),
@@ -98,41 +93,25 @@
                 provider: $("#Provider").val(),
                 status: $("#Status").val()
             };
-          
+
             ExecuteAjax('@Url.Action("Search")', data, function (view)
             {
                 $("#divPurchases").html(view);
-                HideLoading();
             });
         });
 
         $("#btnCreate").click(function ()
         {
-            ShowLoading();
+            ShowLoading('static');
             ExecuteAjax('@Url.Action("BeginPurchase")', {}, function (response)
             {
-                HideLoading();
-                $("#divNewPurchase").html(response);
+                HideLoading(function ()
+                {
+                    ShowModal(response, 'static');
+                });
             });
         });
-    }).keydown(function (e)
-    {
-        if (e.which == 13 || (e.altKey && e.which == 66)) {
-            $("#btnSearch").click();
-        }
-
-        if (e.altKey && e.keyCode == 76) {
-            $("#btnClear").click();
-        }
-        if (e.altKey && e.keyCode == 78) {
-            $("#btnCreate").click();
-        }
     });
 
-    function Reload()
-    {
-        ShowLoading();
-        window.location = '@Url.Action("History")';
-    }
-
+  
 </script>

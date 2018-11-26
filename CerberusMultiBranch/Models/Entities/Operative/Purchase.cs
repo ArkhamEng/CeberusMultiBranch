@@ -31,8 +31,61 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public ICollection<PurchaseDiscount> PurchaseDiscount { get; set; }
         #endregion
 
+        public string StatusStyle
+        {
+            get
+            {
+                var style = string.Empty;
 
+                switch (this.Status)
+                {
+                    case TranStatus.InProcess:
+                        style = "alert-warning";
+                        break;
+                    case TranStatus.Reserved:
+                        style = "alert-info";
+                        break;
+                    case TranStatus.Compleated:
+                        style = "alert-success";
+                        break;
+                  
+                    case TranStatus.Canceled:
+                        style = "alert-danger";
+                        break;
 
+                 
+                }
+
+                return style;
+            }
+        }
+
+        public string PurchasStatus
+        {
+            get
+            {
+                var name = string.Empty;
+
+                switch (this.Status)
+                {
+                    case TranStatus.InProcess:
+                        name = "En Captura";
+                        break;
+                    case TranStatus.Reserved:
+                        name = "Inventariado";
+                        break;
+                    case TranStatus.Compleated:
+                        name = "Pagado";
+                        break;
+                  
+                    case TranStatus.Canceled:
+                        name = "Cancelado";
+                        break;
+                }
+
+                return name;
+            }
+        }
     }
 
 

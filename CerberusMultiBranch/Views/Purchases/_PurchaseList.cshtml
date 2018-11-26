@@ -1,83 +1,131 @@
-﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.Purchase>
+﻿@model IEnumerable<Purchase>
+@using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
 
-<table id="tbPurchases" class="table table-striped small text-uppercase">
+<table id="tbPurchases" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
     <thead>
-        <tr hidden>
-            <th ></th>
-            <th ></th>
-            <th ></th>
-            <th ></th>
-            <th class="col-xs-1"></th>
-            <th class="col-xs-1"></th>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(model => model.Status)
+            </td>
+            <td>
+                @Html.DisplayName("Tipo")
+            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.Branch.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Bill)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Provider.Name)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.TransactionDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Expiration)
+            </th>
+            <td>
+                @Html.DisplayNameFor(model => model.TotalTaxedAmount)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.DiscountPercentage)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.DiscountedAmount)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.FinalAmount)
+            </td>
+            <th>
+                @Html.DisplayName("Abonos")
+            </th>
+            <th>
+                @Html.DisplayName("Deuda")
+            </th>
+            <td>
+                @Html.DisplayNameFor(model => model.InsDate)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.InsUser)
+            </td>
+       
+            <td>
+                @Html.DisplayNameFor(model => model.UpdDate)
+            </td>
+            <td>
+                @Html.DisplayNameFor(model => model.UpdUser)
+            </td>
+        
+            <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    <label>Sucursal </label> <br /> @Html.DisplayFor(m => item.Branch.Name)<br />
-                    <label>Agente  </label> <br /> @Html.DisplayFor(m => item.User.UserName)
+                <td class="@item.StatusStyle">
+                    @Html.DisplayFor(m => item.PurchasStatus)
                 </td>
                 <td>
-                    
-                    <label>Factura  </label>   <br /> @Html.DisplayFor(m => item.Bill)<br />
-                    <label>Proveedor</label>  <br />@Html.DisplayFor(m => item.Provider.Name)<br />
+                    @Html.DisplayFor(m => item.TransactionType)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.Branch.Name)
+                </td>
+                <td>
+                    @Html.DisplayUpperFor(m => item.Bill)
+                </td>
+                <td>
+                    @Html.DisplayUpperFor(m => item.Provider.Name)
                 </td>
              
                 <td>
-                    <label>Fecha Compra</label><br /> @item.TransactionDate.ToString("dd/MM/yyyy")<br />
-                    <label>Fecha Expira</label> <br />@item.Expiration.ToString("dd/MM/yyyy")
+                    @Html.DisplayFor(m => item.TransactionDate)
                 </td>
-           
                 <td>
-                    <label>Total sin descuento</label><br /> @Html.DisplayFor(m => item.TotalTaxedAmount)<br />
-                    <label>Total con descuento</label><br /> @item.FinalAmount.ToString("c") |  @item.DiscountPercentage %
+                    @Html.DisplayFor(m => item.Expiration)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.TotalTaxedAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.DiscountPercentage) %
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.DiscountedAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.FinalAmount)
+                </td>
+                <td>
+                    @item.PurchasePayments.Sum(p => p.Amount).ToMoney()
                 </td>
 
-                <td class="input-group col-xs-1" >
-                    @switch (item.TransactionType)
-                    {
-                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Contado:
-                            <div class="form-control alert-success">
-                                @item.TransactionType.ToString()
-                            </div>
-                            break;
-                        case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                            <div class="form-control alert-danger">
-                                @item.TransactionType.ToString()
-                            </div>
-                            break;
-                    }
-                    @switch (item.Status)
-                    {
-                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.InProcess:
-                            <div class="form-control alert-warning">
-                               Procesando
-                            </div>
-                            break;
-                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Reserved:
-                            <div class="form-control alert-info">
-                                Inventariado
-                            </div>
-                            break;
-                      
-                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Compleated:
-                            <div class="form-control alert-success">
-                                Pagado
-                            </div>
-                            break;
-                        case CerberusMultiBranch.Models.Entities.Operative.TranStatus.Canceled:
-                            <div class="form-control alert-danger">
-                                Cancelado
-                            </div>
-                            break;
-                    }
+                <td>
+                    @{ var debt = item.TotalTaxedAmount - item.PurchasePayments.Sum(p => p.Amount); }
+                    @debt.ToMoney()
                 </td>
-                <td class="col-xs-1">
-                    <button class="btn btn-primary" 
+                <td>
+                    @Html.DisplayFor(model => item.InsDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.InsUser)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(model => item.UpdDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(model => item.UpdUser)
+                </td>
+                <td>
+                    <button class="btn btn-warning bt-sm"
                             onclick="window.location = '@Url.Action("Detail",new { id= item.PurchaseId})'" title="Ver detalle y editar">
-                        <span class="fa fa-edit" />
+                        <span class="fa fa-edit"></span>
+                        Editar
                     </button>
                 </td>
             </tr>
@@ -87,23 +135,31 @@
 
 @{
 
-    var totalAmount = Model.Sum(purchase => purchase.FinalAmount);
+    var totalAmount = Model.Where(p=> p.Status != TranStatus.Canceled && p.Status != TranStatus.InProcess).Sum(purchase => purchase.FinalAmount);
     var debst = 0.0;
 
-    foreach(var purchase in Model)
+    foreach(var purchase in Model.Where(p => p.Status != TranStatus.Canceled && p.Status != TranStatus.InProcess))
     {
         debst += purchase.FinalAmount - purchase.PurchasePayments.Sum(a => a.Amount);
     }
 }
 <script>
-    $(document).ready(function () {
-        Paginate("#tbPurchases", 8);
+    $(document).ready(function ()
+    {
+      
+        $("#tbPurchases").removeClass("hidden");
+
+        var printPurchasesOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Compras"))', Columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] };
+
+        Paginate("#tbPurchases", 10, true, null, false, "#tbButtonsPurchases", printPurchasesOp);
 
         var tAmount = "Total " + GetCurrency(parseFloat('@totalAmount'));
 
         var tDebst = "Por Pagar " + GetCurrency(parseFloat('@debst'));
         $("#Total").text(tAmount);
         $("#Debts").text(tDebst);
+
+        HideLoading();
     });
 
 

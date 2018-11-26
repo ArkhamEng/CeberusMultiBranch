@@ -204,7 +204,7 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
            //scrollCollapse: true,
            fixedHeader: true,
            responsive: responsive,
-
+           "aaSorting": [],
            "lengthChange": false,
            "searching": searching,
            "order": [],
@@ -278,7 +278,7 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
 }
 
 //SHOWS MODAL WITH CUSTON FUNCTIONS AND CONTENT
-function ShowModal(html, backdrop, size)
+function ShowModal(html, backdrop, size, closeCallback)
 {
     $("#ModalDialog").removeClass('modal-sm');
     $("#ModalDialog").removeClass('modal-lg');
@@ -294,12 +294,22 @@ function ShowModal(html, backdrop, size)
     $("#ModalContent").html(html);
 
     $("#SiteModal").modal({ backdrop: backdrop });
+
+    //si la modal se sin invocar el método hide
+    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e)
+    {
+        if (closeCallback != null)
+            closeCallback();
+        
+        $("#SiteModalContent").html('');
+    });
 }
 
 //Hide Main Modal
 function HideModal(callback, removeContent)
 {
-    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
+    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e)
+    {
         if (callback != null)
             callback();
 

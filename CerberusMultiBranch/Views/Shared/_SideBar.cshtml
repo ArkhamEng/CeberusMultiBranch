@@ -5,18 +5,18 @@
     <!-- Sidebar Header -->
     <div class="sidebar-header bgSidebar" style="max-height:100px">
         <div class="col-md-8 col-md-offset-2">
-            <div class="image">
+            <div class="imageSide">
                 <img src="@Url.Action("GetPicture", "Json")" class="img img-responsive img-rounded" onmouseover="SetPointer(this)" title="Cambiar foto de perfil" style="width:100%"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture", "Manage")'" />
             </div>
         </div>
     </div>
-    <label class="btn btn-danger btn-xs col-md-12" onmouseover="SetPointer(this)"
+    <label class="btn btn-danger btn-xs col-md-12 col-xs-12 col-sm-12" onmouseover="SetPointer(this)"
            onclick="ShowLoading(); window.location = '@Url.Action("ChangePassword", "Manage")'">
         @User.Identity.GetUserName()
     </label>
-    <div class="col-md-12 row">
-        <ul class="list-unstyled components" style="width:200px">
+    <div class="">
+        <ul class="list-unstyled components col-md-12 col-sm-12 col-xs-12" >
             <li>
                 <a href="/Products/" onclick="ShowLoading()">
                     &nbsp;Productos<span class="fa fa-dropbox" style="float:left" />
@@ -48,13 +48,13 @@
                 </ul>
             </li>
 
-         
+
             @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor") || User.IsInRole("Cajero"))
             {
                 <li>
                     <a href="#salesSm" data-toggle="collapse" aria-expanded="false">&nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" /></a>
                     <ul class="collapse list-unstyled" id="salesSm">
-                        
+
                         @if (User.IsInRole("Supervisor"))
                         {
                             <li><a href="/Sales/Report/" onclick="ShowLoading()">&nbsp;Reporte de ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
@@ -99,7 +99,14 @@
 
             @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
             {
-                <li><a href="/Purchases/History" onclick="ShowLoading()">&nbsp;Compras<span class="fa fa-shopping-basket" style="float:left" /></a></li>
+              
+
+                <li>
+                    <a href="#purchaseSm" data-toggle="collapse" aria-expanded="false">&nbsp;Compras<span class="fa fa-shopping-basket" style="float:left" /></a>
+                    <ul class="collapse list-unstyled" id="purchaseSm">
+                        <li><a href="/Purchases/Report" onclick="ShowLoading()">&nbsp;Reporte de compras<span class="fa fa-file-text" style="float:left" /></a></li>
+                    </ul>
+                </li>            
             }
 
 

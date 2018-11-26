@@ -1,0 +1,96 @@
+﻿@using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
+
+@model IEnumerable<StockMovement>
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button type="button" class="close"  onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+        </button>
+        <h4 class="panel-title">
+            <span class="fa fa-cubes"></span> Movimientos del producto
+        </h4>
+    </div>
+    <div class="panel-body">
+        
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div id="dtButtonsMovements"  class="col-md-6">
+
+                </div>
+                <div class="col-md-6">
+                    <input id="txtFilterMovements" class="form-control" placeholder="Filtro de busqueda" type="search" />
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <table id="tbMovements" class="table table nowrap table-bordered small" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(m => m.MovementType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.OperationType)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.MovementDate)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Quantity)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.User)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Comment)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="@item.FlowStyle">
+                                    @Html.DisplayFor(m => item.MovementType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.OperationType)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.MovementDate)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.Quantity)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(m => item.User)
+                                </td>
+                                <td style="white-space:normal">
+                                    @Html.DisplayFor(m => item.Comment)
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+    </div>
+    <div class="panel-footer clearfix">
+        <button class="btn btn-danger pull-right" type="button" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+            Cerrar
+        </button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbMovements", 10, true, "#txtFilterMovements", false, "#dtButtonsMovements");
+    });
+</script>

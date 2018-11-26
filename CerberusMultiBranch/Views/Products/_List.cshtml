@@ -28,7 +28,7 @@
 
                         @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", 2); }
 
-                        <div class='@imgC' style="vertical-align:central">
+                        <div class='@imgC' style="align-items:center">
                             @if (prod.Images.Count > 0)
                             {
                                     <img src="@prod.Images.First().Path" class="img-responsive img-rounded" onmouseover="SetPointer(this)" style="max-height:150px"
@@ -40,16 +40,18 @@
                             }
                         </div>
                         @{ string txtC = string.Format("col-md-{0} {1}", (i == 2 ? 8 : 9), !prod.IsActive ? "text-danger" : string.Empty); }
-                        <div class='@txtC' onclick="Detail(@prod.ProductId,@prod.IsActive)" onmouseover="SetPointer(this)">
-                            <h4>
-                                <label>@prod.Code</label>
+                        <div class='@txtC'>
+                            <h4  onclick="Detail(@prod.ProductId,@prod.IsActive)" onmouseover="SetPointer(this)" >
+                                <strong>
+                                    <u>@prod.Code</u>    
+                                </strong>
                             </h4>
 
                             <h4>
 
                                 @Html.DisplayFor(model => prod.Name)
 
-                                @if (prod.ModelCompatibilities.Count > 0)
+                                @*@if (prod.ModelCompatibilities.Count > 0)
                                 {
                                     string content = string.Empty;
 
@@ -61,7 +63,7 @@
                                     <span class="glyphicon glyphicon-eye-open text-warning" type="button" rel="popover" onmouseover="SetPointer(this)"
                                           title="Modelos Compatibles" onclick="CompatibilitiesPop('@content')">
                                     </span>
-                                }
+                                }*@
                             </h4>
 
 
@@ -75,6 +77,7 @@
                             else
                             {
                                 <h6>
+                                    
                                     Código @prod.Code
                                 </h6>
                             }
@@ -91,14 +94,17 @@
                                     @Html.DisplayFor(model => prod.WholesalerPrice)
                                 </label>
                             </h4>
-                            @*<h5 onmouseover="SetPointer(this)" onclick="StockInBranches('@prod.ProductId')">*@
+                            
                             <h5>
-                                <span class="badge bg-info">
-                                    @prod.Quantity
-                                </span>
-                                disponibles
-                                <span class="fa fa-cubes"></span>
-                                Unidad: @prod.Unit
+                                <button type="button" class="btn btn-default" title="ver movimientos" onclick="ShowMovements(@prod.ProductId)">
+                                    <span class="badge bg-info">
+                                        @prod.Quantity
+                                    </span>
+                                    disponibles
+                                    <span class="fa fa-cubes"></span>
+                                    Unidad: @prod.Unit
+                                </button>
+                             
                             </h5>
                             <h6>
                                 Fila @prod.Row
@@ -166,9 +172,6 @@
     </tbody>
 </table>
 
-<input type="hidden" id="transId" />
-
-<div id="divMovement"></div>
 
 <script>
     $(document).ready(function ()
@@ -195,64 +198,43 @@
 
     }
 
-    function BeginDelete(id) {
-        console.log(id);
-        $("#transId").val(id);
-        ShowConfirm("¿Estas seguro de eliminar el producto?",
-            "Al eliminar tambien se borraran las imagenes y el registro no se podra recuperar", true, Delete);
-    }
 
-    function BeginActivate(id) {
-        $("#transId").val(id);
-        ShowConfirm("¿Estas seguro de la activación del producto?",
-            "Al activarlo, el producto estara disponible para venta y edición, ¿deseas continuar?", true, Activate);
-    }
-
-    function Activate() {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("Activate")', { id: $("#transId").val(), isGrid: $("#IsGrid").val() }, function (response) {
-            HideLoading();
-
-            if (response.Result == "OK")
-                LookFor();
-            else
-                ShowMessage(response.Result, response.Message, 'warning');
-        });
-    }
-
-    function Delete()
+    function BeginDelete(id)
     {
-        ShowLoading();
-        ExecuteAjax('@Url.Action("Delete")', { id: $("#transId").val() }, function (response) {
-            HideLoading();
-
-            if (response.Result == "OK")
-                LookFor();
-            else
-                ShowMessage(response.Result, response.Message, 'warning');
-        });
+        ShowConfirm("¿Estas seguro de eliminar el producto?. Al eliminar tambien se borraran las imagenes y el registro no se podra recuperar", '@Url.Action("Delete", "Products")', id, LookFor);
     }
 
-    function BeginEdit(id) {
-        ShowLoading();
+    function BeginActivate(id)
+    {
+        ShowConfirm("¿Estas seguro de la activación del producto?, Al activarlo, el producto estara disponible para venta y edición, ¿deseas continuar?", '@Url.Action("Activate", "Products")', id, LookFor);
+    }
 
-        ExecuteAjax('@Url.Action("Edit", "Products")', { productId: id }, function (response) {
-            HideLoading();
+  
+    function BeginEdit(id)
+    {
+        ShowLoading('static');
 
-            if ($.isPlainObject(response))
-                ShowMessage(response.Result, response.Message, 'warning');
-            else
+        ExecuteAjax('@Url.Action("Edit", "Products")', { productId: id }, function (response)
+        {
+            HideLoading(function ()
+            {
                 $("#divModals").html(response);
+            });
         });
     }
 
-    function BeginMovement(pid) {
-        ShowLoading();
+    function BeginMovement(pid)
+    {
+        ShowLoading('static');
+
         var param = { productId: pid };
 
-        ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view) {
-            HideLoading();
-            $("#divModals").html(view);
+        ExecuteAjax('@Url.Action("BeginMovement", "Products")', param, function (view)
+        {
+            HideLoading(function ()
+            {
+                $("#divModals").html(view);
+            });
         });
     }
 
@@ -263,6 +245,19 @@
         ExecuteAjax('@Url.Action("GetProductImages","Products")', { id: id }, function (response) {
             HideLoading(function () {
                 ShowModal(response,true,'lg');
+            });
+        });
+    }
+
+    function ShowMovements(id)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("GetProductMovements", "Products")', { id: id }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static', 'lg');
             });
         });
     }

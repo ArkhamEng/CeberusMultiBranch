@@ -34,12 +34,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null,100);
+            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null,Cons.InitialRows);
 
             return View(model);
         }
 
-
+        [HttpPost]
+        [CustomAuthorize(Roles = "Supervisor, Cajero")]
         public ActionResult BeginCancel(int id)
         {
             try
@@ -124,7 +125,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         bp.LastStock = bp.Stock;
                         bp.Stock += detail.Quantity;
 
-                        sm.Comment = "CANCELACION DE VENTA: " + sale.Folio;
+                        sm.Comment = "Cancelación de venta: " + sale.Folio;
                         sm.MovementType = MovementType.Entry;
                     }
                     else
@@ -132,7 +133,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         bp.LastStock = bp.Stock + bp.Reserved;
                         bp.Reserved += detail.Quantity;
 
-                        sm.Comment = "CANCELACION DE VENTA: " + sale.Folio;
+                        sm.Comment = "Cancelación de venta: " + sale.Folio;
                         sm.MovementType = MovementType.Reservation;
                     }
 
@@ -191,6 +192,21 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
             string folio, string client, string user, TranStatus? status)
         {
+
+            if (beginDate == null || endDate == null || (beginDate > endDate))
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.InvalidData,
+                    Body = "Debes usar el filtro de fechas y asegurarte que la fecha final sea mayor ó igual que la fecha de inicio",
+                    Header = "Fechas invalidas"
+                });
+            }
+
+            endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+
             //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
@@ -201,7 +217,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client,
-            string user, TranStatus? status, string userId, int top = 10000)
+            string user, TranStatus? status, string userId, int top = Cons.NoTopResults)
         {
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);

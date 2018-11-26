@@ -15,3 +15,19 @@ function BeginCancelSale(id, onCancelCompleated)
         });
     });
 }
+
+function BeginCancelPurchase(id, onCancelCompleated)
+{
+    ShowLoading('static');
+
+    console.log(id);
+
+    ExecuteAjax("/Purchases/BeginCancel", { id: id }, function (response)
+    {
+        HideLoading(function () {
+            ShowModal(response, 'static');
+
+            OnCancelCompleated = onCancelCompleated;
+        });
+    });
+}

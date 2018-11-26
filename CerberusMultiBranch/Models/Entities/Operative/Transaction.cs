@@ -45,10 +45,15 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double TotalTaxAmount { get; set; }
 
+        [Display(Name = "Monto descuento")]
+        [DataType(DataType.Currency)]
         public double DiscountedAmount { get; set; }
 
+        [Display(Name = "Descuento")]
         public double DiscountPercentage { get; set; }
 
+        [DataType(DataType.Currency)]
+        [Display(Name = "Monto Final")]
         public double FinalAmount { get; set; }
 
         [Index("IDX_Status", IsUnique = false)]
@@ -68,10 +73,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
 
         [Required]
+        [Display(Name = "Editado")]
         public DateTime UpdDate { get; set; }
 
         [Required]
+        [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
+
+        [Required]
+        [Display(Name = "Creado")]
+        public DateTime InsDate { get; set; }
+
+        [Required]
+        [Display(Name ="Creador por")]
+        public string InsUser { get; set; }
 
 
         [ForeignKey("UserId")]
@@ -82,6 +97,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public Transaction()
         {
             this.Expiration = DateTime.Now;
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.InsDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+            this.InsUser = HttpContext.Current.User.Identity.Name;
         }
 
         [NotMapped]

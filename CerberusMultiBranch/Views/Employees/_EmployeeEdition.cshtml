@@ -3,7 +3,7 @@
 
 @Scripts.Render("~/bundles/jqueryval")
 
-@using (Html.BeginForm("Save", "Employees", FormMethod.Post, new { enctype = "multipart/form-data", id= "SaveForm" }))
+@using (Html.BeginForm("Save", "Employees", FormMethod.Post, new { enctype = "multipart/form-data", id = "SaveForm" }))
 {
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
@@ -13,9 +13,14 @@
 
 
     <div class="panel panel-primary">
-        <div class="panel-heading text-strong">
-            <span class="fa fa-user"></span>
-            Datos de Empleado
+        <div class="panel-heading">
+            <button type="button" id="btnCloseEdit" class="close">
+                <span class="fa fa-times"></span>
+            </button>
+            <h4 class="panel-title">
+                <span class="fa fa-user"></span>
+                Datos de Empleado
+            </h4>
         </div>
         <div class="panel-body  small">
             <ul class="nav nav-tabs">
@@ -28,14 +33,14 @@
                     <br />
                     <div class="row">
                         <div class="col-md-2">
-                           <div class="image">
-                               <img id="imgEmployeeEdit" src="@Model.ImageFormated" class="img img-responsive" style="width:100%" />
-                           </div>
-                           
+                            <div class="image">
+                                <img id="imgEmployeeEdit" src="@Model.ImageFormated" class="img img-responsive" style="width:100%" />
+                            </div>
+
                             <label id="uplEmployee" class="btn btn-warning btn-xs col-md-12">
                                 <span class="fa fa-upload"></span>
                                 Adjuntar foto
-                                <input type="file" name="PostedFile" onchange="ImageLoaded(this)" style="display: none;">
+                                <input type="file" name="PostedFile" onchange="ImageLoaded(this)" style="display: none;" accept="image/*">
                             </label>
                         </div>
 
@@ -43,7 +48,7 @@
                             @Html.LabelFor(model => model.Code, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-tag"></i></span>
-                                @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control input-sm",  disabled = "disabled" } })
+                                @Html.EditorFor(model => model.Code, new { htmlAttributes = new { @class = "form-control input-sm", disabled = "disabled" } })
                             </div>
                         </div>
 
@@ -69,8 +74,11 @@
                             @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                                @Html.EditorFor(model => model.Name, new { htmlAttributes = 
-                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.Name, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
                         </div>
@@ -79,12 +87,15 @@
                             @Html.LabelFor(model => model.NSS, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-medkit"></i></span>
-                                @Html.EditorFor(model => model.NSS, new { htmlAttributes = 
-                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.NSS, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.NSS, "", new { @class = "text-danger" })
                         </div>
-                      
+
                     </div>
 
                     <div class="row">
@@ -93,8 +104,11 @@
                             @Html.LabelFor(model => model.FTR, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-id-badge"></i></span>
-                                @Html.EditorFor(model => model.FTR, new { htmlAttributes = 
-                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.FTR, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.FTR, "", new { @class = "text-danger" })
                         </div>
@@ -103,8 +117,11 @@
                             @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                @Html.EditorFor(model => model.Phone, new { htmlAttributes = 
-                               new { @class = "form-control input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.Phone, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
                         </div>
@@ -114,8 +131,11 @@
                             @Html.LabelFor(model => model.EmergencyPhone, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-phone"></i></span>
-                                @Html.EditorFor(model => model.EmergencyPhone, new { htmlAttributes = 
-                               new { @class = "form-control input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.EmergencyPhone, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.EmergencyPhone, "", new { @class = "text-danger" })
                         </div>
@@ -124,8 +144,11 @@
                             @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-at"></i></span>
-                                @Html.EditorFor(model => model.Email, new { htmlAttributes = 
-                               new { @class = "form-control text-lowercase input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.Email, new
+                           {
+                               htmlAttributes =
+                               new { @class = "form-control text-lowercase input-sm", autocomplete = "off" }
+                           })
                             </div>
                             @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                         </div>
@@ -152,7 +175,7 @@
                             @Html.LabelFor(model => model.UserId, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-user-circle-o"></i></span>
-                                @Html.EditorFor(model => model.User.UserName, new { htmlAttributes = new { @class = "form-control text-lowercase input-sm", autocomplete = "off", disabled ="true" } })
+                                @Html.EditorFor(model => model.User.UserName, new { htmlAttributes = new { @class = "form-control text-lowercase input-sm", autocomplete = "off", disabled = "true" } })
                             </div>
                             @Html.ValidationMessageFor(model => model.User.UserName, "", new { @class = "text-danger" })
                         </div>
@@ -170,7 +193,7 @@
                                 @Html.LabelFor(model => Address.City.StateId, htmlAttributes: new { @class = "control-label" })
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-map"></i></span>
-                                    @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes: 
+                                    @Html.DropDownListFor(model => model.StateId, Model.States, "", htmlAttributes:
                                    new { @class = "form-control text-uppercase input-sm" })
                                 </div>
                                 @Html.ValidationMessageFor(model => Address.City.StateId, "", new { @class = "text-danger" })
@@ -255,8 +278,7 @@
 
 <script>
 
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         SetCascade("#StateId", "#Address_CityId", '@Url.Action("GetCities", "Json")');
 
         $("#Code").attr("readonly", true);
@@ -271,14 +293,12 @@
     });
 
 
-    function ImageLoaded(input)
-    {
+    function ImageLoaded(input) {
         var files = input.files;
 
         var reader = new FileReader();
 
-        reader.onload = function (e)
-        {
+        reader.onload = function (e) {
             $("#imgEmployeeEdit").attr("src", e.target.result);
         };
         reader.readAsDataURL(files[0]);

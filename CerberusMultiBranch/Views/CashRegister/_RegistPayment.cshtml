@@ -190,19 +190,24 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetInputEvents();
 
-        Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, value) {
+        Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, value)
+        {
             OnFolioSelected(id, value);
         });
 
         SumAmount();
     });
 
-    function SetInputEvents() {
-        $("#CashAmount").off('keyup').keyup(function () {
-            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
+    function SetInputEvents()
+    {
+        $("#CashAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
                 var val = $("#CashAmount").val();
                 var result = Calculate(val);
 
@@ -214,8 +219,10 @@
             SumAmount();
         });
 
-        $("#CardAmount").off('keyup').keyup(function () {
-            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
+        $("#CardAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
                 var val = $("#CardAmount").val();
                 var result = Calculate(val);
 
@@ -228,14 +235,16 @@
         });
 
         //cuando se limpia el campo de folio
-        $("#Folio").off('keyup').keyup(function (e) {
-            if (e.keyCode == 9)
+        $("#Folio").off('keyup').keyup(function (e)
+        {
+            if (e.keyCode == undefined || e.keyCode == 9 || e.keyCode == 13)
                 return;
 
             if (!$("#Folio").hasClass('alert-info'))
                 return;
 
-            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado') {
+            if ('@Model.Details.First().Sale.TransactionType' == '@TransactionType.Contado')
+            {
                 $("#CashAmount").val($("#AmountToPay").val());
             }
 

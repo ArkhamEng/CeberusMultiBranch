@@ -49,6 +49,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.UserId = sale.UserId;
             this.UpdUser = sale.UpdUser;
             this.Comment = sale.Comment;
+            this.InsDate = sale.InsDate;
+            this.InsUser = sale.InsUser;
             
             this.CarMakes = new List<ISelectable>().ToSelectList();
             this.Categories = new List<ISelectable>().ToSelectList();
