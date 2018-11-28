@@ -87,8 +87,10 @@
     function AddModel(productId)
     {
       
-        if ($("#Ini").val() > 1900 & $("#End").val() >= $("#Ini").val()) {
-            ShowLoading();
+        if ($("#Ini").val() > 1900 & $("#End").val() >= $("#Ini").val())
+        {
+            ShowModLoading();
+
             var param =
                 {
                     productId: productId,
@@ -97,20 +99,16 @@
                     end: $("#End").val()
                 }
 
-            ExecuteAjax('@Url.Action("AddCompatibility")', param, function (response) {
-                HideLoading();
-                if ($.isPlainObject(response))
+            ExecuteAjax('@Url.Action("AddCompatibility")', param, function (response)
+            {
+                HideModLoading(function ()
                 {
-                    ShowMessage(response.Result, response.Message, 'warning');
-                }
-                else {
                     $("#divModels").html(response);
-                }
+                });
             });
         }
         else
-            ShowMessage("Error de datos!!",
-                "los años no pueden ser menores a 1900 y el año final no puede ser menor que el incial", "warning");
+            ShowNotify("Error de datos!!","info","los años no pueden ser menores a 1900 y el año final no puede ser menor que el incial", 3000);
             
     }
 

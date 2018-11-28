@@ -68,10 +68,13 @@
 
     });
 
-    function GetAssignedCategories() {
-        if ($("#PartSystemId").val() != 0) {
+    function GetAssignedCategories()
+    {
+        if ($("#PartSystemId").val() != 0)
+        {
             ExecuteAjax('@Url.Action("GetSystemConfig", "Configuration")', { id: $("#PartSystemId").val() },
-                function (response) {
+                function (response)
+                {
                     $("#divSystemCategory").html(response);
                 });
         }
@@ -96,10 +99,13 @@
 
         ExecuteAjax('@Url.Action("SaveSystem","Configuration")', { system: sys }, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                $("#divSystems").html(response);
-            }, true);
+                HideModal(function ()
+                {
+                    $("#divSystems").html(response);
+                }, true);
+            });
         });
 
     }

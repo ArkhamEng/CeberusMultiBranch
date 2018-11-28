@@ -15,9 +15,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ClientId { get; set; }
 
-        [Display(Name = "Ciudad/Municipio")]
-        public int? CityId { get; set; }
-
+      
         [Display(Name = "Clave")]
         [Required]
         [MaxLength(10)]
@@ -39,14 +37,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(15)]
         public string FTR { get; set; }
 
-        [Display(Name = "Dirección")]
-        [MaxLength(150)]
-        public string Address { get; set; }
-
-        [Display(Name = "C.P.")]
-        [MaxLength(10)]
-        [DataType(DataType.PostalCode)]
-        public string ZipCode { get; set; }
 
         [Display(Name = "Fecha de Ingreso")]
         [DataType(DataType.Date)]

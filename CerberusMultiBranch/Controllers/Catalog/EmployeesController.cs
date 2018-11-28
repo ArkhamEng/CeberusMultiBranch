@@ -170,7 +170,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     response.Id = employee.EmployeeId;
                     response.Header = "Nuevo Empleado registrado";
-                    response.Body = "Empleado " + employee.Name.ToUpperInvariant() +
+                    response.Body = "El Empleado " + employee.Name.ToUpperInvariant() +
                         " fue agregado correctamente, si requiere el uso de sistema deberas configurarle un usuario";
                 }
                 else

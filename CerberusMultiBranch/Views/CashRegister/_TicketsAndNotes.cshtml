@@ -88,33 +88,21 @@
             };
             ExecuteAjax('@Url.Action("SearchNotes")', data, function (view)
             {
-                HideModLoading();
-                $("#divNotesToPrint").html(view);
+                HideModLoading(function ()
+                {
+                    $("#divNotesToPrint").html(view);
+                });
             });
         });
     });
 
-    function Reload() {
+    function Reload()
+    {
         $("#BeginDate").val(null);
         $("#EndDate").val(null);
         $("#Folio").val("");
         $("#Client").val("");
         $("#divNotesToPrint").html("");
     }
-
-    $(document).keydown(function (e)
-    {
-        if (e.which == 13 || (e.altKey && e.which == 66))
-        {
-            $("#btnSearch").click();
-        }
-
-        if (e.altKey && e.keyCode == 76) {
-            ShowLoading();
-            $("#btnClear").click();
-        }
-    });
-
-
 </script>
 

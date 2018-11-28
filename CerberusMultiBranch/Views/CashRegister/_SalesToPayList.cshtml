@@ -20,7 +20,7 @@
         {
             <tr>
                 <td>@Html.DisplayFor(m => item.Folio)</td>
-                <td>@Html.DisplayUpperFor(m => item.Client.Name)</td>
+                <td style="white-space:normal">@Html.DisplayUpperFor(m => item.Client.Name)</td>
 
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
 
@@ -74,8 +74,7 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#tbSales").removeClass("hidden");
         Paginate("#tbSales", 6, true, null, false);
 
@@ -98,13 +97,13 @@
 
     function PrintDocument(saleId, printType)
     {
-        ShowModLoading('static');
+        ShowModLoading();
 
         ExecuteAjax('@Url.Action("PrintDocument")', { saleId: saleId, printType: printType }, function (response)
         {
-            HideModLoading();
-
-            $("#divPrinter").html(response);
+            HideModLoading(function () {
+                $("#divPrinter").html(response);
+            });
         });
     }
 </script> 

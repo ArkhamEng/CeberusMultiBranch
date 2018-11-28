@@ -14,10 +14,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Key]
         public int EmployeeId { get; set; }
 
-        [Display(Name = "Ciudad ó Municipio")]
-        public int? CityId { get; set; }
-
-
+    
         [Display(Name = "Puesto")]
         public int? JobPositionId { get; set; }
 
@@ -47,15 +44,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [MaxLength(15)]
         public string NSS { get; set; }
 
-        [Display(Name = "Dirección")]
-        [MaxLength(100)]
-        public string Address { get; set; }
-
-        [Display(Name = "C.P.")]
-        [DataType(DataType.PostalCode)]
-        [MaxLength(6)]
-        public string ZipCode { get; set; }
-
+     
         [Display(Name = "Fecha de Ingreso")]
         [DataType(DataType.Date)]
         [Required]

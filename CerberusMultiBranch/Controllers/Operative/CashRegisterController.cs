@@ -780,10 +780,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 //busco la venta a pagar
                 var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).
-                            Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.User).
-                            //  Include(s => s.Client.City).Include(s => s.Client.City.State).
-                            Include(s => s.SaleDetails.Select(td => td.Product)).
-                            Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                            Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.Client.Addresses).Include(s => s.User).
+                            Include(s => s.SaleDetails.Select(td => td.Product)).Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
                             Include(s => s.Branch).FirstOrDefault();
 
@@ -925,7 +923,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         PaymentMethod = PaymentMethod.Efectivo,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "COBRO AUTOMATICO EN CAJA"
+                        Comment = "ABONO A VENTA "+sale.Folio.ToUpper()
                     };
 
                     sale.SalePayments.Add(p);
@@ -942,7 +940,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         PaymentMethod = PaymentMethod.Tarjeta,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "COBRO AUTOMATICO EN CAJA",
+                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper(),
                         Reference = payment.Reference
                     };
 
@@ -962,7 +960,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         PaymentMethod = PaymentMethod.Vale,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "COBRO AUTOMATICO EN CAJA",
+                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper(),
                         Reference = note.Folio
                     };
 
@@ -1034,13 +1032,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 return PartialView("_PrintElements", model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "Ocurrio un error al registrar el pago de la venta",
+                    Body = "detale :"+ex.Message,
                     Header = "Error al cobrar!"
                 });
             }

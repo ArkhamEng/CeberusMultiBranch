@@ -21,7 +21,7 @@ using CerberusMultiBranch.Models.Entities.Finances;
 namespace CerberusMultiBranch.Controllers.Operative
 {
     [CustomAuthorize(Roles = "Supervisor,Capturista")]
-    public class PurchasesController : Controller
+    public partial class PurchasesController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
@@ -590,7 +590,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         //this method is call when the purchase is finishes and inventoried
         [HttpPost]
-        public ActionResult Compleate(int purchaseId)
+        public ActionResult Compleate(int id)
         {
             try
             {
@@ -598,7 +598,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var model = db.Purchases.Include(p => p.PurchaseDetails).
                     Include(p => p.PurchaseDetails.Select(pd => pd.Product.BranchProducts)).Include(p=> p.PurchaseDiscount).
-                    FirstOrDefault(p => p.PurchaseId == purchaseId);
+                    FirstOrDefault(p => p.PurchaseId == id);
 
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
@@ -623,10 +623,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                         //si el precio de compra en sucursal es mayor al precio del detalle
                         //se promedian las cantidades y se genera un nuevo precio
-                        if (brp.BuyPrice > realPrice)
+                        if (brp.BuyPrice > realPrice && brp.Stock > Cons.Zero)
                         {
                             var oldAmount = (brp.Stock + brp.Reserved) * brp.BuyPrice;
-
                             brp.BuyPrice = (oldAmount + detail.Amount) / (brp.Stock + brp.Reserved + detail.Quantity);
                         }
                         //si el nuevo precio de compra es mayor o igual se actualiza y recalculan los precios (para eliminar errores previos en la captura del precio)
@@ -731,6 +730,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Include(p => p.PurchasePayments).Include(p => p.User).
                 FirstOrDefault();
 
+            model.FinalAmount = Math.Round(model.FinalAmount, Cons.Two);
+            
+
             model.PurchaseDetails.ToList().ForEach(p =>
             {
                 p.Product.Equivalences = db.Equivalences.Where(e => e.ProductId == p.ProductId
@@ -785,13 +787,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Danger,
                     Header = "Error al registrar el pago!!",
-                    Body = "Ocurrio un error inesperado al registra el pago",
+                    Body = "Mensaje "+ex.Message,
                     Code = Cons.Responses.Codes.ServerError
                 });
             }

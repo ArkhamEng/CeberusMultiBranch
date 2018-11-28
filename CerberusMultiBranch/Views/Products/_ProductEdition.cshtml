@@ -1,0 +1,120 @@
+﻿
+@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+@using CerberusMultiBranch.Support
+
+
+@Scripts.Render("~/bundles/jqueryval")
+
+@using (Html.BeginForm("Save", "Products", FormMethod.Post, new { enctype = "multipart/form-data", id = "SaveForm" }))
+{
+
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <button type="button" id="btnCloseEdit" class="close">
+                <span class="fa fa-times"></span>
+            </button>
+
+            <h4 class="panel-title">
+                <span class="fa fa-cube"></span>
+                Edición de producto
+            </h4>
+        </div>
+        <div class="panel-body">
+            <ul class="nav nav-tabs">
+                <li class="active">
+                    <a data-toggle="tab" href="#general">
+                        <span class="fa fa-columns"></span>
+                        Datos Generales
+                    </a>
+                </li>
+
+                @if (Model.ProductId > Cons.Zero)
+                {
+                    <li>
+                        <a data-toggle="tab" href="#models">
+                            <span class="fa fa-car"></span>
+                            Compatibilidad
+                            <span class="bg-danger badge">
+                                @Model.Compatibilities.Count
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a data-toggle="tab" href="#images">
+                            <span class="fa fa-image"></span> Imagenes
+                            <span class="bg-danger badge">
+                                @Model.Images.Count
+                            </span>
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            <div class="tab-content">
+                <div id="general" class="tab-pane fade in active small">
+                    @Html.Partial("_ProductEditionGeneral", Model)
+                </div>
+                @if (Model.Quantity > Cons.Zero)
+                {
+                    <script>
+                                $(".btnToHide").prop("disabled", true);
+                    </script>
+                }
+                <div id="models" class="tab-pane fade">
+                    <div>
+                        @Html.Partial("_CarModelSelector", Model)
+                    </div>
+                </div>
+
+                <div id="images" class="tab-pane fade">
+                    <div id="divProductImages">
+                        @Html.Partial("_ProductEditionImages", Model.Images)
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <button class="btn btn-primary" type="submit">
+                    <span class="fa fa-save"></span>
+                    Guardar
+                </button>
+                <button class="btn btn-danger" type="button" id="EditCancel">
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+    $(document).ready(function ()
+    {
+        SetCascade("#PartSystemId", "#CategoryId", '@Url.Action("GetCategories", "Json")');
+
+     
+        $("#StorePercentage").keyup(SetPrice);
+        $("#StorePercentage").click(SetPrice);
+
+        $("#WholesalerPercentage").keyup(SetPrice);
+        $("#WholesalerPercentage").click(SetPrice);
+
+        $("#DealerPercentage").keyup(SetPrice);
+        $("#DealerPercentage").click(SetPrice);
+
+        $("#BuyPrice").keyup(SetPrice);
+        $("#BuyPrice").click(SetPrice);
+    });
+
+    function SetPrice()
+    {
+        var sp = (1 + $("#StorePercentage").val() / 100);
+        var wp = (1 + $("#WholesalerPercentage").val() / 100);
+        var dp = (1 + $("#DealerPercentage").val() / 100);
+
+        $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(0));
+        $("#WholesalerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
+        $("#DealerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
+    }
+</script>

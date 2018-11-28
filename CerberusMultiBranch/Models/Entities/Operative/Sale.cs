@@ -22,7 +22,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Folio { get; set; }
 
-        [Display(Name ="Comisión")]
+        [Display(Name = "Comisión")]
         public int ComPer { get; set; }
 
         [Display(Name = "Monto de Comisión")]
@@ -79,6 +79,19 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             }
         }
 
+        public string Days
+        {
+            get
+            {
+               var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
+
+                if (days >= Cons.Zero)
+                    return string.Format("{0} días Expirado",days);
+                else
+                    return string.Format("Expira en {0} días",days);
+            }
+        }
+
         public string Delivery
         {
             get { return this.SendingType == Cons.Zero ? "En Sucursal" : "A Domicilio"; }
@@ -118,13 +131,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         {
             get
             {
-                return !(HttpContext.Current.User.IsInRole("Supervisor") && 
-                   ( (this.Status == TranStatus.Revision || this.Status == TranStatus.Compleated) &&
-                   DateTime.Now.ToLocal().Subtract(this.TransactionDate).Days < Cons.DaysToCancel) );
+                return !(HttpContext.Current.User.IsInRole("Supervisor") &&
+                   ((this.Status == TranStatus.Revision || this.Status == TranStatus.Compleated) &&
+                   DateTime.Now.ToLocal().Subtract(this.TransactionDate).Days < Cons.DaysToCancel));
             }
         }
 
-        public Sale():base()
+        public Sale() : base()
         {
             this.SaleDetails = new List<SaleDetail>();
             this.TransactionDate = DateTime.Now.ToLocal();

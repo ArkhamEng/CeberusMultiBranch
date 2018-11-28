@@ -56,18 +56,17 @@
 
 <script>
     $(document).ready(function ()
-    {       
+    {
     });
 
     function RemoveFromSystem(id)
     {
         var sc = { partSystemId: $("#PartSystemId").val(), categoryId: id }
 
-        ExecuteAjax('@Url.Action("RemoveSystemCategory", "Configuration")', sc, function (response) {
-            if ($.isPlainObject(response)) { }
-            else {
+        ExecuteAjax('@Url.Action("RemoveSystemCategory", "Configuration")', sc, function (response) 
+        {
+           
                 $("#divSystemCategory").html(response);
-            }
         });
     }
 
@@ -76,11 +75,7 @@
         var sc = { PartSystemId: $("#PartSystemId").val(), CategoryId: $("#SelectedCategoryId").val() }
         ExecuteAjax('@Url.Action("AddSystemCategory", "Configuration")', { sysCat: sc }, function (response)
         {
-            if($.isPlainObject(response)){}
-            else
-            {
-                $("#divSystemCategory").html(response);
-            }
+            $("#divSystemCategory").html(response);
         });
     }
 </script>

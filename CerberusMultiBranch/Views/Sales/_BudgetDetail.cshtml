@@ -83,14 +83,20 @@
 
 
 <script>
-    function ApplyBudget(id) {
+    function ApplyBudget(id)
+    {
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("ApplyBudget", "Sales")', { budgetId: id }, function (response) {
-            HideModal(function () {
-                ShowNotify(response.Header, response.Result, response.Body, 3000);
+        ExecuteAjax('@Url.Action("ApplyBudget", "Sales")', { budgetId: id }, function (response)
+        {
+            HideModLoading(function ()
+            {
+                HideModal(function () {
+                    ShowNotify(response.Header, response.Result, response.Body, 3000);
 
-            }, true);
+                }, true);
+            });
+         
         });
     }
 </script>

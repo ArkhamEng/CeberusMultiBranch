@@ -41,6 +41,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var top = quickSearch ? Cons.QuickResults : Cons.MaxResults;
 
+            top = 30000;
             var model = LookFor(stateId, cityId, name, ftr, id, top);
 
             if (!quickSearch)
@@ -74,7 +75,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              (c.IsActive)
                          select new ClientViewModel
                          {
-                             Address = c.Address,
                              BusinessName = c.BusinessName,
                              ClientId = c.ClientId,
                              Code = c.Code,
@@ -87,7 +87,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              Phone = c.Phone,
                              UsedAmount = c.UsedAmount,
                              UpdDate = c.UpdDate,
-                             ZipCode = c.ZipCode,
                              Type = c.Type,
                              CreditDays = c.CreditDays,
                              CreditComment = c.CreditComment,
@@ -315,7 +314,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult GetClientCreditData(int id)
         {
-            var client = db.Clients.Find(id);
+            var client = db.Clients.FirstOrDefault(p=> p.ClientId == id);
 
             if (client.CreditDays == Cons.Zero)
                 return Json(new { Result = "Error", Message = client.CreditComment ?? "No se han configurado los días de credito  para este cliente" });

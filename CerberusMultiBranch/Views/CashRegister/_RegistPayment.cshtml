@@ -167,12 +167,12 @@
     <div class="panel-footer clearfix">
         <div class="pull-right">
 
-            <button class="btn btn-primary" type="button" title="Imprimir Nota" onclick="RegisterPayment(2)" this.onclick=null>
+            <button id="btnRegistNote" class="btn btn-primary" type="button" title="Imprimir Nota">
                 <span class="fa fa-file"></span>
                 Imprimir Nota
             </button>
 
-            <button class="btn btn-info" type="button" title="Imprimir ticket" onclick="RegisterPayment(1)" this.onclick=null>
+            <button  id="btnRegistTicket" class="btn btn-info" type="button" title="Imprimir ticket">
                 <span class="fa fa-ticket"></span>
                 Imprimir Ticket
             </button>
@@ -200,7 +200,25 @@
         });
 
         SumAmount();
+
+        BindRegistButtons();
     });
+
+
+    function BindRegistButtons()
+    {
+        $("#btnRegistNote").off('click').on('click', function ()
+        {
+            $("#btnRegistNote").off('click');
+            RegisterPayment(2);
+        });
+
+        $("#btnRegistTicket").off('click').on('click', function ()
+        {
+            $("#btnRegistTicket").off('click');
+            RegisterPayment(1);
+        });
+    }
 
     function SetInputEvents()
     {
@@ -285,7 +303,8 @@
             var tot = parseFloat($("#AmountToPay").val());
 
             //si el monto del vale excede o es igual a la cantidad  pagar, inhibo el ingreso de otra forma de pago
-            if (response.Extra > tot || response.Extra == tot) {
+            if (response.Extra > tot || response.Extra == tot)
+            {
                 $("#CashAmount").val(0);
                 $("#CashAmount").attr("disabled", true);
 
@@ -321,7 +340,8 @@
         $("#total").text(amount.toFixed(2));
     }
 
-    function Calculate(val) {
+    function Calculate(val)
+    {
         var total = parseFloat($("#AmountToPay").val()) - parseFloat($("#CreditNoteAmount").val());
 
         var result = (total - parseFloat(val));
@@ -334,7 +354,8 @@
 
     function RegisterPayment(printType)
     {
-        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
+        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0)
+        {
             ShowNotify("Cantidad Incorrecta!", "warning",
                 "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 3000);
             return;
@@ -352,13 +373,22 @@
             PrintType: printType
         };
 
-        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response) {
-            HideModal(function () {
-                CheckPendingPayments();
-                $("#divPrinter").html(response);
+        console.log("Parametros de pago");
+        console.log(param);
 
-            }, true);
-        });
+        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response)
+        {
+            HideModLoading(function ()
+            {
+                HideModal(function ()
+                {
+                    CheckPendingPayments();
+                    $("#divPrinter").html(response);
+
+                }, true);
+            });
+          
+        }, BindRegistButtons);
     }
 
 

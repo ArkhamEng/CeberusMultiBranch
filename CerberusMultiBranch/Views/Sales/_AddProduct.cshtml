@@ -108,12 +108,10 @@
 
             ExecuteAjax('@Url.Action("CompleateAdd")', param, function (response)
             {
-                HideLoading();
-
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Header, response.Message, 'warning');
-                else
+                HideLoading(function()
+                {
                     $("#divDetails").html(response);
+                });
             });
         });
         $("#ModalAddProduct").modal("hide");

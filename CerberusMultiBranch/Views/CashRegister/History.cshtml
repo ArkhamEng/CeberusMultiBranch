@@ -48,7 +48,7 @@
     {
         ShowLoading();
         var param = { branchId: $("#BranchId").val(), beginDate: $("#BeginDate").val(), endDate: $("#EndDate").val() }
-        console.log(param);
+        
         ExecuteAjax('@Url.Action("Search")', param, function (view)
         {
             $("#divCashRegisterList").html(view);

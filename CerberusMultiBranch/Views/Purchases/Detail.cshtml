@@ -197,7 +197,11 @@
 
         $("#btnCompleate").click(function ()
         {
-            ShowConfirm("Terminar e inventariar?", "Estas seguro que quieres inventariar esta compra?", 'static', SubmitCompleate);
+            ShowConfirm("Terminar e inventariar?, Estas seguro que quieres inventariar esta compra?",
+                '@Url.Action("Compleate","Purchases")', '@Model.PurchaseId', function ()
+                {
+                    window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
+                });
         });
 
         if ('@Model.Status' == '@TranStatus.Reserved' || '@Model.Status' == '@TranStatus.Compleated')
@@ -230,25 +234,13 @@
         $("#ModalQuickProvider").modal('hide');
     }
 
-    function SubmitCompleate()
-    {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("Compleate")', { purchaseId: $("#PurchaseId").val() }, function (response)
-        {
-            HideLoading(function ()
-            {
-                window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
-            });
-        });
-    }
 
     function ShowCancel()
     {
         BeginCancelPurchase('@Model.PurchaseId', function () { window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})'; });
     }
 
-   
+
 
 </script>
 

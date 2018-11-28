@@ -42,7 +42,7 @@
                   <label>Proveedor</label> @item.Product.Equivalences.First().Code <br />
                   <label>Autobien</label>  @Html.DisplayFor(modelItem => item.Product.Code)
                 </td>
-                <td>
+                <td style="white-space:normal">
                     @Html.DisplayFor(modelItem => item.Product.Name)<br />
                 </td>
                 <td>
@@ -65,7 +65,12 @@
         }
     </tbody>
 </table>
-
+@{
+    var det = Model.FirstOrDefault();
+    var totAmount = det != null ? det.Purchase.TotalAmount : Cons.Zero;
+    var totTaxedAmount = det != null ? det.Purchase.TotalTaxedAmount : Cons.Zero;
+    var finalAmount = det != null ? det.Purchase.FinalAmount : Cons.Zero;
+ }
 
 <script>
     $(document).ready(function ()
@@ -79,11 +84,11 @@
             $("#btnCompleate").hide();
 
 
-        $("#divTotalAmount").text('@Model.First().Purchase.TotalAmount.ToMoney()');
+        $("#divTotalAmount").text('@totAmount.ToMoney()');
 
-        $("#divTaxedAmount").text('@Model.First().Purchase.TotalTaxedAmount.ToMoney()');
+        $("#divTaxedAmount").text('@totTaxedAmount.ToMoney()');
 
-        $("#divFinalAmount").text('@Model.First().Purchase.FinalAmount.ToMoney()');
+        $("#divFinalAmount").text('@finalAmount.ToMoney()');
 
     });
 

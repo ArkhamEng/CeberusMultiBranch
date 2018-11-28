@@ -212,15 +212,7 @@
   
     function BeginEdit(id)
     {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("Edit", "Products")', { productId: id }, function (response)
-        {
-            HideLoading(function ()
-            {
-                $("#divModals").html(response);
-            });
-        });
+        ShowCatalogModal(SearchBy, null, 'Product', id);
     }
 
     function BeginMovement(pid)

@@ -217,6 +217,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public Product()
         {
             this.NewCompatibilities = new List<string>();
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name; 
 
         }
         #endregion

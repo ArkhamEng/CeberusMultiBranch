@@ -2,51 +2,35 @@
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
-<table id="tbSales" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+<table id="tbSales" class="table dt-responsive table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
-            <td>
-                @Html.DisplayNameFor(model => model.Status)
-            </td>
-            <td>
+            <th >
                 @Html.DisplayName("Tipo")
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.Branch.Name)
-            </td>
-            <th>
-                @Html.DisplayNameFor(model => model.Folio)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Client.Name)
+
+            <th >
+                @Html.DisplayName("Folio")
+            </th>
+            <th >
+                @Html.DisplayName("Cliente")
             </th>
             <th>
                 @Html.DisplayName("Agente")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TransactionDate)
+                @Html.DisplayName("Fecha")
             </th>
+            <th >
+                @Html.DisplayName("Crédito")
+            </th>
+
             <th>
-                @Html.DisplayNameFor(model => model.Expiration)
+                @Html.DisplayName("Total")
             </th>
-            <td>
-                @Html.DisplayNameFor(model => model.TotalTaxedAmount)
-            </td>
             <th>
                 @Html.DisplayName("Abonos")
-            </th>
-            <th>
-                @Html.DisplayName("Deuda")
-            </th>
-            <td>
-                @Html.DisplayNameFor(model => model.ComPer)
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.ComAmount)
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.SendingType)
-            </td>
+            </th>           
             <th></th>
         </tr>
     </thead>
@@ -54,50 +38,39 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td class="@item.StatusStyle">
-                    @Html.DisplayFor(m => item.SaleStatus)
-                </td>
                 <td>
                     @Html.DisplayFor(m => item.TransactionType)
+                    <div class="@item.StatusStyle">
+                        @Html.DisplayFor(m => item.SaleStatus)
+                    </div>
                 </td>
-
                 <td>
+                    @Html.DisplayUpperFor(m => item.Folio) <br />
                     @Html.DisplayUpperFor(m => item.Branch.Name)
                 </td>
-                <td>
-                    @Html.DisplayUpperFor(m => item.Folio)
-                </td>
-                <td>
+
+                <td style="min-width:200px">
                     @Html.DisplayUpperFor(m => item.Client.Name)
                 </td>
                 <td>
                     @Html.DisplayUpperFor(m => item.User.UserName)
                 </td>
                 <td>
-                    @Html.DisplayFor(m => item.TransactionDate)
+                    @item.TransactionDate.ToString("dd/MM/yyyy")
                 </td>
                 <td>
-                    @Html.DisplayFor(m => item.Expiration)
+                    <strong>
+                        @Html.DisplayFor(m => item.Days)
+                    </strong>
                 </td>
-                <td>
+                <td class="text-right">
                     @Html.DisplayFor(m => item.TotalTaxedAmount)
                 </td>
-                <td>
-                    @item.SalePayments.Sum(p => p.Amount).ToMoney()
-                </td>
+                <td class="text-right">
+                    @item.SalePayments.Sum(p => p.Amount).ToMoney() <br />
 
-                <td>
                     @{ var debt = item.TotalTaxedAmount - item.SalePayments.Sum(p => p.Amount); }
-                    @debt.ToMoney()
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.ComPer) %
-                </td>
-                <td>
-                  @item.ComAmount.ToMoney()
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.Delivery)
+                  
                 </td>
                 <td>
                     <button class="btn btn-warning btn-sm" title="Editar Venta"
@@ -106,10 +79,10 @@
                     </button>
                 </td>
             </tr>
-        }
+                        }
     </tbody>
     @{
-        var totalCommision = Model.Where(sale=> sale.Status == TranStatus.Compleated).Sum(sale => sale.ComAmount);
+        var totalCommision = Model.Where(sale => sale.Status == TranStatus.Compleated).Sum(sale => sale.ComAmount);
         var totalAmount = Model.Where(sale => sale.Status != TranStatus.Canceled && sale.Status != TranStatus.PreCancel).Sum(sale => sale.TotalTaxedAmount);
         var payed = Model.Where(sale => sale.Status != TranStatus.Canceled && sale.Status != TranStatus.PreCancel).Sum(sale => sale.SalePayments.Sum(s => s.Amount));
     }
@@ -118,11 +91,10 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#tbSales").removeClass("hidden");
 
-        var printSalesOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Ventas"))', Columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] };
+        var printSalesOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Ventas"))', Columns: [0, 1, 2, 3, 4, 5, 6, 7] };
 
         Paginate("#tbSales", 10, true, null, false, "#tbButtonsSales", printSalesOp);
 

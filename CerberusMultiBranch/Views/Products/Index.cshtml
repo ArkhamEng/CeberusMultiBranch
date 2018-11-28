@@ -102,39 +102,39 @@
             CascadeModel();
         });
 
-        $("#btnCreate").click(function () {
-            ShowLoading();
-            ExecuteAjax('@Url.Action("Edit","Products")', {}, function (response) {
-                HideLoading();
-                if ($.isPlainObject(response))
-                    ShowMessage(response.Result, response.Message, "warning");
-                else
-                    $("#divModals").html(response)
-            });
+        $("#btnCreate").click(function ()
+        {
+            ShowCatalogModal(function (id)
+            {
+                ShowCatalogModal(SearchBy, function () { SearchBy(id); }, 'Product', id);
+
+            }, null, 'Product', 0);
         });
 
-        $("#btnSearch").click(function () {
+        $("#btnSearch").click(function ()
+        {
             LookFor();
         });
 
-        $("#btnSearchProvider").click(function () {
+        $("#btnSearchProvider").click(function ()
+        {
             var f = $("#txtName").val();
 
-            if (f.length < 3) {
-                ShowMessage("Datos insuficientes!", "Para realizar una busqueda en el catálogo de proveedores"
-                    + "es necesario ingresar por lo menos 3 caracteres en el filtro de descripción / código", "warning");
+            if (f.length < 5)
+            {
+                ShowNotify("Datos insuficientes!","info", "Para realizar una busqueda en el catálogo de proveedores"
+                    + "es necesario ingresar por lo menos 5 caracteres en el filtro de descripción / código", 4000);
                 return;
             }
 
-            ShowLoading();
-            ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response) {
-                HideLoading();
-                if ($.isPlainObject(response)) {
-                    ShowMessage(response.Result, response.Message, "warning");
-                }
-                else {
-                    $("#divModals").html(response);
-                }
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("ExternalSearch", "Products")', { filter: $("#txtName").val() }, function (response)
+            {
+                HideLoading(function ()
+                {
+                    ShowModal(response,"static","lg", null);
+                });
             });
         });
 
@@ -156,6 +156,14 @@
         $("#btnClear").click(function () { ShowLoading(); window.location = '@Url.Action("Index",new { })' })
     });
 
+    function SearchBy(id)
+    {
+        ExecuteAjax('@Url.Action("Search")', { id: id, isGrid: $("#IsGrid").val() }, function (view)
+        {
+            $("#divProducts").html(view);
+        });
+    }
+
     function LookFor()
     {
 
@@ -172,9 +180,10 @@
         };
         ExecuteAjax('@Url.Action("Search")', data, function (view)
         {
-            HideLoading();
-
-            $("#divProducts").html(view);
+            HideLoading(function ()
+            {
+                $("#divProducts").html(view);
+            });
         });
     }
 

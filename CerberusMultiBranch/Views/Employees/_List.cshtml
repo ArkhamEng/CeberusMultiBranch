@@ -142,7 +142,8 @@
 
         ShowConfirm(text, '@Url.Action("Deactivate","Employees")', id, function ()
         {
-            ExecuteAjax('@Url.Action("Search")', {}, function (view) {
+            ExecuteAjax('@Url.Action("Search")', {}, function (view)
+            {
                 $("#divEmployees").html(view);
             });
         });

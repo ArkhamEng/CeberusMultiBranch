@@ -2,37 +2,48 @@
 //Muestra la ventada emergente de Edición /Captura de catalogos, dependiendo del 
 //tipo dado en el parametro Entity (Client,Employee,Supplier, Product, etc), si se envía un disable call back
 //se considerara que la ventana no esta en modo de edición
-function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBack) {
+function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBack)
+{
     ShowLoading('static');
 
     var param = {};
     var url = "";
     var unlockUrl = "";
-    var personIdFileld = "";
+    var idField = "";
     //si es para Editar
-    if (id > 0) {
+    
+    if (!isNaN(id) && id > 0)
+    {
         param = { id: id };
 
-        switch (Entity) {
+        switch (Entity)
+        {
             case "Client":
                 url = "/Clients/BeginAdd";
                 unlockUrl = "/Clients/UnLock/";
-                personIdFileld = "ClientId";
+                idField = "ClientId";
                 break;
             case "Provider":
                 url = "/Providers/BeginAdd";
                 unlockUrl = "/Providers/UnLock/";
-                personIdFileld = "ProviderId";
+                idField = "ProviderId";
                 break;
             case "Employee":
                 url = "/Employees/BeginAdd";
                 unlockUrl = "/Employees/UnLock/";
-                personIdFileld = "EmployeeId";
+                idField = "EmployeeId";
+                break;
+            case "Product":
+                url = "/Products/BeginAdd";
+                unlockUrl = "/Products/UnLock/";
+                idField = "ProductId";
                 break;
         }
     }
-    else {
-        switch (Entity) {
+    else if(id == 0)
+    {
+        switch (Entity)
+        {
             case "Client":
                 url = "/Clients/BeginAdd";
                 break;
@@ -40,11 +51,22 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                 url = "/Providers/BeginAdd";
                 break;
             case "Employee":
-                url = "/Employees/BeginAdd";
+                url = "/Products/BeginAdd";
+                break;
+            case "Product":
+                url = "/Products/BeginAdd";
                 break;
         }
-
-        unlockUrl = '';
+    }
+    else
+    {
+        param = id;
+        switch (Entity)
+        {
+            case "ProductCopy":
+                url = "/Products/BeginCopy";
+                break;
+        }
     }
     var form = "#SaveForm";
 
@@ -69,6 +91,7 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                     if (CloseCallBack != null)
                         CloseCallBack();
                 };
+
                 ShowModal(response, 'static', 'lg', onHidden);
 
 
@@ -80,12 +103,16 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                     if (typeof (disableCallBack) != 'undefined')
                         disableCallBack();
                         //de lo contrario, entro a modo edición y bloqueo el registro
-                    else {
+                    else
+                    {
                         ShowNotify("Registro bloqueado!", "warning", "Dispones de 5 min para realizar cambios, sobre este registro", 4000);
                     }
                 }
 
-                SubmitPerson(OnCompleate, form, personIdFileld);
+                if (Entity != "Product")
+                    SubmitPerson(OnCompleate, form, idField);
+                else
+                    SubmitProduct(OnCompleate, form, idField);
 
                 //evento del boton cancel
                 $("#EditCancel").off('click').click(function (e)
@@ -187,6 +214,69 @@ function SubmitPerson(SuccessCallBack, form, idField) {
 
 
 
+function SubmitProduct(SuccessCallBack, form, idField)
+{
+    $(form).off('submit').on('submit', function (e)
+    {
+        e.preventDefault();
+
+        var $form = $(e.target),
+        formData = new FormData(),
+        params = $form.serializeArray(),
+        files = [],
+        addresses = [];
+
+       
+        if (!$form.valid())
+        {
+            ShowNotify("Error de validación", "danger", "Existen errores en lo datos capturados, por favor verifica", 3500);
+            return;
+        }
+
+
+        //agrego todos los campos del formulario
+        $.each(params, function (i, val) {
+            formData.append(val.name, val.value);
+        });
+
+     
+        ShowModLoading();
+
+        $.ajax({
+            url: $form.attr('action'),
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            success: function (response)
+            {
+                HideModLoading();
+
+                if ($.isPlainObject(response) && response.Code != 200)
+                {
+                    ShowNotify(response.Header, response.Result, response.Body, 3500);
+
+                    switch (response.Code) {
+                        case 401:
+                            window.location = data.LogOnUrl;
+                            break;
+                    }
+                }
+                else {
+                    HideModal(function ()
+                    {
+                        ShowNotify(response.Header, response.Result, response.Body, 3500);
+                        SuccessCallBack(response.Id);
+                    }, true);
+                }
+            },
+            error: function () { HideModLoading(); }
+        });
+    });
+}
+
+
 function ShowConfirm(text, url, id, CompleatedCallBack) {
 
     $("#ConfirmText").html(text);
@@ -214,10 +304,8 @@ function ShowConfirm(text, url, id, CompleatedCallBack) {
     $("#ModalConfirm").modal({ backdrop: 'static' });
 }
 
-function HideConfirm(callback)
-{
-    $("#ModalConfirm").off("hidden.bs.modal").on("hidden.bs.modal", function (e)
-    {
+function HideConfirm(callback) {
+    $("#ModalConfirm").off("hidden.bs.modal").on("hidden.bs.modal", function (e) {
         if (callback != null)
             callback();
     });
@@ -226,14 +314,11 @@ function HideConfirm(callback)
 }
 
 
-function ShowQuickSearch(url, onRecordSelected, onClosed)
-{
+function ShowQuickSearch(url, onRecordSelected, onClosed) {
     ShowLoading('static');
 
-    ExecuteAjax(url, { quickSearch: true }, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax(url, { quickSearch: true }, function (response) {
+        HideLoading(function () {
             recordSelected = onRecordSelected;
 
             onCloseQuickSearch = onClosed;

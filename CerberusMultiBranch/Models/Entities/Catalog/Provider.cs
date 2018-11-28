@@ -15,9 +15,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     {
         public int ProviderId { get; set; }
 
-        [Display(Name = "Ciudad/Municipio")]
-        public int? CityId { get; set; }
-
+       
         [Display(Name = "Clave")]
         [Required]
         [MaxLength(10)]
@@ -47,18 +45,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Index("Unq_FTR", IsUnique = true)]
         public string FTR { get; set; }
 
-     
-        [Display(Name = "Dirección")]
-        [DataType(DataType.MultilineText)]
-        [MaxLength(150)]        
-        public string Address { get; set; }
-
-        [Display(Name = "C.P.")]
-        [MaxLength(10)]
-        [DataType(DataType.PostalCode)]
-        public string ZipCode { get; set; }
-
-
+    
         [Display(Name = "E-mail")]
         [DataType(DataType.EmailAddress, ErrorMessage = "Ingresa una dirección de correo válida ej. nombre@tudominio.com")]
         [MaxLength(100)]
@@ -143,9 +130,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             return new Provider
             {
                 ProviderId = this.ProviderId,
-                Address = this.Address,
                 BusinessName = this.BusinessName,
-                CityId = this.CityId,
                 Code = this.Code,
                 Email = this.Email,
                 FTR = this.FTR,
@@ -153,7 +138,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
                 UpdDate = this.UpdDate,
                 Name = this.Name,
                 Phone = this.Phone,
-                ZipCode = this.ZipCode,
                 WebSite = this.WebSite
                 
             };

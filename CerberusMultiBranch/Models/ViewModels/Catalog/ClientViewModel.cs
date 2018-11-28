@@ -101,9 +101,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public ClientViewModel(Client client)
         {
-            this.Address      = client.Address;
             this.BusinessName = client.BusinessName;
-            this.CityId       = client.CityId;
+            
             this.ClientId     = client.ClientId;
             this.Code         = client.Code;
             this.Email        = client.Email;
@@ -115,7 +114,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Phone        = client.Phone;
             this.UsedAmount = client.UsedAmount;
             this.UpdDate      = client.UpdDate;
-            this.ZipCode      = client.ZipCode;
             this.Type         = client.Type;
             this.CreditDays   = client.CreditDays;
             this.CreditComment = client.CreditComment;

@@ -100,7 +100,8 @@
     {
         Paginate("#tbWithdrawals", 8, true, null, false);
 
-        $("#btnAdd").off('click').click(function () {
+        $("#btnAdd").off('click').click(function ()
+        {
             var data = { amount: $("#txtAmount").val(), comment: $("#txtCommentW").val(), causeId: $("#WCauseId").val() };
 
             if (isNaN(data.amount) || data.amount <= 0) {
@@ -108,12 +109,14 @@
                 return;
             }
 
-            if (isNaN(data.causeId) || data.causeId <= 0) {
+            if (isNaN(data.causeId) || data.causeId <= 0)
+            {
                 ShowNotify("Erro de captura", "danger", "Debe seleccionar una causa de retiro", 3000);
                 return;
             }
 
-            if (data.comment.length <= 20) {
+            if (data.comment.length <= 20)
+            {
                 ShowNotify("Erro de captura", "danger", "Debe agregar un comentario de mas de 20 caracteres", 3000);
                 return;
             }
@@ -124,6 +127,7 @@
             ExecuteAjax('@Url.Action("AddWithdrawal","CashRegister")', data, function (response)
             {
                 window.location = '@Url.Action("Index")';
+
             });
         });
     });

@@ -38,8 +38,12 @@
         {
             var data = { amount: $("#CashAmount").val(), comment: $("#txtCommentClose").val() };
 
-            if (data.comment.length < 15)
-                ShowNotify("Comentario requerido", "warning", "Se requiere un comentario de 15 o mas caracteres", 3000);
+            if (data.comment.length < 10)
+            {
+                ShowNotify("Comentario requerido", "warning", "Se requiere un comentario de 10 o mas caracteres", 3000);
+                return;
+            }
+                
 
             ShowModLoading();
 

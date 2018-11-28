@@ -63,10 +63,14 @@
 
         ExecuteAjax('@Url.Action("SaveCause","Configuration")', {cause: cause} , function (response)
         {
-            HideModal(function ()
+            HideModLoadig(function ()
             {
-                $("#divCauses").html(response);
-            }, true);
+                HideModal(function ()
+                {
+                    $("#divCauses").html(response);
+                }, true);
+            });
+           
         });
 
     }

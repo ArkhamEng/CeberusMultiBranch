@@ -113,7 +113,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public ProviderViewModel(Provider provider)
         {
-            this.Address = provider.Address;
             this.BusinessName = provider.BusinessName;
             this.ProviderId = provider.ProviderId;
             this.Code = provider.Code;
@@ -124,7 +123,6 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Phone = provider.Phone;
             this.UpdDate = provider.UpdDate;
             this.UpdUser = provider.UpdUser;
-            this.ZipCode = provider.ZipCode;
             this.WebSite = provider.WebSite;
             this.Agent = provider.Agent;
             this.AgentPhone = provider.AgentPhone;

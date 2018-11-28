@@ -75,10 +75,13 @@
 
         ExecuteAjax('@Url.Action("SaveCategory","Configuration")', { category: cat }, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                $("#divCategories").html(response);
-            }, true);
+                HideModal(function () {
+                    $("#divCategories").html(response);
+                }, true);
+            });
+          
         });
     }
 

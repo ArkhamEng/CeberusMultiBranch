@@ -1,0 +1,104 @@
+﻿
+@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.ProductImage>
+
+@using (Html.BeginForm("SaveImage", "Products", FormMethod.Post, new { enctype = "multipart/form-data", id = "SaveImageForm" }))
+{
+    <div class="panel panel-default">
+        <div id="pnlImages" class="panel panel-body">
+
+            @foreach (var image in Model)
+            {
+                var divId = "divImage" + image.ProductImageId;
+
+                <div class="col-md-4">
+                    <button class="close" type="button" onclick="RemoveImage('@image.ProductImageId')">
+                        <span class="fa fa-times-circle"></span>
+                    </button>
+                    <div class="image">
+                        <img class="img-responsive img-thumbnail" src="@image.Path" />
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+                <label class="btn btn-success btn-sm">
+                    <span class="fa fa-picture-o"></span>
+                    Agregar Imagen
+                    <input type="file" id="imgUploader" onchange="ImageProductLoaded()" style="display: none;" accept="image/*">
+                </label>
+            </div>
+        </div>
+    </div>
+}
+
+
+<script>
+    $(document).ready(function ()
+    {
+        
+    });
+
+    function RemoveImage(id)
+    {
+        ShowModLoading();
+
+        ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response)
+        {
+            HideModLoading();
+            $("#divProductImages").html(response);
+        });
+    }
+
+    function ImageProductLoaded()
+    {
+        ShowModLoading();
+
+        var data = new FormData();
+        var files = $("#imgUploader").get(0).files
+
+        if (files.length > 0)
+        {
+            data.append("image", files[0]);
+            data.append("id", $("#ProductId").val());
+        }
+
+        $.ajax({
+            url: '@Url.Action("SaveImage")',
+            data: data,
+            type: "POST",
+            cache: false,
+            contentType: false,
+            processData: false,
+            type: 'POST',
+            
+            success: function (response)
+            {
+                HideModLoading();
+
+                if ($.isPlainObject(response) && response.Code != 200)
+                {
+                    ShowNotify(response.Header, response.Result, response.Body, 3500);
+
+                    switch (response.Code)
+                    {
+                        case 401:
+                            window.location = data.LogOnUrl;
+                            break;
+                    }
+                }
+                else
+                {
+                    $("#divProductImages").html(response);
+                }
+            },
+            error: function ()
+            {
+                ShowNotify("Error guardar", "warning", "No fue posible adjuntar la imagen al producto", 3000);
+                HideModLoading();
+            }
+        });
+
+    }
+</script>

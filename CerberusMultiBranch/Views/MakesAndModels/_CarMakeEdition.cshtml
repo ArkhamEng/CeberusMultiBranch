@@ -65,10 +65,13 @@
 
         ExecuteAjax('@Url.Action("SaveCarMake","MakesAndModels")', { carMake: carMake }, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                $("#divMakes").html(response);
-            }, true);
+                HideModal(function ()
+                {
+                    $("#divMakes").html(response);
+                }, true);
+            });
         });
 
     }

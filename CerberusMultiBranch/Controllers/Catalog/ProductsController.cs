@@ -1,29 +1,27 @@
-﻿using System.Data;
+﻿using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Config;
+using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.ViewModels.Catalog;
+using CerberusMultiBranch.Models.ViewModels.Operative;
+using CerberusMultiBranch.Support;
+using Microsoft.AspNet.Identity;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Web.Mvc;
-using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Models.ViewModels.Catalog;
-using CerberusMultiBranch.Support;
-using System;
-using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models;
-using System.Collections.Generic;
-using Microsoft.AspNet.Identity;
-using CerberusMultiBranch.Models.Entities.Operative;
 using System.Text.RegularExpressions;
-using System.Web;
-using CerberusMultiBranch.Models.ViewModels.Operative;
+using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     [CustomAuthorize]
-    public class ProductsController : Controller
+    public partial class ProductsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        #region Index Methods
+        #region Basic Catalog Methods
         public ActionResult Index()
         {
             var model = new SearchProductViewModel();
@@ -36,452 +34,14 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public ActionResult BeginTransference(int destBranchId, int productId)
+        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid, int? id)
         {
-            try
-            {
-                var branchId = User.Identity.GetBranchId();
-
-                var branchP = db.BranchProducts.Include(bp => bp.Product).
-                    Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                     FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
-
-                var destBranch = db.Branches.FirstOrDefault(p=> p.BranchId == destBranchId);
-
-                TransferViewModel transfer = new TransferViewModel
-                {
-                    TransBranch = destBranch.Name,
-                    TransBranchId = destBranch.BranchId,
-                    TransCode = branchP.Product.Code,
-                    TransImage = branchP.Product.Images.Count > Cons.Zero ? branchP.Product.Images.First().Path : "/Content/Images/sinimagen.jpg",
-                    TransName = branchP.Product.Name,
-                    TransProductId = productId,
-                    TransStock = branchP.Stock,
-                    TransUnit = branchP.Product.Unit
-                };
-
-                return PartialView("_Transference", transfer);
-            }
-            catch (Exception)
-            {
-                return Json(new JResponse
-                {
-                    Code = Cons.Responses.Codes.ServerError,
-                    Result = Cons.Responses.Danger,
-                    Header="Errro al Transferir",
-                    Body ="Ocurrio un error inesperado al realizar la transferencia"
-                });
-            }
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public JsonResult Transfer(int detsBranchId, int productId, double quantity)
-        {
-
-            var branchId = User.Identity.GetBranchId();
-
-            var orBP = db.BranchProducts.Include(br => br.Product).Include(br => br.Branch).
-                FirstOrDefault(br => br.BranchId == branchId && br.ProductId == productId);
-
-            if (orBP.Stock < quantity)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Warning,
-                    Code = Cons.Responses.Codes.InvalidData,
-                    Header = "Imposible realizar la transferencia",
-                    Body = "La cantidad solicitada es mayor a la disponible en sucursal"
-                });
-            }
-
-            //Obtengo la relacion producto sucursal destino
-            var destBp = db.BranchProducts.Include(b => b.Branch).
-                        FirstOrDefault(b => b.BranchId == detsBranchId && b.ProductId == productId);
-
-            try
-            {
-                //si no existe la creo de lo contrario la actualizo
-                if (destBp == null)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Header = "Imposible realizar la transferencia",
-                        Body = "El producto no se esta configurado en la sucursal de destino, es necesario realizar las configuraciones antes de transferir"
-                    });
-                }
-                else
-                {
-                    destBp.LastStock = destBp.Stock;
-                    destBp.Stock += quantity;
-                    destBp.UpdDate = DateTime.Now;
-                    destBp.UpdUser = User.Identity.Name;
-                }
-
-                db.Entry(destBp).Property(p => p.LastStock).IsModified = true;
-                db.Entry(destBp).Property(p => p.Stock).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-
-                //agrego los movimientos de Stock en la sucursal destino
-                StockMovement smD = new StockMovement
-                {
-                    BranchId = destBp.BranchId,
-                    ProductId = destBp.ProductId,
-                    Comment = "Transferencia de sucursal " + orBP.Branch.Name,
-                    MovementType = MovementType.Entry,
-                    MovementDate = DateTime.Now,
-                    User = User.Identity.Name,
-                    Quantity = quantity
-                };
-
-                db.StockMovements.Add(smD);
-
-                //agrego los movimientos de Stock en la sucursal origen
-                StockMovement smO = new StockMovement
-                {
-                    BranchId = orBP.BranchId,
-                    ProductId = orBP.ProductId,
-                    Comment = "Transferencia a sucursal " + destBp.Branch.Name,
-                    MovementType = MovementType.Exit,
-                    MovementDate = DateTime.Now,
-                    User = User.Identity.Name,
-                    Quantity = quantity
-                };
-
-                db.StockMovements.Add(smO);
-
-                //actualizo stock en sucursal de origen
-                orBP.LastStock = orBP.Stock;
-                orBP.Stock -= quantity;
-                orBP.UpdUser = User.Identity.Name;
-                orBP.UpdDate = DateTime.Now.ToLocal();
-
-                db.Entry(orBP).Property(p => p.LastStock).IsModified = true;
-                db.Entry(orBP).Property(p => p.Stock).IsModified = true;
-                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(orBP).Property(p => p.UpdDate).IsModified = true;
-
-                db.SaveChanges();
-
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Success,
-                    Code = Cons.Responses.Codes.Success,
-                    Header = "Transferencia exitosa!",
-                    Body = "Se transfirieron " + quantity + " unidades del producto " + orBP.Product.Code.ToUpper() + " a la sucursale " + destBp.Branch.Name.ToUpper()
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al transferir",
-                    Body = "Ocurrio un error inesperado al transferir, detalle:" + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult GetProductImages(int id)
-        {
-           var list =  db.ProductImages.Where(pi => pi.ProductId == id).Select(pi => pi.Path).ToList();
-
-            if (list.Count == Cons.Zero)
-                list.Add(Cons.NoImagePath);
-
-            return PartialView("_ProductImages", list);
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public ActionResult GetProductMovements(int id)
-        {
-            try
-            {
-                int branchId = User.Identity.GetBranchId();
-
-                var model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m=> m.MovementDate).ToList();
-
-                if(model.Count == Cons.Zero)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Info,
-                        Code = Cons.Responses.Codes.RecordNotFound,
-                        Header = "Producto sin movimientos",
-                        Body = "El producto, aun no tiene movimientos registrados en esta sucursal"
-                    });
-                }
-
-
-                return PartialView("_ProductMovement", model);
-            }
-            catch (Exception)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al obtener datos",
-                    Body = "Ocurrio un error inesperado obtener los movimientos del producto"
-                });
-            }
-         
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public ActionResult BeginMovement(int productId)
-        {
-            var branchId = User.Identity.GetBranchId();
-
-            var branchP = db.BranchProducts.Include(bp => bp.Product).
-                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
-
-            if (branchP == null)
-            {
-                branchP = new BranchProduct { BranchId = branchId, ProductId = productId, UpdDate = DateTime.Now };
-                db.BranchProducts.Add(branchP);
-                db.SaveChanges();
-
-                branchP = db.BranchProducts.Include(bp => bp.Product).
-                       Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                       FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
-            }
-
-
-            return PartialView("_Movement", branchP);
-        }
-
-
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Supervisor")]
-        public JsonResult Move(int productId, MovementType type, double quantity)
-        {
-            var branchId = User.Identity.GetBranchId();
-
-            var branchP = db.BranchProducts.Include(bp => bp.Product).
-                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
-                         Include(bp => bp.Product.PackageDetails).
-                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
-
-            if (type == MovementType.Exit)
-            {
-                if (branchP.Stock < quantity)
-                    return Json(new
-                    {
-                        Result = "Imposible realizar el movimiento",
-                        Message = "La cantidad a retirar supera la disponible"
-                    });
-                else
-                {
-                    branchP.LastStock = branchP.Stock;
-                    branchP.Stock -= quantity;
-                    branchP.UpdDate = DateTime.Now;
-                    branchP.StockMovements = branchP.StockMovements ?? new List<StockMovement>();
-
-                    var mSm = new StockMovement
-                    {
-                        BranchId = branchP.BranchId,
-                        ProductId = branchP.ProductId,
-                        Quantity = quantity,
-                        MovementType = MovementType.Exit,
-                        User = User.Identity.Name,
-                        MovementDate = DateTime.Now,
-                        Comment = "Salida manual producto"
-                    };
-
-                    db.StockMovements.Add(mSm);
-
-                    // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
-                    if (branchP.Product.ProductType == ProductType.Package)
-                    {
-                        foreach (var det in branchP.Product.PackageDetails)
-                        {
-
-                            var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
-
-                            dtBranchP.LastStock = dtBranchP.Stock;
-                            dtBranchP.Stock += det.Quantity * quantity;
-
-                            db.Entry(dtBranchP).State = EntityState.Modified;
-
-                            //creo los reingresos del producto al inventario
-                            var sm = new StockMovement
-                            {
-                                BranchId = dtBranchP.BranchId,
-                                ProductId = dtBranchP.ProductId,
-                                Quantity = det.Quantity,
-                                MovementType = MovementType.Entry,
-                                User = User.Identity.Name,
-                                MovementDate = DateTime.Now,
-                                Comment = "Ingreso por salida de disolución de paquete"
-                            };
-                        }
-                    }
-                }
-            }
-            else
-            {
-                branchP.LastStock = branchP.Stock;
-                branchP.Stock += quantity;
-
-                var mSm = new StockMovement
-                {
-                    BranchId = branchP.BranchId,
-                    ProductId = branchP.ProductId,
-                    Quantity = quantity,
-                    MovementType = MovementType.Entry,
-                    User = User.Identity.Name,
-                    MovementDate = DateTime.Now,
-                    Comment = "Entrada manual de producto"
-                };
-
-                db.StockMovements.Add(mSm);
-
-                // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
-                if (branchP.Product.ProductType == ProductType.Package)
-                {
-                    foreach (var det in branchP.Product.PackageDetails)
-                    {
-                        var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
-
-                        //verifico si la cantidad en stock es suficiente para alimentar el paquete, si no lo es, 
-                        //la operación concluye
-                        if (dtBranchP == null || dtBranchP.Stock < (det.Quantity * quantity))
-                        {
-                            return Json(new
-                            {
-                                Result = "Imposible realizar el ingreso del paquete!",
-                                Message = "No hay suficiente producto en inventario, revise la configuración del paquete para conocer las cantidades necesarias"
-                            });
-                        }
-
-                        dtBranchP.LastStock = dtBranchP.Stock;
-                        dtBranchP.Stock -= det.Quantity;
-
-                        db.Entry(dtBranchP).State = EntityState.Modified;
-
-                        //creo los reingresos del producto al inventario
-                        var sm = new StockMovement
-                        {
-                            BranchId = dtBranchP.BranchId,
-                            ProductId = dtBranchP.ProductId,
-                            Quantity = det.Quantity,
-                            MovementType = MovementType.Exit,
-                            User = User.Identity.Name,
-                            MovementDate = DateTime.Now,
-                            Comment = "Salida para formar paquete"
-                        };
-
-                        db.StockMovements.Add(sm);
-                    }
-                }
-            }
-
-            try
-            {
-                db.Entry(branchP).State = EntityState.Modified;
-                db.SaveChanges();
-
-                return Json(new
-                {
-                    Result = "OK",
-                    Message = "Movimiento exitoso! se ha actualizado la cantidad de producto en inventario",
-                    Code = branchP.Product.Code
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Ocurrio un error al guardar los datos", Message = ex.Message });
-            }
-
-        }
-
-   
-
-        [HttpPost]
-        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid)
-        {
-            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid);
+            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid,id);
             return PartialView("_List", model);
         }
 
-        [HttpPost]
-        public ActionResult SearchEdit(string code)
-        {
-            var model = LookFor(null, null, null, null, null, code, null, false);
-            return PartialView("_List", model);
-        }
 
-        [HttpPost]
-        public ActionResult ExternalSearch(string filter)
-        {
-            string[] arr = new List<string>().ToArray();
-
-            if (filter != null && filter != string.Empty)
-                arr = filter.Trim().Split(' ');
-
-            var products = (from ep in db.ExternalProducts.Include(ep => ep.Provider)
-                            join eq in db.Equivalences.Include(e => e.Product)
-                            on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
-                            from x in gj.DefaultIfEmpty()
-
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description + ""
-                            + ep.Provider.Name + "" + ep.TradeMark).Contains(s)))
-                            select new
-                            {
-                                ProviderId = ep.ProviderId,
-                                Code = ep.Code,
-                                Description = ep.Description,
-                                InternalCode = gj.FirstOrDefault().Product.Code,
-                                Price = ep.Price,
-                                TradeMark = ep.TradeMark,
-                                Unit = ep.Unit,
-                                ProductId = (int?)gj.FirstOrDefault().ProductId ?? Cons.Zero,
-                                ProviderName = ep.Provider.Name
-                            }).Take((int)Cons.OneHundred).ToList();
-
-            var model = products.Select(ep => new ExternalProduct
-            {
-                ProviderId = ep.ProviderId,
-                Code = ep.Code,
-                Description = ep.Description,
-                InternalCode = ep.InternalCode,
-                Price = ep.Price,
-                TradeMark = ep.TradeMark,
-                Unit = ep.Unit,
-                ProductId = ep.ProductId,
-                ProviderName = ep.ProviderName
-            }).ToList();
-
-            return PartialView("_ProviderProducts", model);
-        }
-
-        [HttpPost]
-        public ActionResult GetStockInBranches(int productId)
-        {
-            var branches = db.Branches.Include(b => b.BranchProducts).ToList();
-
-            foreach (var branch in branches)
-            {
-                var bp = branch.BranchProducts.FirstOrDefault(b => b.ProductId == productId);
-                branch.Quantity = bp != null ? bp.Stock : 0;
-            }
-
-
-            return PartialView("_StockInBranches", branches);
-        }
-
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int top = Cons.MaxProductResult)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid,int? id, int top = Cons.MaxProductResult)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -492,7 +52,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 arr = name.Trim().Split(' ');
 
                 if (arr.Length == Cons.One)
-                    arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", ""); 
+                    arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", "");
             }
 
             List<Product> products = new List<Product>();
@@ -500,7 +60,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
             products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
                         Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
                         Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
-                        where (categoryId == null || p.CategoryId == categoryId)
+                        where (id == null || p.ProductId == id)
+                        && (categoryId == null || p.CategoryId == categoryId)
                         && (partSystemId == null || p.PartSystemId == partSystemId)
                         && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
 
@@ -547,55 +108,310 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
-        private List<List<Product>> OrderAsGrid(List<Product> products)
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista")]
+        public ActionResult BeginAdd(int? id)
         {
-            List<List<Product>> prodMod = new List<List<Product>>();
-
-            bool newRow = true;
-            List<Product> list = null;
-
-            for (int i = Cons.Zero; i < products.Count; i++)
+            try
             {
-                if (newRow)
+                ProductViewModel vm;
+                //si el Id tiene valor busco el producto
+                if (id != null)
                 {
-                    list = new List<Product>();
-                    list.Add(products[i]);
+                    var branchId = User.Identity.GetBranchId();
 
-                    if (i == products.Count - Cons.One)
-                        prodMod.Add(list);
+                    var product = db.Products.Include(p => p.BranchProducts).Include(p => p.Compatibilities).
+                                   Include(p => p.Images).FirstOrDefault(p => p.ProductId == id);
 
-                    newRow = false;
+                    if (product.IsLocked && User.Identity.Name != product.UserLock)
+                    {
+                        return Json(new JResponse
+                        {
+                            Result = Cons.Responses.Info,
+                            Code = Cons.Responses.Codes.InvalidData,
+                            Header = "Producto bloqueado",
+                            Body = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                           product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
+                        });
+                    }
+
+                    DBHelper.SetProductState(id.Value, branchId, User.Identity.Name, true);
+
+                    //busco los datos del stock en sucursal
+                    var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+
+                    product.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                    product.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                    product.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                    product.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+
+                    product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
+                    product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                    product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                    product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                    product.Ledge = bp != null ? bp.Ledge : string.Empty;
+                    product.Row = bp != null ? bp.Row : string.Empty;
+                    product.StockLocked = bp != null ? bp.StockLocked : false;
+
+                    vm = new ProductViewModel(product);
+                }
+                else
+                    vm = new ProductViewModel();
+
+                var variables = db.Variables;
+
+                //si el porcentaje de venta en mostrador viene en 0, ocupo los porcentajes por defecto
+                if (vm.StorePercentage <= Cons.Zero)
+                {
+                    vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                    vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                    vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+                }
+
+                //si la unidad viene vacía ocupo el valor por defecto
+                if (vm.Unit == null || vm.Unit == string.Empty)
+                    vm.Unit = variables.FirstOrDefault(v => v.Name == nameof(Product.Unit)).Value;
+
+                List<Category> cats = new List<Category>();
+
+                //si hay un sistema seleccionado busco sus categorías
+                if (vm.PartSystemId > Cons.Zero)
+                {
+                    cats = db.SystemCategories.Where(sc => sc.PartSystemId == vm.PartSystemId).
+                        Select(sc => sc.Category).OrderBy(c => c.Name).ToList();
+
+                    cats.ForEach(c => c.Name += " | " + c.SatCode);
+                }
+
+                //asigno la lista de categorias y sistemas al view model
+                vm.Categories = cats.ToSelectList();
+                vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+
+                //si es un producto existente, busco la lista de Armadoras de vehiculos, para el view model
+                if (vm.ProductId > Cons.Zero)
+                    vm.CarMakes = db.CarMakes.ToSelectList();
+
+                return PartialView("_ProductEdition", vm);
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Header = "Error al comenzar la edición!",
+                    Body = "Mensaje " + ex.Message,
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
+
+        }
+
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista")]
+        public ActionResult Save(Product product)
+        {
+            try
+            {
+                product.UpdDate = DateTime.Now.ToLocal();
+                product.UpdUser = User.Identity.GetUserName();
+
+                if (product.WholesalerPercentage < 10)
+                    return Json(new JResponse{ Header = "Error en porcentaje", Body = "El porcentaje de mayorista no puede ser menor al 10%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+                if (product.DealerPercentage < 15)
+                    return Json(new  JResponse{ Header = "Error en porcentaje", Body = "El porcentaje de distribuidor no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+                if (product.StorePercentage < 20)
+                    return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mostrador no puede ser menor al 20%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+
+
+                //si el producto es nuevo
+                if (product.ProductId == Cons.Zero)
+                {
+                    var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
+
+                    if (pc == Cons.Zero)
+                    {
+                        switch (product.ProductType)
+                        {
+                            case ProductType.Single:
+                                SaveSingle(product);
+                                break;
+                            case ProductType.Package:
+                                if (product.Quantity > Cons.Zero)
+                                {
+                                    return Json(new JResponse
+                                    {
+                                        Header = "Cantidad no autorizada",
+                                        Body = "No es posible agregar una cantidad inicial mayor a cero a un paquete " +
+                                                  "sin haber configurado al menos un producto en su contenido",
+                                        Result = Cons.Responses.Warning,
+                                        Code = Cons.Responses.Codes.InvalidData
+                                    });
+                                }
+                                SavePackage(product);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        return Json(new JResponse
+                        {
+                            Header = "El código de producto ya existe",
+                            Body = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code,
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.InvalidData
+                        });
+                    }
+
+                    return Json(new JResponse
+                    {
+                        Header = "Producto agregado",
+                        Body = "El producto " + product.Code.ToUpper() + " fue agregado correctamente",
+                        Result = Cons.Responses.Success,
+                        Code = Cons.Responses.Codes.Success,
+                        Id = product.ProductId
+                    });
                 }
                 else
                 {
-                    list.Add(products[i]);
-                    prodMod.Add(list);
-                    newRow = true;
+                    switch (product.ProductType)
+                    {
+                        case ProductType.Single:
+                            SaveSingle(product);
+                            break;
+                        case ProductType.Package:
+                            SavePackage(product);
+                            break;
+                    }
+
+                    return Json(new JResponse
+                    {
+                        Header = "Prodcuto actualizado",
+                        Body = "Los datos del product "+product.Code+" fueron actualizados correctamente",
+                        Result = Cons.Responses.Success,
+                        Code = Cons.Responses.Codes.Success,
+                        Id = product.ProductId
+                    });
                 }
             }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Error al guardar el producto", Message = ex.Message });
+            }
 
-            return prodMod;
+        }
+      
+
+        [HttpPost]
+        public ActionResult UnLock(int id)
+        {
+            try
+            {
+                var branchId = User.Identity.GetBranchId();
+                DBHelper.SetProductState(id, branchId, User.Identity.Name, false);
+
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Info,
+                    Code = Cons.Responses.Codes.Success,
+                    Header = "Producto desbloqueado!",
+                    Body = "Se libero el bloque del producto"
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al desbloquear el producto",
+                    Body = "Mensaje: " + ex.Message
+                });
+            }
+
         }
 
         #endregion
 
+        #region Method for Copy
         [HttpPost]
-        public ActionResult QuickSearch(string name)
+        public ActionResult ExternalSearch(string filter)
         {
             string[] arr = new List<string>().ToArray();
 
-            if (name != null && name != string.Empty)
-                arr = name.Trim().Split(' ');
+            if (filter != null && filter != string.Empty)
+                arr = filter.Trim().Split(' ');
 
+            var products = (from ep in db.ExternalProducts.Include(ep => ep.Provider)
+                            join eq in db.Equivalences.Include(e => e.Product)
+                            on new { ep.ProviderId, ep.Code } equals new { eq.ProviderId, eq.Code } into gj
+                            from x in gj.DefaultIfEmpty()
 
-            var model = (from p in db.Products
-                         where
-                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)) && p.IsActive)
-                         select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
+                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + "" + ep.Description + ""
+                            + ep.Provider.Name + "" + ep.TradeMark).Contains(s)))
+                            select new
+                            {
+                                ProviderId = ep.ProviderId,
+                                Code = ep.Code,
+                                Description = ep.Description,
+                                InternalCode = gj.FirstOrDefault().Product.Code,
+                                Price = ep.Price,
+                                TradeMark = ep.TradeMark,
+                                Unit = ep.Unit,
+                                ProductId = (int?)gj.FirstOrDefault().ProductId ?? Cons.Zero,
+                                ProviderName = ep.Provider.Name
+                            }).Take((int)Cons.OneHundred).ToList();
 
-            return PartialView("_ProductList", model);
+            var model = products.Select(ep => new ExternalProduct
+            {
+                ProviderId = ep.ProviderId,
+                Code = ep.Code,
+                Description = ep.Description,
+                InternalCode = ep.InternalCode,
+                Price = ep.Price,
+                TradeMark = ep.TradeMark,
+                Unit = ep.Unit,
+                ProductId = ep.ProductId,
+                ProviderName = ep.ProviderName
+            }).ToList();
+
+            return PartialView("_ProviderProducts", model);
         }
 
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista")]
+        public ActionResult BeginCopy(int providerId, string code)
+        {
+            var variables = db.Variables;
+            var ep = db.ExternalProducts.Find(providerId, code);
+
+            ProductViewModel vm = new ProductViewModel();
+
+            vm.IsActive = true;
+            vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+            vm.Name = ep.Description;
+            vm.TradeMark = ep.TradeMark;
+            vm.Unit = ep.Unit;
+            vm.BuyPrice = ep.Price;
+            vm.MinQuantity = Cons.One;
+            vm.Code = ep.Code;//Regex.Replace(ep.Code, @"^[a-zA-Z0-9]+$", "");
+            vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+            vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+            vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+
+            vm.DealerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+            vm.StorePrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)), Cons.Zero);
+            vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+
+            return PartialView("_ProductEdition", vm);
+        }
+
+        #endregion
+
+
+        #region Utility Methods
         [HttpPost]
         public ActionResult ShowDetail(int id)
         {
@@ -669,208 +485,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 });
             }
         }
-
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult AddToPackage(int packagedId, int productId, double quantity)
-        {
-            // busco el producto padre (paquete)
-            var pck = db.Products.Include(p => p.BranchProducts).
-                Include(p => p.PackageDetails).
-                FirstOrDefault(p => p.ProductId == packagedId);
-
-            //si ya ha sido ingresado en alguna sucursal, verifico que no haya existencia
-            //actualmente.
-            if (pck.BranchProducts != null)
-            {
-                foreach (var bp in pck.BranchProducts)
-                {
-                    //si el hay existencia en alguna sucursal, no se puede modificar la composición
-                    if (bp.Stock > Cons.Zero)
-                    {
-                        return Json(new
-                        {
-                            Result = "Imposible modificar el paquete",
-                            Message = "La composición del paquete no se puede alterar " +
-                            "ya que aun hay existencia de este es una o mas sucursales. " +
-                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
-                        });
-                    }
-                }
-            }
-
-            var pd = pck.PackageDetails.FirstOrDefault(pkd => pkd.DetailtId == productId);
-
-            if (pd == null)
-            {
-                PackageDetail d = new PackageDetail { PackageId = packagedId, DetailtId = productId, Quantity = quantity };
-                db.PackageDetails.Add(d);
-            }
-            else
-            {
-                pd.Quantity += quantity;
-                db.Entry(pd).State = EntityState.Modified;
-            }
-
-
-            db.SaveChanges();
-
-            var model = db.PackageDetails.Include(pkD => pkD.Detail).
-                Where(pkD => pkD.PackageId == packagedId).ToList();
-
-            return PartialView("_PackageDetails", model);
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult SaveImage()
-        {
-            var productId = System.Web.HttpContext.Current.Request.Form["productId"].ToInt();
-            if (System.Web.HttpContext.Current.Request.Files.AllKeys.Any())
-            {
-                var file = System.Web.HttpContext.Current.Request.Files["image"];
-
-                if (file.FileName.Trim().Length >= 80)
-                    return Json(new { Result="Nombre de Archivo Invalido!", Message="El nombre del archivo no puede ser mayor a 80 caracteres"});
-                
-
-                if (file.ContentLength > 0)
-                {
-                    if (file != null)
-                    {
-                        ProductImage f = new ProductImage();
-
-                        f.Path = FileManager.SaveImage(file, productId.ToString(), ImageType.Products);
-                        f.ProductId = productId;
-                        f.Name = file.FileName;
-                        f.Type = file.ContentType;
-                        f.Size = file.ContentLength; 
-
-                        db.ProductImages.Add(f);
-                        db.SaveChanges();
-                    }
-                }
-            }
-
-            var images = db.ProductImages.Where(i => i.ProductId == productId);
-            return PartialView("_ImagesLoaded", images);
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult Edit(int? productId)
-        {
-            ProductViewModel vm;
-            //si el Id tiene valor busco el producto
-            if (productId != null)
-            {
-                var branchId = User.Identity.GetBranchId();
-
-                var product = db.Products.Where(p => p.ProductId == productId).
-                    Include(p => p.BranchProducts).
-                    Include(p => p.Compatibilities).
-                    Include(p => p.Images).
-                    Include(p => p.PackageDetails).FirstOrDefault();
-
-                if (product.IsLocked && User.Identity.Name != product.UserLock)
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Info,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Header = "Producto bloqueado",
-                        Body = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
-                        product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
-                    });
-
-                DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, true);
-
-                //busco los datos del stock en sucursal
-                var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
-
-                product.Quantity = bp != null ? bp.Stock : Cons.Zero;
-                product.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
-                product.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
-                product.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
-
-                product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
-                product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
-                product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
-                product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
-                product.Ledge = bp != null ? bp.Ledge : string.Empty;
-                product.Row = bp != null ? bp.Row : string.Empty;
-                product.StockLocked = bp != null ? bp.StockLocked : false;
-
-                vm = new ProductViewModel(product);
-            }
-            else
-                vm = new ProductViewModel();
-
-            var variables = db.Variables;
-
-            //si el porcentaje de venta en mostrador viene en 0, ocupo los porcentajes por defecto
-            if (vm.StorePercentage <= Cons.Zero)
-            {
-                vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
-                vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
-                vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
-            }
-
-            //si la unidad viene vacía ocupo el valor por defecto
-            if (vm.Unit == null || vm.Unit == string.Empty)
-                vm.Unit = variables.FirstOrDefault(v => v.Name == nameof(Product.Unit)).Value;
-
-            List<Category> cats = new List<Category>();
-
-            //si hay un sistema seleccionado busco sus categorías
-            if (vm.PartSystemId > Cons.Zero)
-            {
-                cats = db.SystemCategories.Where(sc => sc.PartSystemId == vm.PartSystemId).
-                    Select(sc => sc.Category).OrderBy(c => c.Name).ToList();
-
-                cats.ForEach(c => c.Name += " | " + c.SatCode);
-            }
-
-            //asigno la lista de categorias y sistemas al view model
-            vm.Categories = cats.ToSelectList();
-            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
-
-            //si es un producto existente, busco la lista de Armadoras de vehiculos, para el view model
-            if (vm.ProductId > Cons.Zero)
-                vm.CarMakes = db.CarMakes.ToSelectList();
-
-            return PartialView("_QuickAddProduct", vm);
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult BeginCopy(int providerId, string code)
-        {
-            var variables = db.Variables;
-            var ep = db.ExternalProducts.Find(providerId, code);
-
-            ProductViewModel vm = new ProductViewModel();
-
-            vm.IsActive = true;
-            vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
-            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
-            vm.Name = ep.Description;
-            vm.TradeMark = ep.TradeMark;
-            vm.Unit = ep.Unit;
-            vm.BuyPrice = ep.Price;
-            vm.MinQuantity = Cons.One;
-            vm.Code = ep.Code;//Regex.Replace(ep.Code, @"^[a-zA-Z0-9]+$", "");
-            vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
-            vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
-            vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
-
-            vm.DealerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.DealerPercentage / Cons.OneHundred)), Cons.Zero);
-            vm.StorePrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.StorePercentage / Cons.OneHundred)), Cons.Zero);
-            vm.WholesalerPrice = Math.Round(vm.BuyPrice * (Cons.One + (vm.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
-
-            return PartialView("_QuickAddProduct", vm);
-        }
-
 
         private void SaveSingle(Product product)
         {
@@ -999,85 +613,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             db.SaveChanges();
         }
 
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult QuickSave(Product product)
-        {
-            try
-            {
-                product.UpdDate = DateTime.Now.ToLocal();
-                product.UpdUser = User.Identity.GetUserName();
-
-                if (product.WholesalerPercentage < 10)
-                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de mayorista no puede ser menor al 10%" });
-                if (product.DealerPercentage < 15)
-                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de distribuidor no puede ser menor al 15%" });
-                if (product.StorePercentage < 20)
-                    return Json(new { Result = "Error en porcentaje", Message = "El porcentaje de mostrador no puede ser menor al 20%" });
-
-
-                //si el producto es nuevo
-                if (product.ProductId == Cons.Zero)
-                {
-                    var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
-
-                    if (pc == Cons.Zero)
-                    {
-                        switch (product.ProductType)
-                        {
-                            case ProductType.Single:
-                                SaveSingle(product);
-                                break;
-                            case ProductType.Package:
-                                if (product.Quantity > Cons.Zero)
-                                {
-                                    return Json(new
-                                    {
-                                        Result = "Cantidad no autorizada",
-                                        Message = "No es posible agregar una cantidad inicial mayor a cero a un paquete " +
-                                                  "sin haber configurado al menos un producto en su contenido"
-                                    });
-                                }
-                                SavePackage(product);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            Result = "El código de producto ya existe",
-                            Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
-                        });
-                    }
-
-                    return Edit(product.ProductId);
-                }
-                else
-                {
-                    switch (product.ProductType)
-                    {
-                        case ProductType.Single:
-                            SaveSingle(product);
-                            break;
-                        case ProductType.Package:
-                            SavePackage(product);
-                            break;
-                    }
-
-                    return Json(new
-                    {
-                        Result = "OK",
-                        Message = "Los cambios al producto se aplicaron correctamente " + product.Code
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { Result = "Error al guardar el producto", Message = ex.Message });
-            }
-
-        }
 
         private void SavePackage(Product package)
         {
@@ -1285,238 +820,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
-        [HttpPost]
-        public ActionResult Copy(Product product, int providerId, string code)
-        {
-            product.UpdDate = DateTime.Now;
-            product.UpdUser = User.Identity.GetUserName();
-            product.IsActive = true;
-            try
-            {
-                var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
-
-                if (pc == Cons.Zero)
-                {
-                    //creo la equivalencia
-                    SaveSingle(product);
-                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
-                    db.Equivalences.Add(eq);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        Result = "El código de producto ya existe",
-                        Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
-                    });
-                }
-
-                return Edit(product.ProductId);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    Result = "Error al asociar el producto",
-                    Message = ex.Message
-                });
-            }
-        }
-
-
-        [HttpPost]
-        public ActionResult RemoveFromPackage(int packageId, int productId)
-        {
-            // busco el producto padre (paquete)
-            var pck = db.Products.Include(p => p.BranchProducts).
-                Include(p => p.PackageDetails).
-                FirstOrDefault(p => p.ProductId == packageId);
-
-            //reviso si hay existencias de este paquete en alguna sucursal
-            if (pck.BranchProducts != null)
-            {
-                foreach (var bp in pck.BranchProducts)
-                {
-                    if (bp.Stock > Cons.Zero)
-                    {
-                        return Json(new
-                        {
-                            Result = "Imposible modificar el paquete",
-                            Message = "La composición del paquete no se puede alterar " +
-                            "ya que aun hay existencia de este es una o mas sucursales. " +
-                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
-                        });
-                    }
-                }
-            }
-            //obtengo el detalle a eliminar del producto padre (paquete)
-            var pd = pck.PackageDetails.FirstOrDefault(p => p.DetailtId == productId);
-
-            db.PackageDetails.Remove(pd);
-            db.SaveChanges();
-
-            //hago una busqueda de los detalles del paquete actualizado
-            var model = db.PackageDetails.Include(pkD => pkD.Detail).
-                Where(pkD => pkD.PackageId == packageId).ToList();
-
-            return PartialView("_PackageDetails", model);
-        }
-
-
-        [HttpPost]
-        public ActionResult UnLock(int? productId)
-        {
-            if (productId != null && productId.Value > Cons.Zero)
-            {
-                var branchId = User.Identity.GetBranchId();
-                DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, false);
-            }
-
-            return Json(new JResponse
-            {
-                Result = Cons.Responses.Info,
-                Code = Cons.Responses.Codes.Success,
-                Header = "Producto desbloqueado",
-                Body ="Se removio el bloque del producto"
-            });
-        }
-
-
-        // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [CustomAuthorize(Roles = "Capturista")]
-        //public ActionResult Create([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product,HttpPostedFileBase file)
-        public ActionResult Create([Bind(Exclude = "Compatibilities")]Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-
-                    var branchId = User.Identity.GetBranchId();
-
-                    product.UpdDate = DateTime.Now.ToLocal();
-                    product.UpdUser = User.Identity.Name;
-
-                    if (product.ProductId == Cons.Zero)
-                    {
-                        db.Products.Add(product);
-                        db.SaveChanges();
-                    }
-                    else
-                        db.Entry(product).State = EntityState.Modified;
-
-                    var bp = db.BranchProducts.
-                        FirstOrDefault(bProd => bProd.ProductId == product.ProductId && bProd.BranchId == branchId);
-
-                    if (bp == null)
-                    {
-                        bp = new BranchProduct();
-                        bp.ProductId = product.ProductId;
-                        bp.BranchId = branchId;
-                        bp.Stock = product.Quantity;
-                        bp.BuyPrice = product.BuyPrice;
-                        bp.LastStock = Cons.Zero;
-                        bp.StorePercentage = product.StorePercentage;
-                        bp.DealerPercentage = product.DealerPercentage;
-                        bp.WholesalerPercentage = product.WholesalerPercentage;
-                        bp.WholesalerPrice = product.WholesalerPrice;
-                        bp.DealerPrice = product.DealerPrice;
-                        bp.StorePrice = product.StorePrice;
-                        bp.Row = product.Row;
-                        bp.Ledge = product.Ledge;
-                        bp.UpdDate = DateTime.Now.ToLocal();
-                        db.BranchProducts.Add(bp);
-
-                        //si se ingresa una cantidad de producto mayor a cero al crearlo
-                        //entonces genero movimiento de stock (Entrada)
-                        if (product.Quantity > Cons.Zero)
-                        {
-                            var sm = new StockMovement();
-                            sm.Quantity = product.Quantity;
-                            sm.BranchId = branchId;
-                            sm.ProductId = product.ProductId;
-                            sm.MovementDate = DateTime.Now.ToLocal();
-                            sm.MovementType = MovementType.Entry;
-                            sm.User = User.Identity.Name;
-                            sm.Comment = "Ingreso en creación";
-
-                            db.StockMovements.Add(sm);
-                        }
-                    }
-                    else
-                    {
-                        //si la cantidad de producto que se esta ingresando es diferente a la que hay es stock
-                        //registro un movimiento de inventario
-                        var sM = new StockMovement();
-                        sM.ProductId = product.ProductId;
-                        sM.BranchId = bp.BranchId;
-                        sM.MovementDate = DateTime.Now.ToLocal();
-                        sM.User = User.Identity.GetUserName();
-
-
-                        if (bp.Stock > product.Quantity)
-                        {
-                            sM.Quantity = bp.Stock - product.Quantity;
-                            sM.MovementType = MovementType.Exit;
-                            sM.Comment = "Salida por ajuste rápido";
-
-                            db.StockMovements.Add(sM);
-                        }
-                        //si la nueva cantidad es mayor, registro una entrada
-                        else if (bp.Stock < product.Quantity)
-                        {
-                            sM.Quantity = product.Quantity - bp.Stock;
-                            sM.MovementType = MovementType.Entry;
-                            sM.Comment = "Entrada por ajuste rápido";
-
-                            db.StockMovements.Add(sM);
-                        }
-
-                        //si hay actualización de stock
-                        bp.LastStock = bp.Stock;
-                        bp.Stock = product.Quantity;
-
-                        //actualizo precios y porcentajes 
-                        bp.StorePercentage = product.StorePercentage;
-                        bp.DealerPercentage = product.DealerPercentage;
-                        bp.BuyPrice = product.BuyPrice;
-                        bp.WholesalerPercentage = product.WholesalerPercentage;
-                        bp.WholesalerPrice = product.WholesalerPrice;
-                        bp.DealerPrice = product.DealerPrice;
-                        bp.StorePrice = product.StorePrice;
-                        bp.Row = product.Row;
-                        bp.Ledge = product.Ledge;
-                        bp.UpdDate = DateTime.Now.ToLocal();
-
-                        db.Entry(bp).State = EntityState.Modified;
-                    }
-                    db.SaveChanges();
-                }
-                catch (Exception ex)
-                {
-
-                    ViewBag.Header = "Error al guardar";
-                    ViewBag.Message = "Ocurrio un error al guardo los datos del producto detalle:" + ex.Message + " inner exception" + ex.InnerException.Message;
-                    var model = new ProductViewModel(product);
-
-                    model.Images = new List<ProductImage>();
-                    model.Compatibilities = new List<Compatibility>();
-                    model.Categories = db.Categories.ToSelectList();
-                    model.CarMakes = db.CarMakes.ToSelectList();
-                    model.Systems = db.Systems.ToSelectList();
-
-
-                    return View(model);
-                }
-            }
-
-            return RedirectToAction("Create", new { id = product.ProductId });
-        }
 
         [HttpPost]
         public ActionResult AddCompatibility(int productId, int modelId, int begin, int end)
@@ -1605,6 +908,476 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
         }
 
+        #endregion
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Supervisor")]
+        public ActionResult BeginMovement(int productId)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+            if (branchP == null)
+            {
+                branchP = new BranchProduct { BranchId = branchId, ProductId = productId, UpdDate = DateTime.Now };
+                db.BranchProducts.Add(branchP);
+                db.SaveChanges();
+
+                branchP = db.BranchProducts.Include(bp => bp.Product).
+                       Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                       FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+            }
+
+
+            return PartialView("_Movement", branchP);
+        }
+
+
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Supervisor")]
+        public JsonResult Move(int productId, MovementType type, double quantity)
+        {
+            var branchId = User.Identity.GetBranchId();
+
+            var branchP = db.BranchProducts.Include(bp => bp.Product).
+                         Include(bp => bp.Product.Images).Include(bp => bp.Branch).
+                         Include(bp => bp.Product.PackageDetails).
+                         FirstOrDefault(bp => bp.BranchId == branchId && bp.ProductId == productId);
+
+            if (type == MovementType.Exit)
+            {
+                if (branchP.Stock < quantity)
+                    return Json(new
+                    {
+                        Result = "Imposible realizar el movimiento",
+                        Message = "La cantidad a retirar supera la disponible"
+                    });
+                else
+                {
+                    branchP.LastStock = branchP.Stock;
+                    branchP.Stock -= quantity;
+                    branchP.UpdDate = DateTime.Now;
+                    branchP.StockMovements = branchP.StockMovements ?? new List<StockMovement>();
+
+                    var mSm = new StockMovement
+                    {
+                        BranchId = branchP.BranchId,
+                        ProductId = branchP.ProductId,
+                        Quantity = quantity,
+                        MovementType = MovementType.Exit,
+                        User = User.Identity.Name,
+                        MovementDate = DateTime.Now,
+                        Comment = "Salida manual producto"
+                    };
+
+                    db.StockMovements.Add(mSm);
+
+                    // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
+                    if (branchP.Product.ProductType == ProductType.Package)
+                    {
+                        foreach (var det in branchP.Product.PackageDetails)
+                        {
+
+                            var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
+
+                            dtBranchP.LastStock = dtBranchP.Stock;
+                            dtBranchP.Stock += det.Quantity * quantity;
+
+                            db.Entry(dtBranchP).State = EntityState.Modified;
+
+                            //creo los reingresos del producto al inventario
+                            var sm = new StockMovement
+                            {
+                                BranchId = dtBranchP.BranchId,
+                                ProductId = dtBranchP.ProductId,
+                                Quantity = det.Quantity,
+                                MovementType = MovementType.Entry,
+                                User = User.Identity.Name,
+                                MovementDate = DateTime.Now,
+                                Comment = "Ingreso por salida de disolución de paquete"
+                            };
+                        }
+                    }
+                }
+            }
+            else
+            {
+                branchP.LastStock = branchP.Stock;
+                branchP.Stock += quantity;
+
+                var mSm = new StockMovement
+                {
+                    BranchId = branchP.BranchId,
+                    ProductId = branchP.ProductId,
+                    Quantity = quantity,
+                    MovementType = MovementType.Entry,
+                    User = User.Identity.Name,
+                    MovementDate = DateTime.Now,
+                    Comment = "Entrada manual de producto"
+                };
+
+                db.StockMovements.Add(mSm);
+
+                // si el producto es un paquete, debo regresar cada producto que lo complementa al stock individual
+                if (branchP.Product.ProductType == ProductType.Package)
+                {
+                    foreach (var det in branchP.Product.PackageDetails)
+                    {
+                        var dtBranchP = db.BranchProducts.Find(branchId, det.DetailtId);
+
+                        //verifico si la cantidad en stock es suficiente para alimentar el paquete, si no lo es, 
+                        //la operación concluye
+                        if (dtBranchP == null || dtBranchP.Stock < (det.Quantity * quantity))
+                        {
+                            return Json(new
+                            {
+                                Result = "Imposible realizar el ingreso del paquete!",
+                                Message = "No hay suficiente producto en inventario, revise la configuración del paquete para conocer las cantidades necesarias"
+                            });
+                        }
+
+                        dtBranchP.LastStock = dtBranchP.Stock;
+                        dtBranchP.Stock -= det.Quantity;
+
+                        db.Entry(dtBranchP).State = EntityState.Modified;
+
+                        //creo los reingresos del producto al inventario
+                        var sm = new StockMovement
+                        {
+                            BranchId = dtBranchP.BranchId,
+                            ProductId = dtBranchP.ProductId,
+                            Quantity = det.Quantity,
+                            MovementType = MovementType.Exit,
+                            User = User.Identity.Name,
+                            MovementDate = DateTime.Now,
+                            Comment = "Salida para formar paquete"
+                        };
+
+                        db.StockMovements.Add(sm);
+                    }
+                }
+            }
+
+            try
+            {
+                db.Entry(branchP).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new
+                {
+                    Result = "OK",
+                    Message = "Movimiento exitoso! se ha actualizado la cantidad de producto en inventario",
+                    Code = branchP.Product.Code
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "Ocurrio un error al guardar los datos", Message = ex.Message });
+            }
+
+        }
+
+
+        [HttpPost]
+        public ActionResult SearchEdit(string code)
+        {
+            var model = LookFor(null, null, null, null, null, code, null, false,null);
+            return PartialView("_List", model);
+        }
+
+     
+
+        [HttpPost]
+        public ActionResult GetStockInBranches(int productId)
+        {
+            var branches = db.Branches.Include(b => b.BranchProducts).ToList();
+
+            foreach (var branch in branches)
+            {
+                var bp = branch.BranchProducts.FirstOrDefault(b => b.ProductId == productId);
+                branch.Quantity = bp != null ? bp.Stock : 0;
+            }
+
+
+            return PartialView("_StockInBranches", branches);
+        }
+
+        private List<List<Product>> OrderAsGrid(List<Product> products)
+        {
+            List<List<Product>> prodMod = new List<List<Product>>();
+
+            bool newRow = true;
+            List<Product> list = null;
+
+            for (int i = Cons.Zero; i < products.Count; i++)
+            {
+                if (newRow)
+                {
+                    list = new List<Product>();
+                    list.Add(products[i]);
+
+                    if (i == products.Count - Cons.One)
+                        prodMod.Add(list);
+
+                    newRow = false;
+                }
+                else
+                {
+                    list.Add(products[i]);
+                    prodMod.Add(list);
+                    newRow = true;
+                }
+            }
+
+            return prodMod;
+        }
+
+     
+        [HttpPost]
+        public ActionResult QuickSearch(string name)
+        {
+            string[] arr = new List<string>().ToArray();
+
+            if (name != null && name != string.Empty)
+                arr = name.Trim().Split(' ');
+
+
+            var model = (from p in db.Products
+                         where
+                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)) && p.IsActive)
+                         select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
+
+            return PartialView("_ProductList", model);
+        }
+
+   
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista")]
+        public ActionResult AddToPackage(int packagedId, int productId, double quantity)
+        {
+            // busco el producto padre (paquete)
+            var pck = db.Products.Include(p => p.BranchProducts).
+                Include(p => p.PackageDetails).
+                FirstOrDefault(p => p.ProductId == packagedId);
+
+            //si ya ha sido ingresado en alguna sucursal, verifico que no haya existencia
+            //actualmente.
+            if (pck.BranchProducts != null)
+            {
+                foreach (var bp in pck.BranchProducts)
+                {
+                    //si el hay existencia en alguna sucursal, no se puede modificar la composición
+                    if (bp.Stock > Cons.Zero)
+                    {
+                        return Json(new
+                        {
+                            Result = "Imposible modificar el paquete",
+                            Message = "La composición del paquete no se puede alterar " +
+                            "ya que aun hay existencia de este es una o mas sucursales. " +
+                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
+                        });
+                    }
+                }
+            }
+
+            var pd = pck.PackageDetails.FirstOrDefault(pkd => pkd.DetailtId == productId);
+
+            if (pd == null)
+            {
+                PackageDetail d = new PackageDetail { PackageId = packagedId, DetailtId = productId, Quantity = quantity };
+                db.PackageDetails.Add(d);
+            }
+            else
+            {
+                pd.Quantity += quantity;
+                db.Entry(pd).State = EntityState.Modified;
+            }
+
+
+            db.SaveChanges();
+
+            var model = db.PackageDetails.Include(pkD => pkD.Detail).
+                Where(pkD => pkD.PackageId == packagedId).ToList();
+
+            return PartialView("_PackageDetails", model);
+        }
+
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Capturista")]
+        public ActionResult Edit1(int? productId)
+        {
+            ProductViewModel vm;
+            //si el Id tiene valor busco el producto
+            if (productId != null)
+            {
+                var branchId = User.Identity.GetBranchId();
+
+                var product = db.Products.Where(p => p.ProductId == productId).
+                    Include(p => p.BranchProducts).
+                    Include(p => p.Compatibilities).
+                    Include(p => p.Images).
+                    Include(p => p.PackageDetails).FirstOrDefault();
+
+                if (product.IsLocked && User.Identity.Name != product.UserLock)
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Header = "Producto bloqueado",
+                        Body = string.Format("Bloqueado por {0}, Fecha del bloqueo {1}", product.UserLock,
+                        product.LockDate.Value.ToString("dd/MM/yyyy HH:mm"))
+                    });
+
+                DBHelper.SetProductState(productId.Value, branchId, User.Identity.Name, true);
+
+                //busco los datos del stock en sucursal
+                var bp = product.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+
+                product.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                product.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                product.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                product.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+
+                product.BuyPrice = bp != null ? bp.BuyPrice : Cons.Zero;
+                product.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                product.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                product.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                product.Ledge = bp != null ? bp.Ledge : string.Empty;
+                product.Row = bp != null ? bp.Row : string.Empty;
+                product.StockLocked = bp != null ? bp.StockLocked : false;
+
+                vm = new ProductViewModel(product);
+            }
+            else
+                vm = new ProductViewModel();
+
+            var variables = db.Variables;
+
+            //si el porcentaje de venta en mostrador viene en 0, ocupo los porcentajes por defecto
+            if (vm.StorePercentage <= Cons.Zero)
+            {
+                vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
+            }
+
+            //si la unidad viene vacía ocupo el valor por defecto
+            if (vm.Unit == null || vm.Unit == string.Empty)
+                vm.Unit = variables.FirstOrDefault(v => v.Name == nameof(Product.Unit)).Value;
+
+            List<Category> cats = new List<Category>();
+
+            //si hay un sistema seleccionado busco sus categorías
+            if (vm.PartSystemId > Cons.Zero)
+            {
+                cats = db.SystemCategories.Where(sc => sc.PartSystemId == vm.PartSystemId).
+                    Select(sc => sc.Category).OrderBy(c => c.Name).ToList();
+
+                cats.ForEach(c => c.Name += " | " + c.SatCode);
+            }
+
+            //asigno la lista de categorias y sistemas al view model
+            vm.Categories = cats.ToSelectList();
+            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+
+            //si es un producto existente, busco la lista de Armadoras de vehiculos, para el view model
+            if (vm.ProductId > Cons.Zero)
+                vm.CarMakes = db.CarMakes.ToSelectList();
+
+            return PartialView("_QuickAddProduct", vm);
+        }
+
+       
+
+      
+
+        [HttpPost]
+        public ActionResult Copy(Product product, int providerId, string code)
+        {
+            product.UpdDate = DateTime.Now;
+            product.UpdUser = User.Identity.GetUserName();
+            product.IsActive = true;
+            try
+            {
+                var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
+
+                if (pc == Cons.Zero)
+                {
+                    //creo la equivalencia
+                    SaveSingle(product);
+                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
+                    db.Equivalences.Add(eq);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        Result = "El código de producto ya existe",
+                        Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
+                    });
+                }
+
+                return Json("OK"); //Edit(product.ProductId);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al asociar el producto",
+                    Message = ex.Message
+                });
+            }
+        }
+
+
+        [HttpPost]
+        public ActionResult RemoveFromPackage(int packageId, int productId)
+        {
+            // busco el producto padre (paquete)
+            var pck = db.Products.Include(p => p.BranchProducts).
+                Include(p => p.PackageDetails).
+                FirstOrDefault(p => p.ProductId == packageId);
+
+            //reviso si hay existencias de este paquete en alguna sucursal
+            if (pck.BranchProducts != null)
+            {
+                foreach (var bp in pck.BranchProducts)
+                {
+                    if (bp.Stock > Cons.Zero)
+                    {
+                        return Json(new
+                        {
+                            Result = "Imposible modificar el paquete",
+                            Message = "La composición del paquete no se puede alterar " +
+                            "ya que aun hay existencia de este es una o mas sucursales. " +
+                            "Debes eliminar el paquete de todos los inventarios para poder modificarlo"
+                        });
+                    }
+                }
+            }
+            //obtengo el detalle a eliminar del producto padre (paquete)
+            var pd = pck.PackageDetails.FirstOrDefault(p => p.DetailtId == productId);
+
+            db.PackageDetails.Remove(pd);
+            db.SaveChanges();
+
+            //hago una busqueda de los detalles del paquete actualizado
+            var model = db.PackageDetails.Include(pkD => pkD.Detail).
+                Where(pkD => pkD.PackageId == packageId).ToList();
+
+            return PartialView("_PackageDetails", model);
+        }
+
+
+    
+
         [HttpPost]
         public ActionResult SearchForPackage(string filter)
         {
@@ -1633,56 +1406,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_ListForPackage", products);
         }
 
-        [HttpPost]
-        public ActionResult GetImages(int productId)
-        {
-            try
-            {
-                var model = db.ProductImages.Where(pi => pi.ProductId == productId);
-                return PartialView("_ImagesLoaded", model);
-            }
-            catch (Exception)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al obtener datos",
-                    Body = "Ocurrio un error al obtener las imagenes"
-                });
-            }
-          
-        }
-
-        [HttpPost]
-        [CustomAuthorize(Roles = "Capturista")]
-        public ActionResult DeleteImage(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-
-            var image = db.ProductImages.Find(id);
-            int pId = image.ProductId;
-            if (image == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
-            }
-
-            var pPath = Server.MapPath(image.Path);
-            System.IO.File.Delete(pPath);
-
-
-            db.ProductImages.Remove(image);
-            db.SaveChanges();
-
-            var model = db.ProductImages.Where(i => i.ProductId == pId).ToList();
-
-            ModelState.Clear();
-
-            return PartialView("_ImagesLoaded", model);
-        }
 
         [HttpPost]
         [CustomAuthorize(Roles = "Capturista")]
@@ -1704,7 +1427,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                             return Json(new JResponse
                             {
                                 Result = Cons.Responses.Warning,
-                                Code  = Cons.Responses.Codes.InvalidData,
+                                Code = Cons.Responses.Codes.InvalidData,
                                 Header = "Imposible eliminar",
                                 Body = "Esto producto tiene existencias en la sucursal " + bProd.Branch.Name
                             });
@@ -1762,7 +1485,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         Result = Cons.Responses.Success,
                         Code = Cons.Responses.Codes.Success,
                         Header = "Producto Desactivdao",
-                        Body ="El producto ha sido desactivado y no podra ser utiliado en ninguna operación"
+                        Body = "El producto ha sido desactivado y no podra ser utiliado en ninguna operación"
                     });
                 }
                 else
@@ -1794,7 +1517,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             try
             {
-                var product = db.Products.FirstOrDefault(p=> p.ProductId == id);
+                var product = db.Products.FirstOrDefault(p => p.ProductId == id);
 
                 product.IsActive = true;
                 product.UpdDate = DateTime.Now.ToLocal();
@@ -1873,6 +1596,148 @@ namespace CerberusMultiBranch.Controllers.Catalog
             //}
 
             return PartialView("_MovementList", model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [CustomAuthorize(Roles = "Capturista")]
+        //public ActionResult Create([Bind(Include = "ProductId,Code,Name,Description,MinQuantity,BarCode,BuyPrice")] Product product,HttpPostedFileBase file)
+        public ActionResult Save1([Bind(Exclude = "Compatibilities")]Product product)
+        {
+
+            try
+            {
+                var response = new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success
+                };
+
+                var branchId = User.Identity.GetBranchId();
+
+                product.UpdDate = DateTime.Now.ToLocal();
+                product.UpdUser = User.Identity.Name;
+
+                if (product.ProductId == Cons.Zero)
+                {
+                    db.Products.Add(product);
+                    db.SaveChanges();
+                }
+                else
+                    db.Entry(product).State = EntityState.Modified;
+
+                var bp = db.BranchProducts.
+                    FirstOrDefault(bProd => bProd.ProductId == product.ProductId && bProd.BranchId == branchId);
+
+                if (bp == null)
+                {
+                    bp = new BranchProduct();
+                    bp.ProductId = product.ProductId;
+                    bp.BranchId = branchId;
+                    bp.Stock = product.Quantity;
+                    bp.BuyPrice = product.BuyPrice;
+                    bp.LastStock = Cons.Zero;
+                    bp.StorePercentage = product.StorePercentage;
+                    bp.DealerPercentage = product.DealerPercentage;
+                    bp.WholesalerPercentage = product.WholesalerPercentage;
+                    bp.WholesalerPrice = product.WholesalerPrice;
+                    bp.DealerPrice = product.DealerPrice;
+                    bp.StorePrice = product.StorePrice;
+                    bp.Row = product.Row;
+                    bp.Ledge = product.Ledge;
+                    bp.UpdDate = DateTime.Now.ToLocal();
+                    bp.UpdUser = User.Identity.Name;
+                    db.BranchProducts.Add(bp);
+
+                    //si se ingresa una cantidad de producto mayor a cero al crearlo
+                    //entonces genero movimiento de stock (Entrada)
+                    if (product.Quantity > Cons.Zero)
+                    {
+                        var sm = new StockMovement();
+                        sm.Quantity = product.Quantity;
+                        sm.BranchId = branchId;
+                        sm.ProductId = product.ProductId;
+                        sm.MovementDate = DateTime.Now.ToLocal();
+                        sm.MovementType = MovementType.Entry;
+                        sm.User = User.Identity.Name;
+                        sm.Comment = "Ingreso en creación";
+
+                        db.StockMovements.Add(sm);
+
+                        response.Id = product.ProductId;
+                        response.Header = "Nuevo Producto registrado";
+                        response.Body = "El Producto " + product.Code.ToUpperInvariant() +
+                            " fue agregado correctamente, ahora puedes adjuntarle imagenes y configruar compatibilidades";
+                    }
+                }
+                else
+                {
+                    //si la cantidad de producto que se esta ingresando es diferente a la que hay es stock
+                    //registro un movimiento de inventario
+                    var sM = new StockMovement();
+                    sM.ProductId = product.ProductId;
+                    sM.BranchId = bp.BranchId;
+                    sM.MovementDate = DateTime.Now.ToLocal();
+                    sM.User = User.Identity.GetUserName();
+
+
+                    if (bp.Stock > product.Quantity)
+                    {
+                        sM.Quantity = bp.Stock - product.Quantity;
+                        sM.MovementType = MovementType.Exit;
+                        sM.Comment = "Salida por ajuste rápido";
+
+                        db.StockMovements.Add(sM);
+                    }
+                    //si la nueva cantidad es mayor, registro una entrada
+                    else if (bp.Stock < product.Quantity)
+                    {
+                        sM.Quantity = product.Quantity - bp.Stock;
+                        sM.MovementType = MovementType.Entry;
+                        sM.Comment = "Entrada por ajuste rápido";
+
+                        db.StockMovements.Add(sM);
+                    }
+
+                    //si hay actualización de stock
+                    bp.LastStock = bp.Stock;
+                    bp.Stock = product.Quantity;
+
+                    //actualizo precios y porcentajes 
+                    bp.StorePercentage = product.StorePercentage;
+                    bp.DealerPercentage = product.DealerPercentage;
+                    bp.BuyPrice = product.BuyPrice;
+                    bp.WholesalerPercentage = product.WholesalerPercentage;
+                    bp.WholesalerPrice = product.WholesalerPrice;
+                    bp.DealerPrice = product.DealerPrice;
+                    bp.StorePrice = product.StorePrice;
+                    bp.Row = product.Row;
+                    bp.Ledge = product.Ledge;
+                    bp.UpdDate = DateTime.Now.ToLocal();
+
+                    db.Entry(bp).State = EntityState.Modified;
+
+
+                    response.Id = product.ProductId;
+                    response.Header = "Producto actualizado!";
+                    response.Body = "Se registraron las modificaciones del Producto " + product.Code.ToUpperInvariant() +
+                        " y se liberaron bloqueos sobre el registro";
+                }
+                db.SaveChanges();
+
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Header = "Error al guardar el producto",
+                    Body = "Mensaje:" + ex.Message
+                });
+            }
         }
 
         protected override void Dispose(bool disposing)

@@ -45,6 +45,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -71,6 +79,7 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -187,6 +196,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
+    <Compile Include="Controllers\Catalog\ProductComplementController.cs" />
     <Compile Include="Controllers\Catalog\ProvidersController.cs" />
     <Compile Include="Controllers\Common\JsonController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
@@ -197,6 +207,7 @@
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
+    <Compile Include="Controllers\Operative\PurchaseOrderController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
@@ -367,6 +378,10 @@
     <Compile Include="Migrations\201811241956331_InsPropertiesTransaction.Designer.cs">
       <DependentUpon>201811241956331_InsPropertiesTransaction.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201811280539464_removeFieldsFromCatalog.cs" />
+    <Compile Include="Migrations\201811280539464_removeFieldsFromCatalog.Designer.cs">
+      <DependentUpon>201811280539464_removeFieldsFromCatalog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -437,6 +452,7 @@
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\PurchasOrderViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleCancelViewModel.cs" />
@@ -789,6 +805,8 @@
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
     <Content Include="Scripts\jquery.maskedinput.min.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.0.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.0.min.js" />
     <Content Include="Scripts\jszip\jszip.min.js" />
     <Content Include="Scripts\pnotify\pnotify.buttons.js" />
     <Content Include="Scripts\pnotify\pnotify.js" />
@@ -848,10 +866,7 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Products\Create.cshtml" />
     <Content Include="Views\Products\Index.cshtml" />
-    <Content Include="Views\Configuration\Create.cshtml" />
-    <Content Include="Views\Configuration\Index.cshtml" />
     <Content Include="Views\Products\_List.cshtml" />
     <Content Include="Views\Products\_ImagesLoaded.cshtml" />
     <Content Include="Views\Clients\_ClientEdition.cshtml" />
@@ -908,7 +923,6 @@
     <Content Include="Views\CashRegister\Detail.cshtml" />
     <Content Include="Views\Sales\_PriceSelector.cshtml" />
     <Content Include="Views\Manage\AddProfilePicture.cshtml" />
-    <Content Include="Views\CashRegister\RegistPayment.cshtml" />
     <Content Include="Views\Sales\Payments.cshtml" />
     <Content Include="Views\CashRegister\_SalesToPayList.cshtml" />
     <Content Include="Views\CashRegister\_TicketsAndNotes.cshtml" />
@@ -971,7 +985,6 @@
     <Content Include="Views\Shared\_Message.cshtml" />
     <Content Include="Views\Shared\_Modal.cshtml" />
     <Content Include="Views\Shared\_QuickProduct.cshtml" />
-    <Content Include="Views\Configuration\SystemTest.cshtml" />
     <Content Include="Views\Configuration\_WithdrawalCauseEdition.cshtml" />
     <Content Include="Views\MakesAndModels\_CarModels.cshtml" />
     <Content Include="Views\MakesAndModels\_CarModelList.cshtml" />
@@ -982,6 +995,11 @@
     <Content Include="Views\Products\_ProductImages.cshtml" />
     <Content Include="Views\Products\_ProductMovement.cshtml" />
     <Content Include="Views\Purchases\_CancelPurchase.cshtml" />
+    <Content Include="Views\Products\_ProductEdition.cshtml" />
+    <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
+    <Content Include="Views\Products\_ProductEditionImages.cshtml" />
+    <Content Include="Views\Shared\_ChildLoading.cshtml" />
+    <Content Include="Views\Purchases\Order.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -989,6 +1007,8 @@
     <Folder Include="Content\ProductImages\" />
     <Folder Include="Content\UserProfile\" />
     <Folder Include="Views\Inventory\" />
+    <Folder Include="Views\ProductComplement\" />
+    <Folder Include="Views\PurchaseOrder\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -1120,6 +1140,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811241956331_InsPropertiesTransaction.resx">
       <DependentUpon>201811241956331_InsPropertiesTransaction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811280539464_removeFieldsFromCatalog.resx">
+      <DependentUpon>201811280539464_removeFieldsFromCatalog.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

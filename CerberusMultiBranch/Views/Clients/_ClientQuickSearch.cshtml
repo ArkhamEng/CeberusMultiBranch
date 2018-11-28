@@ -49,8 +49,10 @@
 
         ExecuteAjax('@Url.Action("Search", "Clients")', { name: $("#FClientName").val(), quickSearch: true }, function (view) 
         {
-            $("#divClientList").html(view);
-            HideModLoading();
+            HideModLoading(function ()
+            {
+                $("#divClientQuickSearchList").html(view);
+            });
         });
     }
 

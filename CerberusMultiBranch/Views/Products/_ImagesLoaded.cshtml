@@ -51,18 +51,21 @@
     </label>
 </div>
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#Pictures").val("@imgIndex");
     });
 
-    function DeleteImage(id) {
+    function DeleteImage(id)
+    {
         ExecuteAjax('@Url.Action("DeleteImage", "Products")', { id: id }, function (response)
         {
             $("#divImages").html(response);
         });
     }
 
-    function ImageLoaded() {
+    function ImageLoaded()
+    {
         var data = new FormData();
         var files = $("#imgUploader").get(0).files
 

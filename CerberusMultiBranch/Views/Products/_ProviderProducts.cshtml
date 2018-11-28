@@ -1,100 +1,96 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Catalog.ExternalProduct>
 
-<div id="ModalProviderProducts" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content panel panel-primary">
-            <div class="modal-header panel-heading">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Productos de proveedores</h4>
-            </div>
-            <div class="modal-body panel-body">
-                <table id="tbProviderProducts" class="table small">
-                    <thead>
-                        <tr>
-                            <th>
-                                @Html.DisplayName("Descripción")
-                            </th>
 
-                            <th>
-                                @Html.DisplayName("Proveedor")
-                            </th>
-                            <th>
-                                @Html.DisplayName("Precio")
-                            </th>
-                            <th>
-                                @Html.DisplayName("Cv AB")
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr class="text-uppercase">
-                                <td>
-                                    <label>
-                                        <span class="fa fa-tag"></span>
-                                        @item.Code
-                                    </label><br />
-                                    @item.Description<br />
-                                    Por <label>@item.TradeMark <span class="fa fa-registered"></span> </label> | Unidad @item.Unit
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.ProviderName)
-                                </td>
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button type="button" class="close" onclick="HideModal(null, true)">
+            <span class="fa fa-times"></span>
+        </button>
+
+        <h4 class="panel-title">
+            <span class="fa fa-cubes"></span>
+            Productos de proveedores
+        </h4>
+    </div>
+    <div class="panel-body">
+        <table id="tbProviderProducts" class="table small">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Descripción")
+                    </th>
+
+                    <th>
+                        @Html.DisplayName("Proveedor")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Precio")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Cv AB")
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr class="text-uppercase">
+                    <td>
+                        <label>
+                            <span class="fa fa-tag"></span>
+                            @item.Code
+                        </label><br />
+                        @item.Description<br />
+                        Por <label>@item.TradeMark <span class="fa fa-registered"></span> </label> | Unidad @item.Unit
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProviderName)
+                    </td>
 
 
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Price)
-                                </td>
-                                <td align="center">
-                                    <div class="btn-group-vertical">
-                                        @if (item.InternalCode == null || item.InternalCode == string.Empty)
-                                        {
-                                            <button type="button" class="btn btn-danger" onclick="BeginCopy('@item.ProviderId','@item.Code')" title="Copiar a catálogo">
-                                                <span class="fa fa-copy"></span>
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            @Html.DisplayFor(modelItem => item.InternalCode)
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Price)
+                    </td>
+                    <td align="center">
+                        <div class="btn-group-vertical">
+                            @if (item.InternalCode == null || item.InternalCode == string.Empty)
+                                {
+                                <button type="button" class="btn btn-danger" onclick="BeginCopy('@item.ProviderId','@item.Code')" title="Copiar a catálogo">
+                                    <span class="fa fa-copy"></span>
+                                </button>
+                                }
+                                else
+                                {
+                                @Html.DisplayFor(modelItem => item.InternalCode)
+                                }
+                        </div>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
 
 
+
 <script>
     $(document).ready(function () {
-        Paginate("#tbProviderProducts", 5);
-
-        $("#ModalProviderProducts").modal('show');
-
-
+        Paginate("#tbProviderProducts", 7);
     });
 
     function BeginCopy(provId, code)
     {
-        ExecuteAjax('@Url.Action("BeginCopy")', { providerId: provId, code: code }, function (view)
+        HideModal(function ()
         {
-            $("#ModalProviderProducts").on('hidden.bs.modal', function ()
-            {
-                $("#divModals").html(view);
-                $("#exCode").val(code);
-                $("#ProviderId").val(provId);
+            ShowCatalogModal(function () {
+                ShowCatalogModal(SearchBy, function () { SearchBy(id); }, 'Product', id);
 
-                $("#ModalQuickAddProduct").modal("show");
-            });
+            }, null, 'ProductCopy', { providerId: provId, code: code });
 
-            $("#ModalProviderProducts").modal('hide');
         });
+       
     }
 
 </script>

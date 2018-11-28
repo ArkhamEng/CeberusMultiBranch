@@ -93,13 +93,16 @@
 
         ExecuteAjax('@Url.Action("CompleateSale", "Sales")', param, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                CheckCart();
-                $(".prodRow").removeClass("info");
-                ShowNotify(response.Header, response.Result, response.Body, 3000);
+                HideModal(function ()
+                {
+                    CheckCart();
+                    $(".prodRow").removeClass("info");
+                    ShowNotify(response.Header, response.Result, response.Body, 3000);
 
-            }, true);
+                }, true);
+            });
         });
     }
 
@@ -109,12 +112,15 @@
 
         ExecuteAjax('@Url.Action("CreateBudget", "Sales")', {}, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                CheckCart();
-                $(".prodRow").removeClass("info");
-                $("#divPrinter").html(response);
-            }, true);
+                HideModal(function ()
+                {
+                    CheckCart();
+                    $(".prodRow").removeClass("info");
+                    $("#divPrinter").html(response);
+                }, true);
+            });
         });
     }
 

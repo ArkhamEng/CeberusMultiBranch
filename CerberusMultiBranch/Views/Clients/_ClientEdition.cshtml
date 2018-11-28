@@ -261,10 +261,12 @@
 
 <script>
 
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         SetCascade("#StateId", "#Address_CityId", '@Url.Action("GetCities", "Json")');
 
-        $("#Name").keyup(function () {
+        $("#Name").keyup(function ()
+        {
             $("#BusinessName").val($("#Name").val());
             $("#LegalRepresentative").val($("#Name").val());
         });

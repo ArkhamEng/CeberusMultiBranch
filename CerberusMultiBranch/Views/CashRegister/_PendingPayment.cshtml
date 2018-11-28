@@ -2,7 +2,7 @@
 @using CerberusMultiBranch.Support
 
 
-<table id="tbPendingPayment" class="table dt-responsive nowrap table-bordered small" style="width:100%">
+<table id="tbPendingPayment" class="table dt-responsive  table-bordered small" style="width:100%">
     <thead>
         <tr>
             <th class="text-center">@Html.DisplayName("Folio")</th>
@@ -22,12 +22,12 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td class="text-uppercase">@Html.DisplayFor(m => item.Folio)</td>
-                <td>
+                <td class="text-uppercase" >@Html.DisplayFor(m => item.Folio)</td>
+                <td style="min-width:120px">
                     @Html.DisplayUpperFor(m => item.Client.Name)
                 </td>
 
-                <td align="center">
+                <td align="center" style="min-width:100px">
                     @Html.DisplayUpperFor(m => item.User.UserName)
                 </td>
                 <td align="center">
@@ -94,7 +94,6 @@
             CheckPendingPayments();
 
             CheckRefunding();
-            console.log("Se recarga");
         });
     }
 

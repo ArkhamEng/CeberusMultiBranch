@@ -78,7 +78,7 @@
                 <td>
                     @Html.DisplayUpperFor(m => item.Bill)
                 </td>
-                <td>
+                <td style="white-space:nowrap">
                     @Html.DisplayUpperFor(m => item.Provider.Name)
                 </td>
              
@@ -105,7 +105,7 @@
                 </td>
 
                 <td>
-                    @{ var debt = item.TotalTaxedAmount - item.PurchasePayments.Sum(p => p.Amount); }
+                    @{ var debt = item.FinalAmount - item.PurchasePayments.Sum(p => p.Amount); }
                     @debt.ToMoney()
                 </td>
                 <td>

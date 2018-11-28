@@ -155,8 +155,6 @@
 
         var totalAmount = parseFloat($("#FinalAmount").val()).toFixed(2);
 
-        console.log("Final Amount "+totalAmount);
-
         var debt =(totalAmount - @Model.Sum(p => p.Amount));
 
       

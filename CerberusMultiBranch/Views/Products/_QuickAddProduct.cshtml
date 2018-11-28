@@ -193,7 +193,8 @@
         };
 
         //si el ProviderId tiene valor, quiere decir que es una copia de producto del proveedor
-        if ($("#ProviderId").val() != '') {
+        if ($("#ProviderId").val() != '')
+        {
             var param =
                 {
                     product: product, providerId: $("#ProviderId").val(),
@@ -236,9 +237,11 @@
                         }
                     });
                 }
-                else {
+                else
+                {
                     $("#ModalQuickAddProduct").modal("hide");
-                    $("#ModalQuickAddProduct").on("hidden.bs.modal", function () {
+                    $("#ModalQuickAddProduct").on("hidden.bs.modal", function ()
+                    {
                         SearchEdited(product.Code);
                         $("#divQuickAdd").html(response)
                     });
@@ -248,7 +251,8 @@
     }
 
 
-    function SearchEdited(code) {
+    function SearchEdited(code)
+    {
         ExecuteAjax('@Url.Action("SearchEdit")', { code: code }, function (response) {
             $("#divProducts").html(response);
         });

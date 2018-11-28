@@ -73,10 +73,13 @@
 
         ExecuteAjax('@Url.Action("SaveCarModel","MakesAndModels")', { carModel: carModel }, function (response)
         {
-            HideModal(function ()
+            HideModLoading(function ()
             {
-                $("#divModels").html(response);
-            }, true);
+                HideModal(function () {
+                    $("#divModels").html(response);
+                }, true);
+            });
+           
         });
 
     }

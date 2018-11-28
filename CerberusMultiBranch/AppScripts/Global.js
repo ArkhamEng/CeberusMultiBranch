@@ -38,20 +38,6 @@ function ShowNotify(title, type, message, delay) {
     });
 };
 
-//LOADING CONTROL FUNCTIONS
-function ShowLoading(backdrop) {
-    $("#Loading").modal({ backdrop: backdrop });
-}
-
-function HideLoading(callback) {
-    $("#Loading").off("hidden.bs.modal").on("hidden.bs.modal", function (e) {
-        if (callback != null)
-            callback();
-    });
-
-    $("#Loading").modal('hide');
-}
-
 
 
 
@@ -127,7 +113,7 @@ function LoadPopOver(button, callback) {
 
 
 //AJAX CALL
-function ExecuteAjax(url, parameters, callback)
+function ExecuteAjax(url, parameters, callback, errorCallBack)
 {
     $.ajax({
         url: url,
@@ -141,6 +127,9 @@ function ExecuteAjax(url, parameters, callback)
                 HideModLoading();
                 ShowNotify(response.Header, response.Result, response.Body, 3500);
 
+                if (errorCallBack != null)
+                    errorCallBack(response);
+
                 switch (response.Code)
                 {
                     case 401:
@@ -149,15 +138,16 @@ function ExecuteAjax(url, parameters, callback)
                 }
 
             }
-            else {
+            else
+            {
                 callback(response);
             }
         },
         error: function (err)
         {
             HideLoading();
-            HideModLoading();
-            ShowNotify("Error Inesperado!", "dark", "ocurrio un error, quiza has perdido la conexion a internet!", 3500);
+            HideModLoading();            
+            ShowNotify("Sin respuesta del servidor!", "danger", "El servidor no respondio en el tiempo esperado, revisa tu conexión a internet", 3500);
         }
     });
 }
@@ -348,8 +338,10 @@ function ShowChildModal(content, openCallBack, size)
 }
 
 //Hide Child Modal 
-function HideChildModal() {
-    $('#ChildModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+function HideChildModal()
+{
+    $('#ChildModal').off('hidden.bs.modal').on('hidden.bs.modal', function ()
+    {
         $('#SiteModal').css('opacity', 1);
         $('#SiteModal').removeData("modal").modal({});
         $('body').addClass("modal-open");
@@ -360,18 +352,53 @@ function HideChildModal() {
 }
 
 
+//LOADING CONTROL FUNCTIONS
+function ShowLoading(backdrop) {
+    $("#Loading").modal({ backdrop: backdrop });
+}
+
+function HideLoading(callback)
+{
+    $("#Loading").off("hidden.bs.modal").on("hidden.bs.modal", function (e)
+    {
+        if (callback != null)
+            callback();
+    });
+
+    $("#Loading").modal('hide');
+}
+
+
 //Loading In Modal
 function ShowModLoading()
 {
-    $("#ModalContent").children().hide();
-    $("#ModalLoading").children().show();
+    $("#ChildLoading").off("shown.bs.modal").on('shown.bs.modal', function ()
+    {
+        $('#SiteModal').css('opacity', .7);
+        $('#SiteModal').unbind();
+    });
+
+  
+    $("#ChildLoading").css("margin-top", "100px");
+    $("#ChildLoading").modal({ backdrop: 'static' });
 }
 
-function HideModLoading()
+function HideModLoading(callback)
 {
-    $("#ModalLoading").children().hide();
-    $("#ModalContent").children().show();
+    $('#ChildLoading').off('hidden.bs.modal').on('hidden.bs.modal', function ()
+    {
+        $('#SiteModal').css('opacity', 1);
+        $('#SiteModal').removeData("modal").modal({});
+        $('body').addClass("modal-open");
+
+        if (callback != null)
+            callback();
+    });
+
+    $('#ChildLoading').modal("hide");
 }
+
+
 
 
 //CONFIRM CONTROL FUNCTIONS

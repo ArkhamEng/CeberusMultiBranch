@@ -44,7 +44,7 @@
                     @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
                 </div>
 
-               
+
             </div>
         </div>
 
@@ -68,13 +68,11 @@
 @Html.HiddenFor(m => m.TotalRefund)
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         var form = $("#formRefund");
         form.validate();
 
-        $("#RefundCash").off('keyup').keyup(function ()
-        {
+        $("#RefundCash").off('keyup').keyup(function () {
             var val = $("#RefundCash").val();
             var result = CalculateRefund(val);
 
@@ -82,8 +80,7 @@
 
             $("#RefundCredit").val(result);
 
-            if (result < 0)
-            {
+            if (result < 0) {
                 $("#RefundCredit").val(0);
                 $("#RefundCash").val($("#TotalRefund").val());
             }
@@ -91,8 +88,7 @@
             EvalCredit();
         });
 
-        $("#RefundCredit").off('keyup').keyup(function ()
-        {
+        $("#RefundCredit").off('keyup').keyup(function () {
             var val = $("#RefundCredit").val();
             var result = CalculateRefund(val);
 
@@ -111,8 +107,7 @@
         EvalCredit();
     });
 
-    function EvalCredit()
-    {
+    function EvalCredit() {
         var Ammount = parseFloat($("#RefundCredit").val());
 
         if (Ammount > 0)
@@ -121,8 +116,7 @@
             $("#Ident").attr("disabled", true);
     }
 
-    function CalculateRefund(val)
-    {
+    function CalculateRefund(val) {
         var total = parseFloat($("#TotalRefund").val());
 
         var result = (total - parseFloat(val));
@@ -130,15 +124,13 @@
         return result;
     }
 
-    function ApplyRefund()
-    {
+    function ApplyRefund() {
         var form = $("#formRefund");
 
         if (!form.valid())
             return;
 
-        HideModal(function()
-        {
+        HideModal(function () {
             ShowLoading('static');
 
             var ref = {
@@ -150,26 +142,20 @@
                 ReceivedBy: $("#ReceivedBy").val()
             }
 
-            ExecuteAjax('@Url.Action("CreateRefund","CashRegister")', { refund: ref }, function (response)
-            {
-                HideLoading(function ()
-                {
+            ExecuteAjax('@Url.Action("CreateRefund","CashRegister")', { refund: ref }, function (response) {
+                HideLoading(function () {
                     CheckRefunding();
                     $("#divPrinter").html(response);
                 });
             });
 
-        },true);
+        }, true);
     }
 
-    function GetCreditNote(id)
-    {
-        ExecuteAjax('@Url.Action("PrintCreditNote")', { noteId: id }, function (response)
-        {
-            if (!$.isPlainObject(response)) {
-                $("#divPrinter").html(response);
-                PrintCreditNote();
-            }
+    function GetCreditNote(id) {
+        ExecuteAjax('@Url.Action("PrintCreditNote")', { noteId: id }, function (response) {
+            $("#divPrinter").html(response);
+            PrintCreditNote();
         });
     }
 </script>
