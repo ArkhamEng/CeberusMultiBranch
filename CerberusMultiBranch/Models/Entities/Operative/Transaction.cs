@@ -10,7 +10,7 @@ using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
-    public abstract class Transaction
+    public abstract class Transaction 
     {
         [Required]
         [Index("IDX_BranchId", IsUnique = false)]

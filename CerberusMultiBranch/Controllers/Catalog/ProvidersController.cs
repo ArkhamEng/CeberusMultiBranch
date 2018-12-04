@@ -24,21 +24,36 @@ namespace CerberusMultiBranch.Controllers.Catalog
         public ActionResult Index()
         {
             var model = new SearchPersonViewModel<ProviderViewModel>();
-            model.Persons = LookFor(null, null, null, null, null);
+            model.Persons = LookFor(null, null, null, null, null, Cons.MaxResults);
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult Search(int? stateId, int? cityId, string name, string phone, int? id)
+        public ActionResult Search(int? stateId, int? cityId, string name, string phone, int? id, bool quickSearch = false)
         {
-            var model = LookFor(stateId, cityId, name, phone, id);
-            return PartialView("_List", model);
+            var top = quickSearch ? Cons.QuickResults : Cons.MaxResults;
+
+            top = Cons.MaxResults;
+
+            var model = LookFor(stateId, cityId, name,phone, id, top);
+
+            if (!quickSearch)
+                return PartialView("_List", model);
+            else
+                return PartialView("_ProviderQuickSearchList", model);
+        }
+
+        [HttpPost]
+        public ActionResult ShowQuickSearch()
+        {
+            var model = LookFor(null, null, null, null, null, Cons.QuickResults);
+
+            return PartialView("_ProviderQuickSearch", model);
         }
 
 
-
-        private List<ProviderViewModel> LookFor(int? stateId, int? cityId, string name, string phone, int? id)
+        private List<ProviderViewModel> LookFor(int? stateId, int? cityId, string name, string phone, int? id, int top)
         {
             string[] arr = new List<string>().ToArray();
 
@@ -49,8 +64,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                          where
                              (id == null || provider.ProviderId == id) &&
                              (name == null || name == string.Empty || arr.Any(n => (provider.Code + " " + provider.Name).Contains(name))) &&
-                             //(stateId == null || provider.City.StateId == stateId) &&
-                             //(cityId == null || provider.CityId == cityId) &&
                              (phone == null || phone == string.Empty || provider.Phone == phone) &&
                              (provider.IsActive)
                          select new ProviderViewModel
@@ -79,7 +92,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                              LockUser = provider.LockUser,
                              LockEndDate = provider.LockEndDate,
                              Addresses = provider.Addresses,
-                         }).OrderBy(e => e.Name).ToList();
+                         }).Take(top).OrderBy(c => c.Name).ToList();
 
             return model;
         }
@@ -159,7 +172,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 if (provider.ProviderId == Cons.Zero)
                 {
 
-                    var exProv = db.Providers.FirstOrDefault(p => p.FTR == provider.FTR || provider.Name == provider.Name);
+                    var exProv = db.Providers.FirstOrDefault(p => (!string.IsNullOrEmpty(p.FTR)  && p.FTR == provider.FTR) || p.Name == provider.Name);
 
                     if (exProv != null)
                     {

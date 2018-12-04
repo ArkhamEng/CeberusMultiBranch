@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder" Collapsed="true">
+    <Position X="5.5" Y="2.5" Width="1.5" />
+    <AssociationLine Name="PurchaseOrderDetails" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrderDetail">
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-1.576" Y="0.829" Height="0.182" Width="1.525" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>CAAAIAQAACAEACCABAARAQKAIAAAACxIAAgAQAAIACA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseOrder.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrderDetails" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrderDetail" Collapsed="true">
+    <Position X="5.25" Y="4.25" Width="2" />
+    <AssociationLine Name="Product" Type="CerberusMultiBranch.Models.Entities.Catalog.Product">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.683" Y="0.06" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>MAACIAAAAAAAACAAhAAABIIAIAAAACAAAAgAAAAAEAA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseOrderDetail.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Product" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Catalog.Product" Collapsed="true">
+    <Position X="2.25" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FIIAGAAQCYhAgoBBMCGgAYQAMAAAEhFEAAwAoIQAKoA=</HashCode>
+      <FileName>Models\Entities\Catalog\Product.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Config.Branch" Collapsed="true">
+    <Position X="9.25" Y="2.5" Width="1.5" />
+    <AssociationLine Name="PurchaseOrder" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.818" Y="0.102" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAADAAAAAABAAAAEBAKhBQQAAAAAAAACABAAgAIAAAA=</HashCode>
+      <FileName>Models\Entities\Config\Branch.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrder" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Catalog.Provider" Collapsed="true">
+    <Position X="2.25" Y="2.75" Width="1.5" />
+    <AssociationLine Name="PurchaseOrders" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.579" Y="-0.263" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAVAAAABACBABAAAFIEgAAQDIhEAAIAAAAgAOAABAAA=</HashCode>
+      <FileName>Models\Entities\Catalog\Provider.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrders" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseStatus" Collapsed="true">
+    <Position X="4.5" Y="0.5" Width="1.5" />
+    <AssociationLine Name="PurchaseOrders" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="5.25" Y="1.062" />
+        <Point X="5.25" Y="1.437" />
+        <Point X="5.938" Y="1.437" />
+        <Point X="5.938" Y="2.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true" ManuallySized="true">
+        <Position X="-0.692" Y="1.175" Height="0.182" Width="1.222" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAgAAAAAAAAAAQAAAAAAIAAAAAAAAAIAAA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseStatus.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrders" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseType" Collapsed="true">
+    <Position X="6.75" Y="0.5" Width="1.5" />
+    <AssociationLine Name="PurchaseOrders" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="7.531" Y="1.062" />
+        <Point X="7.531" Y="1.437" />
+        <Point X="6.562" Y="1.437" />
+        <Point X="6.562" Y="2.5" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="-2.263" Y="1.173" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAABgAAAAAAAAAAQAAAAAAIAAAAAAQAAAAAA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseType.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrders" />
+    </ShowAsCollectionAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Catalog.ShipMethod" Collapsed="true">
+    <Position X="2" Y="1" Width="1.5" />
+    <AssociationLine Name="PurchaseOrders" Type="CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
+      <Path>
+        <Point X="3.5" Y="1.313" />
+        <Point X="4.5" Y="1.313" />
+        <Point X="4.5" Y="2.688" />
+        <Point X="5.5" Y="2.688" />
+      </Path>
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.308" Y="0.821" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAgAAAAAAAAAAYAIAAAAIAIAAgAAAAAAAA=</HashCode>
+      <FileName>Models\Entities\Catalog\ShipMethod.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="PurchaseOrders" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Enum Name="CerberusMultiBranch.Models.Entities.Purchasing.PStatus" Collapsed="true">
+    <Position X="9.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAQCAAABgAAAAAAAAAAAAAABAAAEAAAIAAA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseStatus.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="CerberusMultiBranch.Models.Entities.Purchasing.PType" Collapsed="true">
+    <Position X="11.25" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Models\Entities\Purchasing\PurchaseType.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

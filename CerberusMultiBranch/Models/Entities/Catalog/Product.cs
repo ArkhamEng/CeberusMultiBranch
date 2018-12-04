@@ -6,7 +6,7 @@ using System.Web;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System;
 using CerberusMultiBranch.Support;
-
+using CerberusMultiBranch.Models.Entities.Purchasing;
 
 namespace CerberusMultiBranch.Models.Entities.Catalog
 {
@@ -91,14 +91,17 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<Compatibility> Compatibilities { get; set; }
 
-        public ICollection<SaleDetail> TransactionDetails { get; set; }
+        public ICollection<SaleDetail> SaleDetails { get; set; }
+
+        public ICollection<PurchaseDetail> PurchaseDetails { get; set; }
 
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
         public ICollection<Equivalence> Equivalences { get; set; }
 
-        //[InverseProperty("Detail")]
-        //public virtual ICollection<PackageDetail> Details { get; set; }
+        public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+
+        public ICollection<PurchaseItem> PurchaseItems { get; set; }
 
 
         [InverseProperty("Package")]

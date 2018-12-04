@@ -180,7 +180,8 @@ function SetCascade(ddlParent, ddlChild, url) {
 
 
 //Realiza paginación  sobre una tabla
-function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContainer, printOp, rows) {
+function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContainer, printOp, rows)
+{
     var searching = false;
 
     if (typeof (filter) != 'undefined')
@@ -338,7 +339,7 @@ function ShowChildModal(content, openCallBack, size)
 }
 
 //Hide Child Modal 
-function HideChildModal()
+function HideChildModal(closCallBack)
 {
     $('#ChildModal').off('hidden.bs.modal').on('hidden.bs.modal', function ()
     {
@@ -346,6 +347,9 @@ function HideChildModal()
         $('#SiteModal').removeData("modal").modal({});
         $('body').addClass("modal-open");
         $("#ChildModalContent").html("");
+
+        if (closCallBack != null)
+            closCallBack();
     });
 
     $('#ChildModal').modal("hide");
@@ -453,3 +457,69 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
 }
 
 
+
+
+//Pagina agrupando filas
+function GroupRow(table, iniRecords, filter, index, colspan)
+{
+    var searching = false;
+
+    if (typeof (filter) != 'undefined')
+        searching = true;
+
+    var oTable = $(table).DataTable(
+       {         
+           fixedHeader: true,
+           responsive: false,
+           "aaSorting": [],
+           "lengthChange": false,
+           "searching": searching,
+           "order": [],
+           "lengthMenu": [[5, 10, 20, 50, 100, -1], [5, 10, 20, 50, 100, "All"]],
+           "pageLength": iniRecords,
+           "language": {
+               "search": "filtrar resultados",
+               "lengthMenu": "mostrar  _MENU_ ",
+               "zeroRecords": "no hay datos disponibles",
+               "info": "página _PAGE_ de _PAGES_",
+               "infoEmpty": "",
+               "infoFiltered": "(filtrado de _MAX_ total registros)",
+               "paginate": {
+                   "previous": "Anterior",
+                   "next": "Siguiente"
+               }
+           },
+           "columnDefs": [
+               { "visible": false, "targets": index }
+           ],
+         
+           "displayLength": 25,
+           "drawCallback": function (settings)
+           {
+               var api = this.api();
+               var rows = api.rows({ page: 'current' }).nodes();
+               var last = null;
+
+               api.column(index, { page: 'current' }).data().each(function (group, i)
+               {
+                   if (last !== group) {
+                       $(rows).eq(i).before(
+                           '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
+                       );
+
+                       last = group;
+                   }
+               });
+           }
+       });
+    if (typeof (filter) != 'undefined')
+    {
+        $(filter).keyup(function () {
+            oTable.data().search(this.value).draw();
+        });
+
+        $(table + "_filter").addClass("hidden");
+    }
+
+    
+}

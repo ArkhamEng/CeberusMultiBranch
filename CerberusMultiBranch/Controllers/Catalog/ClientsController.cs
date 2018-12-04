@@ -41,7 +41,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         {
             var top = quickSearch ? Cons.QuickResults : Cons.MaxResults;
 
-            top = 30000;
+            top = Cons.MaxResults;
             var model = LookFor(stateId, cityId, name, ftr, id, top);
 
             if (!quickSearch)

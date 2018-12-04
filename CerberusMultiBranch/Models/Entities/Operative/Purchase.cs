@@ -19,7 +19,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public string Bill { get; set; }
 
-       
+        [MaxLength(20)]
+        public string Folio { get; set; }
 
         #region Navigation Properties
         public virtual Provider Provider { get; set; }

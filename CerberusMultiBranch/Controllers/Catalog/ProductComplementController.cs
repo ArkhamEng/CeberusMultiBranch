@@ -8,12 +8,92 @@ using System.Web;
 using System.Web.Mvc;
 using System.Data.Entity;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
+using System.Text.RegularExpressions;
+using Microsoft.AspNet.Identity;
 
 namespace CerberusMultiBranch.Controllers.Catalog
 {
     public partial class ProductsController : Controller
     {
 
+        #region QuickSearch
+
+        [HttpPost]
+        public ActionResult ShowQuickSearch(int? providerId)
+        {
+            var model = LookForPurchase(null, providerId.Value);
+
+            return PartialView("_ProductQuickSearch", model);
+        }
+
+        [HttpPost]
+        public ActionResult QuickSearch(string filter, int? providerId)
+        {
+            var model = LookForPurchase(filter, providerId.Value);
+
+            return PartialView("_ProductQuickSearchList", model);
+        }
+
+        private List<ProductViewModel> LookForPurchase(string filter, int providerId)
+        {
+
+            string[] arr = new List<string>().ToArray();
+
+            if (filter != null && filter != string.Empty)
+            {
+                arr = filter.Trim().Split(' ');
+
+                if (arr.Length == Cons.One)
+                    arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", "");
+            }
+
+            var branches = User.Identity.GetBranches().Select(b => b.BranchId);
+            var userId = User.Identity.GetUserId();
+
+            var products = (from bp in db.BranchProducts
+                        
+                            join e  in db.Equivalences on bp.ProductId equals e.ProductId into em
+                            from eq in em.DefaultIfEmpty()
+                            join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
+                            from ep in exm.DefaultIfEmpty()
+                            join it in db.PurchaseItems on new { bp.BranchId, bp.ProductId, eq.ProviderId } equals new { it.BranchId, it.ProductId, it.ProviderId } into itm
+                            from its in itm.DefaultIfEmpty()
+
+                            where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
+                                  (its == null || its.UserId == userId) &&
+                                  (eq == null || eq.ProviderId == providerId) &&
+                                  (branches.Contains(bp.BranchId)) &&
+                                  (bp.Stock < bp.MaxQuantity)
+
+
+                            select new ProductViewModel
+                            {
+                                ProductId = bp.ProductId,
+                                Name = bp.Product.Name,
+                                Code = bp.Product.Code,
+                                BranchId = bp.BranchId,
+                                TradeMark = bp.Product.TradeMark,
+                                LockDate = bp.Product.LockDate,
+                                UserLock = bp.Product.UserLock,
+                                MaxQuantity = bp.Product.MaxQuantity,
+                                MinQuantity = bp.Product.MinQuantity,
+                                Quantity = bp.Stock,
+                                AddQuantity = bp.Product.MaxQuantity - bp.Stock,
+                                BranchName = bp.Branch.Name,
+                                ProviderCode = ep != null ? ep.Code : "No asignado",
+                                BuyPrice = ep != null ? ep.Price : Cons.Zero,
+                                AddToPurchaseDisabled = (its != null)
+
+                            }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).ToList();
+
+            return products;
+        }
+
+
+        #endregion
+
+
+        #region Product Movements
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor")]
         public ActionResult GetProductMovements(int id)
@@ -51,6 +131,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
         }
 
+        #endregion
 
         #region Images
         [HttpPost]

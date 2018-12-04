@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -35,18 +36,15 @@ namespace CerberusMultiBranch.Models.Entities.Config
 
         public ICollection<Sale> Sales { get; set; }
 
+        public ICollection<PurchaseOrder> PurchaseOrder { get; set; }
+
         public ICollection<BranchProduct> BranchProducts { get; set; }
 
         public ICollection<CashRegister> CashRegisters { get; set; }
 
         public ICollection<UserBranch> UserBranches { get; set; }
 
-        //[NotMapped]
-        //public ICollection<Operation> Sales { get { return this.Transactions.OfType<Operation>().ToList(); } }
-
-
-        //[NotMapped]
-        //public ICollection<Purchase> Purchases { get { return this.Transactions.OfType<Purchase>().ToList(); } }
+        public ICollection<PurchaseItem> PurchaseItems { get; set; }
 
         [NotMapped]
         public int Id { get { return this.BranchId; } }

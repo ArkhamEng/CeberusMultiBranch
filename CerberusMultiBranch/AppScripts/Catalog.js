@@ -314,10 +314,15 @@ function HideConfirm(callback) {
 }
 
 
-function ShowQuickSearch(url, onRecordSelected, onClosed) {
+function ShowQuickSearch(url, onRecordSelected, onClosed, param)
+{
     ShowLoading('static');
+    console.log(param)
+    if (param == null)
+        param = { quickSearch: true }
 
-    ExecuteAjax(url, { quickSearch: true }, function (response) {
+    ExecuteAjax(url, param, function (response)
+    {
         HideLoading(function () {
             recordSelected = onRecordSelected;
 

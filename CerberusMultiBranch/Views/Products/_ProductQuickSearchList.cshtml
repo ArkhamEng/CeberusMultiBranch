@@ -1,0 +1,178 @@
+﻿@model IEnumerable<ProductViewModel>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
+
+
+
+<table id="tbProductQuickSearch" class="table dt-responsive table-bordered small hidden" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+
+            <th>
+                @Html.DisplayName("Sucursal")
+            </th>
+
+            <th>
+                @Html.DisplayName("Costo")
+            </th>
+
+            <th>
+                @Html.DisplayName("Inventario")
+            </th>
+
+            <th>
+                @Html.DisplayName("Máximo")
+            </th>
+
+            <th >
+                @Html.DisplayName("Cantidad")
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr class='@item.PurchasRowStyle'>
+                <td class="text-uppercase" style="min-width:280px">                  
+                    <h5 style="text-align:center">
+                       Código Interno: @Html.DisplayFor(modelItem => item.Code)     -    
+                        Código Proveedor:  
+                        <u onmouseover="SetPointer(this)" title="has click para modificar el costo y código de proveedor" onclick="BeginProviderCode('@item.ProductId')">
+                           @Html.DisplayFor(modelItem => item.ProviderCode) 
+                            <span class="fa fa-edit"></span>
+                        </u>
+                    </h5>
+                    <p style="text-align:center">
+                        @Html.DisplayFor(modelItem => item.Name) <br />
+                        <strong>Marca</strong>  @Html.DisplayFor(modelItem => item.TradeMark)
+                    </p>
+                </td> 
+                
+                <td class="text-uppercase">
+                    @Html.HiddenFor(modelItem => item.BranchId)
+                    @Html.DisplayFor(modelItem => item.BranchName)
+                </td>
+
+                <td class="text-uppercase">
+                    @Html.HiddenFor(modelItem => item.ProductId)
+                    @Html.DisplayFor(modelItem => item.BuyPrice)
+                </td>
+
+                <td class="text-lowercase text-center">
+                   @Html.DisplayFor(modelItem => item.Quantity)
+                    @Html.HiddenFor(modelItem => item.Quantity)
+                </td>
+
+                <td class="text-uppercase  text-center">
+                    @Html.DisplayFor(modelItem => item.MaxQuantity)
+                    @Html.HiddenFor(modelItem => item.MaxQuantity)
+                </td>
+
+                <td class="text-uppercase  text-center" style="max-width:50px">
+                   
+                    <input type="number" onkeyup="CheckQuantity(this)" autocomplete="off" class="form-control text-uppercase input-sm" id="item_AddQuantity" value="@item.AddQuantity" disabled="@item.AddToPurchaseDisabled" />
+                </td>
+
+                <td >
+                    <button type="button" class="btn btn-primary btn-xs" onclick="ProductSelected(this)" title="has click para agregar esta partida a una orden de compra" disabled='@item.AddToPurchaseDisabled'>
+                        <span class="fa fa-plus"></span>
+                        Agregar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        GroupRow("#tbProductQuickSearch", 10, "#FProductName", 0, 6)
+
+        $("#tbProductQuickSearch").removeClass("hidden");
+    });
+
+    var recordSelected;
+
+    
+    function ProductSelected(btn)
+    {
+        var row = $(btn).parent().parent()[0];
+        var txt = $(row).find("#item_AddQuantity");
+
+        var toAdd     =  $(txt).val();
+        var productId = $(row).find("#item_ProductId").val();
+
+        var branchId = $(row).find("#item_BranchId").val();
+        var code = $(row).find("#item_BranchId").val();
+
+        var param = 
+           {
+               BranchId: branchId,
+               ProviderId: $("#ProviderId").val(),
+               ProductId :productId,
+               Quantity: toAdd,
+               PurchaseTypeId: $("#PuschaseType").val(),
+           };
+       
+        ShowModLoading();
+
+        ExecuteAjax('@Url.Action("AddToCart", "Purchases")', { item: param }, function (response)
+        {
+            HideModLoading(function ()
+            {
+                $(btn).attr('disabled', true);
+                $(txt).attr('disabled', true);
+                $(row).addClass('bgDataTable-info');
+                ShowNotify("Partida agregado", "info", "Partida agregada a la orden de compra", 3000);
+                $("#divPurchaseDetails").html(response);
+            });         
+        });
+    }
+
+    //evalua la cantidad de produto ingresado (no puede superar al maximo configurado)
+    function CheckQuantity(input)
+    {
+        var row = $(input).parent().parent()[0];
+
+
+        var stock = parseFloat($(row).find("#item_Quantity").val());
+        var max = parseFloat($(row).find("#item_MaxQuantity").val());
+
+        var quantity = $(input).val();
+
+        if (isNaN(quantity) || quantity == '')
+            $(input).val(max - stock);
+          
+
+        quantity = parseFloat(quantity);
+  
+        var total = stock + quantity;
+
+       
+        if(total > max || quantity <= 0)
+            $(input).val(max - stock);
+
+    }
+
+    //llama la ventana código proveedor
+    function BeginProviderCode(productId)
+    {
+        ShowModLoading();
+
+        ExecuteAjax('@Url.Action("BeginSetCode", "Purchases")', { productId: productId, providerId: $("#ProviderId").val() }, function (response)
+        {
+            HideModLoading(function ()
+            {
+                ShowChildModal(response, null,'sm');
+            });
+        });
+    }
+   
+</script>

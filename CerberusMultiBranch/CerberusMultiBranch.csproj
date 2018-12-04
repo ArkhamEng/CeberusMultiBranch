@@ -207,7 +207,7 @@
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
-    <Compile Include="Controllers\Operative\PurchaseOrderController.cs" />
+    <Compile Include="Controllers\Operative\PurchasingController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
@@ -382,6 +382,14 @@
     <Compile Include="Migrations\201811280539464_removeFieldsFromCatalog.Designer.cs">
       <DependentUpon>201811280539464_removeFieldsFromCatalog.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201812010527370_PurchasingSchema.cs" />
+    <Compile Include="Migrations\201812010527370_PurchasingSchema.Designer.cs">
+      <DependentUpon>201812010527370_PurchasingSchema.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201812031858595_lastChanges.cs" />
+    <Compile Include="Migrations\201812031858595_lastChanges.Designer.cs">
+      <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -393,6 +401,7 @@
     <Compile Include="Models\Entities\Catalog\ExternalProduct.cs" />
     <Compile Include="Models\Entities\Catalog\PackageDetail.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
+    <Compile Include="Models\Entities\Catalog\ShipMethod.cs" />
     <Compile Include="Models\Entities\Catalog\TempExternalProduct.cs" />
     <Compile Include="Models\Entities\Config\City.cs" />
     <Compile Include="Models\Entities\Config\ISelectable.cs" />
@@ -430,6 +439,11 @@
     <Compile Include="Models\Entities\Operative\StockMovement.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseItem.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseOrder.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseOrderDetail.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseStatus.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
@@ -452,10 +466,11 @@
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
-    <Compile Include="Models\ViewModels\Operative\PurchasOrderViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\PurchaseCartViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleCancelViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\SetProviderCodeViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\WithdrawalViewModel.cs" />
@@ -720,6 +735,8 @@
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\semanticui.scss" />
     <Content Include="Models\Entities\Operative\SalePayment.cd" />
+    <Content Include="Models\Entities\Operative\Purchase.cd" />
+    <Content Include="Models\Entities\Purchasing\PurchaseOrder.cd" />
     <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
     <None Include="Properties\PublishProfiles\SimsTrial.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -881,7 +898,6 @@
     <Content Include="Views\Providers\Index.cshtml" />
     <Content Include="Views\Providers\_List.cshtml" />
     <Content Include="Views\Employees\_List.cshtml" />
-    <Content Include="Views\Shared\_CatalogButtonGroup.cshtml" />
     <Content Include="Views\Products\_CarModelSelector.cshtml" />
     <Content Include="Views\Clients\_ClientQuickSearch.cshtml" />
     <Content Include="Views\Shared\_QuickProvider.cshtml" />
@@ -999,7 +1015,13 @@
     <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
     <Content Include="Views\Products\_ProductEditionImages.cshtml" />
     <Content Include="Views\Shared\_ChildLoading.cshtml" />
-    <Content Include="Views\Purchases\Order.cshtml" />
+    <Content Include="Views\Purchases\PurchaseCart.cshtml" />
+    <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
+    <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
+    <Content Include="Views\Products\_ProductQuickSearch.cshtml" />
+    <Content Include="Views\Products\_ProductQuickSearchList.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseCartDetail.cshtml" />
+    <Content Include="Views\Purchases\_SetProviderCode.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1008,7 +1030,6 @@
     <Folder Include="Content\UserProfile\" />
     <Folder Include="Views\Inventory\" />
     <Folder Include="Views\ProductComplement\" />
-    <Folder Include="Views\PurchaseOrder\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -1143,6 +1164,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201811280539464_removeFieldsFromCatalog.resx">
       <DependentUpon>201811280539464_removeFieldsFromCatalog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812010527370_PurchasingSchema.resx">
+      <DependentUpon>201812010527370_PurchasingSchema.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201812031858595_lastChanges.resx">
+      <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

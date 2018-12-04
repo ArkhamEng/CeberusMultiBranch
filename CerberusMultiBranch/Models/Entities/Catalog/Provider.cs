@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -112,9 +113,13 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
     
        public ICollection<Purchase> Purchases { get; set; }
 
+        public ICollection<PurchaseOrder> PurchaseOrders { get; set; }
+
         public ICollection<ExternalProduct> ExternalProducts { get; set; }
 
-        
+        public ICollection<PurchaseItem> PurchaseItems { get; set; }
+
+
         public ICollection<Address> Addresses { get; set; }
 
         public Provider()

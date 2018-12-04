@@ -201,19 +201,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         [HttpPost]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate, string bill, string provider, string user, TranStatus? status)
         {
-            //if (beginDate == null || endDate == null || (beginDate > endDate))
-            //{
-            //    return Json(new JResponse
-            //    {
-            //        Result = Cons.Responses.Warning,
-            //        Code = Cons.Responses.Codes.InvalidData,
-            //        Body = "Debes usar el filtro de fechas y asegurarte que la fecha final sea mayor ó igual que la fecha de inicio",
-            //        Header = "Fechas invalidas"
-            //    });
-            //}
-
-            //endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
-
             //si el usuario no es un supervisor, busco solo las comprar registradas por el 
             var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 

@@ -64,6 +64,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [MaxLength(30)]
         public string Ledge { get; set; }
 
+        [Display(Name = "Cant. Máxima")]
+        public double MaxQuantity { get; set; }
+
+        [Display(Name = "Cant. Mínima")]
+        public double MinQuantity { get; set; }
+
         public DateTime UpdDate { get; set; }
 
         public bool StockLocked { get; set; }

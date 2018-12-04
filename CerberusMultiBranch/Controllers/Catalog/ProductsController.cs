@@ -36,12 +36,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid, int? id)
         {
-            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid,id);
+            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid, id);
             return PartialView("_List", model);
         }
 
+     
 
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid,int? id, int top = Cons.MaxProductResult)
+        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int? id, int top = Cons.MaxProductResult)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -218,9 +219,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 product.UpdUser = User.Identity.GetUserName();
 
                 if (product.WholesalerPercentage < 10)
-                    return Json(new JResponse{ Header = "Error en porcentaje", Body = "El porcentaje de mayorista no puede ser menor al 10%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+                    return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mayorista no puede ser menor al 10%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
                 if (product.DealerPercentage < 15)
-                    return Json(new  JResponse{ Header = "Error en porcentaje", Body = "El porcentaje de distribuidor no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+                    return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de distribuidor no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
                 if (product.StorePercentage < 20)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mostrador no puede ser menor al 20%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
 
@@ -288,7 +289,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     return Json(new JResponse
                     {
                         Header = "Prodcuto actualizado",
-                        Body = "Los datos del product "+product.Code+" fueron actualizados correctamente",
+                        Body = "Los datos del product " + product.Code + " fueron actualizados correctamente",
                         Result = Cons.Responses.Success,
                         Code = Cons.Responses.Codes.Success,
                         Id = product.ProductId
@@ -301,7 +302,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             }
 
         }
-      
+
 
         [HttpPost]
         public ActionResult UnLock(int id)
@@ -1085,11 +1086,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [HttpPost]
         public ActionResult SearchEdit(string code)
         {
-            var model = LookFor(null, null, null, null, null, code, null, false,null);
+            var model = LookFor(null, null, null, null, null, code, null, false, null);
             return PartialView("_List", model);
         }
 
-     
+
 
         [HttpPost]
         public ActionResult GetStockInBranches(int productId)
@@ -1136,25 +1137,25 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return prodMod;
         }
 
-     
-        [HttpPost]
-        public ActionResult QuickSearch(string name)
-        {
-            string[] arr = new List<string>().ToArray();
 
-            if (name != null && name != string.Empty)
-                arr = name.Trim().Split(' ');
+        //[HttpPost]
+        //public ActionResult QuickSearch(string name)
+        //{
+        //    string[] arr = new List<string>().ToArray();
+
+        //    if (name != null && name != string.Empty)
+        //        arr = name.Trim().Split(' ');
 
 
-            var model = (from p in db.Products
-                         where
-                           (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)) && p.IsActive)
-                         select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
+        //    var model = (from p in db.Products
+        //                 where
+        //                   (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name).Contains(s)) && p.IsActive)
+        //                 select p).Include(p => p.Images).Take(Cons.QuickResults).ToList();
 
-            return PartialView("_ProductList", model);
-        }
+        //    return PartialView("_ProductList", model);
+        //}
 
-   
+
 
         [HttpPost]
         [CustomAuthorize(Roles = "Capturista")]
@@ -1293,9 +1294,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             return PartialView("_QuickAddProduct", vm);
         }
 
-       
 
-      
+
+
 
         [HttpPost]
         public ActionResult Copy(Product product, int providerId, string code)
@@ -1376,7 +1377,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         }
 
 
-    
+
 
         [HttpPost]
         public ActionResult SearchForPackage(string filter)

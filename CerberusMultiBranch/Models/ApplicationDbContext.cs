@@ -2,6 +2,7 @@
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Finances;
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<ProductImage> ProductImages { get; set; }
 
+        public DbSet<ShipMethod> ShipMethodes { get; set; }
+
         #endregion
 
         #region Operative
@@ -105,6 +108,19 @@ namespace CerberusMultiBranch.Models
 
         #endregion
 
+        #region Purchasing
+
+        public DbSet<PurchaseItem> PurchaseItems { get; set; }
+
+        public DbSet<PurchaseOrder> PurchaseOrder { get; set; }
+
+        public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+
+        public DbSet<PurchaseType> PurchaseTypes { get; set; }
+
+        public DbSet<PurchaseStatus> PurchaseStatuses { get; set; }
+
+        #endregion
 
         public ApplicationDbContext() : base("DefaultConnection", throwIfV1Schema: false)
         { }

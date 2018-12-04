@@ -1,6 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ using System.Web.Mvc;
 namespace CerberusMultiBranch.Models.ViewModels.Catalog
 {
     [NotMapped]
-    public class ProductViewModel:Product
+    public class ProductViewModel : Product
     {
         public SelectList Categories { get; set; }
 
@@ -25,11 +26,32 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList ProductTypes { get; set; }
 
+        public string BranchName { get; set; }
+
+        public string ProviderName { get; set; }
+
+        public int ProviderId { get; set; }
+
+        public PType PurchaseType { get; set; }
+
+        public int BranchId { get; set; }
+
+        [DataType(DataType.PhoneNumber)]
+        public double AddQuantity { get; set; }
+
+        public bool AddToPurchaseDisabled { get; set; }
+
+        public string PurchasRowStyle
+        {
+            get { return this.AddToPurchaseDisabled ? "bgDataTable-info" : string.Empty; }
+        }
+
+    
 
         public ProductViewModel()
         {
-            this.Categories    = new List<Category>().ToSelectList();
-            this.Images        = new List<ProductImage>();
+            this.Categories = new List<Category>().ToSelectList();
+            this.Images = new List<ProductImage>();
             this.Compatibilities = new List<Compatibility>();
             this.CarMakes = new List<CarMake>().ToSelectList();
             this.CarModels = new List<CarModel>().ToSelectList();
@@ -39,7 +61,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
             this.StockRequired = true;
             this.IsActive = true;
-            this.PackageDetails = new  List<PackageDetail>();
+            this.PackageDetails = new List<PackageDetail>();
             this.FillTypes();
         }
 
@@ -90,4 +112,4 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.ProductTypes = t.ToSelectList();
         }
     }
-} 
+}

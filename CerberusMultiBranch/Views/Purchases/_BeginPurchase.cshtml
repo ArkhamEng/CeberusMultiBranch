@@ -92,7 +92,7 @@
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-right">
-                <button class="btn btn-primary" onclick="AcceptCreate()" type="button">
+                <button id="btnCreatePurchase" class="btn btn-primary" type="button">
                     <span class="fa fa-check"></span>
                     Aceptar
                 </button>
@@ -162,7 +162,11 @@
             $("#ProviderId").val("");
             $("#ProviderName").removeClass('alert-info');
         });
+
+        $("#btnCreatePurchase").off("click").on("click", AcceptCreate);
     });
+
+
 
     function AcceptCreate()
     {
@@ -185,9 +189,14 @@
                 Motive: $("#Motive").val()
             };
      
+        ShowModLoading();
+
         ExecuteAjax('@Url.Action("Create","Purchases")', { model: purchase }, function (response)
         {
             window.location = '@Url.Action("Detail")/' + response.Id;
+        }, function ()
+        {
+            $("#btnCreatePurchase").off("click").on("click", AcceptCreate);
         });
     }
 
