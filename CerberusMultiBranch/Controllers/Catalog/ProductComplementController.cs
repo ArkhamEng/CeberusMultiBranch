@@ -52,19 +52,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             var products = (from bp in db.BranchProducts
                         
-                            join e  in db.Equivalences on bp.ProductId equals e.ProductId into em
+                            join e  in db.Equivalences.Where(ev=> ev.ProviderId == providerId) on bp.ProductId equals e.ProductId into em
                             from eq in em.DefaultIfEmpty()
                             join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
                             from ep in exm.DefaultIfEmpty()
-                            join it in db.PurchaseItems on new { bp.BranchId, bp.ProductId, eq.ProviderId } equals new { it.BranchId, it.ProductId, it.ProviderId } into itm
+                            join it in db.PurchaseItems.Where(i=> i.UserId == userId && i.ProviderId == providerId) on 
+                                new { bp.BranchId, bp.ProductId} equals new { it.BranchId, it.ProductId} into itm
                             from its in itm.DefaultIfEmpty()
 
                             where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
-                                  (its == null || its.UserId == userId) &&
-                                  (eq == null || eq.ProviderId == providerId) &&
-                                  (branches.Contains(bp.BranchId)) &&
-                                  (bp.Stock < bp.MaxQuantity)
-
+                                   (branches.Contains(bp.BranchId)) &&
+                                   (bp.Stock < bp.MaxQuantity) && 
+                                   (bp.Product.IsActive)
 
                             select new ProductViewModel
                             {
@@ -78,7 +77,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                                 MaxQuantity = bp.Product.MaxQuantity,
                                 MinQuantity = bp.Product.MinQuantity,
                                 Quantity = bp.Stock,
-                                AddQuantity = bp.Product.MaxQuantity - bp.Stock,
+                                AddQuantity = its != null? its.Quantity :  bp.Product.MaxQuantity - bp.Stock,
                                 BranchName = bp.Branch.Name,
                                 ProviderCode = ep != null ? ep.Code : "No asignado",
                                 BuyPrice = ep != null ? ep.Price : Cons.Zero,

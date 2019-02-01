@@ -26,6 +26,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public SelectList ProductTypes { get; set; }
 
+
+        //propiedades para orden de compra
         public string BranchName { get; set; }
 
         public string ProviderName { get; set; }
@@ -41,11 +43,16 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         public bool AddToPurchaseDisabled { get; set; }
 
+        [DataType(DataType.Currency)]
+        public double TotalLine { get; set; }
+
         public string PurchasRowStyle
         {
             get { return this.AddToPurchaseDisabled ? "bgDataTable-info" : string.Empty; }
         }
 
+        [Display(Name="En pedido")]
+        public double QtyOrdered { get; set; }
     
 
         public ProductViewModel()

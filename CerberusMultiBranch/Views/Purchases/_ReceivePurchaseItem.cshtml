@@ -1,0 +1,281 @@
+﻿
+@model CerberusMultiBranch.Models.ViewModels.Operative.ProductReceptionViewModel
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button class="close" type="button" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+        </button>
+        <h4 class="panel-title">
+            <span class="fa fa-cubes"></span>
+            Recepción de artículos
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                @Html.HiddenFor(model => model.DetailId)
+                <table class="table small">
+                    <tr>
+                        <td colspan="4">
+                            <h4 class="form-group col-md-12 text-center">
+                                @Model.Description <br />
+                                <strong><span class="fa fa-cubes"></span></strong> @Model.MeasureUnit
+                            </h4>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div id="divAlert" class="alert alert-attention hidden">
+
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(m => m.RequestedQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.RequestedQty, new { htmlAttributes = new { @class = "form-control  input-sm", autocomplete = "off", @readonly = true } })
+                        </td>
+                        <td>
+                            @Html.LabelFor(m => m.ReceivedQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.ReceivedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()" } })
+                        </td>
+                        <td>
+                            @Html.LabelFor(m => m.RejectedQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.RejectedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()" } })
+                        </td>
+                        <td>
+                            @Html.LabelFor(m => m.StocketQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.StocketQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", @readonly = true } })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+
+                            @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes:
+                              new { @class = "form-control text-uppercase input-sm", autocomplete = "off", placeholder = "Escribe un comentario..", })
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="pnlItems" class="hidden">
+            <table id="tbItems" class="table table-bordered small">
+                <thead>
+                    <tr>
+                        <th>Consecutivo</th>
+                        <th>Número de serie</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Serials)
+                    {
+                        <tr>
+                            <td>
+                                @item.Consecutive
+                            </td>
+                            <td>
+                                <input id='serialNumber' type='text' value="@item.SerialNumber" class='form-control input-sm' />
+                            </td>
+                            <td>
+                                @item.InsUser
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if(Model.SerialsSaved.Count > 0)
+        {
+            <table class="table table-bordered small">
+                <tr>
+                    <td>No Serie</td>
+                    <td>Fecha Ingreso</td>
+                    <td>Usuario</td>
+                </tr>
+
+                @foreach (var item in Model.SerialsSaved)
+                {
+                    <tr>
+                        <td>@item.SerialNumber</td>
+                        <td>@item.InsDate.ToShortDateString()</td>
+                        <td>@item.InsUser</td>
+                    </tr>
+                }
+            </table>
+        }
+
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-sm btn-primary" type="button" onclick="ApplyReception()">
+            <span class="fa fa-check"></span>
+            Aceptar
+        </button>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        if (parseInt('@Model.Serials.Count') > 0)
+            $("#pnlItems").removeClass("hidden");
+    });
+
+
+    function SetReceiveQty(input) {
+        var received = parseFloat($("#ReceivedQty").val());
+        var rejected = parseFloat($("#RejectedQty").val());
+
+        if (received < 0) {
+            $("#ReceivedQty").val(0);
+            received = 0;
+        }
+
+        if (received < rejected)
+            $("#RejectedQty").val(received)
+
+        SetRowsForSerial();
+    }
+
+    function SetRejected() {
+        var rejected = parseFloat($("#RejectedQty").val());
+        var received = parseFloat($("#ReceivedQty").val());
+
+        if (rejected > received) {
+            ShowNotify("Cantidad excedente", "info", "La cantidad rechazada no puede ser mayor a la recibida", 3000);
+            $("#RejectedQty").val(received);
+        }
+
+        if (rejected < 0) {
+            parseFloat($("#RejectedQty").val(0));
+            ShowNotify("Cantidad incorrecta", "warning", "La cantidad no puede ser menor a 0", 3000);
+            received = 0;
+        }
+
+        SetRowsForSerial();
+    }
+
+    function SetRowsForSerial() {
+        var rejected = parseFloat($("#RejectedQty").val());
+        var received = parseFloat($("#ReceivedQty").val());
+
+        var stocked = received - rejected;
+
+        $("#StocketQty").val(stocked);
+
+        if (stocked == 0) {
+            ShowNotify("Sin unidades", "esta partida no almacenara ninguna unidad en inventario", "info", 3000);
+        }
+        if ('@Model.IsTrackable' == 'True') {
+
+            $("#tbItems tbody").empty();
+
+            if (stocked) {
+                $("#pnlItems").removeClass('hidden');
+
+                for (i = 0; i < stocked; i++) {
+                    var consecutive = parseInt(i) + 1;
+                    $("#tbItems tbody").append("<tr><td>" + consecutive + "</td><td><input id='serialNumber' type='text' class='form-control input-sm' /></td><td></td></tr>");
+                }
+            }
+            else {
+                $("#pnlItems").addClass('hidden');
+            }
+        }
+    }
+
+    function ApplyReception() {
+        var serials = [];
+        $("#tbItems tbody tr").each(function (index, row) {
+            var item = { SerialNumber: $(row).find("#serialNumber").val(), Consecutive: index + 1 }
+            serials.push(item);
+        });
+
+        var detail =
+        {
+            DetailId: $("#DetailId").val(),
+            ReceivedQty: $("#ReceivedQty").val(),
+            RejectedQty: $("#RejectedQty").val(),
+            StocketQty: $("#StocketQty").val(),
+            Comment: $("#Comment").val(),
+            Serials: serials,
+            HasValues: true
+        };
+
+
+        $("#tbPurchaseDetails tbody tr").each(function (index, row) {
+            var id = $(row).find("#item_PurchaseOrderDetailId").val();
+
+            if (id == detail.DetailId) {
+                var unitPrice = parseFloat($(row).find("#item_UnitPrice").val());
+
+                var lineTotal = (detail.StocketQty * unitPrice);
+
+                $(row).find("#tdReceivedQty").text(detail.ReceivedQty);
+                $(row).find("#tdRejectedQty").text(detail.RejectedQty);
+                $(row).find("#tdStocketQty").text(detail.StocketQty);
+
+                $(row).find("#tdLineTotal").text(GetCurrency(lineTotal));
+
+                $(row).find("#item_LineTotal").val(lineTotal);
+
+                if (detail.RejectedQty > 0 || detail.ReceivedQty == 0) {
+                    $(row).addClass("alert alert-warning");
+                }
+                else {
+                    $(row).removeClass("alert alert-warning");
+                    $(row).addClass("alert alert-success");
+                }
+            }
+        });
+
+        var subTotal = 0;
+
+
+        $("#tbPurchaseDetails tbody tr").each(function (index, row) {
+            var lt = $(row).find("#item_LineTotal");
+
+            subTotal = subTotal + parseFloat(lt.val());
+        });
+
+        var taxRate = parseFloat($("#TaxRate").val());
+
+        var taxAmount = parseFloat(subTotal * taxRate / 100).toFixed(2);
+
+        var totalDue = parseFloat(parseFloat(subTotal) + parseFloat(taxAmount)).toFixed(2);
+
+
+        $("#tdSubTotal").text("$" + subTotal.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+
+        $("#tdTaxAmount").text("$" + taxAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+
+        $("#tdTotalDue").text("$" + totalDue.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+
+
+        var added = false;
+
+        $(ReceivedDetails).each(function (index, item) {
+            if (item.DetailId == detail.DetailId) {
+                item.Received = detail.Received;
+                item.Rejected = detail.Rejected;
+                item.Stocked = detail.Stocked;
+                item.Comment = detail.Comment;
+                item.Serials = detail.Serials;
+
+                added = true;
+            }
+        });
+
+        if (!added)
+            ReceivedDetails.push(detail);
+
+
+
+        HideModal(null, true);
+    }
+
+
+</script>

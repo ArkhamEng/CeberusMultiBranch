@@ -604,31 +604,20 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                if(begin == null || end == null || (begin > end))
+                if(end != null)
+                    end = end.Value.AddHours(23).AddMinutes(59);
+
+                if (begin != null && end != null && (begin > end))
                 {
                     return Json(new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Debes usar el filtro de fechas y asegurarte que la fecha final sea mayor ó igual que la fecha de inicio",
+                        Body = "La fecha final debe ser mayor ó igual que la fecha de inicio",
                         Header = "Fechas invalidas"
                     });
                 }
-                end = end.Value.AddHours(23).AddMinutes(59);
-
-           
-                if (end.Value.Subtract(begin.Value).Days > Cons.DaysToCancel)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "El rango de fechas no debe exceder de 30 días",
-                        Header = "Fechas invalidas"
-                    });
-                }
-
-              
+     
 
                 var sales = LookForNotes(begin, end, folio, client, status);
                 return PartialView("_SalesToPayList", sales);

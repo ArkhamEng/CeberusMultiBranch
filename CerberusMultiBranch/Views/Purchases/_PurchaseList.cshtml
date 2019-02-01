@@ -2,62 +2,52 @@
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
-<table id="tbPurchases" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+<table id="tbPurchases" class="table dt-responsive  table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
-            <td>
-                @Html.DisplayNameFor(model => model.Status)
-            </td>
-            <td>
-                @Html.DisplayName("Tipo")
-            </td>
             <th>
-                @Html.DisplayNameFor(model => model.Branch.Name)
+                @Html.DisplayName("Tipo")
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Bill)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Provider.Name)
+                @Html.DisplayNameFor(model => model.Branch.Name)
+            </th>
+         
+            <th>
+                @Html.DisplayName("Proveedor")
+            </th>
+            <th>
+                @Html.DisplayName("Fecha")
             </th>
 
             <th>
-                @Html.DisplayNameFor(model => model.TransactionDate)
+                @Html.DisplayName("Descuento")
+            </th>
+            <th style="white-space:nowrap">
+                @Html.DisplayName("Monto Final")
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Expiration)
-            </th>
-            <td>
-                @Html.DisplayNameFor(model => model.TotalTaxedAmount)
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.DiscountPercentage)
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.DiscountedAmount)
-            </td>
-            <td>
-                @Html.DisplayNameFor(model => model.FinalAmount)
-            </td>
-            <th>
-                @Html.DisplayName("Abonos")
+                @Html.DisplayName("Pagos")
             </th>
             <th>
-                @Html.DisplayName("Deuda")
+                @Html.DisplayName("Adeudos")
             </th>
-            <td>
+         
+            <th>
                 @Html.DisplayNameFor(model => model.InsDate)
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.InsUser)
-            </td>
+            </th>
        
-            <td>
+            <th>
                 @Html.DisplayNameFor(model => model.UpdDate)
-            </td>
-            <td>
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.UpdUser)
-            </td>
+            </th>
         
             <th></th>
         </tr>
@@ -67,47 +57,45 @@
         {
             <tr>
                 <td class="@item.StatusStyle">
+                    @Html.DisplayFor(m => item.TransactionType) <br />
                     @Html.DisplayFor(m => item.PurchasStatus)
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.TransactionType)
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.Branch.Name)
                 </td>
                 <td>
                     @Html.DisplayUpperFor(m => item.Bill)
                 </td>
                 <td style="white-space:nowrap">
+                    @Html.DisplayFor(m => item.Branch.Name)
+                </td>
+             
+                <td style="min-width:250px">
                     @Html.DisplayUpperFor(m => item.Provider.Name)
                 </td>
              
-                <td>
-                    @Html.DisplayFor(m => item.TransactionDate)
+                <td  style="min-width:100px">
+                    @item.TransactionDate.ToString("dd/MM/yyyy")<br />
+                    <strong>
+                        @Html.DisplayFor(m => item.Days)
+                    </strong>
                 </td>
-                <td>
-                    @Html.DisplayFor(m => item.Expiration)
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.TotalTaxedAmount)
-                </td>
-                <td>
-                    @Html.DisplayFor(model => item.DiscountPercentage) %
-                </td>
-                <td>
+             
+           
+                <td class="text-right">
+                    @Html.DisplayFor(model => item.DiscountPercentage) % <br />
                     @Html.DisplayFor(model => item.DiscountedAmount)
                 </td>
-                <td>
-                    @Html.DisplayFor(model => item.FinalAmount)
-                </td>
-                <td>
-                    @item.PurchasePayments.Sum(p => p.Amount).ToMoney()
+
+                <td class="text-right">
+                    @Html.DisplayFor(m => item.FinalAmount)
                 </td>
 
-                <td>
-                    @{ var debt = item.FinalAmount - item.PurchasePayments.Sum(p => p.Amount); }
-                    @debt.ToMoney()
+                <td class="text-right">
+                    @item.PurchasePayments.Sum(p => p.Amount).ToMoney()
                 </td>
+               
+               <td class="text-right">
+                   @{ var debt = item.FinalAmount - item.PurchasePayments.Sum(p => p.Amount); }
+                   @debt.ToMoney()
+               </td>
                 <td>
                     @Html.DisplayFor(model => item.InsDate)
                 </td>
@@ -122,7 +110,7 @@
                     @Html.DisplayFor(model => item.UpdUser)
                 </td>
                 <td>
-                    <button class="btn btn-warning bt-sm"
+                    <button class="btn btn-warning btn-sm"
                             onclick="window.location = '@Url.Action("Detail",new { id= item.PurchaseId})'" title="Ver detalle y editar">
                         <span class="fa fa-edit"></span>
                         Editar

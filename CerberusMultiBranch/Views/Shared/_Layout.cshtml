@@ -6,7 +6,7 @@
 }
 
 <div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
-    <div class="col-xs-10 col-sm-8 col-md-2 pull-left">
+    <div class="col-xs-10 col-sm-8 col-md-2  pull-left">
         <div class="col-xs-6 col-sm-4 col-md-12">
             @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
             {
@@ -93,8 +93,10 @@
 
 
 <script>
-    $(document).ready(function () {
-        if ('@User.IsValid()' != 'True') {
+    $(document).ready(function ()
+    {
+        if ('@User.IsValid()' != 'True')
+        {
             $("#AccessBlock").modal({ backdrop: 'static' });
         }
     });

@@ -51,7 +51,7 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                 url = "/Providers/BeginAdd";
                 break;
             case "Employee":
-                url = "/Products/BeginAdd";
+                url = "/Employees/BeginAdd";
                 break;
             case "Product":
                 url = "/Products/BeginAdd";
@@ -317,13 +317,15 @@ function HideConfirm(callback) {
 function ShowQuickSearch(url, onRecordSelected, onClosed, param)
 {
     ShowLoading('static');
-    console.log(param)
+    
+
     if (param == null)
         param = { quickSearch: true }
 
     ExecuteAjax(url, param, function (response)
     {
-        HideLoading(function () {
+        HideLoading(function ()
+        {
             recordSelected = onRecordSelected;
 
             onCloseQuickSearch = onClosed;

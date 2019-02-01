@@ -5,6 +5,35 @@ using System.Web;
 
 namespace CerberusMultiBranch.Support
 {
+    public struct ConfigVariable
+    {
+        public struct Pricing
+        {
+            public const string IVA = "IVA";
+
+            public const string StorePercentage = "StorePercentage";
+
+            public const string DealerPercentage = "DealerPercentage";
+
+            public const string WholesalerPercentage = "WholesalerPercentage";
+        }
+
+        public struct Maling
+        {
+            public const string SmtpHost = "SmtpHost";
+
+            public const string PurchasingCredentials = "PurchasingCredentials";
+
+            public const string BillingCredentials = "BillingCredentials";
+
+            public const string PurchasingSender = "PurchasingSender";
+
+            public const string PurchasingLogo = "PurchasingLogo";
+
+            public const string PurchasingSubject = "PurchasingSubject";
+        }
+    }
+
     public static class Cons
     {
         public struct Responses
@@ -30,6 +59,15 @@ namespace CerberusMultiBranch.Support
                 
 
             }
+        }
+
+        public struct Formats
+        {
+            public const string PurchaseFolioMask = "{0}-{1}-{2}";
+
+            public const string YearFolioFormat = "00";
+
+            public const string PurchaseSeqFormat = "000000";
         }
 
         public const int QuickResults = 300;
@@ -89,6 +127,8 @@ namespace CerberusMultiBranch.Support
         public const string LogingUrl = "/Account/Login";
 
         public const string NoImagePath = "/Content/Images/sinimagen.jpg";
+
+        public const char SplitChar = ',';
     }
 
     public struct FileStruct

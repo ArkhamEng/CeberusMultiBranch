@@ -1,0 +1,162 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrderDetail>
+@using CerberusMultiBranch.Support
+
+
+
+<table id="tbPurchaseDetails" class="table small">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Code)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UnitPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReceivedQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RejectedQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StockedQty)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LineTotal)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.HiddenFor(modelItem => item.PurchaseOrderDetailId)
+                    @Html.DisplayFor(modelItem => item.Product.Code)
+                </td>
+                <td>
+                    @Html.DisplayUpperFor(modelItem => item.Product.Name) <br />
+                    <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark) <strong>Unidad</strong> @Html.DisplayUpperFor(modelItem => item.Product.Unit)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.UnitPrice)
+                    @Html.HiddenFor(modelItem => item.UnitPrice)
+                    @Html.HiddenFor(modelItem => item.LineTotal)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderQty)
+                </td>
+
+                <td id="tdReceivedQty">
+                    @Html.DisplayFor(modelItem => item.ReceivedQty)
+                </td>
+                <td id="tdRejectedQty">
+                    @Html.DisplayFor(modelItem => item.RejectedQty)
+                </td>
+                <td id="tdStocketQty">
+                    @Html.DisplayFor(modelItem => item.StockedQty)
+                </td>
+                <td id="tdLineTotal">
+                    @Html.DisplayFor(modelItem => item.LineTotal)
+                </td>
+                <th>
+                    <button class="btn btn-primary btn-sm" type="button" onclick="ReceiveProduct('@item.PurchaseOrderDetailId')">
+                        <span class="fa fa-level-down"></span>
+                    </button>
+                </th>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="6" rowspan="3">
+                <div class="col-md-12 form-group">
+                    <h4>
+                        @Html.Label("Observaciones", htmlAttributes: new { @class = "control-label" })<br />
+                        @Model.First().PurchaseOrder.Comment
+                    </h4>
+                </div>
+            </td>
+            <td>
+                <h4><strong>Sub-Total</strong></h4>
+            </td>
+            <td>
+                <h4 id="tdSubTotal">@Model.Sum(d => d.LineTotal).ToMoney()</h4>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <h4><strong>I.V.A</strong></h4>
+            </td>
+            <td>
+                <h4 id="tdTaxAmount">
+                    @Model.First().PurchaseOrder.TaxAmount.ToMoney()
+                </h4>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+
+            <td>
+                <h4>
+                    <strong>Total</strong>
+                </h4>
+            </td>
+            <td>
+                <h4 id="tdTotalDue">
+                    @Model.First().PurchaseOrder.TotalDue.ToMoney()
+                </h4>
+            </td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+    var ReceivedDetails = [];
+
+    function Received(input)
+    {
+        var row = $(input).parent().parent();
+
+        var orderQty = parseFloat($(row).find("#item_OrderQty").val());
+
+        var received = parseFloat($(input).val());
+
+        if (received > orderQty)
+            $(input).val(orderQty);
+
+        if (received < 0)
+            $(input).val(0);
+    }
+
+    function ReceiveProduct(id) {
+        var detail;
+
+        $(ReceivedDetails).each(function (index, item)
+        {
+            if (item.DetailId == id) {
+                detail = item;
+            }
+        });
+
+        if (detail == null) {
+            detail = { DetailId: parseInt(id) };
+        }
+
+        ExecuteAjax('@Url.Action("ReceiveProduct", "Purchases")', { item: detail }, function (response) {
+            ShowModal(response, 'static');
+        });
+    }
+
+</script>

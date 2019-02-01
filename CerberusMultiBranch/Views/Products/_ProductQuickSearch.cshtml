@@ -25,6 +25,10 @@
                                 <span class="glyphicon glyphicon-search"></span>
                                 Buscar
                             </button>
+                            <button type="button" class="btn btn-success" onclick="CreateProduct()">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Nuevo
+                            </button>
                         </span>
                     </div>
                 </div>
@@ -42,12 +46,15 @@
 </div>
 
 <script>
-  
+
+    var onCloseQuickSearch;
+
+    var recordSelected;
+
     function QuickSearchProduct()
     {
-        
         ShowModLoading();
-
+       
         ExecuteAjax('@Url.Action("QuickSearch", "Products")', { filter: $("#FProductName").val(), providerId: $("#ProviderId").val() }, function (view) 
         {
             HideModLoading(function ()
@@ -57,11 +64,21 @@
         });
     }
 
-    var onCloseQuickSearch;
+   
 
     function CloseQuickSearch()
     {
         HideModal(onCloseQuickSearch, true);
+    }
+
+    function CreateProduct()
+    {       
+        HideModal(function()
+        {
+            ShowCatalogModal(null, null, 'Product',0);
+
+        },true);
+        
     }
 
 </script>

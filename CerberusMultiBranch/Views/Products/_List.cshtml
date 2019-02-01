@@ -41,7 +41,7 @@
                         </div>
                         @{ string txtC = string.Format("col-md-{0} {1}", (i == 2 ? 8 : 9), !prod.IsActive ? "text-danger" : string.Empty); }
                         <div class='@txtC'>
-                            <h4  onclick="Detail(@prod.ProductId,@prod.IsActive)" onmouseover="SetPointer(this)" >
+                            <h4  onclick="Detail('@prod.ProductId','@prod.IsActive.ToString()')" onmouseover="SetPointer(this)" >
                                 <strong>
                                     <u>@prod.Code</u>    
                                 </strong>
@@ -96,7 +96,7 @@
                             </h4>
                             
                             <h5>
-                                <button type="button" class="btn btn-default" title="ver movimientos" onclick="ShowMovements(@prod.ProductId)">
+                                <button type="button" class="btn btn-default" title="ver movimientos" onclick="ShowMovements('@prod.ProductId')">
                                     <span class="badge bg-info">
                                         @prod.Quantity
                                     </span>
@@ -181,9 +181,7 @@
 
     function Detail(id, isActive)
     {
-        if (!isActive)
-            ShowNotify("Producto Desactivado","info", "Este producto ha sido desactivado, contacte a un supervisor para solicitar una activación", 3000);
-        else
+        if (isActive == 'True' || isActive == 'true')
         {
             ShowLoading('static');
 
@@ -195,7 +193,11 @@
                 });
             });
         }
-
+        else
+        {
+            console.log("ShowDetail Id:" + id + " IsActive:" + isActive);
+            ShowNotify("Producto Desactivado", "info", "Este producto ha sido desactivado, contacte a un supervisor para solicitar una activación", 3000);
+        }
     }
 
 

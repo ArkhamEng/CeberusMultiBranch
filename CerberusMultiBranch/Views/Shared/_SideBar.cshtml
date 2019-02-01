@@ -94,7 +94,24 @@
                 </li>
             }
 
+            <li>
+                <a href="#InventorySubMenu" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Inventario<span class="fa fa-dropbox" style="float:left" />
+                </a> 
 
+                <ul class="collapse list-unstyled" id="InventorySubMenu">
+                    <li>
+                        <a href="/Purchases/PurchaseEstimation" onclick="ShowLoading()">
+                            &nbsp;Estimacion de Compra<span class="fa fa-clipboard" style="float:left" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/Inventory/PurchaseOrders" onclick="ShowLoading()">
+                            &nbsp;Ordenes de compra<span class="fa fa-file-text-o" style="float:left" />
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
 
             @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))

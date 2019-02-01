@@ -15,7 +15,6 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [MaxLength(25)]
         public string Name { get; set; }
 
-        [MaxLength(15)]
         public string Value { get; set; }
     }
 }

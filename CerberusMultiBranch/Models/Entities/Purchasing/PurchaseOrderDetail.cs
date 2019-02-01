@@ -1,6 +1,8 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Support;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Web;
@@ -14,19 +16,38 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
         public int PurchaseOrderId { get; set; }
 
+        [Display(Name = "Producto")]
         public int ProductId { get; set; }
 
-        public double OrderQty { get; set; }
-
+        [Display(Name = "Costo Unitario")]
+        [DataType(DataType.Currency)]
         public double UnitPrice { get; set; }
 
-        public double LineTotal { get; set; }
+    
+        [Display(Name = "Pedidos")]
+        public double OrderQty { get; set; }
 
+        [Display(Name = "Recibidos")]
         public double ReceivedQty { get; set; }
 
+        [Display(Name = "Rechazados")]
         public double RejectedQty { get; set; }
 
-        public double StokedQty { get; set; }
+        [Display(Name = "Inventariados")]
+        public double StockedQty { get; set; }
+
+        [Display(Name = "Comentario")]
+        public string Comment { get; set; }
+
+        public bool IsCompleated { get; set; }
+
+        [Display(Name = "Total")]
+        [DataType(DataType.Currency)]
+        public double LineTotal { get; set; }
+
+        [Display(Name = "Descuento")]
+        [DataType(DataType.Currency)]
+        public double Discount { get; set; }
 
         [Display(Name = "Creado")]
         public DateTime InsDate { get; set; }
@@ -45,6 +66,9 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public virtual Product Product { get; set; }
 
         public virtual PurchaseOrder PurchaseOrder { get; set; }
+
+        public ICollection<StockMovement> StockMovements { get; set; }
+
 
         #endregion
 

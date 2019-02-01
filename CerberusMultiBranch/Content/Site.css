@@ -2,8 +2,6 @@
     padding-top: 50px;
     padding-bottom: 20px;
     -webkit-print-color-adjust: exact;
-    
-
 }
 
 .BodyLogin
@@ -141,41 +139,76 @@ a[aria-expanded="true"]::before {
     {
         margin-left: 0;
     }
- 
-
-
-    .dtContainer {
-        width: 400px;
-    }
 }
 
-.dtContainer {
-    max-width: 1100px;
-}
-
-@media (min-width: 769px) {
-     
-    .dtContainer {
-        width: 700px;
-    }
-}
-
-@media (min-width: 992px) 
+@media  screen and (max-width : 1950px) 
 {
     .dtContainer 
     {
-        width: 900px;
+        width: 1660px;
     }
-
-      
 }
 
-@media (min-width: 1200px) {
-    .dtContainer {
-        width: 1100px;
-    }
 
+@media  screen and (max-width : 1600px) 
+{
+    .dtContainer 
+    {
+        width: 1300px;
+    }
 }
+
+@media  screen and (max-width : 1400px) 
+{
+    .dtContainer
+    {
+        width: 100%;
+        min-width:1130px;
+        
+    }
+}
+
+@media  screen and (max-width : 1200px) 
+{
+    .dtContainer 
+    {
+        width: 100%;
+        min-width: 870px;
+        
+    }
+}
+
+@media  screen and (max-width : 979px) 
+{
+    .dtContainer 
+    {
+        width: 100%;
+        min-width: 700px;
+        background-color:red;
+    }
+}
+
+@media only screen and (max-width : 767px) 
+{
+     .dtContainer 
+    {
+        width: 767px;
+        
+    }
+}
+
+@media only screen and (max-width : 480px) 
+{
+      .dtContainer 
+    {
+        width: 480px;
+        
+    }
+}
+
+
+
+
 
 /********************/
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";

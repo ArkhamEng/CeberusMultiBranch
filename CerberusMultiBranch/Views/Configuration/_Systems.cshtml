@@ -44,8 +44,10 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("EditSystem", "Configuration")', {}, function (response) {
-            HideLoading(function () {
+        ExecuteAjax('@Url.Action("EditSystem", "Configuration")', {}, function (response)
+        {
+            HideLoading(function ()
+            {
                 ShowModal(response, 'static');
             });
         });

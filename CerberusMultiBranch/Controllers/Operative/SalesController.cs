@@ -34,7 +34,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null,Cons.InitialRows);
+            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null, Cons.InitialRows);
 
             return View(model);
         }
@@ -45,9 +45,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-              var sale =  db.Sales.Include(s=> s.SalePayments).FirstOrDefault(s => s.SaleId == id);
+                var sale = db.Sales.Include(s => s.SalePayments).FirstOrDefault(s => s.SaleId == id);
 
-                if(sale == null)
+                if (sale == null)
                 {
                     return Json(new JResponse
                     {
@@ -58,7 +58,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
-              if(sale.Status == TranStatus.Canceled || sale.Status == TranStatus.PreCancel)
+                if (sale.Status == TranStatus.Canceled || sale.Status == TranStatus.PreCancel)
                 {
                     return Json(new JResponse
                     {
@@ -79,7 +79,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 };
 
                 return PartialView("_CancelSale", model);
-           
+
             }
             catch (Exception)
             {
@@ -111,11 +111,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //agrego movimiento al inventario
                     StockMovement sm = new StockMovement
                     {
-                        BranchId     = bp.BranchId,
-                        ProductId    = bp.ProductId,
-                        User         = User.Identity.Name,
+                        BranchId = bp.BranchId,
+                        ProductId = bp.ProductId,
+                        User = User.Identity.Name,
                         MovementDate = DateTime.Now.ToLocal(),
-                        Quantity     = detail.Quantity
+                        Quantity = detail.Quantity
                     };
 
                     //se  regresa al inventario todo producto de la venta
@@ -153,14 +153,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.UpdDate = DateTime.Now.ToLocal();
                 sale.Comment = comment;
 
-                var message = string.Format("Se cancelo la venta {0}, el producto ha sido regreado al inventario",sale.Folio);
+                var message = string.Format("Se cancelo la venta {0}, el producto ha sido regreado al inventario", sale.Folio);
 
                 //si la venta tiene pagos, coloco el status como precancel para que pase por caja para generar 
                 //una devolución
                 if (payments > Cons.Zero)
                 {
                     sale.Status = TranStatus.PreCancel;
-                    message = string.Format("Se cancelo la venta {0}, para concluir el proceso, se debe aplicar un rembolso desde la caja",sale.Folio.ToUpper());
+                    message = string.Format("Se cancelo la venta {0}, para concluir el proceso, se debe aplicar un rembolso desde la caja", sale.Folio.ToUpper());
                 }
 
 
@@ -171,7 +171,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Success,
                     Header = "Cancelación exitosa",
-                    Body   = message,
+                    Body = message,
                     Code = Cons.Responses.Codes.Success
                 });
             }
@@ -193,18 +193,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             string folio, string client, string user, TranStatus? status)
         {
 
-            if (beginDate == null || endDate == null || (beginDate > endDate))
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Warning,
-                    Code = Cons.Responses.Codes.InvalidData,
-                    Body = "Debes usar el filtro de fechas y asegurarte que la fecha final sea mayor ó igual que la fecha de inicio",
-                    Header = "Fechas invalidas"
-                });
-            }
-
-            endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
+            if (endDate != null)
+                endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
 
 
             //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
@@ -298,9 +288,9 @@ namespace CerberusMultiBranch.Controllers.Operative
         [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult SearchBudgets(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client)
         {
-            int? fol = (folio != null && folio != string.Empty)? Convert.ToInt32(folio):new Nullable<int>();
+            int? fol = (folio != null && folio != string.Empty) ? Convert.ToInt32(folio) : new Nullable<int>();
 
-            var model = (from p in db.Budgets.Include(b=> b.BudgetDetails)
+            var model = (from p in db.Budgets.Include(b => b.BudgetDetails)
                          where
                          (branchId == null || p.BranchId == branchId)
                          && (beginDate == null || p.BudgetDate >= beginDate)
@@ -310,7 +300,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                          select p).OrderByDescending(p => p.BudgetDate).ToList();
 
-            return PartialView("_BudgetList",model);
+            return PartialView("_BudgetList", model);
         }
 
         [HttpPost]
@@ -337,7 +327,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                 {
 
-                    var budget = db.Budgets.Include(b => b.Branch).Include(b=> b.BudgetDetails).
+                    var budget = db.Budgets.Include(b => b.Branch).Include(b => b.BudgetDetails).
                                  FirstOrDefault(b => b.BudgetId == budgetId);
 
 
@@ -347,7 +337,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         {
                             Result = Cons.Responses.Danger,
                             Header = "Cotizacion Expirada",
-                            Body = "Esta cotización expiro en "+budget.DueDate.ToString("dddd, dd MMMM yyyy h:mm tt"),
+                            Body = "Esta cotización expiro en " + budget.DueDate.ToString("dddd, dd MMMM yyyy h:mm tt"),
                             Code = Cons.Responses.Codes.InvalidData
                         });
                     }
@@ -356,14 +346,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         ShoppingCart item = new ShoppingCart
                         {
-                            Amount    = detail.Amount,
-                            Price     = detail.Price,
+                            Amount = detail.Amount,
+                            Price = detail.Price,
                             ProductId = detail.ProductId,
-                            BranchId  = branchId,
-                            ClientId  = budget.ClientId,
-                            BudgetId  = detail.BudgetId,
-                            InsDate   = DateTime.Now.ToLocal(),
-                            Quantity  = detail.Quantity,
+                            BranchId = branchId,
+                            ClientId = budget.ClientId,
+                            BudgetId = detail.BudgetId,
+                            InsDate = DateTime.Now.ToLocal(),
+                            Quantity = detail.Quantity,
                             TaxAmount = detail.TaxAmount,
                             TaxedAmount = detail.TaxedAmount,
                             TaxedPrice = detail.TaxedPrice,
@@ -381,7 +371,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Result = Cons.Responses.Success,
                         Header = "Cotizacón aplicada!",
                         Body = "Los productos en la cotización fueron aplicados al carrito",
-                        Code  = Cons.Responses.Codes.Success
+                        Code = Cons.Responses.Codes.Success
                     });
                 }
 
@@ -405,7 +395,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = db.BudgetDetails.Include(d => d.Product.Images).
                         Where(d => d.BudgetId == budgetId).ToList();
 
-            return PartialView("_BudgetDetail",model);
+            return PartialView("_BudgetDetail", model);
         }
 
 

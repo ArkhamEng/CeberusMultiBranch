@@ -38,11 +38,9 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    @Html.DisplayFor(m => item.TransactionType)
-                    <div class="@item.StatusStyle">
-                        @Html.DisplayFor(m => item.SaleStatus)
-                    </div>
+                <td class="@item.StatusStyle">
+                    @Html.DisplayFor(m => item.TransactionType) <br />
+                    @Html.DisplayFor(m => item.SaleStatus)
                 </td>
                 <td>
                     @Html.DisplayUpperFor(m => item.Folio) <br />
@@ -70,7 +68,7 @@
                     @item.SalePayments.Sum(p => p.Amount).ToMoney() <br />
 
                     @{ var debt = item.TotalTaxedAmount - item.SalePayments.Sum(p => p.Amount); }
-                  
+                     @debt.ToMoney()
                 </td>
                 <td>
                     <button class="btn btn-warning btn-sm" title="Editar Venta"

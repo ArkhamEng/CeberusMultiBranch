@@ -1,0 +1,136 @@
+﻿@model PurchaseCartViewModel
+@using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Models.ViewModels.Operative
+@using CerberusMultiBranch.Support
+@{
+    ViewBag.Title = "Estimación de compra";
+    ViewBag.SubTitle = "Captura de ordenes";
+    ViewBag.Class = "fa fa-clipboard";
+}
+
+@Scripts.Render("~/bundles/jqueryval")
+
+
+@Html.AntiForgeryToken()
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+@Html.HiddenFor(model => model.ProviderId)
+
+
+<br />
+
+
+<div class="panel panel-default">
+    <div class="panel-body small">
+
+        @Html.HiddenFor(m => m.ProviderId)
+
+        <div class="form-group col-md-7">
+            @Html.LabelFor(m => m.ProviderName, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-handshake-o"></i></span>
+                @Html.EditorFor(model => model.ProviderName, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+                @Html.ValidationMessageFor(model => model.ProviderId, "", new { @class = "text-danger" })
+                <span class="input-group-btn">
+                    <button class="btn btn-default btn-sm" type="button" title="Buscar proveedores" onclick="ShowProviderQuickSearch()" id="btnQuickSearchProvider">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group col-md-4 col-md-offset-1">
+            @Html.LabelFor(m => m.PuschaseType, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                @Html.DropDownListFor(model => model.PuschaseType,Model.PurchaseTypes, htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-7">
+            @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                @Html.EditorFor(model => model.Comment, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                @Html.ValidationMessageFor(model => model.Comment, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2 col-md-offset-1">
+            @Html.LabelFor(m => m.DaysToPay, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type="number" } })
+                @Html.ValidationMessageFor(model => model.DaysToPay, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+          
+            <button class="btn btn-primary btn-sm" type="button" title="Generar las ordenes de compra"  id="btnGenerate" onclick="GenerateOrders()">
+                <span class="fa fa-check"></span>
+                Generar pedido(s)
+            </button>
+            <button class="btn btn-danger btn-sm" type="button" title="Remueve todas las partidas agregadas" id="btnCancelAll" onclick="RemoveAll()">
+                <span class="fa fa-times"></span>
+                Cancelar
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div id="divPurchaseDetails" class="panel-body  dtContainer">
+       @Html.Partial("_PurchaseEstimationDetails",Model.PurchaseItems)
+    </div>
+</div>
+
+
+<script>
+   
+    function ShowProviderQuickSearch()
+    {
+        ShowQuickSearch('@Url.Action("ShowQuickSearch", "Providers")', function (id, name, ftr)
+        {
+            $("#ProviderId").val(id);
+            $("#ProviderName").val(name);
+
+            $("#btnBeginAddProduct").removeAttr("disabled");
+        });
+    }
+
+    function RemoveAll()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("RemoveAll","Purchases")', {providerId: $("#ProviderId").val()}, function (response)
+        {
+            ShowNotify(response.Header, response.Result, response.Body, 3000);
+            window.location = '@Url.Action("PurchaseEstimation","Purchases")';
+        });
+    }
+
+    function ShowProductQuickSearch()
+    {
+        ShowQuickSearch('@Url.Action("ShowRequiredProductSearch", "Purchases")', function (id, name, ftr) { }, function () {  }, { providerId: $("#ProviderId").val() });
+    }
+
+    function GenerateOrders()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("CreateOrders", "Purchases")', { providerId: $("#ProviderId").val() }, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowNotify(response.Header, response.Result, response.Body, 3000);
+            });
+            
+           // window.location = '@Url.Action("PurchaseCart","Purchases")';
+        });
+    }
+</script>

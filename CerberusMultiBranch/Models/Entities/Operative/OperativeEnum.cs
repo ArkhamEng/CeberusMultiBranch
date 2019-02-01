@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -36,7 +37,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     public enum MovementType
     {
+        [Display(Name="Entrada")]
         Entry = 1,
+
+        [Display(Name = "Salida")]
         Exit = 2,
         Reservation = 3,
         Release = 4

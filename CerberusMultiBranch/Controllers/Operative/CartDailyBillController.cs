@@ -490,8 +490,6 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-
-
                 if(!User.IsCashRegisterOpen())
                 {
                     return Json(new JResponse
@@ -505,8 +503,6 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var userId = User.Identity.GetUserId();
                 var branchId = User.Identity.GetBranchId();
-
-                
 
                 var cartItems = GetCart(userId, branchId);
 
@@ -533,6 +529,21 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //validaciones de crédito
                 if (type == TransactionType.Credito)
                 {
+                    //verifico si el cliente tiene alguna venta a credito pendiente de pago
+                    var pendingSales = db.Sales.Where(s => s.Expiration < DateTime.Now.TodayLocal() && 
+                                       s.TransactionType == TransactionType.Credito && s.Status == TranStatus.Reserved);
+
+                    if(pendingSales != null && pendingSales.Count() > Cons.Zero)
+                    {
+                        return Json(new JResponse
+                        {
+                            Result = Cons.Responses.Danger,
+                            Header = "Incumplimiento de crédito",
+                            Body = string.Format("El cliente {0} tiene ventas a crédito expiradas, es necesario liquidar el monto",
+                                                client.Name.ToUpper())
+                        });
+                    }
+
                     if (amount > client.CreditAvailable)
                     {
                         return Json(new JResponse
@@ -587,9 +598,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //creo la venta
                 Sale sale = new Sale
                 {
-                    Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
+                    Year     = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
                     BranchId = User.Identity.GetBranchId(),
-                    UserId = User.Identity.GetUserId(),
+                    UserId   = User.Identity.GetUserId(),
                     SendingType = sending,
                     ClientId = cartItems.FirstOrDefault().ClientId,
                     LastStatus = TranStatus.InProcess,

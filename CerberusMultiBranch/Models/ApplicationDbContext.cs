@@ -98,6 +98,10 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<BudgetDetail> BudgetDetails { get; set; }
 
+        public DbSet<TrackingItem> TrackingItems { get; set; }
+
+        public DbSet<ItemLocation> ItemLocations { get; set; }
+
         #endregion
 
         #region Finances
@@ -113,6 +117,8 @@ namespace CerberusMultiBranch.Models
         public DbSet<PurchaseItem> PurchaseItems { get; set; }
 
         public DbSet<PurchaseOrder> PurchaseOrder { get; set; }
+
+        public DbSet<PurchaseOrderHistory> PurchaseOrderHistories { get; set; }
 
         public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
 

@@ -90,6 +90,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public virtual Product Product { get; set; }
 
         public ICollection<StockMovement> StockMovements { get; set; }
+
+        public ICollection<ItemLocation> ItemLocations { get; set; }
         #endregion
     }
 }

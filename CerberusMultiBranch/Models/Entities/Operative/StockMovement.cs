@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CerberusMultiBranch.Models.Entities.Purchasing;
+using CerberusMultiBranch.Support;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -18,6 +20,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Column(Order = 1), ForeignKey("BranchProduct")]
         public int ProductId { get; set; }
 
+        [ForeignKey("TrackingItem")]
+        public int? TrackingItemId { get; set; }
+
+        [ForeignKey("PurchaseOrderDetail")]
+        public int? PurchaseOrderDetailId { get; set; }
+
         [Display(Name = "Unidades")]
         public double Quantity { get; set; }
 
@@ -36,6 +44,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual BranchProduct BranchProduct { get; set; }
 
+        public virtual TrackingItem TrackingItem { get; set; }
+
+        public virtual PurchaseOrderDetail PurchaseOrderDetail { get; set; }
 
         [Display(Name = "Tipo")]
         public string OperationType
@@ -43,7 +54,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             get { return 
                          this.Comment.ToUpper().Contains("SALIDA AUTOMATICA")  ? "Venta"   :
                          this.Comment.ToUpper().Contains("ENTRADA AUTOMATICA") ? "Compra" :
-                         this.Comment.ToUpper().Contains("TRANSFERENCIA")  ? "Transferencia" : "Manual"; }
+                         this.Comment.ToUpper().Contains("TRANSFERENCIA")  ? "Transferencia" :
+                         this.Comment.ToUpper().Contains("CANCEL") ? "Cancelación" :"Manual"; }
         }
 
         public string FlowStyle
@@ -51,6 +63,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             get { return this.MovementType == MovementType.Entry ? "bgDataTable-success" : 
                          this.MovementType == MovementType.Exit  ? "bgDataTable-danger": string.Empty;
             }
+        }
+
+        public StockMovement()
+        {
+            this.MovementDate = DateTime.Now.ToLocal();
+            this.User = HttpContext.Current.User.Identity.Name;
         }
     }
 

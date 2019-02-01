@@ -390,6 +390,22 @@
     <Compile Include="Migrations\201812031858595_lastChanges.Designer.cs">
       <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201901291607361_ConfigVariableLength.cs" />
+    <Compile Include="Migrations\201901291607361_ConfigVariableLength.Designer.cs">
+      <DependentUpon>201901291607361_ConfigVariableLength.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901291928020_PurchaseOrderHistory.cs" />
+    <Compile Include="Migrations\201901291928020_PurchaseOrderHistory.Designer.cs">
+      <DependentUpon>201901291928020_PurchaseOrderHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201901301718130_TrackableProduct.cs" />
+    <Compile Include="Migrations\201901301718130_TrackableProduct.Designer.cs">
+      <DependentUpon>201901301718130_TrackableProduct.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902010506574_Tracking.cs" />
+    <Compile Include="Migrations\201902010506574_Tracking.Designer.cs">
+      <DependentUpon>201902010506574_Tracking.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -426,6 +442,7 @@
     <Compile Include="Models\Entities\Operative\BudgetDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
+    <Compile Include="Models\Entities\Operative\ItemLocation.cs" />
     <Compile Include="Models\Entities\Operative\OperativeEnum.cs" />
     <Compile Include="Models\Entities\Finances\SalePayment.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
@@ -437,11 +454,13 @@
     <Compile Include="Models\Entities\Operative\SaleDetail.cs" />
     <Compile Include="Models\Entities\Operative\ShoppingCart.cs" />
     <Compile Include="Models\Entities\Operative\StockMovement.cs" />
+    <Compile Include="Models\Entities\Operative\TrackingItem.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
     <Compile Include="Models\Entities\Operative\TransactionDetail.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseItem.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseOrder.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseOrderDetail.cs" />
+    <Compile Include="Models\Entities\Purchasing\PurchaseOrderHistory.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseStatus.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
@@ -466,6 +485,7 @@
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\ProductReceptionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseCartViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
@@ -483,6 +503,7 @@
     <Compile Include="Support\FileManager.cs" />
     <Compile Include="Support\GzipWrapper.cs" />
     <Compile Include="Support\JResponse.cs" />
+    <Compile Include="Support\MailSender.cs" />
     <Compile Include="Support\record.cs" />
     <Compile Include="Support\Shift.cs" />
   </ItemGroup>
@@ -671,6 +692,7 @@
     <Content Include="Content\pnotify\pnotify.buttons.css" />
     <Content Include="Content\pnotify\pnotify.css" />
     <Content Include="Content\pnotify\pnotify.nonblock.css" />
+    <Content Include="Content\Templates\PurchaseOrderTemplate.html" />
     <Content Include="Content\themes\base\accordion.css" />
     <Content Include="Content\themes\base\all.css" />
     <Content Include="Content\themes\base\autocomplete.css" />
@@ -1015,13 +1037,22 @@
     <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
     <Content Include="Views\Products\_ProductEditionImages.cshtml" />
     <Content Include="Views\Shared\_ChildLoading.cshtml" />
-    <Content Include="Views\Purchases\PurchaseCart.cshtml" />
+    <Content Include="Views\Purchases\PurchaseEstimation.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearch.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearchList.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseCartDetail.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseEstimationDetails.cshtml" />
     <Content Include="Views\Purchases\_SetProviderCode.cshtml" />
+    <Content Include="Views\Purchases\PurchaseOrder.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseOrderDetails.cshtml" />
+    <Content Include="Views\Purchases\_ReceivePurchaseItem.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseOrderRequest.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseOrderRevision.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseOrder.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseOrderHistories.cshtml" />
+    <Content Include="Views\Purchases\_RequiredProductSearch.cshtml" />
+    <Content Include="Views\Purchases\_RequiredProductSearchList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1170,6 +1201,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201812031858595_lastChanges.resx">
       <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901291607361_ConfigVariableLength.resx">
+      <DependentUpon>201901291607361_ConfigVariableLength.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901291928020_PurchaseOrderHistory.resx">
+      <DependentUpon>201901291928020_PurchaseOrderHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201901301718130_TrackableProduct.resx">
+      <DependentUpon>201901301718130_TrackableProduct.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902010506574_Tracking.resx">
+      <DependentUpon>201902010506574_Tracking.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

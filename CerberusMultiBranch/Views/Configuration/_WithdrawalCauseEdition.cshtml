@@ -52,7 +52,8 @@
     {
         var form = $("#SaveCauseForm");
 
-        if (!form.valid()) {
+        if (!form.valid())
+        {
             ShowNotify("Error de validación", 'warning', "Existen errores en los datos capturado, por favor verifique", 3000);
             return;
         }
@@ -63,14 +64,13 @@
 
         ExecuteAjax('@Url.Action("SaveCause","Configuration")', {cause: cause} , function (response)
         {
-            HideModLoadig(function ()
+            HideModLoading(function ()
             {
                 HideModal(function ()
                 {
                     $("#divCauses").html(response);
                 }, true);
             });
-           
         });
 
     }

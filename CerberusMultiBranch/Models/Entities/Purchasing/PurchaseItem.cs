@@ -28,6 +28,13 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
         public double TotalLine { get; set; }
 
+
+        public string Comment { get; set; }
+        
+        public int DaysToPay { get; set; }
+
+        public double TaxRate { get; set; }
+
         #region Navigation Properties
         public virtual Provider Provider { get; set; }
 

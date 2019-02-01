@@ -4,7 +4,7 @@
 @using CerberusMultiBranch.Support
 @using CerberusMultiBranch.Models.ViewModels.Catalog
 
-<table id="tbProviders" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+<table id="tbProviders" class="table dt-responsive  table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
             <th>
@@ -76,10 +76,10 @@
                     @Html.DisplayFor(modelItem => item.Code)
                 </td>
                
-                <td class="text-uppercase">
+                <td class="text-uppercase" style="min-width:250px">
                     @Html.DisplayUpperFor(modelItem => item.Name)
                 </td>
-                <td class="text-uppercase">
+                <td class="text-uppercase" style="min-width:250px">
                     @Html.DisplayUpperFor(modelItem => item.BusinessName)
                 </td>
                 <td class="text-uppercase">

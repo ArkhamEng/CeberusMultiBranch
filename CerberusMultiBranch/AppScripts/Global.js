@@ -5,7 +5,8 @@
 });
 
 
-function GetCurrency(value) {
+function GetCurrency(value)
+{
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
 }
 
@@ -468,7 +469,8 @@ function GroupRow(table, iniRecords, filter, index, colspan)
         searching = true;
 
     var oTable = $(table).DataTable(
-       {         
+       {
+           destroy:true,
            fixedHeader: true,
            responsive: false,
            "aaSorting": [],
@@ -500,26 +502,31 @@ function GroupRow(table, iniRecords, filter, index, colspan)
                var rows = api.rows({ page: 'current' }).nodes();
                var last = null;
 
-               api.column(index, { page: 'current' }).data().each(function (group, i)
-               {
-                   if (last !== group) {
-                       $(rows).eq(i).before(
-                           '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
-                       );
+               apCd = api.column(index, { page: 'current' }).data();
 
-                       last = group;
-                   }
-               });
+               if (apCd != 'undefined')
+               {
+                   apCd.each(function (group, i)
+                   {
+                       if (last !== group) {
+                           $(rows).eq(i).before(
+                               '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
+                           );
+
+                           last = group;
+                       }
+                   });
+               }
            }
        });
     if (typeof (filter) != 'undefined')
     {
-        $(filter).keyup(function () {
+        $(filter).keyup(function ()
+        {
             oTable.data().search(this.value).draw();
         });
 
         $(table + "_filter").addClass("hidden");
     }
 
-    
 }

@@ -1,0 +1,139 @@
+﻿@model CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder
+@using CerberusMultiBranch.Support
+
+<html>
+
+<body>
+
+
+
+    <table style="border:1px; border-style:double; width:936px">
+        <thead>
+            <tr>
+                <th colspan="6">
+                    <table style="width:100%">
+                        <tr>
+                            <td width="300px">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td>
+                                            <img src="cid:PurchasingLogo" style="width:150px" />
+                                        </td>
+                                    </tr>
+                                    <tr><td colspan="2" style="height:10px"></td></tr>
+                                    <tr>
+                                        <td>
+                                            <label class="control-label">
+                                                Autopartes Bicentenario S.A. de C.V.
+                                            </label><br />
+                                            APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                                            LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="292px" align="center">
+                                <div style="width:250px">
+                                    <label>Expedida en sucursal</label><br />
+                                    @Model.Branch.Address
+                                </div>
+                            </td>
+                            <td width="244px">
+                                <table style="width:100%" class="table-bordered">
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            <label>Orden de compra</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">
+                                            <label>Folio</label>
+                                        </td>
+                                        <td class="text-center">
+                                            <label>Fecha</label>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center">
+                                            @Model.Folio
+                                        </td>
+                                        <td class="text-center">
+                                            @DateTime.Now.TodayLocal().ToString("dd/MM/yyyy")
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="2" class="text-center">
+                                            <label>Tipo de Compra:</label>
+                                            <a>@Model.PurchaseType.Name.</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td colspan="6" style="height:50px"></td></tr>
+            <tr>
+                <td style="border:1px; border-style:double"> <strong>Código</strong></td>
+                <td style="border:1px; border-style:double"><strong>Descripción</strong></td>
+                <td style="border:1px; border-style:double"><strong>Unidad</strong></td>
+                <td style="border:1px; border-style:double"><strong>Costo</strong></td>
+                <td style="border:1px; border-style:double"><strong>Cantidad</strong></td>
+                <td style="border:1px; border-style:double"><strong>Sub-Total</strong></td>
+            </tr>
+            @foreach (var item in Model.PurchaseOrderDetails)
+            {
+                <tr>
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.Product.Code)
+                    </td>
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    </td>
+                    <td style="border:1px; border-style:double">
+                        @item.Product.Unit
+                    </td>
+
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td>
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.OrderQty)
+                    </td>
+
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.LineTotal)
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+
+        <tfoot>
+            <tr>
+                <td colspan="4" rowspan="3"></td>
+                <td><strong>Sub-Total</strong></td>
+                <td>@Model.SubTotal.ToMoney()</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><strong>I.V.A</strong></td>
+                <td>
+                    @Model.TaxAmount.ToMoney()
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+
+                <td><strong>Total</strong></td>
+                <td>@Model.TotalDue.ToMoney()</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</body>
+</html>

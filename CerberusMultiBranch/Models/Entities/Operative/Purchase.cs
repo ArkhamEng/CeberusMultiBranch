@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Finances;
+using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -85,6 +86,24 @@ namespace CerberusMultiBranch.Models.Entities.Operative
                 }
 
                 return name;
+            }
+        }
+
+        public string Days
+        {
+            get
+            {
+                var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
+
+                if (days > Cons.Zero)
+                    return string.Format("{0} días Expirado", days);
+                else if(days == Cons.Zero)
+                    return "Expira hoy!";
+                else 
+                {
+                    days = days * -Cons.One;
+                    return string.Format("Expira en {0} días", days);
+                }
             }
         }
     }

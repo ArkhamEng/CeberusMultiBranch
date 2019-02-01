@@ -31,8 +31,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
-            model.BeginDate = null;
-            model.EndDate = null;
+            model.BeginDate    = DateTime.Now.TodayLocal();
+            model.EndDate   = DateTime.Now.TodayLocal();
             model.Branches = branches.ToSelectList();
             model.Purchases = LookFor(null, null, null, null, null, null, null, TranStatus.Reserved, Cons.InitialRows);
 

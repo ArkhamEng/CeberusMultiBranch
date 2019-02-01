@@ -25,6 +25,9 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Folio")]
         public string Folio { get; set; }
 
+        [Display(Name = "Factura")]
+        public string Bill { get; set; }
+
         [Display(Name = "Estado de Compra")]
         public PStatus PurchaseStatusId { get; set; }
 
@@ -34,17 +37,25 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Método de Envío")]
         public int ShipMethodId { get; set; }
 
-        [Display(Name = "Fecha de Pedido")]
-        public DateTime OrderDate { get; set; }
+        [Display(Name = "Fecha Pedido")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime? OrderDate { get; set; }
 
-        [Display(Name = "Fecha de Vencimiento")]
-        public DateTime DueDate { get; set; }
+        [Display(Name = "Fecha Vencimiento")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime? DueDate { get; set; }
 
         [Display(Name = "Fecha Envío")]
-        public DateTime ShipDate { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime? ShipDate { get; set; }
 
-        [Display(Name = "Fecha de Entrega")]
-        public DateTime DeliveryDate { get; set; }
+        [Display(Name = "Fecha Entrega")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
+        public DateTime? DeliveryDate { get; set; }
 
         [DataType(DataType.Currency)]
         public double SubTotal { get; set; }
@@ -57,6 +68,9 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [DataType(DataType.Currency)]
         public double TotalDue { get; set; }
 
+        public int DaysToPay { get; set; }
+
+        public double Freight { get; set; }
 
         [Display(Name = "Creado")]
         public DateTime InsDate { get; set; }
@@ -70,6 +84,13 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
 
+        [Display(Name = "Comentario")]
+        public string Comment { get; set; }
+
+        public int Year { get; set; }
+
+        public int Sequential { get; set; }
+
         #region Navigation Properties
         public virtual Provider Provider { get; set; }
 
@@ -82,7 +103,11 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public virtual ShipMethod ShipMethod { get; set; }
 
         public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+
+        public ICollection<PurchaseOrderHistory> PurchaseOrderHistories { get; set; }
         #endregion
+
+      
 
         public PurchaseOrder()
         {

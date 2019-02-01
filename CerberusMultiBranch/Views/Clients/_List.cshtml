@@ -6,7 +6,7 @@
 
 @using CerberusMultiBranch.Support
 
-    <table id="tbClients" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+    <table id="tbClients" class="table dt-responsive  table-bordered small hidden" style="width:100%">
         <thead>
             <tr class="panel panel-danger panel-heading ">
                 <th>
@@ -23,13 +23,17 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Email)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Phones)
+                <th style="white-space:nowrap">
+                    @Html.DisplayName("Telefono 1")
                 </th>
-                <th>
+                <th style="white-space:nowrap"> 
+                    @Html.DisplayName("Telefono 2")
+                </th>
+               
+                <th style="white-space:nowrap">
                     @Html.DisplayNameFor(model => model.CreditLimit)
                 </th>
-                <th>
+                <th style="white-space:nowrap">
                     @Html.DisplayNameFor(model => model.CreditAvailable)
                 </th>
                 <th>
@@ -56,7 +60,7 @@
                     <td class="text-uppercase">
                         @Html.DisplayFor(modelItem => item.Code)
                     </td>
-                    <td class="text-uppercase">
+                    <td class="text-uppercase" style="min-width:200px">
                         @Html.DisplayUpperFor(modelItem => item.Name)
                     </td>
                     <td class="text-uppercase">
@@ -66,10 +70,12 @@
                     <td class="text-lowercase">
                         @Html.DisplayLowerFor(modelItem => item.Email)
                     </td>
-                    <td >
-                        @Html.DisplayFor(modelItem => item.Phones)
+                    <td style="white-space:nowrap">
+                        @Html.DisplayFor(modelItem => item.Phone)
                     </td>
-
+                    <td style="white-space:nowrap">
+                        @Html.DisplayFor(modelItem => item.Phone2)
+                    </td>
                     <td class="text-uppercase">
                         @Html.DisplayFor(modelItem => item.CreditLimit)
                     </td>

@@ -61,6 +61,8 @@
 
                 <td class="text-uppercase">
                     @Html.HiddenFor(modelItem => item.ProductId)
+                    @Html.HiddenFor(modelItem => item.BuyPrice)
+                    @Html.HiddenFor(modelItem => item.ProviderCode)
                     @Html.DisplayFor(modelItem => item.BuyPrice)
                 </td>
 
@@ -93,12 +95,9 @@
 <script>
     $(document).ready(function ()
     {
-        GroupRow("#tbProductQuickSearch", 10, "#FProductName", 0, 6)
-
         $("#tbProductQuickSearch").removeClass("hidden");
+        GroupRow("#tbProductQuickSearch", 10, "#FProductName",0, 6)
     });
-
-    var recordSelected;
 
     
     function ProductSelected(btn)
@@ -110,7 +109,15 @@
         var productId = $(row).find("#item_ProductId").val();
 
         var branchId = $(row).find("#item_BranchId").val();
-        var code = $(row).find("#item_BranchId").val();
+        var code = $(row).find("#item_ProviderCode").val();
+        var price =parseFloat($(row).find("#item_BuyPrice").val());
+
+        if (code == 'No asignado')
+        {
+            ShowNotify("Sin código de proveedor", "warning", "Este producto no tiene relación con el proveedor seleccionado", 3000);
+            return;
+        }
+            
 
         var param = 
            {
@@ -119,6 +126,7 @@
                ProductId :productId,
                Quantity: toAdd,
                PurchaseTypeId: $("#PuschaseType").val(),
+               Price: price
            };
        
         ShowModLoading();

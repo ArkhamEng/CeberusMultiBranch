@@ -84,12 +84,17 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         {
             get
             {
-               var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
+                var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
 
-                if (days >= Cons.Zero)
-                    return string.Format("{0} días Expirado",days);
+                if (days > Cons.Zero)
+                    return string.Format("{0} días Expirado", days);
+                else if (days == Cons.Zero)
+                    return "Expira hoy!";
                 else
-                    return string.Format("Expira en {0} días",days);
+                {
+                    days = days * -Cons.One;
+                    return string.Format("Expira en {0} días", days);
+                }
             }
         }
 

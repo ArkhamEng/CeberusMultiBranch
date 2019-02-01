@@ -69,6 +69,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public bool StockRequired { get; set; }
 
+        [Display(Name = "Rastreable")]
+        public bool IsTrackable { get; set; }
+
         [Required]
         public DateTime UpdDate { get; set; }
 
@@ -102,6 +105,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
 
         public ICollection<PurchaseItem> PurchaseItems { get; set; }
+
+        public ICollection<TrackingItem> TrackingItems { get; set; }
 
 
         [InverseProperty("Package")]
