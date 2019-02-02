@@ -1,0 +1,134 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+@using CerberusMultiBranch.Support
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button type="button" class="close" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+        </button>
+        <div class="modal-title">
+            <span class="fa fa-edit" style="float:left">
+            </span>
+            Edición de partida
+        </div>
+    </div>
+    <div class="panel-body">
+
+        @Html.HiddenFor(m => Model.ProductId)
+        @Html.HiddenFor(m => Model.BuyPrice)
+
+        <div class="col-md-6 text-uppercase">
+            <h4 class="text-center">
+                Cod. Int: [@Model.Code]
+            </h4>
+        </div>
+
+        <div class="col-md-6 text-uppercase">
+            <h4 class="text-center">
+                Cod. Prov: [@Model.ProviderCode]
+            </h4>
+        </div>
+
+        <div class="col-md-12 text-center text-uppercase">
+            <h4>
+                @Model.Name
+            </h4>
+        </div>
+        <hr />
+        <div class="row small">
+            <div class="form-group col-md-3">
+                @Html.Label("Costo", htmlAttributes: new { @class = "control-label" })
+                <input type="text" class="form-control text-uppercase input-sm" value="@Model.BuyPrice.ToMoney()" readonly="readonly" />
+
+            </div>
+            <div class="form-group col-md-3">
+                @Html.Label("Inventario", htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.Quantity, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+            <div class="form-group col-md-3">
+                @Html.Label("Máximo", htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.MaxQuantity, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+            <div class="form-group col-md-3">
+                @Html.Label("Ordenar", htmlAttributes: new { @class = "control-label" })
+                @Html.EditorFor(model => model.AddQuantity, new
+           {
+               htmlAttributes = new
+               {
+                   type = "number",
+                   @class = "form-control text-uppercase input-sm",
+                   autocomplete = "off",
+                   onclick = "SetTotal()",
+                   onkeyup = "SetTotal()"
+               }
+           })
+            </div>
+        </div>
+        <h3 class="text-center" id="divTotal">
+            Total Partida: @Model.TotalLine.ToMoney()
+        </h3>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button id="btnChangeQuantity" class="btn btn-primary  btn-sm" type="button" onclick="SetDetailChange('@Model.ProductId','@Model.BranchId')">
+                <span class="glyphicon glyphicon-ok"></span>
+                Aplicar
+            </button>
+            <button class="btn btn-danger btn-sm" type="button" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    function SetTotal() {
+        var stock = parseFloat($("#Quantity").val());
+        var max = parseFloat($("#MaxQuantity").val());
+        var add = parseFloat($("#AddQuantity").val());
+        var price = parseFloat($("#BuyPrice").val());
+
+        if (!$.isNumeric(add) || add < 0) {
+            add = 0;
+            $("#AddQuantity").val(add);
+        }
+
+        var quantity = add + stock;
+
+        if (quantity > max) {
+            add = max - stock;
+
+            $("#AddQuantity").val(add);
+        }
+
+        var total = price * add;
+
+
+        $("#divTotal").text("Total Partida " + GetCurrency(total));
+    }
+
+    function SetDetailChange(productId, branchId)
+    {
+
+        ShowModLoading();
+
+        var model =
+           { productId: productId, branchId: branchId, quantity: $("#AddQuantity").val() };
+
+        console.log(model);
+
+        ExecuteAjax('@Url.Action("SetDatailChange", "Purchases")', model, function (response)
+        {
+            HideModLoading(function ()
+            {
+                $("#divPurchaseDetails").html(response);
+
+                HideModal(null, true);
+            });
+        });
+
+    }
+</script>

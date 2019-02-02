@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using CerberusMultiBranch.Models.Entities.Operative;
 using System.Text.RegularExpressions;
+using CerberusMultiBranch.Models.ViewModels.Purchasing;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -33,13 +34,65 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             if (items.Count > Cons.Zero)
             {
-                model.ProviderId = items.FirstOrDefault().ProviderId;
-                model.ProviderName = items.FirstOrDefault().ProviderName;
-                model.PuschaseType = items.FirstOrDefault().PurchaseType;
+                model.ProviderId    = items.FirstOrDefault().Value.First().ProviderId;
+                model.ProviderName  = items.FirstOrDefault().Value.First().ProviderName;
+                model.PurchaseType  = items.FirstOrDefault().Value.First().PurchaseType;
                 model.PurchaseItems = items;
             }
 
             return View(model);
+        }
+
+
+
+        private Dictionary<string, IEnumerable<ProductViewModel>> GetEstimationDetails(string userId)
+        {
+            var branches = User.Identity.GetBranches().Select(b => b.BranchId);
+
+            var groups = (from itm in db.PurchaseItems
+                         join p in db.Products on itm.ProductId equals p.ProductId
+                         join b in db.BranchProducts on new { itm.BranchId, itm.ProductId } equals new { b.BranchId, b.ProductId }
+
+                         join e in db.Equivalences on new { itm.ProviderId, itm.ProductId } equals new { e.ProviderId, e.ProductId } into em
+                         from eq in em.DefaultIfEmpty()
+                         join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
+                         from ep in exm.DefaultIfEmpty()
+
+
+                         where (itm.UserId == userId) &&
+                               (branches.Contains(itm.Branch.BranchId))
+
+                         select new ProductViewModel
+                         {
+                             ProductId = p.ProductId,
+                             Name = p.Name,
+                             Code = p.Code,
+                             TradeMark = p.TradeMark,
+                             MaxQuantity = b.MaxQuantity,
+                             MinQuantity = b.MinQuantity,
+                             Quantity = b.Stock,
+                             BranchName = b.Branch.Name,
+                             BranchId = itm.BranchId,
+                             AddQuantity = itm.Quantity,
+                             ProviderId = itm.ProviderId,
+                             ProviderName = itm.Provider.Name,
+                             TotalLine = itm.TotalLine,
+                             PurchaseType = itm.PurchaseTypeId,
+                             ProviderCode = ep.Code,
+                             BuyPrice = itm.Price
+
+                         }).OrderBy(p => p.BranchName).GroupBy(p=> p.BranchName).ToList();
+
+            var model = new Dictionary<string, IEnumerable<ProductViewModel>>();
+
+            groups.ForEach(group => 
+            {
+                var header = group.Key + " - Total " + group.Sum(p => p.TotalLine).ToMoney();
+                model.Add(header, group);
+            });
+
+          
+            return model;
         }
 
         #region Búsqueda de Productos
@@ -48,6 +101,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var model = LookForPurchase(null, providerId.Value);
 
+           
             return PartialView("_RequiredProductSearch", model);
         }
 
@@ -56,10 +110,11 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             var model = LookForPurchase(filter, providerId.Value);
 
+            
             return PartialView("_RequiredProductSearchList", model);
         }
 
-        private List<ProductViewModel> LookForPurchase(string filter, int providerId)
+        private List<RequiredProductGroupViewModel> LookForPurchase(string filter, int providerId)
         {
 
             string[] arr = new List<string>().ToArray();
@@ -110,10 +165,121 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).ToList();
 
-            return products;
+
+            var groups = products.GroupBy(i => i.ProductId);
+
+            List<RequiredProductGroupViewModel> productGroups = new List<RequiredProductGroupViewModel>();
+
+            foreach (var group in groups)
+            {
+                RequiredProductGroupViewModel pGroup = new RequiredProductGroupViewModel
+                {
+                    Code = group.First().Code,
+                    Description = group.First().Name,
+                    ProviderCode = group.First().ProviderCode,
+                    ProductId = group.First().ProductId,
+                    Unit = group.First().Unit,
+                    TradeMark = group.First().TradeMark,
+                    Branches = group
+                };
+
+                productGroups.Add(pGroup);
+            }
+
+
+            return productGroups;
         }
         #endregion
 
+        [HttpPost]
+        public ActionResult EditDetail(int productId, int branchId)
+        {
+            try
+            {
+                var userId = HttpContext.User.Identity.GetUserId();
+
+                var model = (from itm in db.PurchaseItems.Where(i=> i.ProductId == productId && i.BranchId == branchId && i.UserId == userId)
+                              join p in db.Products on itm.ProductId equals p.ProductId
+                              join b in db.BranchProducts on new { itm.BranchId, itm.ProductId } equals new { b.BranchId, b.ProductId }
+
+                              join e in db.Equivalences on new { itm.ProviderId, itm.ProductId } equals new { e.ProviderId, e.ProductId } into em
+                              from eq in em.DefaultIfEmpty()
+                              join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
+                              from ep in exm.DefaultIfEmpty()
+
+
+                            //  where (itm.UserId == userId && itm.Branch.BranchId == branchId && itm.ProductId == productId)
+
+                              select new ProductViewModel
+                              {
+                                  ProductId = p.ProductId,
+                                  Name = p.Name,
+                                  Code = p.Code,
+                                  TradeMark = p.TradeMark,
+                                  MaxQuantity = b.MaxQuantity,
+                                  MinQuantity = b.MinQuantity,
+                                  Quantity = b.Stock,
+                                  BranchName = b.Branch.Name,
+                                  BranchId = itm.BranchId,
+                                  AddQuantity = itm.Quantity,
+                                  ProviderId = itm.ProviderId,
+                                  ProviderName = itm.Provider.Name,
+                                  TotalLine = itm.TotalLine,
+                                  PurchaseType = itm.PurchaseTypeId,
+                                  ProviderCode = ep.Code,
+                                  BuyPrice = itm.Price,
+
+                              }).FirstOrDefault();
+
+
+
+                return PartialView("_EditEstimationDetail",model);
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al obtener datos",
+                    Body = "Detalle del error " + ex.Message
+                });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult SetDatailChange(int productId, int branchId, double quantity)
+        {
+            try
+            {
+                var userId = HttpContext.User.Identity.GetUserId();
+
+                var detail = db.PurchaseItems.FirstOrDefault(i => i.ProductId == productId && i.BranchId == branchId && i.UserId == userId);
+
+                detail.Quantity = quantity;
+                detail.TotalLine = (quantity * detail.Price).RoundMoney();
+
+                db.Entry(detail).Property(p => p.Quantity).IsModified = true;
+                db.Entry(detail).Property(p => p.TotalLine).IsModified = true;
+
+                db.SaveChanges();
+
+                var model = GetEstimationDetails(userId);
+
+                return PartialView("_PurchaseEstimationDetails", model);
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Header = "Error al guardar",
+                    Body = "Detalle del error " + ex.Message
+                });
+            }
+        }
 
         [HttpPost]
         public ActionResult BeginSetCode(int productId, int providerId)
@@ -339,55 +505,8 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-
-        private List<ProductViewModel> GetEstimationDetails(string userId)
-        {
-            var branches = User.Identity.GetBranches().Select(b => b.BranchId);
-
-            var model = (from itm in db.PurchaseItems
-                         join p in db.Products on itm.ProductId equals p.ProductId
-                         join b in db.BranchProducts on new { itm.BranchId, itm.ProductId } equals new { b.BranchId, b.ProductId }
-
-                         join e in db.Equivalences on new { itm.ProviderId, itm.ProductId } equals new { e.ProviderId, e.ProductId } into em
-                         from eq in em.DefaultIfEmpty()
-                         join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
-                         from ep in exm.DefaultIfEmpty()
-
-
-                         where (itm.UserId == userId) &&
-                               (branches.Contains(itm.Branch.BranchId))
-
-                         select new ProductViewModel
-                         {
-                             ProductId = p.ProductId,
-                             Name = p.Name,
-                             Code = p.Code,
-                             TradeMark = p.TradeMark,
-                             MaxQuantity = b.MaxQuantity,
-                             MinQuantity = b.MinQuantity,
-                             Quantity = b.Stock,
-                             BranchName = b.Branch.Name,
-                             BranchId = itm.BranchId,
-                             AddQuantity = itm.Quantity,
-                             ProviderId = itm.ProviderId,
-                             ProviderName = itm.Provider.Name,
-                             TotalLine = itm.TotalLine,
-                             PurchaseType = itm.PurchaseTypeId,
-                             ProviderCode = ep.Code,
-                             BuyPrice = itm.Price
-
-                         }).OrderBy(p => p.BranchName).ToList();
-
-            model.ForEach(m =>
-            {
-                m.BranchName += " - Total " + model.Where(md => md.BranchId == m.BranchId).Sum(p => p.TotalLine).ToMoney();
-            });
-
-            return model;
-        }
-
         [HttpPost]
-        public ActionResult CreateOrders(int providerId)
+        public ActionResult CreateOrders(int providerId, string comment, PType purchaseTypeId, int daysToPay)
         {
             try
             {
@@ -421,13 +540,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     PurchaseOrder order = new PurchaseOrder
                     {
-                        BranchId = first.BranchId,
-                        OrderDate = DateTime.Now.TodayLocal(),
-                        ProviderId = first.ProviderId,
-                        PurchaseTypeId = first.PurchaseTypeId,
+                        BranchId   = first.BranchId,
+                        OrderDate  = DateTime.Now.TodayLocal(),
+                        ProviderId = providerId,
+                        PurchaseTypeId = purchaseTypeId,
                         PurchaseOrderDetails = new List<PurchaseOrderDetail>(),
-                        Comment = first.Comment,
-                        DaysToPay = first.DaysToPay
+                        Comment    = comment,
+                        DaysToPay  = daysToPay
                     };
 
                     foreach (var item in group)
@@ -450,7 +569,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     order.SubTotal  = order.PurchaseOrderDetails.Sum(d => d.LineTotal).RoundMoney();
                     order.TaxAmount = (order.SubTotal * (iva / 100)).RoundMoney();
                     order.TotalDue  = (order.SubTotal + order.TaxAmount).RoundMoney();
-                    order.Comment   = items.First().Comment;
 
                     purchaseOrders.Add(order);
                 }

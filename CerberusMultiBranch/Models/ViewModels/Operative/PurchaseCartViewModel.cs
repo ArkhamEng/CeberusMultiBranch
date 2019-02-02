@@ -24,7 +24,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public double DaysToPay { get; set; }
 
         [Display(Name = "Tipo de Compra")]
-        public PType PuschaseType { get; set; }
+        public PType PurchaseType { get; set; }
 
         public SelectList PurchaseTypes { get; set; }
 
@@ -39,11 +39,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             get { return (this.PurchaseItems.Count() == Cons.Zero); }
         }
 
-        public IEnumerable<ProductViewModel> PurchaseItems { get; set; }
+        public Dictionary<string,IEnumerable<ProductViewModel>> PurchaseItems { get; set; }
 
         public PurchaseCartViewModel()
         {
-            this.PurchaseItems = new List<ProductViewModel>();
+            this.PurchaseItems = new Dictionary<string, IEnumerable<ProductViewModel>>();
         }
     }
 }

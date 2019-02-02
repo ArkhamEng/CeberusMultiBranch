@@ -1,113 +1,116 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel>
+﻿@model Dictionary<string, IEnumerable<CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel>>
 
 @using CerberusMultiBranch.Support
 @using CerberusMultiBranch.Models.Entities.Purchasing
 
-<table id="tbPurchaseCartDetail" class="table dt-responsive table-bordered small hidden" style="width:100%">
-    <thead>
-        <tr>
 
-            <th>
-                @Html.DisplayName("Sucursal")
-            </th>
+@foreach (var group in Model)
+{
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h5 class="panel-title text-center">
+                <strong>
+                    @group.Key
+                </strong>
+            </h5>
+        </div>
+        <div class="panel-body">
+            <table class="table table-bordered small">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("Códigos")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Descripción")
+                        </th>
 
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
+                        <th>
+                            @Html.DisplayName("Costo")
+                        </th>
 
-            <th>
-                @Html.DisplayName("Costo")
-            </th>
+                        <th>
+                            @Html.DisplayName("Inventario")
+                        </th>
 
-            <th>
-                @Html.DisplayName("Inventario")
-            </th>
+                        <th>
+                            @Html.DisplayName("Máximo")
+                        </th>
 
-            <th>
-                @Html.DisplayName("Máximo")
-            </th>
+                        <th>
+                            @Html.DisplayName("Cantidad")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Total")
+                        </th>
+                        <th>
 
-            <th>
-                @Html.DisplayName("Cantidad")
-            </th>
-            <th>
-                @Html.DisplayName("Total")
-            </th>
-            <th style="max-width:70px">
-                <button class="btn btn-primary btn-xs" type="button" title="Agregar productos" id="btnBeginAddProduct" onclick="ShowProductQuickSearch()">
-                    <span class="fa fa-plus"></span>
-                    Agregar
-                </button>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
+                        </th>
+                </thead>
+                <tbody>
+                    @foreach (var item in group.Value)
+                    {
+                        <tr>
+                            <td>
+                                Int: [@Html.DisplayFor(modelItem => item.Code)]<br />
+                                Prov:[@Html.DisplayFor(modelItem => item.ProviderCode)]
+                            </td>
+                            <td style="min-width:280px">
 
-                <td>
-                    <h5 style="text-align:center;">
-                        <strong>
-                            @Html.DisplayFor(modelItem => item.BranchName)
-                        </strong>
-                    </h5>
-                </td>
+                                @Html.HiddenFor(modelItem => item.ProductId)
 
-                <td style="min-width:280px">
+                                @Html.DisplayUpperFor(modelItem => item.Name) <br />
+                                <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.TradeMark)
+                            </td>
 
-                    @Html.HiddenFor(modelItem => item.ProductId)
-                    <strong>  Código Interno:</strong> @Html.DisplayFor(modelItem => item.Code)     -   <strong> Código Proveedor: </strong>  @Html.DisplayFor(modelItem => item.ProviderCode)
+                            <td class="text-uppercase">
+                                @Html.DisplayFor(modelItem => item.BuyPrice)
+                            </td>
 
-                    <br />
-                    <p>
-                        @Html.DisplayUpperFor(modelItem => item.Name) <br />
-                        <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.TradeMark)
-                    </p>
-                </td>
+                            <td class="text-lowercase text-center">
+                                @Html.DisplayFor(modelItem => item.Quantity)
+                            </td>
 
-                <td class="text-uppercase">
-                    @Html.DisplayFor(modelItem => item.BuyPrice)
-                </td>
+                            <td class="text-uppercase  text-center">
+                                @Html.DisplayFor(modelItem => item.MaxQuantity)
+                            </td>
 
-                <td class="text-lowercase text-center">
-                    @Html.DisplayFor(modelItem => item.Quantity)
-                </td>
+                            <td class="text-uppercase  text-center">
+                                @Html.DisplayFor(modelItem => item.AddQuantity)
+                            </td>
+                            <td class="text-uppercase  text-center">
+                                @Html.DisplayFor(modelItem => item.TotalLine)
+                            </td>
 
-                <td class="text-uppercase  text-center">
-                    @Html.DisplayFor(modelItem => item.MaxQuantity)
-                </td>
+                            <td>
+                                <button type="button" class="btn btn-warning btn-sm" onclick="EditDetail('@item.BranchId','@item.ProductId')" title="has click para editar esta partida">
+                                    <span class="fa fa-edit"></span>
+                                </button>
 
-                <td class="text-uppercase  text-center" style="max-width:50px">
-                    @Html.EditorFor(modelItem => item.AddQuantity, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
-                </td>
-                <td class="text-uppercase  text-center">
-                    @Html.DisplayFor(modelItem => item.TotalLine)
-                </td>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="RemoveFromEstimation('@item.BranchId','@item.ProductId')" title="has click para remover esta partida">
+                                    <span class="fa fa-trash"></span>
+                                </button>
+                              
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
-                <td>
-                    <button type="button" class="btn btn-danger btn-xs" onclick="RemoveFromCart('@item.BranchId','@item.ProductId')" title="has click para remover esta partida">
-                        <span class="fa fa-remove"></span>
-                        Quitar
-                    </button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+
 
 @{ var hasItems = (Model.Count() > Cons.Zero); }
 
 <script>
     $(document).ready(function ()
     {
-        $("#tbPurchaseCartDetail").removeClass("hidden");
-
-        GroupRow("#tbPurchaseCartDetail", 100, null, 0, 7);
-
-        $("#PuschaseType").change(function () {
+        $("#PuschaseType").change(function ()
+        {
             var value = this.value;
-       
+
             if ($("#PuschaseType").val() != '@Convert.ToInt16(PType.Credit)')
             {
                 $("#DaysToPay").attr("disabled", true);
@@ -124,18 +127,11 @@
             $("#btnGenerate").removeAttr("disabled");
             $("#btnCancelAll").removeAttr("disabled");
             $("#btnQuickSearchProvider").attr("disabled", true);
-            $("#PuschaseType").attr("disabled", true);
-            $("#Comment").attr("disabled", true);
-            $("#DaysToPay").attr("disabled", true);
         }
-        else
-        {
+        else {
             $("#btnGenerate").attr("disabled", true);
             $("#btnCancelAll").attr("disabled", true);
             $("#btnQuickSearchProvider").removeAttr("disabled");
-            $("#PuschaseType").removeAttr("disabled");
-            $("#Comment").removeAttr("disabled");
-            $("#DaysToPay").removeAttr("disabled");
         }
 
         if ($("#ProviderId").val() == '' || $("#ProviderId").val() == 0)
@@ -146,16 +142,25 @@
     });
 
 
-
-    function RemoveFromCart(branchId, productId)
+    function RemoveFromEstimation(branchId, productId)
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("RemoveFromEstimation", "Purchases")', { branchId: branchId, productId: productId }, function (response)
-        {
+        ExecuteAjax('@Url.Action("RemoveFromEstimation", "Purchases")', { branchId: branchId, productId: productId }, function (response) {
+            HideLoading(function () {
+                $("#divPurchaseDetails").html(response);
+            });
+        });
+    }
+
+    function EditDetail(branchId, productId)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("EditDetail", "Purchases")', { branchId: branchId, productId: productId }, function (response) {
             HideLoading(function ()
             {
-                $("#divPurchaseDetails").html(response);
+                ShowModal(response, 'static');
             });
         });
     }
