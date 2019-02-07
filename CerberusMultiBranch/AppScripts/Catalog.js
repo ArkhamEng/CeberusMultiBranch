@@ -140,7 +140,8 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
 function SubmitPerson(SuccessCallBack, form, idField) {
-    $(form).off('submit').on('submit', function (e) {
+    $(form).off('submit').on('submit', function (e)
+    {
         e.preventDefault();
 
         var $form = $(e.target),

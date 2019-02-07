@@ -70,6 +70,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
         public int DaysToPay { get; set; }
 
+        [Display(Name = "Costo de Envío")]
         public double Freight { get; set; }
 
         [Display(Name = "Creado")]
@@ -107,7 +108,48 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public ICollection<PurchaseOrderHistory> PurchaseOrderHistories { get; set; }
         #endregion
 
-      
+
+        #region NotMapped
+
+        public bool CanSend
+        {
+            get
+            {
+                return (this.PurchaseStatusId == PStatus.Authorized ||
+                        this.PurchaseStatusId == PStatus.SendingFailed && 
+                        HttpContext.Current.User.IsInRole("Capturista"));
+            }
+        }
+
+        public bool CanRevise
+        {
+            get
+            {
+                return (this.PurchaseStatusId == PStatus.InRevision &&
+                    (HttpContext.Current.User.IsInRole("Almacenista") || HttpContext.Current.User.IsInRole("Administrador")));
+            }
+        }
+
+        public bool CanAuthorize
+        {
+            get
+            {
+                return (this.PurchaseStatusId == PStatus.Revised && 
+                    (HttpContext.Current.User.IsInRole("Supervisor") || HttpContext.Current.User.IsInRole("Administrador")) );
+            }
+        }
+
+        public bool CanReceive
+        {
+            get
+            {
+                return ((this.PurchaseStatusId == PStatus.Watting ||
+                         this.PurchaseStatusId == PStatus.Partial) && 
+                         (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador")) );
+            }
+        }
+
+        #endregion
 
         public PurchaseOrder()
         {

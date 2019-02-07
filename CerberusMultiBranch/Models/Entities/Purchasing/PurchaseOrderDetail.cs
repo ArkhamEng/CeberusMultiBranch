@@ -30,8 +30,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Recibidos")]
         public double ReceivedQty { get; set; }
 
-        [Display(Name = "Rechazados")]
-        public double RejectedQty { get; set; }
+        [Display(Name = "Complemento")]
+        public double ComplementQty { get; set; }
 
         [Display(Name = "Inventariados")]
         public double StockedQty { get; set; }
@@ -46,7 +46,6 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public double LineTotal { get; set; }
 
         [Display(Name = "Descuento")]
-        [DataType(DataType.Currency)]
         public double Discount { get; set; }
 
         [Display(Name = "Creado")]
@@ -61,6 +60,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Editado por")]
         public string UpdUser { get; set; }
 
+        [NotMapped]
+        public string ProviderCode { get; set; }
 
         #region Navigation Properties
         public virtual Product Product { get; set; }

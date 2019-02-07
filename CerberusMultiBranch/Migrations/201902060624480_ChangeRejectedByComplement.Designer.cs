@@ -7,13 +7,13 @@ namespace CerberusMultiBranch.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.3-40302")]
-    public sealed partial class ConfigVariableLength : IMigrationMetadata
+    public sealed partial class ChangeRejectedByComplement : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(ConfigVariableLength));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ChangeRejectedByComplement));
         
         string IMigrationMetadata.Id
         {
-            get { return "201901291607361_ConfigVariableLength"; }
+            get { return "201902060624480_ChangeRejectedByComplement"; }
         }
         
         string IMigrationMetadata.Source

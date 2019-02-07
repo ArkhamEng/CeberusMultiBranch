@@ -6,14 +6,14 @@
 <div class="panel panel-primary">
     <div class="panel-heading clearfix">
         <div class="text-uppercase">
-            <div class="col-md-4">
+            <div class="col-md-4 text-left">
                 Marca  [@Html.DisplayFor(modelItem => Model.TradeMark)]
             </div>
-            <div class="col-md-4">
-                Cod Interno [@Model.Code]
+            <div class="col-md-4 text-center" title="Codigo interno">
+                Cod Int. [@Model.Code]
             </div>
-            <div class="col-md-4">
-                Cod Proveedor
+            <div class="col-md-4 text-right" title="Código del proveedor">
+                Cod. Prov.
                 <u onmouseover="SetPointer(this)" title="has click para modificar el costo y código de proveedor" onclick="BeginProviderCode('@Model.ProductId')">
                     @Html.DisplayFor(modelItem => Model.ProviderCode)
                     <span class="fa fa-edit"></span>
@@ -37,6 +37,7 @@
                     <th>
                         @Html.DisplayName("Precio Compra")
                     </th>
+
                     <th>
                         @Html.DisplayName("Maximo")
                     </th>

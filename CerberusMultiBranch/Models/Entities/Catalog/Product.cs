@@ -119,6 +119,11 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [DataType(DataType.Currency)]
         public double BuyPrice { get; set; }
 
+
+        [NotMapped]
+        [Display(Name = "Descuento")]
+        public double Discount { get; set; }
+
         [NotMapped]
         [Display(Name = "% Mostrador")]
         [Required]

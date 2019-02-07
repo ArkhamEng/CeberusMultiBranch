@@ -3,16 +3,16 @@ namespace CerberusMultiBranch.Migrations
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class ConfigVariableLength : DbMigration
+    public partial class discountDetail : DbMigration
     {
         public override void Up()
         {
-            AlterColumn("Config.Variable", "Value", c => c.String());
+            AddColumn("Purchasing.PurchaseItem", "Discount", c => c.Double(nullable: false));
         }
         
         public override void Down()
         {
-            AlterColumn("Config.Variable", "Value", c => c.String(maxLength: 15));
+            DropColumn("Purchasing.PurchaseItem", "Discount");
         }
     }
 }

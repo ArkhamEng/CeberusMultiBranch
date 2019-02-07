@@ -22,6 +22,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
         public double Price { get; set; }
 
+        public double Discount { get; set; }
+
         public PType PurchaseTypeId { get; set; }
 
         public double Quantity { get; set; }

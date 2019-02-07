@@ -15,6 +15,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 @Html.HiddenFor(model => model.DetailId)
+                @Html.HiddenFor(model => model.Discount)
                 <table class="table small">
                     <tr>
                         <td colspan="4">
@@ -38,15 +39,15 @@
                         </td>
                         <td>
                             @Html.LabelFor(m => m.ReceivedQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.ReceivedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()" } })
+                            @Html.EditorFor(model => model.ReceivedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()", @readonly = true } })
                         </td>
                         <td>
-                            @Html.LabelFor(m => m.RejectedQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.RejectedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()" } })
+                            @Html.LabelFor(m => m.ComplementQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.ComplementQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetComplement()", @readonly = true } })
                         </td>
                         <td>
-                            @Html.LabelFor(m => m.StocketQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.StocketQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", @readonly = true } })
+                            @Html.LabelFor(m => m.StockedQty, htmlAttributes: new { @class = "control-label" })
+                            @Html.EditorFor(model => model.StockedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", @readonly = true } })
                         </td>
                     </tr>
                     <tr>
@@ -55,6 +56,13 @@
 
                             @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes:
                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off", placeholder = "Escribe un comentario..", })
+
+                            <div class="checkbox" title="Cierra la partida con pendientes y recalcula los montos">
+                                <label class="control-label">
+                                    @Html.CheckBoxFor(model => model.IsCompleated, new { htmlAttributes = new { @class = "form-control" } })
+                                    <strong> Recepción completa </strong>
+                                </label>
+                            </div>
                         </td>
                     </tr>
                 </table>
@@ -89,7 +97,7 @@
             </table>
         </div>
 
-        @if(Model.SerialsSaved.Count > 0)
+        @if (Model.SerialsSaved.Count > 0)
         {
             <table class="table table-bordered small">
                 <tr>
@@ -119,73 +127,62 @@
 </div>
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         if (parseInt('@Model.Serials.Count') > 0)
             $("#pnlItems").removeClass("hidden");
+
+        if ('@Model.ReceiveDisabled' == 'False')
+            $("#ReceivedQty").attr("readonly", false);
+
+        if ('@Model.ComplementDisabled' == 'False')
+            $("#ComplementQty").attr("readonly", false);
     });
 
 
     function SetReceiveQty(input) {
         var received = parseFloat($("#ReceivedQty").val());
-        var rejected = parseFloat($("#RejectedQty").val());
 
         if (received < 0) {
             $("#ReceivedQty").val(0);
             received = 0;
         }
+        $("#StockedQty").val(received);
 
-        if (received < rejected)
-            $("#RejectedQty").val(received)
-
-        SetRowsForSerial();
+        SetRowsForSerial(received);
     }
 
-    function SetRejected() {
-        var rejected = parseFloat($("#RejectedQty").val());
+    function SetComplement() {
+        var complement = parseFloat($("#ComplementQty").val());
         var received = parseFloat($("#ReceivedQty").val());
 
-        if (rejected > received) {
-            ShowNotify("Cantidad excedente", "info", "La cantidad rechazada no puede ser mayor a la recibida", 3000);
-            $("#RejectedQty").val(received);
-        }
-
-        if (rejected < 0) {
-            parseFloat($("#RejectedQty").val(0));
+        if (complement < 0) {
+            parseFloat($("#ComplementQty").val(0));
             ShowNotify("Cantidad incorrecta", "warning", "La cantidad no puede ser menor a 0", 3000);
-            received = 0;
+            return;
         }
 
-        SetRowsForSerial();
+        $("#StockedQty").val(complement + received);
+
+        SetRowsForSerial(complement);
     }
 
-    function SetRowsForSerial() {
-        var rejected = parseFloat($("#RejectedQty").val());
-        var received = parseFloat($("#ReceivedQty").val());
-
-        var stocked = received - rejected;
-
-        $("#StocketQty").val(stocked);
-
-        if (stocked == 0) {
-            ShowNotify("Sin unidades", "esta partida no almacenara ninguna unidad en inventario", "info", 3000);
-        }
-        if ('@Model.IsTrackable' == 'True') {
-
+    function SetRowsForSerial(quantity) {
+        if ('@Model.IsTrackable' == 'True' && parseFloat(quantity) > 0) {
             $("#tbItems tbody").empty();
 
-            if (stocked) {
-                $("#pnlItems").removeClass('hidden');
+            $("#pnlItems").removeClass('hidden');
 
-                for (i = 0; i < stocked; i++) {
-                    var consecutive = parseInt(i) + 1;
-                    $("#tbItems tbody").append("<tr><td>" + consecutive + "</td><td><input id='serialNumber' type='text' class='form-control input-sm' /></td><td></td></tr>");
-                }
-            }
-            else {
-                $("#pnlItems").addClass('hidden');
+            for (i = 0; i < quantity; i++) {
+                var consecutive = parseInt(i) + 1;
+                $("#tbItems tbody").append("<tr><td>" + consecutive + "</td><td><input id='serialNumber' type='text' class='form-control input-sm' /></td><td></td></tr>");
             }
         }
+        else {
+            $("#pnlItems").addClass('hidden');
+        }
     }
+
 
     function ApplyReception() {
         var serials = [];
@@ -198,73 +195,82 @@
         {
             DetailId: $("#DetailId").val(),
             ReceivedQty: $("#ReceivedQty").val(),
-            RejectedQty: $("#RejectedQty").val(),
-            StocketQty: $("#StocketQty").val(),
+            ComplementQty: $("#ComplementQty").val(),
+            RequestedQty: $("#RequestedQty").val(),
+            StockedQty: $("#StockedQty").val(),
+            Discount: $("#Discount").val(),
             Comment: $("#Comment").val(),
+            IsCompleated: (parseFloat($("#StockedQty").val()) >= parseFloat($("#RequestedQty").val())) || $("#IsCompleated").prop("checked"),
             Serials: serials,
-            HasValues: true
+            HasValues: true,
         };
 
-
-        $("#tbPurchaseDetails tbody tr").each(function (index, row) {
-            var id = $(row).find("#item_PurchaseOrderDetailId").val();
-
-            if (id == detail.DetailId) {
-                var unitPrice = parseFloat($(row).find("#item_UnitPrice").val());
-
-                var lineTotal = (detail.StocketQty * unitPrice);
-
-                $(row).find("#tdReceivedQty").text(detail.ReceivedQty);
-                $(row).find("#tdRejectedQty").text(detail.RejectedQty);
-                $(row).find("#tdStocketQty").text(detail.StocketQty);
-
-                $(row).find("#tdLineTotal").text(GetCurrency(lineTotal));
-
-                $(row).find("#item_LineTotal").val(lineTotal);
-
-                if (detail.RejectedQty > 0 || detail.ReceivedQty == 0) {
-                    $(row).addClass("alert alert-warning");
-                }
-                else {
-                    $(row).removeClass("alert alert-warning");
-                    $(row).addClass("alert alert-success");
-                }
-            }
-        });
 
         var subTotal = 0;
 
 
         $("#tbPurchaseDetails tbody tr").each(function (index, row) {
+            var id = $(row).find("#item_PurchaseOrderDetailId").val();
+            var option = $("#ddlAction").val();
+
+            if (id == detail.DetailId) {
+                var unitPrice = parseFloat($(row).find("#item_UnitPrice").val());
+
+                var lineTotal = detail.IsCompleated ? (detail.StockedQty * unitPrice) : ((detail.RequestedQty * unitPrice));
+
+                if (detail.Discount > 0)
+                    lineTotal = lineTotal - parseFloat(lineTotal * (detail.Discount / 100));
+
+                $(row).find("#tdReceivedQty").text(detail.ReceivedQty);
+                $(row).find("#tdRejectedQty").text(detail.ComplementQty);
+                $(row).find("#tdStockedQty").text(detail.StockedQty);
+
+                $(row).find("#tdLineTotal").text(GetCurrency(lineTotal));
+
+                $(row).find("#item_LineTotal").val(lineTotal);
+
+                if (!detail.IsCompleated)
+                    $(row).addClass("alert alert-attention");
+                else //si se marca como completo, recalcula el costo para inventariar
+                {
+                    $(row).removeClass("alert alert-attention");
+                    $(row).addClass("alert alert-success");
+                }
+            }
+
             var lt = $(row).find("#item_LineTotal");
 
             subTotal = subTotal + parseFloat(lt.val());
         });
 
+
         var taxRate = parseFloat($("#TaxRate").val());
 
-        var taxAmount = parseFloat(subTotal * taxRate / 100).toFixed(2);
+        var freigth = parseFloat($("#Freight").val());
 
-        var totalDue = parseFloat(parseFloat(subTotal) + parseFloat(taxAmount)).toFixed(2);
+        var taxAmount = parseFloat(subTotal * taxRate / 100);
+
+        var totalDue = parseFloat(parseFloat(subTotal) + taxAmount + freigth);
 
 
-        $("#tdSubTotal").text("$" + subTotal.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $("#tdSubTotal").text(GetCurrency(subTotal));
 
-        $("#tdTaxAmount").text("$" + taxAmount.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $("#tdTaxAmount").text(GetCurrency(taxAmount));
 
-        $("#tdTotalDue").text("$" + totalDue.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,"));
+        $("#tdTotalDue").text(GetCurrency(totalDue));
 
 
         var added = false;
 
         $(ReceivedDetails).each(function (index, item) {
             if (item.DetailId == detail.DetailId) {
-                item.Received = detail.Received;
-                item.Rejected = detail.Rejected;
-                item.Stocked = detail.Stocked;
+                item.ReceivedQty = detail.ReceivedQty;
+                item.RequestedQty = detail.RequestedQty;
+                item.ComplementQty = detail.ComplementQty;
+                item.StockedQty = detail.StockedQty;
                 item.Comment = detail.Comment;
                 item.Serials = detail.Serials;
-
+                IsCompleated = detail.IsCompleated
                 added = true;
             }
         });
@@ -272,7 +278,7 @@
         if (!added)
             ReceivedDetails.push(detail);
 
-
+        console.log(detail);
 
         HideModal(null, true);
     }

@@ -117,6 +117,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public ICollection<ExternalProduct> ExternalProducts { get; set; }
 
+        public ICollection<Equivalence> Equivalences { get; set; }
+
         public ICollection<PurchaseItem> PurchaseItems { get; set; }
 
 

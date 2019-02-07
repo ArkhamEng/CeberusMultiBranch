@@ -40,8 +40,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Pedido Caducado")]
         Expired = -3,
 
-        [Display(Name = "Rechazado por proveedor")]
-        Rejected = -2,
+        [Display(Name = "Error en e envio")]
+        SendingFailed = -2,
 
         [Display(Name = "No Autorizado")]
         NotAuthorized = -1,
@@ -49,17 +49,20 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "En revisión")]
         InRevision = 1,
 
-        [Display(Name = "Autorizado")]
-        Authorized = 2,
+        [Display(Name = "Revisado")]
+        Revised = 2,
 
-        [Display(Name = "Enviado a proveedor")]
-        Sended = 3,
+        [Display(Name = "Autorizado")]
+        Authorized = 3,
+
+        [Display(Name = "En espera")]
+        Watting  = 4,
 
         [Display(Name = "Recibido Parcial")]
-        Partial = 4,
+        Partial = 5,
 
         [Display(Name = "Pedido Recibido")]
-        Received = 5,
+        Received = 6,
 
        
     }

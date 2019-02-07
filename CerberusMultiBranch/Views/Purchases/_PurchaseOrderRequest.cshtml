@@ -39,31 +39,31 @@
                                 </div>
                             </td>
                             <td width="244px">
-                                <table style="width:100%" class="table-bordered">
+                                <table style="width:100%;">
                                     <tr>
-                                        <td colspan="2" class="text-center">
+                                        <td colspan="2" class="text-center" style="border:1px; border-style:solid;">
                                             <label>Orden de compra</label>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="text-center">
+                                        <td class="text-center" style="border:1px; border-style:solid;">
                                             <label>Folio</label>
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center" style="border:1px; border-style:solid;">
                                             <label>Fecha</label>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="text-center">
+                                        <td class="text-center" style="border:1px; border-style:solid;">
                                             @Model.Folio
                                         </td>
-                                        <td class="text-center">
+                                        <td class="text-center" style="border:1px; border-style:solid;">
                                             @DateTime.Now.TodayLocal().ToString("dd/MM/yyyy")
                                         </td>
                                     </tr>
 
                                     <tr>
-                                        <td colspan="2" class="text-center">
+                                        <td colspan="2" class="text-center" style="border:1px; border-style:solid;">
                                             <label>Tipo de Compra:</label>
                                             <a>@Model.PurchaseType.Name.</a>
                                         </td>
@@ -78,18 +78,19 @@
         <tbody>
             <tr><td colspan="6" style="height:50px"></td></tr>
             <tr>
-                <td style="border:1px; border-style:double"> <strong>Código</strong></td>
-                <td style="border:1px; border-style:double"><strong>Descripción</strong></td>
-                <td style="border:1px; border-style:double"><strong>Unidad</strong></td>
-                <td style="border:1px; border-style:double"><strong>Costo</strong></td>
-                <td style="border:1px; border-style:double"><strong>Cantidad</strong></td>
-                <td style="border:1px; border-style:double"><strong>Sub-Total</strong></td>
+                <td style="border:1px; border-style:solid"> <strong>Código</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Descripción</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Unidad</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Costo</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Descuento</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Cantidad</strong></td>
+                <td style="border:1px; border-style:solid"><strong>Sub-Total</strong></td>
             </tr>
             @foreach (var item in Model.PurchaseOrderDetails)
             {
                 <tr>
                     <td style="border:1px; border-style:double">
-                        @Html.DisplayFor(modelItem => item.Product.Code)
+                        @Html.DisplayFor(modelItem => item.ProviderCode)
                     </td>
                     <td style="border:1px; border-style:double">
                         @Html.DisplayFor(modelItem => item.Product.Name)
@@ -100,6 +101,9 @@
 
                     <td style="border:1px; border-style:double">
                         @Html.DisplayFor(modelItem => item.UnitPrice)
+                    </td>
+                    <td style="border:1px; border-style:double">
+                        @Html.DisplayFor(modelItem => item.Discount)
                     </td>
                     <td style="border:1px; border-style:double">
                         @Html.DisplayFor(modelItem => item.OrderQty)
@@ -115,7 +119,7 @@
 
         <tfoot>
             <tr>
-                <td colspan="4" rowspan="3"></td>
+                <td colspan="5" rowspan="3"></td>
                 <td><strong>Sub-Total</strong></td>
                 <td>@Model.SubTotal.ToMoney()</td>
                 <td></td>

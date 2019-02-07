@@ -28,6 +28,9 @@
                         <th>
                             @Html.DisplayName("Costo")
                         </th>
+                        <th>
+                            @Html.DisplayName("Descuento")
+                        </th>
 
                         <th>
                             @Html.DisplayName("Inventario")
@@ -65,6 +68,9 @@
 
                             <td class="text-uppercase">
                                 @Html.DisplayFor(modelItem => item.BuyPrice)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Discount) %
                             </td>
 
                             <td class="text-lowercase text-center">

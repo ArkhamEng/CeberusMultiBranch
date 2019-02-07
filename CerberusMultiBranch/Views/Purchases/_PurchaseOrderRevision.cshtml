@@ -1,53 +1,147 @@
-﻿@model CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrder
+﻿@model PurchaseOrder
 @using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Purchasing
 
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <button class="close" type="button" onclick="HideModal(null,true)" title="Cierra ventana de revisión"><span class="fa fa-times"></span></button>
+        <button class="close" type="button" onclick="HideModal(null,true)" title="Cierra ventana"><span class="fa fa-times"></span></button>
         <h4 class="panel-title">
-            <span class="fa fa-check"></span>
-            Revisión de Orden de Compra
+            @switch (Model.PurchaseStatusId)
+            {
+                case PStatus.InRevision:
+                    <span class="fa fa-eye"></span>
+                    <a>Revisón de Order de Compra</a>
+                    break;
+                case PStatus.Revised:
+                    <span class="fa fa-check"></span>
+                    <a>Autorización de Order de Compra</a>
+                    break;
+                case PStatus.Authorized:
+                case PStatus.SendingFailed:
+                    <span class="fa fa-paper-plane"></span>
+                    <a>Envío de Orden de Compra</a>
+                    break;
+                case PStatus.Watting:
+                case PStatus.Partial:
+                    <span class="fa fa-cubes"></span>
+                    <a>Recepción de Orden de Compra</a>
+                    break;
+            }
+
         </h4>
     </div>
     <div class="panel-body small">
-       
+
         <div class="form-group col-md-12 text-center">
             <h3>
                 <span class="fa fa-handshake-o"></span>
                 @Model.Provider.Name
             </h3>
         </div>
-        
+
         <div class="form-group col-md-12 text-center">
             <h4>
                 Monto Total
                 @Model.TotalDue.ToMoney()
             </h4>
         </div>
-       
+        @if (Model.PurchaseStatusId == PStatus.Authorized || Model.PurchaseStatusId == PStatus.SendingFailed)
+        {
+            <div class="form-group col-md-12">
+                @Html.LabelFor(model => model.Provider.Email, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                    @Html.EditorFor(model => model.Provider.Email, new { htmlAttributes = new { @class = "form-control text-lowecase input-sm", autocomplete = "off" } })
+                </div>
+                @Html.ValidationMessageFor(model => model.Provider.Email, "", new { @class = "text-danger" })
+            </div>
+        }
+
+        @if (Model.PurchaseStatusId == PStatus.Watting)
+        {
+            <div class="form-group col-md-8">
+                @Html.LabelFor(m => m.ShipMethodId, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-ship"></i></span>
+                    @Html.DropDownListFor(model => model.ShipMethodId, (SelectList)ViewBag.ShipMethodes, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                </div>
+            </div>
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.Freight, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                    @Html.EditorFor(model => model.Freight, new { htmlAttributes = new { @class = "form-control text-lowecase input-sm", autocomplete = "off", id= "addFreight" } })
+                </div>
+            </div>
+
+          
+        }
+
 
         <div class="col-md-12 form-group">
             @Html.LabelFor(model => model.Comment, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
-                @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm",
-           placeholder="Escribe un comentario..", id="txtComment" })
+                @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes: new
+               {
+                   @class = "form-control text-uppercase input-sm",
+                   placeholder = "Escribe un comentario..",
+                   id = "txtComment"
+               })
             </div>
             @Html.ValidationMessageFor(model => model.Comment, "", new { @class = "text-danger" })
         </div>
+
+
     </div>
     <div class="panel-footer clearfix">
-        <button class="btn  btn-sm btn-success" title="Autoriza el envío de la orden de compra" onclick="SetRevision('@Model.PurchaseOrderId', true)">
-            <span class="fa fa-check"></span>
-            Autorizar
-        </button>
+        @switch (Model.PurchaseStatusId)
+        {
+            case PStatus.InRevision:
+                <button class="btn  btn-sm btn-success" title="Marca la orden como revizada" onclick="SetAction('@Model.PurchaseOrderId', true,false)">
+                    <span class="fa fa-eye"></span>
+                    Revizado
+                </button>
 
-        <button class="btn  btn-sm btn-warning" title="Rechaza el envío de la orden de compra" onclick="SetRevision('@Model.PurchaseOrderId',false)">
-            <span class="glyphicon glyphicon-ban-circle"></span>
-            Rechazar
-        </button>
+                <button class="btn  btn-sm btn-warning" title="Rechaza la orden de compra" onclick="SetAction('@Model.PurchaseOrderId',false,false)">
+                    <span class="fa fa-eye-slash"></span>
+                    Rechazar
+                </button>
+                break;
+            case PStatus.Revised:
+                <button class="btn  btn-sm btn-success" title="Autoriza el envío de la orden de compra" onclick="SetAction('@Model.PurchaseOrderId', true,false)">
+                    <span class="fa fa-check"></span>
+                    Autorizar
+                </button>
 
-        <button class="btn btn-sm btn-danger pull-right" title="Cierra la ventana de revisión" onclick="HideModal(null,true)">
+                <button class="btn  btn-sm btn-warning" title="Rechaza el envío de la orden de compra" onclick="SetAction('@Model.PurchaseOrderId',false,false)">
+                    <span class="glyphicon glyphicon-ban-circle"></span>
+                    Rechazar
+                </button>
+                break;
+            case PStatus.Authorized:
+            case PStatus.SendingFailed:
+                <button class="btn  btn-sm btn-success" title="Envía la orden de compra al proveedor" onclick="SetAction('@Model.PurchaseOrderId', true,true)">
+                    <span class="fa fa-paper-plane"></span>
+                    Enviar
+                </button>
+
+                <button class="btn  btn-sm btn-warning" title="Omite el envío por correo y pasa a espera de mercancía" onclick="SetAction('@Model.PurchaseOrderId',false,true)">
+                    <span class="fa fa-forward"></span>
+                    Omitir envío
+                </button>
+                break;
+            case PStatus.Watting:
+            case PStatus.Partial:
+                <button class="btn  btn-sm btn-success" title="Envía la orden de compra al proveedor" onclick="Receive('@Model.PurchaseOrderId')">
+                    <span class="fa fa-cubes"></span>
+                    Almacenar
+                </button>
+
+                break;
+        }
+
+        <button class="btn btn-sm btn-danger pull-right" title="Cierra la ventana" onclick="HideModal(null,true)">
             <span class="fa fa-times"></span>
             Cerrar
         </button>
@@ -55,32 +149,61 @@
 </div>
 
 <script>
-   
 
-    function SetRevision(id,autorized)
+
+
+    function SetAction(id, authorized, send) {
+        if (send && !authorized && $("#txtComment").val().length < 5 || !send && $("#txtComment").val().length < 5) {
+            ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
+            return;
+        }
+
+        if (send && authorized && $("#Provider_Email").val().length < 5) {
+            ShowNotify("Correo requerido", "warning", "Se requiere una dirección de correo válida", 3000);
+            return;
+        }
+
+        var model = { id: id, comment: $("#txtComment").val(), authorized: authorized, to: $("#Provider_Email").val() };
+
+        ShowModLoading();
+
+        ExecuteAjax('@Url.Action("SetAction", "Purchases")', model, function (response) {
+            HideModLoading(function () {
+                ShowNotify(response.Header, response.Result, response.Body, 3000);
+
+                HideModal(function () {
+                    Reload();
+                }, true);
+
+            });
+        });
+    }
+
+    function Receive(id)
     {
-        var comment = $("#txtComment").val();
-        
-        if (comment.length <5)
+        if ($("#txtComment").val().length < 5)
         {
-            ShowNotify("Comentario requerido","warning","Se requiere un comentario mayor a 5 caracteres",3000);
+            ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
+            return;
+        }
+     
+        if (ReceivedDetails.length < itemsCount)
+        {
+            ShowNotify("Revisión pendiente", "warning", "aun hay partidas pendientes de revisar", 3000);
             return;
         }
 
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("SetRevision", "Purchases")', { id: id, comment: comment, autorized: autorized }, function (response)
+        var model = { items: ReceivedDetails, purchaseOrderId: id, comment: $("#txtComment").val(), shipMethodId: $("#ShipMethodId").val(), freight: $("#addFreight").val() };
+
+        ExecuteAjax('@Url.Action("CompleateReception", "Purchases")', model, function (response)
         {
             HideModLoading(function ()
             {
-                ShowNotify(response.Header, response.Result, response.Body, 3000);
-
-                HideModal(function ()
-                {
-                    Reload();
-                },true);
-               
+                HideModal(function () { Reload(); }, true);
             });
         });
     }
+
 </script>

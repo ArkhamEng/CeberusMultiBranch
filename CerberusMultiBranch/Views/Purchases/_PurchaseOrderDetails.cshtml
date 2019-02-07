@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Purchasing.PurchaseOrderDetail>
 @using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Purchasing
 
 
 
@@ -13,22 +14,25 @@
             <th>
                 @Html.DisplayNameFor(model => model.Product.Name)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
+            <th class="text-center">
+                @Html.DisplayName("Costo")
             </th>
-            <th>
+            <th class="text-center">
+                @Html.DisplayNameFor(model => model.Discount)
+            </th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.OrderQty)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.ReceivedQty)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RejectedQty)
+            <th class="text-center">
+                @Html.DisplayNameFor(model => model.ComplementQty)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.StockedQty)
             </th>
-            <th>
+            <th class="text-center">
                 @Html.DisplayNameFor(model => model.LineTotal)
             </th>
             <th></th>
@@ -37,85 +41,112 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            var cls =  Model.First().PurchaseOrder.DeliveryDate != null ? (item.IsCompleated ?  "alert alert-success" : "alert alert-attention") : "";
+            <tr class="@cls">
                 <td>
                     @Html.HiddenFor(modelItem => item.PurchaseOrderDetailId)
-                    @Html.DisplayFor(modelItem => item.Product.Code)
+                    @Html.DisplayFor(modelItem => item.Product.Code) <br />
+                    @Html.DisplayFor(modelItem => item.ProviderCode)
+                    
                 </td>
                 <td>
                     @Html.DisplayUpperFor(modelItem => item.Product.Name) <br />
                     <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark) <strong>Unidad</strong> @Html.DisplayUpperFor(modelItem => item.Product.Unit)
                 </td>
 
-                <td>
+                <td class="text-right">
                     @Html.DisplayFor(modelItem => item.UnitPrice)
                     @Html.HiddenFor(modelItem => item.UnitPrice)
                     @Html.HiddenFor(modelItem => item.LineTotal)
                 </td>
-                <td>
+                <td class="text-center"> 
+                    @Html.DisplayFor(modelItem => item.Discount) %
+                </td>
+                <td class="text-center">
                     @Html.DisplayFor(modelItem => item.OrderQty)
                 </td>
 
-                <td id="tdReceivedQty">
+                <td id="tdReceivedQty" class="text-center">
                     @Html.DisplayFor(modelItem => item.ReceivedQty)
                 </td>
-                <td id="tdRejectedQty">
-                    @Html.DisplayFor(modelItem => item.RejectedQty)
+                <td id="tdRejectedQty" class="text-center">
+                    @Html.DisplayFor(modelItem => item.ComplementQty)
                 </td>
-                <td id="tdStocketQty">
+                <td id="tdStockedQty" class="text-center">
                     @Html.DisplayFor(modelItem => item.StockedQty)
                 </td>
-                <td id="tdLineTotal">
+                <td id="tdLineTotal" class="text-right">
                     @Html.DisplayFor(modelItem => item.LineTotal)
                 </td>
                 <th>
-                    <button class="btn btn-primary btn-sm" type="button" onclick="ReceiveProduct('@item.PurchaseOrderDetailId')">
-                        <span class="fa fa-level-down"></span>
-                    </button>
+                    @if (item.PurchaseOrder.CanReceive && !item.IsCompleated)
+                    {
+                        <button class="btn btn-primary btn-sm" type="button" onclick="ReceiveProduct('@item.PurchaseOrderDetailId')" title="Recibe articulos de la partida">
+                            <span class="fa fa-plus-circle"></span>
+                        </button>
+                    }
                 </th>
             </tr>
         }
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="6" rowspan="3">
-                <div class="col-md-12 form-group">
-                    <h4>
+            <td colspan="7" rowspan="4">
+                <div class="col-md-12 form-group text-capitalize">
+                    <h5>
                         @Html.Label("Observaciones", htmlAttributes: new { @class = "control-label" })<br />
-                        @Model.First().PurchaseOrder.Comment
-                    </h4>
+                        @Model.First().PurchaseOrder.Comment.ToLower()
+                    </h5>
+                    <h5>
+                        <strong>Por</strong> @Model.First().PurchaseOrder.UpdUser
+                        , @Model.First().PurchaseOrder.UpdDate.ToString("dd/MM/yyyy HH:mm")
+                    </h5>
                 </div>
             </td>
             <td>
-                <h4><strong>Sub-Total</strong></h4>
+                <h5><strong>Subtotal</strong></h5>
             </td>
-            <td>
-                <h4 id="tdSubTotal">@Model.Sum(d => d.LineTotal).ToMoney()</h4>
+            <td class="text-right">
+                <h5 id="tdSubTotal">@Model.Sum(d => d.LineTotal).ToMoney()</h5>
             </td>
             <td></td>
         </tr>
         <tr>
             <td>
-                <h4><strong>I.V.A</strong></h4>
+                <h5><strong>I.V.A</strong></h5>
             </td>
-            <td>
-                <h4 id="tdTaxAmount">
+            <td class="text-right">
+                <h5 id="tdTaxAmount">
                     @Model.First().PurchaseOrder.TaxAmount.ToMoney()
-                </h4>
+                </h5>
             </td>
             <td></td>
         </tr>
         <tr>
 
             <td>
-                <h4>
-                    <strong>Total</strong>
-                </h4>
+                <h5>
+                    <strong>Envío</strong>
+                </h5>
             </td>
+            <td class="text-right">
+                <h5>
+                    @Model.First().PurchaseOrder.Freight.ToMoney()
+                </h5>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+
             <td>
-                <h4 id="tdTotalDue">
+                <h5>
+                    <strong>Total</strong>
+                </h5>
+            </td>
+            <td class="text-right">
+                <h5 id="tdTotalDue">
                     @Model.First().PurchaseOrder.TotalDue.ToMoney()
-                </h4>
+                </h5>
             </td>
             <td></td>
         </tr>
@@ -124,6 +155,7 @@
 
 <script>
     var ReceivedDetails = [];
+    var itemsCount = parseInt('@Model.Where(m=> !m.IsCompleated).Count()');
 
     function Received(input)
     {
@@ -140,7 +172,8 @@
             $(input).val(0);
     }
 
-    function ReceiveProduct(id) {
+    function ReceiveProduct(id)
+    {
         var detail;
 
         $(ReceivedDetails).each(function (index, item)

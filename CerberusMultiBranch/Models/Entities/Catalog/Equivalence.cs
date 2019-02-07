@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CerberusMultiBranch.Support;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -23,10 +24,32 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [ForeignKey("Product")]
         public int ProductId { get; set; }
 
-      
+        public double BuyPrice { get; set; }
+
+        public bool IsDefault { get; set; }
+
+        public DateTime InsDate { get; set; }
+
+        public string  InsUser { get; set; }
+
+        public DateTime UpdDate { get; set; }
+
+        public string UpdUser { get; set; }
+
+
         public virtual Product Product { get; set; }
+
+        public virtual Provider Provider { get; set; }
 
         [NotMapped]
         public  ExternalProduct ExternalProduct { get; set; }
+
+        public Equivalence()
+        {
+            this.InsDate = DateTime.Now.ToLocal();
+            this.InsUser = HttpContext.Current.User.Identity.Name;
+            this.UpdDate = DateTime.Now.ToLocal();
+            this.UpdUser = HttpContext.Current.User.Identity.Name;
+        }
     }
 }

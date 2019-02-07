@@ -105,7 +105,7 @@
             var data = { amount: $("#txtAmount").val(), comment: $("#txtCommentW").val(), causeId: $("#WCauseId").val() };
 
             if (isNaN(data.amount) || data.amount <= 0) {
-                ShowNotify("Erro de captura", "danger", "El monto de retiro debe ser mayor a cero", 3000);
+                ShowNotify("Error de captura", "danger", "El monto de retiro debe ser mayor a cero", 3000);
                 return;
             }
 

@@ -27,11 +27,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [Display(Name = "Descuento")]
         public double Discount { get; set; }
 
-        [Display(Name = "Rechazados")]
-        public double RejectedQty { get; set; }
+        [Display(Name = "Complemento")]
+        public double ComplementQty { get; set; }
 
         [Display(Name = "Almacenados")]
-        public double StocketQty { get; set; }
+        public double StockedQty { get; set; }
 
         [Display(Name = "Observaciones")]
         public string Comment { get; set; }
@@ -42,6 +42,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public bool HasValues { get; set; }
 
         public bool IsCompleated { get; set; }
+
+        public bool ReceiveDisabled { get; set; }
+
+        public bool ComplementDisabled { get; set; }
+
+        public bool Revised { get; set; }
 
         public List<SerialItemViewModel> Serials { get; set; }
 

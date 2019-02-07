@@ -16,8 +16,10 @@
 <hr />
 
 <div class="panel panel-default">
-    @Html.HiddenFor(model=> model.TaxRate)
+    @Html.HiddenFor(model => model.TaxRate)
     @Html.HiddenFor(model => model.TaxAmount)
+    @Html.HiddenFor(model => model.Freight)
+    
     @Html.HiddenFor(model => model.TotalDue)
 
     <div class="panel-body small">
@@ -29,12 +31,18 @@
             </div>
         </div>
 
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-3">
             @Html.LabelFor(m => m.PurchaseTypeId, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-map"></i></span>
-                @Html.DropDownListFor(model => model.PurchaseTypeId, (SelectList)ViewBag.PurchaseTypes, htmlAttributes:
-               new { @class = "form-control text-uppercase input-sm" })
+                @Html.EditorFor(model => model.PurchaseType.Name, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            @Html.Label("Días de Crédito", htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
             </div>
         </div>
 
@@ -42,18 +50,25 @@
             @Html.LabelFor(m => m.OrderDate, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                <div class="col-md-12" style="margin-left:-15px">
-                    @Html.EditorFor(model => model.OrderDate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+                <div class="form-control text-uppercase input-sm">
+                    @(Model.OrderDate != null ? Model.OrderDate.Value.ToString("dd/MM/yyyy") : "--/--/----")
                 </div>
             </div>
         </div>
 
-
-        <div class="form-group col-md-8">
+        <div class="form-group col-md-7">
             @Html.LabelFor(m => m.ProviderId, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-handshake-o"></i></span>
                 @Html.EditorFor(model => model.Provider.Name, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2">
+            @Html.Label("IVA", htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                @Html.EditorFor(model => model.TaxRate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
             </div>
         </div>
 
@@ -62,57 +77,61 @@
             @Html.LabelFor(m => m.DeliveryDate, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                <div class="col-md-12" style="margin-left:-15px">
-                    @Html.EditorFor(model => model.DeliveryDate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+                <div class="form-control text-uppercase input-sm">
+                    @(Model.DeliveryDate != null ? Model.DeliveryDate.Value.ToString("dd/MM/yyyy") : "--/--/----")
                 </div>
             </div>
         </div>
 
-        @*<div class="form-group col-md-2">
-                @Html.LabelFor(m => m.DueDate, htmlAttributes: new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                    <div class="col-md-12" style="margin-left:-15px">
-                        @Html.EditorFor(model => model.DueDate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
-                    </div>
-                </div>
+        <div class="form-group col-md-3">
+            @Html.LabelFor(m => m.ShipMethodId, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-ship"></i></span>
+                @Html.EditorFor(model => model.ShipMethod.Name, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
             </div>
+        </div>
 
-            <div class="form-group col-md-2">
-                @Html.LabelFor(m => m.ShipDate, htmlAttributes: new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
-                    <div class="col-md-12" style="margin-left:-15px">
-                        @Html.EditorFor(model => model.ShipDate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
-                    </div>
-                </div>
+        <div class="form-group col-md-2">
+            @Html.LabelFor(model => model.Freight, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                @Html.EditorFor(model => model.Freight, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
             </div>
+        </div>
 
-            <div class="form-group col-md-2">
-                @Html.LabelFor(m => m.ShipMethodId, htmlAttributes: new { @class = "control-label" })
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="fa fa-ship"></i></span>
-                    @Html.DropDownListFor(model => model.ShipMethodId, (SelectList)ViewBag.ShipMethodes, htmlAttributes:
-                   new { @class = "form-control text-uppercase input-sm" })
-                </div>
-            </div>*@
-
+       
     </div>
     <div class="panel-footer">
-        <button id="btnCheck" class="btn btn-primary btn-sm hidden" type="button" title="Autoriza la orden de compra y la envía por correo al proveedor" onclick="BeginRevision()">
-            <span class="fa fa-check"></span>
-            Revisar
-        </button>
+        @if (Model.CanRevise)
+        {
+            <button class="btn btn-primary btn-sm" type="button" title="Revisia la orden para envíarla a autorización" onclick="BeginAction()">
+                <span class="fa fa-eye"></span>
+                Revisión
+            </button>
+        }
 
-        <button id="btnSend" class="btn btn-primary btn-sm hidden" type="button" title="Autoriza la orden de compra y la envía por correo al proveedor" onclick="SendPurchaseOrder()">
-            <span class="fa fa-paper-plane"></span>
-            Enviar a Proveedor
-        </button>
+        @if (Model.CanAuthorize)
+        {
+            <button  class="btn btn-primary btn-sm" type="button" title="Autoriza la orden de compra y la envía por correo al proveedor" onclick="BeginAction()">
+                <span class="fa fa-check"></span>
+                Autorización
+            </button>
+        }
 
-        <button id="btnReceive" class="btn btn-primary btn-sm hidden" type="button" title="Recibe los articulos en el almacen" onclick="Receive()">
-            <span class="fa fa-cubes"></span>
-            Recibir
-        </button>
+        @if (Model.CanSend)
+        {
+            <button class="btn btn-primary btn-sm" type="button" title="Ea envía por correo al proveedor, esta acción es opcional" onclick="BeginAction()">
+                <span class="fa fa-paper-plane"></span>
+                Enviar a Proveedor
+            </button>
+        }
+        @if (Model.CanReceive)
+        {
+            <button class="btn btn-success btn-sm" type="button" title="Recibe los articulos en el almacen" onclick="BeginAction()">
+                <span class="fa fa-cubes"></span>
+                Recibir
+            </button>
+        }
     </div>
 </div>
 
@@ -148,22 +167,22 @@
             $("#divFolio").removeClass("alert alert-dark");
             $("#divFolio").addClass("alert alert-success");
         }
-            
+
 
         //status color
         switch ('@Model.PurchaseStatusId')
         {
             case '@PStatus.InRevision':
-                $("#btnCheck").removeClass("hidden");
                 $("#divStatus").addClass("alert alert-dark");
                 break;
-            case '@PStatus.Authorized':
-                $("#btnSend").removeClass("hidden");
+            case '@PStatus.Revised':
                 $("#divStatus").addClass("alert alert-success");
                 break;
-            case '@PStatus.Sended':
-                $("#divStatus").addClass("alert alert-info");
-                $("#btnReceive").removeClass("hidden");
+            case '@PStatus.Authorized':
+                $("#divStatus").addClass("alert alert-success");
+                break;
+            case '@PStatus.Watting':
+                $("#divStatus").addClass("alert alert-success");
                 break;
 
             case '@PStatus.Partial':
@@ -173,24 +192,27 @@
             case '@PStatus.Received':
                 $("#divStatus").addClass("alert alert-success");
                 break;
-         
-            case '@PStatus.NotAuthorized':
-                $("#btnAction").removeClass("hidden");
-                $("#divStatus").addClass("alert alert-attention");
-                break;
-            case '@PStatus.Rejected':
+
+            case '@PStatus.SendingFailed':
                 $("#divStatus").addClass("alert alert-warning");
                 break;
+
+            case '@PStatus.NotAuthorized':
+                $("#divStatus").addClass("alert alert-danger");
+                break;
+          
             case '@PStatus.Canceled':
                 $("#divStatus").addClass("alert alert-danger");
                 break;
         }
     });
 
-    function BeginRevision() {
+    function BeginAction()
+    {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("BeginRevision", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response) {
+        ExecuteAjax('@Url.Action("BeginAction", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response)
+        {
             HideLoading(function ()
             {
                 if ($.isPlainObject(response))
@@ -204,14 +226,14 @@
         });
     }
 
+   
     function SendPurchaseOrder()
     {
         ShowLoading('static');
 
         ExecuteAjax('@Url.Action("SendPurchaseOrder", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response)
         {
-            HideLoading(function ()
-            {
+            HideLoading(function () {
                 ShowNotify(response.Header, response.Result, response.Body, 3000);
                 Reload();
 
@@ -219,25 +241,12 @@
         });
     }
 
-    function Receive()
-    {
-        ShowLoading();
-
-        ExecuteAjax('@Url.Action("CompleateReception", "Purchases")', { items: ReceivedDetails, purchaseOrderId: $("#PurchaseOrderId").val() }, function (response)
-        {
-            HideLoading(function ()
-            {
-                $("#divPurchaseOrder").html(response);
-            });
-        });
-    }
-
+ 
     function Reload()
     {
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("ReloadPurchaseOrder", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response)
-        {
+        ExecuteAjax('@Url.Action("ReloadPurchaseOrder", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response) {
             HideLoading(function () {
                 $("#divPurchaseOrder").html(response);
             });

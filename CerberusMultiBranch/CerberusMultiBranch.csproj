@@ -390,21 +390,17 @@
     <Compile Include="Migrations\201812031858595_lastChanges.Designer.cs">
       <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201901291607361_ConfigVariableLength.cs" />
-    <Compile Include="Migrations\201901291607361_ConfigVariableLength.Designer.cs">
-      <DependentUpon>201901291607361_ConfigVariableLength.cs</DependentUpon>
+    <Compile Include="Migrations\201902021829400_PurchaseOrderImprovement.cs" />
+    <Compile Include="Migrations\201902021829400_PurchaseOrderImprovement.Designer.cs">
+      <DependentUpon>201902021829400_PurchaseOrderImprovement.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201901291928020_PurchaseOrderHistory.cs" />
-    <Compile Include="Migrations\201901291928020_PurchaseOrderHistory.Designer.cs">
-      <DependentUpon>201901291928020_PurchaseOrderHistory.cs</DependentUpon>
+    <Compile Include="Migrations\201902022147578_discountDetail.cs" />
+    <Compile Include="Migrations\201902022147578_discountDetail.Designer.cs">
+      <DependentUpon>201902022147578_discountDetail.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201901301718130_TrackableProduct.cs" />
-    <Compile Include="Migrations\201901301718130_TrackableProduct.Designer.cs">
-      <DependentUpon>201901301718130_TrackableProduct.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\201902010506574_Tracking.cs" />
-    <Compile Include="Migrations\201902010506574_Tracking.Designer.cs">
-      <DependentUpon>201902010506574_Tracking.cs</DependentUpon>
+    <Compile Include="Migrations\201902060624480_ChangeRejectedByComplement.cs" />
+    <Compile Include="Migrations\201902060624480_ChangeRejectedByComplement.Designer.cs">
+      <DependentUpon>201902060624480_ChangeRejectedByComplement.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -1205,17 +1201,14 @@
     <EmbeddedResource Include="Migrations\201812031858595_lastChanges.resx">
       <DependentUpon>201812031858595_lastChanges.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201901291607361_ConfigVariableLength.resx">
-      <DependentUpon>201901291607361_ConfigVariableLength.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201902021829400_PurchaseOrderImprovement.resx">
+      <DependentUpon>201902021829400_PurchaseOrderImprovement.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201901291928020_PurchaseOrderHistory.resx">
-      <DependentUpon>201901291928020_PurchaseOrderHistory.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201902022147578_discountDetail.resx">
+      <DependentUpon>201902022147578_discountDetail.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201901301718130_TrackableProduct.resx">
-      <DependentUpon>201901301718130_TrackableProduct.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201902010506574_Tracking.resx">
-      <DependentUpon>201902010506574_Tracking.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201902060624480_ChangeRejectedByComplement.resx">
+      <DependentUpon>201902060624480_ChangeRejectedByComplement.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
