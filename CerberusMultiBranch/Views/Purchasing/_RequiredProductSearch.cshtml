@@ -52,7 +52,7 @@
     function QuickSearchProduct() {
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("SearchRequiredProduct", "Purchases")', { filter: $("#FProductName").val(), providerId: $("#ProviderId").val() }, function (view) {
+        ExecuteAjax('@Url.Action("SearchRequiredProduct", "Purchasing")', { filter: $("#FProductName").val(), providerId: $("#ProviderId").val() }, function (view) {
             HideModLoading(function () {
                 $("#divProductQuickSearchList").html(view);
             });

@@ -402,6 +402,14 @@
     <Compile Include="Migrations\201902060624480_ChangeRejectedByComplement.Designer.cs">
       <DependentUpon>201902060624480_ChangeRejectedByComplement.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902081801061_GlobalDiscount.cs" />
+    <Compile Include="Migrations\201902081801061_GlobalDiscount.Designer.cs">
+      <DependentUpon>201902081801061_GlobalDiscount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902081921393_FixPurchaseItems.cs" />
+    <Compile Include="Migrations\201902081921393_FixPurchaseItems.Designer.cs">
+      <DependentUpon>201902081921393_FixPurchaseItems.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1034,24 +1042,26 @@
     <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
     <Content Include="Views\Products\_ProductEditionImages.cshtml" />
     <Content Include="Views\Shared\_ChildLoading.cshtml" />
-    <Content Include="Views\Purchases\PurchaseEstimation.cshtml" />
+    <Content Include="Views\Purchasing\PurchaseEstimation.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearch.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearchList.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseEstimationDetails.cshtml" />
-    <Content Include="Views\Purchases\_SetProviderCode.cshtml" />
-    <Content Include="Views\Purchases\PurchaseOrder.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseOrderDetails.cshtml" />
-    <Content Include="Views\Purchases\_ReceivePurchaseItem.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseOrderRequest.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseOrderRevision.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseOrder.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseOrderHistories.cshtml" />
-    <Content Include="Views\Purchases\_RequiredProductSearch.cshtml" />
-    <Content Include="Views\Purchases\_RequiredProductSearchList.cshtml" />
-    <Content Include="Views\Purchases\_RequiredProductSearchGroup.cshtml" />
-    <Content Include="Views\Purchases\_EditEstimationDetail.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseEstimationDetails.cshtml" />
+    <Content Include="Views\Purchasing\_SetProviderCode.cshtml" />
+    <Content Include="Views\Purchasing\PurchaseOrder.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderDetails.cshtml" />
+    <Content Include="Views\Purchasing\_ReceivePurchaseItem.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderRequest.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderRevision.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrder.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderHistories.cshtml" />
+    <Content Include="Views\Purchasing\_RequiredProductSearch.cshtml" />
+    <Content Include="Views\Purchasing\_RequiredProductSearchList.cshtml" />
+    <Content Include="Views\Purchasing\_RequiredProductSearchGroup.cshtml" />
+    <Content Include="Views\Purchasing\_EditEstimationDetail.cshtml" />
+    <Content Include="Views\Purchasing\PurchaseOrders.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1209,6 +1219,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902060624480_ChangeRejectedByComplement.resx">
       <DependentUpon>201902060624480_ChangeRejectedByComplement.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902081801061_GlobalDiscount.resx">
+      <DependentUpon>201902081801061_GlobalDiscount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902081921393_FixPurchaseItems.resx">
+      <DependentUpon>201902081921393_FixPurchaseItems.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

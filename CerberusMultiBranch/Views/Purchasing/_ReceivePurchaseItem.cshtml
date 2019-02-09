@@ -209,7 +209,8 @@
         var subTotal = 0;
 
 
-        $("#tbPurchaseDetails tbody tr").each(function (index, row) {
+        $("#tbPurchaseDetails tbody tr").each(function (index, row)
+        {
             var id = $(row).find("#item_PurchaseOrderDetailId").val();
             var option = $("#ddlAction").val();
 
@@ -246,23 +247,39 @@
 
         var taxRate = parseFloat($("#TaxRate").val());
 
-        var freigth = parseFloat($("#Freight").val());
+        var expenses = parseFloat($("#Freight").val()) + parseFloat($("#Insurance").val());
 
         var taxAmount = parseFloat(subTotal * taxRate / 100);
 
-        var totalDue = parseFloat(parseFloat(subTotal) + taxAmount + freigth);
+        var totalDue = parseFloat(parseFloat(subTotal) + taxAmount);
 
+        var disPer = parseFloat($("#Discount").val());
 
+        var discount = 0.0;
+
+        if (disPer > 0 && disPer < 100)
+            discount = totalDue - (totalDue * (disPer / 100));
+        else if (disPer == 100)
+            discount = totalDue;
+      
+
+      
         $("#tdSubTotal").text(GetCurrency(subTotal));
 
         $("#tdTaxAmount").text(GetCurrency(taxAmount));
+
+        $("#tdDiscount").text(GetCurrency(discount));
+
+
+        totalDue = totalDue - discount + expenses;
 
         $("#tdTotalDue").text(GetCurrency(totalDue));
 
 
         var added = false;
 
-        $(ReceivedDetails).each(function (index, item) {
+        $(ReceivedDetails).each(function (index, item)
+        {
             if (item.DetailId == detail.DetailId) {
                 item.ReceivedQty = detail.ReceivedQty;
                 item.RequestedQty = detail.RequestedQty;

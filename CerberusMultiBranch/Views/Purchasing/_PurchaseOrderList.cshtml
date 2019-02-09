@@ -1,0 +1,172 @@
+﻿@model IEnumerable<PurchaseOrder>
+@using CerberusMultiBranch.Models.Entities.Purchasing
+
+
+<table id="tbPurchaseOrders" class="table  small" style="width:100%;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PurchaseStatusId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BranchId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProviderId)
+            </th>
+            <th style="white-space:nowrap">
+                @Html.DisplayNameFor(model => model.ShipMethodId)
+            </th>
+            <th style="white-space:nowrap">
+                @Html.DisplayNameFor(model => model.OrderDate)
+            </th>
+
+            <th style="white-space:nowrap">
+                @Html.DisplayNameFor(model => model.DeliveryDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TotalDue)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxAmount)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.SubTotal)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TaxRate)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.DaysToPay)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Freight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Insurance)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Discount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InsDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InsUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UpdUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            string cls = "alert alert-info";
+
+            switch(item.PurchaseStatusId)
+            {
+                case PStatus.InRevision:
+                    cls = "alert alert-dark";
+                    break;
+                case PStatus.Canceled:
+                    cls = "alert alert-danger";
+                    break;
+                case PStatus.NotAuthorized:
+                case PStatus.SendingFailed:
+                    cls = "alert alert-warning";
+                    break;
+                case PStatus.Partial:
+                    cls = "alert alert-attention";
+                    break;
+                case PStatus.Received:
+                    cls = "alert alert-success";
+                    break;
+
+            }
+
+            <tr>
+                <td style="min-width:100px" class="@cls">
+                    @Html.DisplayFor(modelItem => item.PurchaseStatus.Name) <br />
+                    @Html.DisplayFor(modelItem => item.Folio)
+                </td>
+
+                <td style="min-width:100px">
+                    @Html.ActionLink(item.Branch.Name, "PurchaseOrder", new { id = item.PurchaseOrderId })
+                </td>
+                <td style="min-width:200px">
+                    @Html.ActionLink(item.Provider.Name, "PurchaseOrder", new { id = item.PurchaseOrderId })
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.ShipMethod.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.OrderDate)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeliveryDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalDue)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaxAmount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubTotal)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaxRate) %
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DaysToPay) días
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Freight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Insurance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Discount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InsDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.InsUser)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UpdUser)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        Paginate("#tbPurchaseOrders", 10, true, "#txtMainFilter", false, "#tbButtons")
+
+        
+    });
+</script>

@@ -17,8 +17,49 @@ using CerberusMultiBranch.Models.ViewModels.Purchasing;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    public partial class PurchasesController : Controller
+
+    public class PurchasingController : Controller
     {
+        private ApplicationDbContext db = new ApplicationDbContext();
+
+
+
+        public ActionResult PurchaseOrders()
+        {
+            var st = new List<PStatus>();
+
+            st.Add(PStatus.Canceled);
+            st.Add(PStatus.Received);
+
+            ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
+            ViewBag.PurchaseStatuses = db.PurchaseStatuses.ToSelectList();
+
+            var model = db.PurchaseOrder.Where(o => !st.Contains(o.PurchaseStatusId)).OrderByDescending(o => o.InsDate).ToList();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult SearchPurchaseOrders(int? branchId, string folio, int? purchaseStatusId, string provider, DateTime? beginDate, DateTime? endDate)
+        {
+
+            var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
+
+            var model = (from o in db.PurchaseOrder
+
+                         where (string.IsNullOrEmpty(folio) || o.Folio.Contains(folio)) &&
+                         (branchId == null && branchIds.Contains(o.BranchId) || o.BranchId == branchId) &&
+                         (purchaseStatusId == null || (int)o.PurchaseStatusId == purchaseStatusId) &&
+                         (string.IsNullOrEmpty(provider) || o.Provider.Name.Contains(provider)) &&
+                         (beginDate == null || o.InsDate >= beginDate) && (endDate == null || o.InsDate <= endDate)
+
+                         select o).OrderByDescending(or => or.InsDate).ToList();
+
+
+
+            return PartialView("_PurchaseOrderList", model);
+        }
+
         /// <summary>
         /// Obtiene la sesión de compra del usuario en turno
         /// </summary>
@@ -29,6 +70,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             var model = new PurchaseCartViewModel();
             model.PurchaseTypes = db.PurchaseTypes.ToSelectList();
+            model.ShipmentMethodes = db.ShipMethodes.ToSelectList();
 
             var items = GetEstimationDetails(userId);
 
@@ -36,7 +78,6 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 model.ProviderId = items.FirstOrDefault().Value.First().ProviderId;
                 model.ProviderName = items.FirstOrDefault().Value.First().ProviderName;
-                model.PurchaseType = items.FirstOrDefault().Value.First().PurchaseType;
                 model.PurchaseItems = items;
             }
 
@@ -77,7 +118,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                               ProviderId = itm.ProviderId,
                               ProviderName = itm.Provider.Name,
                               TotalLine = itm.TotalLine,
-                              PurchaseType = itm.PurchaseTypeId,
                               ProviderCode = eq.Code,
                               BuyPrice = itm.Price,
                               Discount = itm.Discount
@@ -143,7 +183,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                           where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
                                  (branches.Contains(bp.BranchId)) &&
-                                 (bp.Stock < bp.MaxQuantity) &&
+                                 (bp.Stock <= bp.MinQuantity) &&
                                  (bp.Product.IsActive)
 
                           select new ProductViewModel
@@ -219,7 +259,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                                  ProviderId = itm.ProviderId,
                                  ProviderName = itm.Provider.Name,
                                  TotalLine = itm.TotalLine,
-                                 PurchaseType = itm.PurchaseTypeId,
                                  ProviderCode = eq.Code,
                                  BuyPrice = itm.Price,
                                  Discount = itm.Discount
@@ -483,13 +522,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpPost]
-        public ActionResult CreateOrders(int providerId, string comment, PType purchaseTypeId, int daysToPay)
+        public ActionResult CreateOrders(PurchaseCartViewModel model)
         {
             try
             {
                 var userId = User.Identity.GetUserId();
 
-                var items = db.PurchaseItems.Where(i => i.ProviderId == providerId && i.UserId == userId).ToList();
+                var items = db.PurchaseItems.Where(i => i.ProviderId == model.ProviderId && i.UserId == userId).ToList();
 
                 var vari = db.Variables.FirstOrDefault(v => v.Name == ConfigVariable.Pricing.IVA);
 
@@ -518,11 +557,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     PurchaseOrder order = new PurchaseOrder
                     {
                         BranchId = first.BranchId,
-                        ProviderId = providerId,
-                        PurchaseTypeId = purchaseTypeId,
+                        ProviderId = model.ProviderId,
+                        PurchaseTypeId = model.PurchaseType,
                         PurchaseOrderDetails = new List<PurchaseOrderDetail>(),
-                        Comment = comment,
-                        DaysToPay = daysToPay
+                        Comment = model.Comment,
+                        DaysToPay = model.DaysToPay,
+                        Freight = model.Freight,
+                        Insurance = model.Insurance,
+                        Discount = model.Discount,
+                        ShipMethodId = model.ShipmentMethodId
                     };
 
                     foreach (var item in group)
@@ -542,10 +585,25 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     order.TaxRate = iva;
                     order.PurchaseStatusId = PStatus.InRevision;
-                    order.ShipMethodId = Cons.One;
+
+                    //total de partidas
                     order.SubTotal = order.PurchaseOrderDetails.Sum(d => d.LineTotal).RoundMoney();
-                    order.TaxAmount = (order.SubTotal * (iva / 100)).RoundMoney();
-                    order.TotalDue = (order.SubTotal + order.TaxAmount).RoundMoney();
+
+                    //monto de iva
+                    order.TaxAmount = (order.SubTotal * (iva / Cons.OneHundred)).RoundMoney();
+
+
+                    var total = (order.SubTotal + order.TaxAmount);
+
+                    //si hay descuento
+                    if (order.Discount > Cons.Zero && order.Discount < Cons.OneHundred)
+                        total = total - (total * (order.Discount / Cons.OneHundred));
+
+                    else if (order.Discount == Cons.OneHundred)
+                        total = total - total;
+
+                    //total de la mercancía con descuento e Iva mas envío y seguro
+                    order.TotalDue = (total + order.Freight + order.Insurance).RoundMoney();
 
                     purchaseOrders.Add(order);
                 }
@@ -635,7 +693,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Serials = new List<SerialItemViewModel>(),
             };
 
-            model.ReceiveDisabled    = detail.PurchaseOrder.PurchaseStatusId != PStatus.Watting;
+            model.ReceiveDisabled = detail.PurchaseOrder.PurchaseStatusId != PStatus.Watting;
             model.ComplementDisabled = detail.PurchaseOrder.PurchaseStatusId != PStatus.Partial;
 
             model.SerialsSaved = detail.StockMovements.Where(m => m.TrackingItem != null).
@@ -662,9 +720,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             return PartialView("_ReceivePurchaseItem", model);
         }
 
-       
+
         [HttpPost]
-        public ActionResult CompleateReception(List<ProductReceptionViewModel> items, int purchaseOrderId, string comment, int? shipMethodId, double? freight)
+        public ActionResult CompleateReception(List<ProductReceptionViewModel> items, int purchaseOrderId, string comment, int? shipMethodId, double? freight, double? insurance, double? discount)
         {
             try
             {
@@ -707,7 +765,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         detail.Comment = item.Comment;
                         detail.IsCompleated = item.IsCompleated;
 
-                      
+
                         var inventory = inventories.FirstOrDefault(i => i.ProductId == detail.ProductId);
 
                         if (inventory.Product.StockRequired)
@@ -771,7 +829,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                             #endregion
                         }
 
-                        if(order.PurchaseStatusId == PStatus.Watting)
+                        if (order.PurchaseStatusId == PStatus.Watting)
                         {
                             var amount = detail.UnitPrice * (detail.IsCompleated ? detail.StockedQty : detail.OrderQty);
 
@@ -779,104 +837,19 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             db.Entry(detail).Property(d => d.LineTotal).IsModified = true;
                         }
- 
-                        db.Entry(detail).Property(d => d.Discount).IsModified      = true;
-                        db.Entry(detail).Property(d => d.ReceivedQty).IsModified   = true;
+
+                        db.Entry(detail).Property(d => d.Discount).IsModified = true;
+                        db.Entry(detail).Property(d => d.ReceivedQty).IsModified = true;
                         db.Entry(detail).Property(d => d.ComplementQty).IsModified = true;
-                        db.Entry(detail).Property(d => d.StockedQty).IsModified    = true;
-                        db.Entry(detail).Property(d => d.UpdDate).IsModified       = true;
-                        db.Entry(detail).Property(d => d.UpdUser).IsModified       = true;
-                        db.Entry(detail).Property(d => d.Comment).IsModified       = true;
-                        db.Entry(detail).Property(d => d.IsCompleated).IsModified  = true;
+                        db.Entry(detail).Property(d => d.StockedQty).IsModified = true;
+                        db.Entry(detail).Property(d => d.UpdDate).IsModified = true;
+                        db.Entry(detail).Property(d => d.UpdUser).IsModified = true;
+                        db.Entry(detail).Property(d => d.Comment).IsModified = true;
+                        db.Entry(detail).Property(d => d.IsCompleated).IsModified = true;
                     }
                 }
 
-                #region Precios y cantidades en stock
-
-                if (order.PurchaseStatusId == PStatus.Watting)
-                {
-                    foreach (var detail in order.PurchaseOrderDetails)
-                    {
-                        var freigthLine = 0d;
-
-                        var inventory = inventories.FirstOrDefault(p => p.ProductId == detail.ProductId);
-
-                        var isModified = false;
-
-                        //solo evaluo costos en la primera recepción, ya que ahi se indica si se contabiliza lo almacenado o lo pedido
-                        if (order.PurchaseStatusId == PStatus.Watting)
-                        {
-                            //el total de la línea mas el envío y el impuesto
-                            var lineTotal = detail.LineTotal * (Cons.One + order.TaxRate / Cons.OneHundred).RoundMoney();
-
-                            //calculo la parte proporcional del envío para la partida
-                            if (freight > 0)
-                                freigthLine = ((freight.Value / lineTotal) * (detail.IsCompleated ? detail.StockedQty : detail.OrderQty)).RoundMoney();
-
-                            lineTotal += freigthLine;
-
-                            //obtengo el costo real individual de los articulos de la partida
-                            var buyPrice = (lineTotal / (detail.IsCompleated ? detail.StockedQty : detail.OrderQty)).RoundMoney();
-
-                            //cantidad actual en inventario
-                            var currentStock = inventory.Stock + inventory.Reserved;
-
-                            //si hay diferencia entre los precios de compra hago modificaciones
-                            if (buyPrice != inventory.BuyPrice)
-                            {
-                                //si el preducto subio de precio o bajó y no hay stock, actualizo el nuevo precio
-                                if (buyPrice > inventory.BuyPrice || (buyPrice < inventory.BuyPrice && currentStock == Cons.Zero))
-                                    inventory.BuyPrice = buyPrice;
-                                else
-                                {
-                                    var currentAmount = (inventory.Stock + inventory.Reserved) * inventory.BuyPrice;
-
-                                    inventory.BuyPrice = ((lineTotal + currentAmount) / (inventory.Stock + inventory.Reserved + (detail.IsCompleated ? detail.StockedQty : detail.OrderQty))).RoundMoney();
-                                }
-
-                                //calculo los precios en base a la utilidad configurada, si no hay margenes de utilidad solo coloco el precio de compra
-                                inventory.DealerPrice = inventory.DealerPercentage != Cons.Zero ? 
-                                                        inventory.BuyPrice * (Cons.One + inventory.DealerPercentage / Cons.OneHundred) : inventory.BuyPrice;
-                                inventory.WholesalerPrice = inventory.WholesalerPercentage != Cons.Zero? 
-                                                            inventory.BuyPrice * (Cons.One + inventory.WholesalerPercentage / Cons.OneHundred) : inventory.BuyPrice;
-                                inventory.StorePrice = inventory.StorePercentage != Cons.Zero ? 
-                                                       inventory.BuyPrice * (Cons.One + inventory.StorePercentage / Cons.OneHundred) : inventory.BuyPrice;
-
-                                db.Entry(inventory).Property(i => i.DealerPrice).IsModified = true;
-                                db.Entry(inventory).Property(i => i.WholesalerPrice).IsModified = true;
-                                db.Entry(inventory).Property(i => i.StorePrice).IsModified = true;
-                                db.Entry(inventory).Property(i => i.BuyPrice).IsModified = true;
-
-                                isModified = true;
-                            }
-                        }
-
-                   
-                        if (inventory.Product.StockRequired)
-                        {
-                            inventory.LastStock = inventory.Stock;
-                            inventory.Stock += (order.PurchaseStatusId == PStatus.Watting ? detail.ReceivedQty : detail.ComplementQty);
-
-                            db.Entry(inventory).Property(i => i.LastStock).IsModified = true;
-                            db.Entry(inventory).Property(i => i.Stock).IsModified = true;
-                            isModified = true;
-                        }
-       
-                        if(isModified)
-                        {
-                            inventory.UpdDate = DateTime.Now.ToLocal();
-                            inventory.UpdUser = HttpContext.User.Identity.Name;
-
-                            db.Entry(inventory).Property(i => i.UpdDate).IsModified = true;
-                            db.Entry(inventory).Property(i => i.UpdUser).IsModified = true;
-                        }
-                    }
-                }
-
-              
-                #endregion
-
-
+                //agrego historico
                 PurchaseOrderHistory history = new PurchaseOrderHistory
                 {
                     PurchaseOrderId = order.PurchaseOrderId,
@@ -891,14 +864,130 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.PurchaseOrderHistories.Add(history);
 
-              
+
+
+                #region Precios y cantidades en stock
+
+                
+                var subTotal = order.PurchaseOrderDetails.Sum(d => d.LineTotal).RoundMoney();
+
+                var taxAmount = (subTotal * (Cons.One + order.TaxRate / Cons.OneHundred)).RoundMoney();
+
+                //calculo la suma de las partidas mas el IVA 
+                var totalDisc = (subTotal + taxAmount).RoundMoney();
+
+                //y menos el descuento
+                if (discount > Cons.Zero && discount < Cons.OneHundred)
+                    totalDisc = totalDisc - (totalDisc * (discount.Value / Cons.OneHundred));
+
+
+
+                foreach (var detail in order.PurchaseOrderDetails)
+                {
+                    var expensesLine = 0d;
+
+                    var inventory = inventories.FirstOrDefault(p => p.ProductId == detail.ProductId);
+
+                    var isModified = false;
+
+                    //solo evaluo costos en la primera recepción, ya que ahi se indica si se contabiliza lo almacenado o lo pedido
+                    if (order.PurchaseStatusId == PStatus.Watting)
+                    {
+                        //el total de la línea mas el iva
+                        var lineTotal = (detail.LineTotal * (Cons.One + order.TaxRate / Cons.OneHundred)).RoundMoney();
+
+                        //y menos el descuento
+                        if (discount > Cons.Zero && discount < Cons.OneHundred)
+                            lineTotal = lineTotal - (lineTotal * (discount.Value / Cons.OneHundred));
+
+                        //los gastos (envío mas seguro)
+                        var expenses = freight.Value + insurance.Value;
+
+                        //calculo la parte proporcional de gastos para la línea (reparto de forma proporcional al costo)
+                        //el total de los gastos entre el total de las partidas (ya con iva y descuentos) por el total de cada partida
+                        if (expenses > 0.0)
+                            expensesLine = ((expenses / totalDisc) * lineTotal).RoundMoney();
+
+                        lineTotal += expensesLine;
+
+                        //obtengo el costo real individual de los articulos de la partida
+                        var buyPrice = (lineTotal / (detail.IsCompleated ? detail.StockedQty : detail.OrderQty)).RoundMoney();
+
+                        //cantidad actual en inventario
+                        var currentStock = inventory.Stock + inventory.Reserved;
+
+                        //si hay diferencia entre los precios de compra hago modificaciones
+                        if (buyPrice != inventory.BuyPrice)
+                        {
+                            //si el producto subio de precio o bajó y no hay stock, actualizo el nuevo precio
+                            if (buyPrice > inventory.BuyPrice || (buyPrice < inventory.BuyPrice && currentStock == Cons.Zero))
+                                inventory.BuyPrice = buyPrice;
+                            else
+                            {
+                                var currentAmount = (inventory.Stock + inventory.Reserved) * inventory.BuyPrice;
+
+                                inventory.BuyPrice = ((lineTotal + currentAmount) / (inventory.Stock + inventory.Reserved + (detail.IsCompleated ? detail.StockedQty : detail.OrderQty))).RoundMoney();
+                            }
+
+                            //calculo los precios en base a la utilidad configurada, si no hay margenes de utilidad solo coloco el precio de compra
+                            inventory.DealerPrice = inventory.DealerPercentage != Cons.Zero ?
+                                                    inventory.BuyPrice * (Cons.One + inventory.DealerPercentage / Cons.OneHundred) : inventory.BuyPrice;
+                            inventory.WholesalerPrice = inventory.WholesalerPercentage != Cons.Zero ?
+                                                        inventory.BuyPrice * (Cons.One + inventory.WholesalerPercentage / Cons.OneHundred) : inventory.BuyPrice;
+                            inventory.StorePrice = inventory.StorePercentage != Cons.Zero ?
+                                                   inventory.BuyPrice * (Cons.One + inventory.StorePercentage / Cons.OneHundred) : inventory.BuyPrice;
+
+                            //el cliente quiere precio cerrados sin centavos
+
+                            inventory.DealerPrice = Math.Round(inventory.DealerPrice, Cons.Zero);
+                            inventory.WholesalerPrice = Math.Round(inventory.WholesalerPrice, Cons.Zero);
+                            inventory.StorePrice = Math.Round(inventory.StorePrice, Cons.Zero);
+
+                            db.Entry(inventory).Property(i => i.DealerPrice).IsModified = true;
+                            db.Entry(inventory).Property(i => i.WholesalerPrice).IsModified = true;
+                            db.Entry(inventory).Property(i => i.StorePrice).IsModified = true;
+                            db.Entry(inventory).Property(i => i.BuyPrice).IsModified = true;
+
+                            isModified = true;
+                        }
+                    }
+
+
+                    if (inventory.Product.StockRequired)
+                    {
+                        inventory.LastStock = inventory.Stock;
+                        inventory.Stock += (order.PurchaseStatusId == PStatus.Watting ? detail.ReceivedQty : detail.ComplementQty);
+
+                        db.Entry(inventory).Property(i => i.LastStock).IsModified = true;
+                        db.Entry(inventory).Property(i => i.Stock).IsModified = true;
+                        isModified = true;
+                    }
+
+                    if (isModified)
+                    {
+                        inventory.UpdDate = DateTime.Now.ToLocal();
+                        inventory.UpdUser = HttpContext.User.Identity.Name;
+
+                        db.Entry(inventory).Property(i => i.UpdDate).IsModified = true;
+                        db.Entry(inventory).Property(i => i.UpdUser).IsModified = true;
+                    }
+                }
+
+
+
+                #endregion
+
+
+
                 if (order.PurchaseStatusId == PStatus.Watting)
                 {
                     order.Freight      = freight.Value;
+                    order.Insurance    = insurance.Value;
+                    order.Discount     = discount.Value;
                     order.ShipMethodId = shipMethodId.Value;
-                    order.SubTotal     = order.PurchaseOrderDetails.Sum(d => d.LineTotal).RoundMoney();
-                    order.TaxAmount    = (order.SubTotal * (order.TaxRate / Cons.OneHundred)).RoundMoney();
-                    order.TotalDue     = (order.SubTotal + order.TaxAmount + freight.Value).RoundMoney();
+                    order.SubTotal     = subTotal;
+                    order.TaxAmount    = taxAmount;
+                    order.TotalDue     = (totalDisc + freight.Value + order.Insurance).RoundMoney();
 
                     db.Entry(order).Property(o => o.Freight).IsModified = true;
                     db.Entry(order).Property(o => o.ShipMethodId).IsModified = true;
@@ -913,9 +1002,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 order.PurchaseStatusId = order.PurchaseOrderDetails.Count(d => !d.IsCompleated) > Cons.Zero ? PStatus.Partial : PStatus.Received;
 
 
-                db.Entry(order).Property(o => o.Comment).IsModified      = true;
-                db.Entry(order).Property(o => o.UpdDate).IsModified      = true;
-                db.Entry(order).Property(o => o.UpdUser).IsModified      = true;
+                db.Entry(order).Property(o => o.Comment).IsModified = true;
+                db.Entry(order).Property(o => o.UpdDate).IsModified = true;
+                db.Entry(order).Property(o => o.UpdUser).IsModified = true;
                 db.Entry(order).Property(o => o.DeliveryDate).IsModified = true;
                 db.Entry(order).Property(o => o.PurchaseStatusId).IsModified = true;
 
@@ -924,9 +1013,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new JResponse
                 {
                     Header = "Mercancía recibida",
-                    Body = "La orden de compra fue" + (order.PurchaseStatusId == PStatus.Received ?"recibida completamente" : "recibída parcialmente"),
+                    Body = "La orden de compra fue" + (order.PurchaseStatusId == PStatus.Received ? "recibida completamente" : "recibída parcialmente"),
                     Code = Cons.Responses.Codes.Success,
-                    Result = (order.PurchaseStatusId == PStatus.Received ? Cons.Responses.Success : Cons.Responses.Info) 
+                    Result = (order.PurchaseStatusId == PStatus.Received ? Cons.Responses.Success : Cons.Responses.Info)
                 });
             }
             catch (Exception ex)
@@ -1279,6 +1368,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     JProperty = false
                 };
             }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                db.Dispose();
+            }
+            base.Dispose(disposing);
         }
 
     }

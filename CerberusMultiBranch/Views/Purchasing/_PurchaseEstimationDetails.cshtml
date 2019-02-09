@@ -152,7 +152,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("RemoveFromEstimation", "Purchases")', { branchId: branchId, productId: productId }, function (response) {
+        ExecuteAjax('@Url.Action("RemoveFromEstimation", "Purchasing")', { branchId: branchId, productId: productId }, function (response) {
             HideLoading(function () {
                 $("#divPurchaseDetails").html(response);
             });
@@ -163,7 +163,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("EditDetail", "Purchases")', { branchId: branchId, productId: productId }, function (response) {
+        ExecuteAjax('@Url.Action("EditDetail", "Purchasing")', { branchId: branchId, productId: productId }, function (response) {
             HideLoading(function ()
             {
                 ShowModal(response, 'static');

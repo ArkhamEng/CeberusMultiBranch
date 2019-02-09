@@ -21,12 +21,28 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public string Comment { get; set; }
 
         [Display(Name = "Días de Crédito")]
-        public double DaysToPay { get; set; }
+        public int DaysToPay { get; set; }
 
         [Display(Name = "Tipo de Compra")]
         public PType PurchaseType { get; set; }
 
+        [Display(Name = "Método de envío")]
+        public int ShipmentMethodId { get; set; }
+
+        [Display(Name = "Costo de envío")]
+        public double Freight { get; set; }
+
+        [Display(Name = "Descuento Global")]
+        public double Discount { get; set; }
+
+        [Display(Name = "Seguro")]
+        public double Insurance { get; set; }
+
+
         public SelectList PurchaseTypes { get; set; }
+
+     
+        public SelectList ShipmentMethodes { get; set; }
 
         public bool SearchProviderDisabled
         {

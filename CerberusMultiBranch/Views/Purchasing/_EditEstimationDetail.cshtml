@@ -86,20 +86,21 @@
 
             </div>
         </div>
-        <div class="panel-footer clearfix">
-            <div class="pull-right">
-                <button id="btnChangeQuantity" class="btn btn-primary  btn-sm" type="button" onclick="SetDetailChange('@Model.ProductId','@Model.BranchId')">
-                    <span class="glyphicon glyphicon-ok"></span>
-                    Aplicar
-                </button>
-                <button class="btn btn-danger btn-sm" type="button" onclick="HideModal(null,true)">
-                    <span class="fa fa-times"></span>
-                    Cancelar
-                </button>
-            </div>
+        
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button id="btnChangeQuantity" class="btn btn-primary  btn-sm" type="button" onclick="SetDetailChange('@Model.ProductId','@Model.BranchId')">
+                <span class="glyphicon glyphicon-ok"></span>
+                Aplicar
+            </button>
+            <button class="btn btn-danger btn-sm" type="button" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+                Cancelar
+            </button>
         </div>
     </div>
-
+    </div>
 
     <script>
 
@@ -157,7 +158,7 @@
 
             console.log(model);
 
-            ExecuteAjax('@Url.Action("SetDatailChange", "Purchases")', model, function (response) {
+            ExecuteAjax('@Url.Action("SetDatailChange", "Purchasing")', model, function (response) {
                 HideModLoading(function () {
                     $("#divPurchaseDetails").html(response);
 

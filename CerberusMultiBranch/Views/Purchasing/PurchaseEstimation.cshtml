@@ -4,7 +4,7 @@
 @using CerberusMultiBranch.Support
 @using CerberusMultiBranch.Models.Entities.Purchasing
 @{
-    ViewBag.Title = "Estimación de compra";
+    ViewBag.Title = "Elaboración de Pedido";
     ViewBag.SubTitle = "Captura de ordenes";
     ViewBag.Class = "fa fa-clipboard";
 }
@@ -49,21 +49,54 @@
             </div>
         </div>
 
-        <div class="form-group col-md-7">
-            @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+        <div class="form-group col-md-3">
+            @Html.LabelFor(m => m.ShipmentMethodId, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
-                @Html.EditorFor(model => model.Comment, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
-                @Html.ValidationMessageFor(model => model.Comment, "", new { @class = "text-danger" })
+                <span class="input-group-addon"><i class="fa fa-ship"></i></span>
+                @Html.DropDownListFor(model => model.ShipmentMethodId, Model.ShipmentMethodes, htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+            </div>
+        </div>
+
+     
+        <div class="form-group col-md-2">
+            @Html.LabelFor(m => m.Freight, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                @Html.EditorFor(model => model.Freight, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number" } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2">
+            @Html.LabelFor(m => m.Insurance, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                @Html.EditorFor(model => model.Insurance, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number" } })
             </div>
         </div>
 
         <div class="form-group col-md-2 col-md-offset-1">
             @Html.LabelFor(m => m.DaysToPay, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
                 @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type="number" } })
-                @Html.ValidationMessageFor(model => model.DaysToPay, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2">
+            @Html.LabelFor(m => m.Discount, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number", id="GlobalDiscount" } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-7">
+            @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-comment"></i></span>
+                @Html.EditorFor(model => model.Comment, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                @Html.ValidationMessageFor(model => model.Comment, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -114,7 +147,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("RemoveAll","Purchases")', {providerId: $("#ProviderId").val()}, function (response)
+        ExecuteAjax('@Url.Action("RemoveAll", "Purchasing")', {providerId: $("#ProviderId").val()}, function (response)
         {
             ShowNotify(response.Header, response.Result, response.Body, 3000);
             window.location = '@Url.Action("PurchaseEstimation","Purchases")';
@@ -123,40 +156,39 @@
 
     function ShowProductQuickSearch()
     {
-        ShowQuickSearch('@Url.Action("ShowRequiredProductSearch", "Purchases")', function (id, name, ftr) { }, function () {  }, { providerId: $("#ProviderId").val() });
+        ShowQuickSearch('@Url.Action("ShowRequiredProductSearch", "Purchasing")', function (id, name, ftr) { }, function () {  }, { providerId: $("#ProviderId").val() });
     }
 
     function GenerateOrders()
     {
-      
-        var model = { providerId: $("#ProviderId").val(), comment: $("#Comment").val(), purchaseTypeId: $("#PurchaseType").val(), daysToPay: $("#DaysToPay").val() };
 
-        if(model.comment.length < 5)
+        var model = {
+            ProviderId: $("#ProviderId").val(),
+            Comment: $("#Comment").val(),
+            PurchaseType: $("#PurchaseType").val(),
+            DaysToPay: $("#DaysToPay").val(),
+            Insurance: $("#Insurance").val(),
+            Freight: $("#Freight").val(),
+            Discount: $("#GlobalDiscount").val(),
+            ShipmentMethodId: $("#ShipmentMethodId").val(),
+        };
+
+        if(model.Comment.length < 5)
         {
             ShowNotify("Datos incorrectos","warning","Necesitas ingresar un comentario de 5 caracteres como mínimo",3000);
             return;
         }
-        console.log(model);
 
-        if (model.purchaseTypeId == '@Convert.ToInt16(PType.Credit)' && (!$.isNumeric(model.daysToPay) ||  parseInt(model.daysToPay) <= 0))
+        if (model.PurchaseTypeId == '@Convert.ToInt16(PType.Credit)' && (!$.isNumeric(model.DaysToPay) ||  parseInt(model.DaysToPay) <= 0))
         {
             ShowNotify("Datos incorrectos","warning","Necesitas ingresar los dias de crédito",3000);
             return;
         }
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("CreateOrders", "Purchases")', model, function (response)
+        ExecuteAjax('@Url.Action("CreateOrders", "Purchasing")', { model: model}, function (response)
         {
-            HideLoading(function ()
-            {
-                ShowNotify(response.Header, response.Result, response.Body, 3000);
-            });
-
-            $("#ProviderId").val(0);
-            $("#DaysToPay").val(0);
-            $("#PurchaseType").val('@Convert.ToInt16(PType.Credit)');
-            $("#Comment").val('');
-
+            window.location = '@Url.Action("PurchaseOrders", "Purchasing")';
         });
     }
 </script>

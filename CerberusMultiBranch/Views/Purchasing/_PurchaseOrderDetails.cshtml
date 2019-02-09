@@ -91,7 +91,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="7" rowspan="4">
+            <td colspan="6" rowspan="5">
                 <div class="col-md-12 form-group text-capitalize">
                     <h5>
                         @Html.Label("Observaciones", htmlAttributes: new { @class = "control-label" })<br />
@@ -103,7 +103,7 @@
                     </h5>
                 </div>
             </td>
-            <td>
+            <td colspan="2">
                 <h5><strong>Subtotal</strong></h5>
             </td>
             <td class="text-right">
@@ -112,7 +112,7 @@
             <td></td>
         </tr>
         <tr>
-            <td>
+            <td colspan="2">
                 <h5><strong>I.V.A</strong></h5>
             </td>
             <td class="text-right">
@@ -124,26 +124,39 @@
         </tr>
         <tr>
 
-            <td>
+            <td colspan="2">
                 <h5>
-                    <strong>Envío</strong>
+                    <strong>Envío y Seguro</strong>
                 </h5>
             </td>
             <td class="text-right">
                 <h5>
-                    @Model.First().PurchaseOrder.Freight.ToMoney()
+                    @Model.First().PurchaseOrder.Expenses
                 </h5>
             </td>
             <td></td>
         </tr>
         <tr>
 
-            <td>
+            <td colspan="2">
+                <h5>
+                    <strong>Descuento</strong>
+                </h5>
+            </td>
+            <td class="text-right">
+                <h5 id="tdTotalDue">
+                    @Model.First().PurchaseOrder.DiscountAmount
+                </h5>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="2">
                 <h5>
                     <strong>Total</strong>
                 </h5>
             </td>
-            <td class="text-right">
+            <td class="text-right" >
                 <h5 id="tdTotalDue">
                     @Model.First().PurchaseOrder.TotalDue.ToMoney()
                 </h5>
@@ -187,7 +200,7 @@
             detail = { DetailId: parseInt(id) };
         }
 
-        ExecuteAjax('@Url.Action("ReceiveProduct", "Purchases")', { item: detail }, function (response) {
+        ExecuteAjax('@Url.Action("ReceiveProduct", "Purchasing")', { item: detail }, function (response) {
             ShowModal(response, 'static');
         });
     }

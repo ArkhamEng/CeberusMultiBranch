@@ -57,21 +57,32 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime? DeliveryDate { get; set; }
 
+        [Display(Name = "SubTotal")]
         [DataType(DataType.Currency)]
         public double SubTotal { get; set; }
 
+        [Display(Name = "IVA")]
         public double TaxRate { get; set; }
 
+        [Display(Name = "Monto IVA")]
         [DataType(DataType.Currency)]
         public double TaxAmount { get; set; }
 
+        [Display(Name = "Total")]
         [DataType(DataType.Currency)]
         public double TotalDue { get; set; }
 
+        [Display(Name = "Condiciones")]
         public int DaysToPay { get; set; }
 
         [Display(Name = "Costo de Envío")]
         public double Freight { get; set; }
+
+        [Display(Name = "Seguro")]
+        public double Insurance { get; set; }
+
+        [Display(Name = "Descuento")]
+        public double Discount { get; set; }
 
         [Display(Name = "Creado")]
         public DateTime InsDate { get; set; }
@@ -110,6 +121,26 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
 
         #region NotMapped
+
+        public string DiscountAmount
+        {
+            get
+            {
+                var sub = this.SubTotal + this.TaxAmount;
+
+                if (this.Discount > Cons.Zero && this.Discount < Cons.OneHundred)
+                    return (sub * (this.Discount / Cons.OneHundred)).ToMoney();
+                else if (this.Discount == Cons.OneHundred)
+                    return sub.ToMoney();
+                else
+                    return ((double)Cons.Zero).ToMoney();
+            }
+        }
+
+        public string Expenses
+        {
+            get { return (this.Freight + Insurance).ToMoney(); }
+        }
 
         public bool CanSend
         {

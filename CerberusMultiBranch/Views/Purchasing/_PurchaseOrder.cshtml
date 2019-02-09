@@ -99,6 +99,29 @@
             </div>
         </div>
 
+        <div class="form-group col-md-2">
+            @Html.LabelFor(model => model.Insurance, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                @Html.EditorFor(model => model.Insurance, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2">
+            @Html.LabelFor(model => model.Discount, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true, id="txtDiscount" } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-2">
+            @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-file-excel-o"></i></span>
+                @Html.EditorFor(model => model.Bill, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+        </div>
        
     </div>
     <div class="panel-footer">
@@ -211,7 +234,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("BeginAction", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response)
+        ExecuteAjax('@Url.Action("BeginAction", "Purchasing")', { id: $("#PurchaseOrderId").val() }, function (response)
         {
             HideLoading(function ()
             {
@@ -231,7 +254,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("SendPurchaseOrder", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response)
+        ExecuteAjax('@Url.Action("SendPurchaseOrder", "Purchasing")', { id: $("#PurchaseOrderId").val() }, function (response)
         {
             HideLoading(function () {
                 ShowNotify(response.Header, response.Result, response.Body, 3000);
@@ -246,7 +269,7 @@
     {
         ShowLoading();
 
-        ExecuteAjax('@Url.Action("ReloadPurchaseOrder", "Purchases")', { id: $("#PurchaseOrderId").val() }, function (response) {
+        ExecuteAjax('@Url.Action("ReloadPurchaseOrder", "Purchasing")', { id: $("#PurchaseOrderId").val() }, function (response) {
             HideLoading(function () {
                 $("#divPurchaseOrder").html(response);
             });

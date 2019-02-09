@@ -4,7 +4,7 @@
 <nav id="sidebar">
     <!-- Sidebar Header -->
     <div class="sidebar-header bgSidebar" style="max-height:100px">
-        <div class="col-md-8 col-md-offset-2">
+        <div style="width:50%; margin:auto">
             <div class="imageSide">
                 <img src="@Url.Action("GetPicture", "Json")" class="img img-responsive img-rounded" onmouseover="SetPointer(this)" title="Cambiar foto de perfil" style="width:100%"
                      onclick="ShowLoading(); window.location = '@Url.Action("AddProfilePicture", "Manage")'" />
@@ -95,38 +95,32 @@
             }
 
             <li>
-                <a href="#InventorySubMenu" data-toggle="collapse" aria-expanded="false">
-                    &nbsp;Inventario<span class="fa fa-dropbox" style="float:left" />
+                <a href="#PurchasingSubMenu" data-toggle="collapse" aria-expanded="false">
+                    &nbsp;Compras<span class="fa fa-shopping-cart" style="float:left" />
                 </a> 
 
-                <ul class="collapse list-unstyled" id="InventorySubMenu">
+                <ul class="collapse list-unstyled" id="PurchasingSubMenu">
                     <li>
-                        <a href="/Purchases/PurchaseEstimation" onclick="ShowLoading()">
-                            &nbsp;Estimacion de Compra<span class="fa fa-clipboard" style="float:left" />
+                        <a href="/Purchasing/PurchaseEstimation" onclick="ShowLoading()">
+                            &nbsp;Elaborar pedido<span class="fa fa-clipboard" style="float:left" />
                         </a>
                     </li>
                     <li>
-                        <a href="/Inventory/PurchaseOrders" onclick="ShowLoading()">
-                            &nbsp;Ordenes de compra<span class="fa fa-file-text-o" style="float:left" />
+                        <a href="/Purchasing/PurchaseOrders" onclick="ShowLoading()">
+                            &nbsp;Ordenes de compra<span class="fa fa-files-o" style="float:left" />
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="/Purchases/Report" onclick="ShowLoading()">
+                            &nbsp;Facturas de compra<span class="fa fa-file-pdf-o" style="float:left" />
                         </a>
                     </li>
                 </ul>
             </li>
 
 
-            @if (User.IsInRole("Capturista") || User.IsInRole("Supervisor"))
-            {
-              
-
-                <li>
-                    <a href="#purchaseSm" data-toggle="collapse" aria-expanded="false">&nbsp;Compras<span class="fa fa-shopping-basket" style="float:left" /></a>
-                    <ul class="collapse list-unstyled" id="purchaseSm">
-                        <li><a href="/Purchases/Report" onclick="ShowLoading()">&nbsp;Reporte de compras<span class="fa fa-file-text" style="float:left" /></a></li>
-                    </ul>
-                </li>            
-            }
-
-
+            
             @if (User.IsInRole("Administrador"))
             {
                 <li>

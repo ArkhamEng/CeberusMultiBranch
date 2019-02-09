@@ -37,10 +37,13 @@
                     <th>
                         @Html.DisplayName("Precio Compra")
                     </th>
-
                     <th>
-                        @Html.DisplayName("Maximo")
+                        @Html.DisplayName("Mínimo")
                     </th>
+                    <th>
+                        @Html.DisplayName("Máximo")
+                    </th>
+                  
                     <th>
                         @Html.DisplayName("Actual")
                     </th>
@@ -69,9 +72,15 @@
                         @Html.DisplayFor(modelItem => item.BuyPrice)
                     </td>
                     <td class="text-uppercase  text-center">
+                        @Html.DisplayFor(modelItem => item.MinQuantity)
+                        @Html.HiddenFor(modelItem => item.MinQuantity)
+                    </td>
+
+                    <td class="text-uppercase  text-center">
                         @Html.DisplayFor(modelItem => item.MaxQuantity)
                         @Html.HiddenFor(modelItem => item.MaxQuantity)
                     </td>
+
 
                     <td class="text-lowercase text-center">
                         @Html.DisplayFor(modelItem => item.Quantity)
@@ -87,7 +96,6 @@
                     <td>
                         <button type="button" class="btn btn-primary btn-xs" onclick="ProductSelected(this)" title="has click para agregar esta partida a una orden de compra" disabled='@item.AddToPurchaseDisabled'>
                             <span class="fa fa-plus"></span>
-                            Agregar
                         </button>
                     </td>
                 </tr>

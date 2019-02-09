@@ -141,7 +141,12 @@ a[aria-expanded="true"]::before {
     }
 }
 
-@media  screen and (max-width : 1950px) 
+.dtContainer
+{
+    width:100%
+}
+
+@media (max-width : 1950px) 
 {
     .dtContainer 
     {
@@ -150,21 +155,20 @@ a[aria-expanded="true"]::before {
 }
 
 
-@media  screen and (max-width : 1600px) 
+@media (max-width : 1600px) 
 {
     .dtContainer 
     {
-        width: 1300px;
+        width: 1350px;
+        
     }
 }
 
-@media  screen and (max-width : 1400px) 
+@media (max-width : 1400px) 
 {
     .dtContainer
     {
-        width: 100%;
-        min-width:1130px;
-        
+       width:1100px; 
     }
 }
 
@@ -172,42 +176,43 @@ a[aria-expanded="true"]::before {
 {
     .dtContainer 
     {
-        width: 100%;
-        min-width: 870px;
-        
+        width: 870px;
     }
 }
 
-@media  screen and (max-width : 979px) 
+@media (max-width : 979px) 
 {
     .dtContainer 
     {
-        width: 100%;
-        min-width: 700px;
-        background-color:red;
+        width: 700px;
+    }
+      #sidebar 
+    {
+        margin-left: -200px;
+    }
+
+    #sidebar.active 
+    {
+        margin-left: 0;
     }
 }
 
-@media only screen and (max-width : 767px) 
+@media (max-width : 767px) 
 {
      .dtContainer 
     {
-        width: 767px;
-        
+        width: 600px;
+        background-color:red
     }
 }
 
-@media only screen and (max-width : 480px) 
+@media (max-width : 480px) 
 {
       .dtContainer 
     {
-        width: 480px;
-        
+        width: 300px;
     }
 }
-
-
-
 
 
 /********************/

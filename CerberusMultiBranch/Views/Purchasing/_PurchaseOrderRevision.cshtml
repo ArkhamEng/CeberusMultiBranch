@@ -48,7 +48,7 @@
         @if (Model.PurchaseStatusId == PStatus.Authorized || Model.PurchaseStatusId == PStatus.SendingFailed)
         {
             <div class="form-group col-md-12">
-                @Html.LabelFor(model => model.Provider.Email, htmlAttributes: new { @class = "control-label" })
+                @Html.LabelFor(model => model.Provider.Email, htmlAttributes: new { @class = "control-label" }) <a class="text-danger">(puedes usar varios separados por coma)</a>
                 <div class="input-group">
                     <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
                     @Html.EditorFor(model => model.Provider.Email, new { htmlAttributes = new { @class = "form-control text-lowecase input-sm", autocomplete = "off" } })
@@ -74,7 +74,21 @@
                 </div>
             </div>
 
-          
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.Insurance, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                    @Html.EditorFor(model => model.Insurance, new { htmlAttributes = new { @class = "form-control text-lowecase input-sm", autocomplete = "off", id = "addInsurance" } })
+                </div>
+            </div>
+
+            <div class="form-group col-md-4">
+                @Html.LabelFor(model => model.Discount, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                    @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-lowecase input-sm", autocomplete = "off", id = "addDiscount" } })
+                </div>
+            </div>
         }
 
 
@@ -167,7 +181,7 @@
 
         ShowModLoading();
 
-        ExecuteAjax('@Url.Action("SetAction", "Purchases")', model, function (response) {
+        ExecuteAjax('@Url.Action("SetAction", "Purchasing")', model, function (response) {
             HideModLoading(function () {
                 ShowNotify(response.Header, response.Result, response.Body, 3000);
 
@@ -195,9 +209,17 @@
 
         ShowModLoading();
 
-        var model = { items: ReceivedDetails, purchaseOrderId: id, comment: $("#txtComment").val(), shipMethodId: $("#ShipMethodId").val(), freight: $("#addFreight").val() };
+        var model = {
+            items: ReceivedDetails,
+            purchaseOrderId: id,
+            comment: $("#txtComment").val(),
+            shipMethodId: $("#ShipMethodId").val(),
+            freight: $("#addFreight").val(),
+            discount: $("#addDiscount").val(),
+            insurance: $("#addInsurance").val(),
+        };
 
-        ExecuteAjax('@Url.Action("CompleateReception", "Purchases")', model, function (response)
+        ExecuteAjax('@Url.Action("CompleateReception", "Purchasing")', model, function (response)
         {
             HideModLoading(function ()
             {

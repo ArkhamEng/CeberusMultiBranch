@@ -1,0 +1,128 @@
+﻿@model IEnumerable<PurchaseOrder>
+@using CerberusMultiBranch.Models.Entities.Purchasing
+
+@{
+    ViewBag.Title = "Ordenes de Compra";
+    ViewBag.Class = "fa fa-files-o";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<hr />
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="form-group col-md-3">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-industry"></i></span>
+                  @Html.DropDownList("BranchId", (SelectList)ViewBag.Branches, "Sucursal", new { @class = "form-control input-sm" })
+                </div>
+            </div>
+
+            <div class="form-group col-md-3">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                    @Html.TextBox("Folio", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Folio" })
+                </div>
+            </div>
+
+          
+
+            <div class="form-group col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-signal"></i></span>
+                   @Html.DropDownList("PurchaseStatusId", (SelectList)ViewBag.PurchaseStatuses, "Status", new { @class = "form-control input-sm" })
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary btn-sm" type="button"  title="Buscar Ordenes de compra" onclick="SearchPurchaseOrders()">
+                            <span class="glyphicon glyphicon-search"></span>
+                            Buscar
+                        </button>
+                    </span>
+                </div>
+            </div>
+         
+            <div class="form-group col-md-6">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-handshake-o"></i></span>
+                    @Html.TextBox("Provider", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Nombre del proveedor" })
+                </div>
+            </div>
+
+            <div class="form-group col-md-2">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+                    @Html.TextBox("BeginDate", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Fecha Inicial" })
+                </div>
+            </div>
+
+            <div class="form-group col-md-4">
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+                    @Html.TextBox("EndDate", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Fecha Final" })
+
+                    <div class="input-group-btn">
+                        <button class="btn btn-warning btn-sm" type="button" onclick="Export()">
+                            <span class="fa fa-file-excel-o"></span>
+                            Exportar a excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+          
+        </div>
+    </div>
+    <div id="tbButtons" class="input-group-btn hidden"></div>
+</div>
+
+<div class="panel panel-default">
+    <div id="divPurchaseOrderList" class="panel panel-body dtContainer">
+            @Html.Partial("_PurchaseOrderList", Model)
+    </div>
+</div>
+
+<script>
+    $(document).ready(function ()
+    {
+        //$(".buttons-copy").addClass("btn-sm");
+        //$(".buttons-copy").removeClass("btn-default");
+        //$(".buttons-copy").addClass("btn-info");
+
+        //$(".buttons-excel").addClass("btn-sm");
+        //$(".buttons-excel").removeClass("btn-default");
+        //$(".buttons-excel").addClass("btn-warning");
+
+        //$(".dt-buttons").removeClass("btn-group");
+
+
+        $("#BeginDate").mask("99/99/9999");
+        $("#EndDate").mask("99/99/9999");
+    });
+
+    function Export()
+    {
+        $(".buttons-excel").click();
+    }
+
+    function SearchPurchaseOrders()
+    {
+        ShowLoading('static');
+
+        var filters =
+            {
+                branchId: $("#BranchId").val(),
+                folio: $("#Folio").val(),
+                purchaseStatusId: $("#PurchaseStatusId").val(),
+                provider: $("#Provider").val(),
+                beginDate: $("#BeginDate").val(),
+                endDate: $("#EndDate").val(),
+            }
+
+        ExecuteAjax('@Url.Action("SearchPurchaseOrders", "Purchasing")', filters, function (response)
+        {
+            HideLoading(function ()
+            {
+                $("#divPurchaseOrderList").html(response);
+            });
+        });
+    }
+</script>

@@ -16,7 +16,6 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public int PurchaseOrderHistoryId { get; set; }
 
         [Display(Name = "Comentario")]
-        [MaxLength(100)]
         public string Comment { get; set; }
 
         [Display(Name = "Estado de Compra")]

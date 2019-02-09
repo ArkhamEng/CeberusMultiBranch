@@ -6,8 +6,7 @@
 }
 
 <div class="navbar navbar-inverse navbar-fixed-top" style="background-color:#c9302c">
-    <div class="col-xs-10 col-sm-8 col-md-2  pull-left">
-        <div class="col-xs-6 col-sm-4 col-md-12">
+    <div class="pull-left" style="width:195px">
             @if (!User.Identity.IsAuthenticated || User.Identity.GetBranchId() != 2)
             {
                 <img src="~/Content/Images/logoAb.png" class="img-responsive" id="sidebarCollapse"
@@ -19,8 +18,6 @@
                     <img src="~/Content/Images/rebilogo.png" class="img-responsive" id="sidebarCollapse" onmouseover="SetPointer(this)" />
                 </div>
             }
-
-        </div>
     </div>
     <div class="container">
         <div class="navbar-header">
