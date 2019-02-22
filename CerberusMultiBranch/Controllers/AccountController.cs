@@ -314,11 +314,11 @@ namespace CerberusMultiBranch.Controllers
 
         [Authorize(Roles = "Administrador")]
         [HttpPost]
-        public ActionResult ResetPassword(string userId)
+        public ActionResult ResetPassword(string id)
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                var user = db.Users.Find(userId);
+                var user = db.Users.Find(id);
 
                 if(user != null)
                 {
@@ -326,12 +326,23 @@ namespace CerberusMultiBranch.Controllers
                     db.Entry(user).State = EntityState.Modified;
 
                     db.SaveChanges();
-                    
-                    return Json(new { Result = "OK", Message = "La contraseña fue cambiada, por seguridad inicie sesión cuanto antes y establesca una nueva" });
+
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Success,
+                        Code = Cons.Responses.Codes.Success,
+                        Header="Contraseña reiniciada",
+                        Body = "La contraseña fue cambiada, por seguridad inicie sesión cuanto antes y establesca una nueva" });
                 }
                 else
                 {
-                    return Json(new { Result = "Error de datos", Message = "El Usuario no existe" });
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.RecordNotFound,
+                        Header = "Error de datos",
+                        Body = "El Usuario no existe"
+                    });
                 }
             }
         }

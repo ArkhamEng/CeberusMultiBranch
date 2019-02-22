@@ -85,6 +85,13 @@
                             <span class="fa fa-plus-circle"></span>
                         </button>
                     }
+                    else if (item.PurchaseOrder.CanViewDetail)
+                    {
+                        <button class="btn btn-default btn-sm" type="button" onclick="ViewDetail('@item.PurchaseOrderDetailId')" title="Ver el detalle de la recepción">
+                            <span class="fa fa-eye"></span>
+                        </button>
+                    }
+
                 </th>
             </tr>
         }
@@ -201,6 +208,13 @@
         }
 
         ExecuteAjax('@Url.Action("ReceiveProduct", "Purchasing")', { item: detail }, function (response) {
+            ShowModal(response, 'static');
+        });
+    }
+
+    function ViewDetail(id)
+    {
+        ExecuteAjax('@Url.Action("ViewDetail", "Purchasing")', { id: id }, function (response) {
             ShowModal(response, 'static');
         });
     }

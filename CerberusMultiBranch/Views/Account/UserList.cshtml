@@ -133,18 +133,12 @@
         Paginate("#tbUsers", 10, true, "#txtName", false, "#dtUserButtons");
     });
 
-    function BeginReset(id) {
-        $("#userId").val(id);
-        ShowConfirm("Restaurar contraseña!",
-        "Esta acción restaurara la contraseña a su valor por defecto, ¿deseas continuar?", true, Reset);
+    function BeginReset(id)
+    {
+        
+        ShowConfirm("Esta acción restaurara la contraseña a su valor por defecto, ¿deseas continuar?",
+            '@Url.Action("ResetPassword", "Account")', id, null);
+    
     }
 
-    function Reset() {
-        ExecuteAjax('@Url.Action("ResetPassword")', { userId: $("#userId").val() }, function (response) {
-            if (response.Result != "OK")
-                ShowMessage(response.Result, response.Message, 'warning');
-            else
-                ShowMessage(response.Result, response.Message, 'success');
-        });
-    }
 </script>

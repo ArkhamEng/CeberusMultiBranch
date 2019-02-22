@@ -126,12 +126,11 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         {
             get
             {
-                var sub = this.SubTotal + this.TaxAmount;
+                var sub = (this.SubTotal + this.TaxAmount + this.Freight + this.Insurance);
 
-                if (this.Discount > Cons.Zero && this.Discount < Cons.OneHundred)
+                if (this.Discount > Cons.Zero)
                     return (sub * (this.Discount / Cons.OneHundred)).ToMoney();
-                else if (this.Discount == Cons.OneHundred)
-                    return sub.ToMoney();
+             
                 else
                     return ((double)Cons.Zero).ToMoney();
             }
@@ -179,6 +178,16 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
                          (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador")) );
             }
         }
+
+        public bool CanViewDetail
+        {
+            get
+            {
+                return ((this.PurchaseStatusId >= PStatus.Watting && 
+                    (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador"))));
+            }
+        }
+
 
         #endregion
 

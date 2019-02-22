@@ -31,6 +31,8 @@ namespace CerberusMultiBranch.Support
             public const string PurchasingLogo = "PurchasingLogo";
 
             public const string PurchasingSubject = "PurchasingSubject";
+
+            public const string PurchasingCC = "PurchasingCC";
         }
     }
 

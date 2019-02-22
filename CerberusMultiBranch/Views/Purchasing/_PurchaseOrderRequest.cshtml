@@ -2,16 +2,56 @@
 @using CerberusMultiBranch.Support
 
 <html>
+<head>
+    <style>
+        .CellHeader {
+            color: #fff;
+            background-color: #c9302c;
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+            border-color: black;
+        }
+
+        .CellContent {
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+        }
+
+        .OrderHeader  {
+            font-size: 30px;
+            color: #fff;
+            background-color: #c9302c;
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+            border-color: black;
+        }
+
+        .Footer
+        {
+            border-bottom:1px;
+            border-bottom-style:solid;
+            font-size:20px;
+        }
+    </style>
+</head>
 
 <body>
 
 
 
-    <table style="border:1px; border-style:double; width:936px">
+    <table style="border:1px; border-style:solid; width:936px">
         <thead>
             <tr>
-                <th colspan="6">
+                <th colspan="7">
                     <table style="width:100%">
+                        <tr>
+                            <td colspan="3" class="text-center OrderHeader">
+                                <label>Orden de compra</label>
+                            </td>
+                        </tr>
                         <tr>
                             <td width="300px">
                                 <table style="width:100%">
@@ -41,31 +81,66 @@
                             <td width="244px">
                                 <table style="width:100%;">
                                     <tr>
-                                        <td colspan="2" class="text-center" style="border:1px; border-style:solid;">
-                                            <label>Orden de compra</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center" style="border:1px; border-style:solid;">
+                                        <td class="text-center CellHeader">
                                             <label>Folio</label>
                                         </td>
-                                        <td class="text-center" style="border:1px; border-style:solid;">
+                                        <td class="text-center CellHeader">
                                             <label>Fecha</label>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="text-center" style="border:1px; border-style:solid;">
+                                        <td class="text-center CellContent">
                                             @Model.Folio
                                         </td>
-                                        <td class="text-center" style="border:1px; border-style:solid;">
+                                        <td class="text-center CellContent">
                                             @DateTime.Now.TodayLocal().ToString("dd/MM/yyyy")
                                         </td>
                                     </tr>
-
                                     <tr>
-                                        <td colspan="2" class="text-center" style="border:1px; border-style:solid;">
-                                            <label>Tipo de Compra:</label>
-                                            <a>@Model.PurchaseType.Name.</a>
+                                        <td colspan="2" class="text-center CellHeader">
+                                            Condiciones de Pago
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-center CellContent">
+                                            <strong>@Model.PurchaseType.Name.</strong>
+                                        </td>
+                                        <td class="text-center CellContent">
+                                            <strong>@Model.DaysToPay días</strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <table style="width:100%">
+                                    <tr>
+                                        <td class="CellHeader">
+                                            Metodo de envío
+                                        </td>
+                                        <td class="CellHeader">
+                                            Costo de Envío
+                                        </td>
+                                        <td class="CellHeader">
+                                            Seguro
+                                        </td>
+                                        <td class="CellHeader">
+                                            Descuento
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="CellContent">
+                                            @Model.ShipMethod.Name
+                                        </td>
+                                        <td class="CellContent">
+                                            @Model.Freight.ToMoney()
+                                        </td>
+                                        <td class="CellContent">
+                                            @Model.Insurance.ToMoney()
+                                        </td>
+                                        <td class="CellContent">
+                                            @Model.Discount %
                                         </td>
                                     </tr>
                                 </table>
@@ -75,67 +150,110 @@
                 </th>
             </tr>
         </thead>
+
         <tbody>
-            <tr><td colspan="6" style="height:50px"></td></tr>
             <tr>
-                <td style="border:1px; border-style:solid"> <strong>Código</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Descripción</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Unidad</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Costo</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Descuento</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Cantidad</strong></td>
-                <td style="border:1px; border-style:solid"><strong>Sub-Total</strong></td>
+                <td colspan="7" style="height:50px"></td>
+            </tr>
+            <tr>
+                <td class="CellHeader" align="center">
+                    <strong>Código</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Descripción</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Unidad</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Costo</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Descuento</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Cantidad</strong>
+                </td>
+                <td class="CellHeader" align="center">
+                    <strong>Sub-Total</strong>
+                </td>
             </tr>
             @foreach (var item in Model.PurchaseOrderDetails)
             {
                 <tr>
-                    <td style="border:1px; border-style:double">
-                        @Html.DisplayFor(modelItem => item.ProviderCode)
+                    <td class="CellContent" width="15%">
+                        @item.ProviderCode.ToUpper()
                     </td>
-                    <td style="border:1px; border-style:double">
-                        @Html.DisplayFor(modelItem => item.Product.Name)
+                    <td class="CellContent" width="40%">
+                        @(item.Product.Name.Length > 50 ? item.Product.Name.Substring(0,50).ToUpper() :item.Product.Name.ToUpper() )
                     </td>
-                    <td style="border:1px; border-style:double">
+                    <td class="CellContent" width="10%">
                         @item.Product.Unit
                     </td>
 
-                    <td style="border:1px; border-style:double">
+                    <td class="CellContent" width="10%" align="center">
                         @Html.DisplayFor(modelItem => item.UnitPrice)
                     </td>
-                    <td style="border:1px; border-style:double">
-                        @Html.DisplayFor(modelItem => item.Discount)
+                    <td class="CellContent" width="10%" align="center">
+                        @Html.DisplayFor(modelItem => item.Discount) %
                     </td>
-                    <td style="border:1px; border-style:double">
+                    <td class="CellContent" width="10%" align="center">
                         @Html.DisplayFor(modelItem => item.OrderQty)
                     </td>
 
-                    <td style="border:1px; border-style:double">
+                    <td class="CellContent" width="15%" align="right">
                         @Html.DisplayFor(modelItem => item.LineTotal)
                     </td>
-
                 </tr>
             }
         </tbody>
 
         <tfoot>
             <tr>
-                <td colspan="5" rowspan="3"></td>
-                <td><strong>Sub-Total</strong></td>
-                <td>@Model.SubTotal.ToMoney()</td>
-                <td></td>
+                <td colspan="4" rowspan="5" class="CellContent" style="font-size:15px" valign="top">
+                    <strong>Observaciones</strong><br />
+                    @Model.Comment.ToUpper() <br />
+
+                    Envíada por: @Model.UpdUser.ToUpper()
+                </td>
+                <td colspan="2" class="Footer">
+                    <strong>SubTotal</strong>
+                </td>
+                <td class="Footer" align="right">
+                    @Model.SubTotal.ToMoney()
+                </td>
             </tr>
             <tr>
-                <td><strong>I.V.A</strong></td>
-                <td>
+                <td colspan="2" class="Footer">
+                    <strong>I.V.A</strong>
+                </td>
+                <td align="right" class="Footer">
                     @Model.TaxAmount.ToMoney()
                 </td>
-                <td></td>
             </tr>
             <tr>
-
-                <td><strong>Total</strong></td>
-                <td>@Model.TotalDue.ToMoney()</td>
-                <td></td>
+                <td colspan="2" class="Footer">
+                    <strong>Envío y Seguro</strong>
+                </td>
+                <td align="right" class="Footer">
+                    @Model.Expenses
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="Footer">
+                    <strong>Descuento</strong>
+                </td>
+                <td align="right" class="Footer">
+                    @Model.DiscountAmount
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" class="Footer">
+                    <strong>Total</strong>
+                </td>
+                <td align="right" class="Footer">
+                    @Model.TotalDue.ToMoney()
+                </td>
             </tr>
         </tfoot>
     </table>

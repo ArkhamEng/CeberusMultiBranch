@@ -27,7 +27,7 @@
 
         @Html.HiddenFor(m => m.Id)
         <div class="panel panel-danger">
-            <div class="panel-body">
+            <div class="panel-body dtContainer">
                 <div class="form-group col-md-5">
                     @Html.LabelFor(m => m.Email, new { @class = "control-label" })
                     <div class="input-group">
@@ -56,15 +56,16 @@
                 </div>
             </div>
             <div class="panel-footer clearfix">
-                <div class="btn-group col-md-10">
-                    <button class="btn btn-primary" onclick="ShowLoading(); window.location='@Url.Action("UserList")'" 
+               
+                    <button class="btn btn-default" onclick="ShowLoading(); window.location='@Url.Action("UserList")'" 
                             type="button">
                         <span class="fa fa-search-plus"></span>
+                        Volver a búsqueda
                     </button>
-                    <button class="btn btn-success" type="submit" onclick="ShowLoading()">
+                    <button class="btn btn-primary" type="submit" onclick="ShowLoading()">
                         <span class="glyphicon glyphicon-floppy-disk"></span>
+                        Guardar
                     </button>
-                </div>
             </div>
         </div>
 

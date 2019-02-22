@@ -53,6 +53,8 @@ namespace CerberusMultiBranch.Support
             foreach (var t in to)
                 message.To.Add(new MailAddress(t));
 
+            foreach (var c in CC)
+                message.CC.Add(c);
 
             message.Subject = subject;
 

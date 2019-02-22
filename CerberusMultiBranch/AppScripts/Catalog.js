@@ -278,17 +278,25 @@ function SubmitProduct(SuccessCallBack, form, idField)
 }
 
 
-function ShowConfirm(text, url, id, CompleatedCallBack) {
+function ShowConfirm(text, url, id, CompleatedCallBack)
+{
 
     $("#ConfirmText").html(text);
 
-    $("#ConfirmAccept").off('click').click(function () {
-        HideConfirm(function () {
+    $("#ConfirmAccept").off('click').click(function ()
+    {
+        HideConfirm(function ()
+        {
             ShowLoading();
 
-            ExecuteAjax(url, { id: id }, function (response) {
-                HideLoading(function () {
-                    if (CompleatedCallBack != null && CompleatedCallBack != 'undefined' && response.Code == 200) {
+            console.log("url:" + url + "Id:" + id);
+
+            ExecuteAjax(url, { id: id }, function (response)
+            {
+                HideLoading(function ()
+                {
+                    if (CompleatedCallBack != null && CompleatedCallBack != 'undefined' && response.Code == 200)
+                    {
                         CompleatedCallBack();
                     }
 
@@ -305,8 +313,10 @@ function ShowConfirm(text, url, id, CompleatedCallBack) {
     $("#ModalConfirm").modal({ backdrop: 'static' });
 }
 
-function HideConfirm(callback) {
-    $("#ModalConfirm").off("hidden.bs.modal").on("hidden.bs.modal", function (e) {
+function HideConfirm(callback)
+{
+    $("#ModalConfirm").off("hidden.bs.modal").on("hidden.bs.modal", function (e)
+    {
         if (callback != null)
             callback();
     });

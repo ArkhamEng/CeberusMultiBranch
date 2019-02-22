@@ -38,7 +38,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [Display(Name = "Seguro")]
         public double Insurance { get; set; }
 
-
+     
         public SelectList PurchaseTypes { get; set; }
 
      

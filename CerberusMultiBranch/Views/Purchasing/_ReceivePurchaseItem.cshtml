@@ -123,6 +123,11 @@
             <span class="fa fa-check"></span>
             Aceptar
         </button>
+
+        <button class="btn btn-sm btn-danger pull-right" type="button" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+            Cerrar
+        </button>
     </div>
 </div>
 
@@ -134,13 +139,11 @@
 
         if ('@Model.ReceiveDisabled' == 'False')
             $("#ReceivedQty").attr("readonly", false);
-
-        if ('@Model.ComplementDisabled' == 'False')
-            $("#ComplementQty").attr("readonly", false);
     });
 
 
-    function SetReceiveQty(input) {
+    function SetReceiveQty(input)
+    {
         var received = parseFloat($("#ReceivedQty").val());
 
         if (received < 0) {

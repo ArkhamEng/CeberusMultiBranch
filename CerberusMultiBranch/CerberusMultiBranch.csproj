@@ -1062,6 +1062,7 @@
     <Content Include="Views\Purchasing\_EditEstimationDetail.cshtml" />
     <Content Include="Views\Purchasing\PurchaseOrders.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderList.cshtml" />
+    <Content Include="Views\Purchasing\_ReceptionDetail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
