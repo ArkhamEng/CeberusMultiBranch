@@ -529,8 +529,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //validaciones de crédito
                 if (type == TransactionType.Credito)
                 {
+                    var dt = DateTime.Now.TodayLocal();
+
                     //verifico si el cliente tiene alguna venta a credito pendiente de pago
-                    var pendingSales = db.Sales.Where(s => s.Expiration < DateTime.Now.TodayLocal() && 
+                    var pendingSales = db.Sales.Where(s => s.Expiration < dt && 
                                        s.TransactionType == TransactionType.Credito && s.Status == TranStatus.Reserved);
 
                     if(pendingSales != null && pendingSales.Count() > Cons.Zero)
@@ -774,7 +776,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 });
 
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {

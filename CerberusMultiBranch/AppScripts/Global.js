@@ -5,6 +5,7 @@
 });
 
 
+
 function GetCurrency(value)
 {
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
@@ -153,6 +154,47 @@ function ExecuteAjax(url, parameters, callback, errorCallBack)
     });
 }
 
+
+function SubmitAjax(url, formData, callback, errorCallBack)
+{
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function (response)
+        {
+            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200) {
+                HideLoading();
+                HideModLoading();
+                ShowNotify(response.Header, response.Result, response.Body, 3500);
+
+                switch (response.Code) {
+                    case 401:
+                        window.location = response.Extra;
+                        break;
+                }
+            }
+            else {
+                HideLoading();
+                HideModLoading();
+                callback(response);
+            }
+        },
+        error: function ()
+        {
+            HideLoading();
+            ShowNotify("Error Inesperado!", "danger", "ocurrio un error, quiza has perdido la conexion a internet!", 3500);
+
+            if (errorCallBack != null)
+                errorCallBack();
+        }
+    });
+}
+
+
 //DROP DOWN CASCADE
 function SetCascade(ddlParent, ddlChild, url) {
     $(ddlParent).unbind('change').change(function (e) {
@@ -274,9 +316,13 @@ function ShowModal(html, backdrop, size, closeCallback)
 {
     $("#ModalDialog").removeClass('modal-sm');
     $("#ModalDialog").removeClass('modal-lg');
+    $("#ModalDialog").removeClass('modal-ul');
 
     if (size == 'lg')
         $("#ModalDialog").addClass('modal-lg');
+
+    if (size == 'ul')
+        $("#ModalDialog").addClass('modal-ul');
 
     if (size == 'sm')
         $("#ModalDialog").addClass('modal-sm');

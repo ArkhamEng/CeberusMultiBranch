@@ -1,0 +1,104 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
+@using CerberusMultiBranch.Support
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <button type="button" class="close" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span>
+        </button>
+        <div class="modal-title">
+            <span class="fa fa-edit" style="float:left">
+            </span>
+            Edición de partida
+        </div>
+    </div>
+    <div class="panel-body panel-group">
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-md-12 text-uppercase">
+                    <h4 class="text-center">
+                        <strong>Cod. Int :</strong> @Model.Code<br />
+                        <strong>Cod. Prov:</strong> @Model.ProviderCode<br />
+                    </h4>
+                </div>
+                <div class="col-md-12 text-center text-uppercase">
+                    <h5>
+                        @Model.Name<br />
+                        <strong>Marca </strong> @Model.TradeMark
+                    </h5>
+                </div>
+            </div>
+        </div>
+        @Html.HiddenFor(m => Model.ProductId)
+        @Html.HiddenFor(m => Model.BuyPrice)
+        @Html.HiddenFor(m => Model.Quantity)
+        @Html.HiddenFor(m => Model.MaxQuantity)
+
+
+        <div class="panel panel-default">
+            <div class="panel panel-body small">
+                <div class="form-group col-md-4">
+                    @Html.Label("Costo", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                        <input type="text" class="form-control text-uppercase input-sm" value="@Model.BuyPrice.ToMoney()" readonly="readonly" />
+                    </div>
+
+                </div>
+
+
+                <div class="form-group col-md-4">
+                    @Html.Label("Descuento", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                        @Html.EditorFor(model => model.Discount, new
+                   {
+                       htmlAttributes = new
+                       {
+                           type = "number",
+                           @class = "form-control text-uppercase input-sm",
+                           autocomplete = "off",
+                           onblur = "SetDiscount()"
+                       }
+                   })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-4">
+                    @Html.Label("Ordenar", htmlAttributes: new { @class = "control-label" })
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                        @Html.EditorFor(model => model.AddQuantity, new
+                   {
+                       htmlAttributes = new
+                       {
+                           type = "number",
+                           @class = "form-control text-uppercase input-sm",
+                           autocomplete = "off",
+                           onblur = "SetTotal()"
+                       }
+                   })
+                    </div>
+                </div>
+                <h3 class="text-center" id="divTotal">
+                    Total Partida: @Model.TotalLine.ToMoney()
+                </h3>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button id="btnChangeQuantity" class="btn btn-primary  btn-sm" type="button" onclick="SetDetailChange('@Model.ProductId','@Model.BranchId')">
+                <span class="glyphicon glyphicon-ok"></span>
+                Aplicar
+            </button>
+            <button class="btn btn-danger btn-sm" type="button" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+                Cancelar
+            </button>
+        </div>
+    </div>
+</div>

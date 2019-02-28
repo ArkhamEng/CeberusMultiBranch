@@ -130,10 +130,12 @@
         if (!form.valid())
             return;
 
-        HideModal(function () {
+        HideModal(function ()
+        {
             ShowLoading('static');
 
-            var ref = {
+            var ref =
+                {
                 RefundClientId: $("#RefundClientId").val(),
                 RefundSaleId: $("#RefundSaleId").val(),
                 RefundCash: $("#RefundCash").val(),

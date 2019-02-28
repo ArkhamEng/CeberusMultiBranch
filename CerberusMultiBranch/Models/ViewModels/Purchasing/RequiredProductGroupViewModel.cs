@@ -20,6 +20,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Purchasing
 
         public string TradeMark { get; set; }
 
+        public string BranchName { get; set; }
+
+        public int GroupBranchId { get; set; }
+
         public IEnumerable<ProductViewModel> Branches { get; set; }
+
+        public IEnumerable<ProductViewModel> Products { get; set; }
     }
 }

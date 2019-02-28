@@ -14,6 +14,12 @@ namespace CerberusMultiBranch
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+              name: "PurchaseEstimation",
+              url: "Purchasing/PurchaseEstimation",
+              defaults: new { controller = "PurchaseEstimation", action = "PurchaseEstimation", id = UrlParameter.Optional });
+
+         
+            routes.MapRoute(
              name: "Clients",
              url: "Catalog/Clients",
              defaults: new { controller = "Clients", action = "Index", id = UrlParameter.Optional });

@@ -13,10 +13,11 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using System.Web.Util;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-
+    [CustomAuthorize]
     public class PurchasingController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -33,128 +34,56 @@ namespace CerberusMultiBranch.Controllers.Operative
             ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
             ViewBag.PurchaseStatuses = db.PurchaseStatuses.ToSelectList();
 
-            var model = db.PurchaseOrder.Where(o => !st.Contains(o.PurchaseStatusId)).OrderByDescending(o => o.InsDate).ToList();
+            var model = db.PurchaseOrders.Where(o => !st.Contains(o.PurchaseStatusId)).OrderByDescending(o => o.InsDate).ToList();
 
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult SearchPurchaseOrders(int? branchId, string folio, int? purchaseStatusId, string provider, DateTime? beginDate, DateTime? endDate)
+        public ActionResult SearchPurchaseOrders(int? branchId, string folio, List<PStatus> status, string provider, DateTime? beginDate, DateTime? endDate)
         {
-
             var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
-            var model = (from o in db.PurchaseOrder
+            status = (status == null) ? new List<PStatus>() : status;
 
-                         where (string.IsNullOrEmpty(folio) || o.Folio.Contains(folio)) &&
+            var model = db.PurchaseOrders.Where(o =>
+                         (status.Count == Cons.Zero || status.Contains(o.PurchaseStatusId)) &&
+
+                         (string.IsNullOrEmpty(folio) || o.Folio.Contains(folio)) &&
+
                          (branchId == null && branchIds.Contains(o.BranchId) || o.BranchId == branchId) &&
-                         (purchaseStatusId == null || (int)o.PurchaseStatusId == purchaseStatusId) &&
-                         (string.IsNullOrEmpty(provider) || o.Provider.Name.Contains(provider)) &&
-                         (beginDate == null || o.InsDate >= beginDate) && (endDate == null || o.InsDate <= endDate)
 
-                         select o).OrderByDescending(or => or.InsDate).ToList();
+                         (string.IsNullOrEmpty(provider) || (o.Folio + " " + o.Provider.Name).Contains(provider)) &&
 
+                         (beginDate == null || o.InsDate >= beginDate) && (endDate == null || o.InsDate <= endDate)).
+                         OrderByDescending(or => or.InsDate).ToList();
 
 
             return PartialView("_PurchaseOrderList", model);
         }
 
-        /// <summary>
-        /// Obtiene la sesión de compra del usuario en turno
-        /// </summary>
-        /// <returns></returns>
-        public ActionResult PurchaseEstimation()
-        {
-            var userId = User.Identity.GetUserId();
-
-            var model = new PurchaseCartViewModel();
-            model.PurchaseTypes = db.PurchaseTypes.ToSelectList();
-            model.ShipmentMethodes = db.ShipMethodes.ToSelectList();
-
-            var items = GetEstimationDetails(userId);
-
-            if (items.Count > Cons.Zero)
-            {
-                model.ProviderId = items.FirstOrDefault().Value.First().ProviderId;
-                model.ProviderName = items.FirstOrDefault().Value.First().ProviderName;
-                model.PurchaseItems = items;
-            }
-
-            return View(model);
-        }
-
-
-
-        private Dictionary<string, IEnumerable<ProductViewModel>> GetEstimationDetails(string userId)
-        {
-            var branches = User.Identity.GetBranches().Select(b => b.BranchId);
-
-            var groups = (from itm in db.PurchaseItems
-                          join p in db.Products on itm.ProductId equals p.ProductId
-                          join b in db.BranchProducts on new { itm.BranchId, itm.ProductId } equals new { b.BranchId, b.ProductId }
-
-                          join e in db.Equivalences on new { itm.ProviderId, itm.ProductId } equals new { e.ProviderId, e.ProductId } into em
-                          from eq in em.DefaultIfEmpty()
-                              //join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
-                              //from ep in exm.DefaultIfEmpty()
-
-
-                          where (itm.UserId == userId) &&
-                                (branches.Contains(itm.Branch.BranchId))
-
-                          select new ProductViewModel
-                          {
-                              ProductId = p.ProductId,
-                              Name = p.Name,
-                              Code = p.Code,
-                              TradeMark = p.TradeMark,
-                              MaxQuantity = b.MaxQuantity,
-                              MinQuantity = b.MinQuantity,
-                              Quantity = b.Stock,
-                              BranchName = b.Branch.Name,
-                              BranchId = itm.BranchId,
-                              AddQuantity = itm.Quantity,
-                              ProviderId = itm.ProviderId,
-                              ProviderName = itm.Provider.Name,
-                              TotalLine = itm.TotalLine,
-                              ProviderCode = eq.Code,
-                              BuyPrice = itm.Price,
-                              Discount = itm.Discount
-
-                          }).OrderBy(p => p.BranchName).GroupBy(p => p.BranchName).ToList();
-
-            var model = new Dictionary<string, IEnumerable<ProductViewModel>>();
-
-            groups.ForEach(group =>
-            {
-                var header = group.Key + " - Total " + group.Sum(p => p.TotalLine).ToMoney();
-                model.Add(header, group);
-            });
-
-
-            return model;
-        }
 
         #region Búsqueda de Productos
-        [HttpPost]
-        public ActionResult ShowRequiredProductSearch(int? providerId)
-        {
-            var model = LookForPurchase(null, providerId.Value);
-
-
-            return PartialView("_RequiredProductSearch", model);
-        }
 
         [HttpPost]
-        public ActionResult SearchRequiredProduct(string filter, int? providerId)
+        public ActionResult OpenSearchProducts(int providerId, int branchId, int purchaseOrderId)
         {
-            var model = LookForPurchase(filter, providerId.Value);
+            var model = LookForPurchase(null, providerId, branchId, purchaseOrderId);
 
-
-            return PartialView("_RequiredProductSearchList", model);
+            return PartialView("_SearchProductForOrder", model);
         }
 
-        private List<RequiredProductGroupViewModel> LookForPurchase(string filter, int providerId)
+
+        [HttpPost]
+        public ActionResult SearchProducts(string filter, int providerId, int branchId, int purchaseOrderId)
+        {
+            var model = LookForPurchase(filter, providerId, branchId, purchaseOrderId);
+
+            return PartialView("_SearchProductForOrderList", model);
+        }
+
+
+        private List<ProductViewModel> LookForPurchase(string filter, int providerId, int branchId, int purchaseOrderId)
         {
 
             string[] arr = new List<string>().ToArray();
@@ -167,483 +96,58 @@ namespace CerberusMultiBranch.Controllers.Operative
                     arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", "");
             }
 
-            var branches = User.Identity.GetBranches().Select(b => b.BranchId);
-            var userId = User.Identity.GetUserId();
+            var products = (from p in db.Products.Where(p => (string.IsNullOrEmpty(filter) || arr.All(s => (p.Code + " " + p.Name).Contains(s))) && p.IsActive)
 
-            var groups = (from bp in db.BranchProducts
+                            join bp in db.BranchProducts on p.ProductId equals bp.ProductId
 
-                          join e in db.Equivalences.Where(ev => ev.ProviderId == providerId) on bp.ProductId equals e.ProductId into em
-                          from eq in em.DefaultIfEmpty()
-                              //join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
-                              //from ep in exm.DefaultIfEmpty()
-                          join it in db.PurchaseItems.Where(i => i.UserId == userId && i.ProviderId == providerId) on
-                              new { bp.BranchId, bp.ProductId } equals new { it.BranchId, it.ProductId } into itm
-                          from its in itm.DefaultIfEmpty()
+                            join d in db.PurchaseOrderDetails.Where(d=> d.PurchaseOrderId == purchaseOrderId) on p.ProductId equals d.ProductId into dm
+                            from od in dm.DefaultIfEmpty()
+                            
+                            join e in db.Equivalences.Where(ev => ev.ProviderId == providerId) on bp.ProductId equals e.ProductId into em
+                            from eq in em.DefaultIfEmpty()
 
-                          where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
-                                 (branches.Contains(bp.BranchId)) &&
-                                 (bp.Stock <= bp.MinQuantity) &&
-                                 (bp.Product.IsActive)
+                            where
+                                   (bp.BranchId == branchId) &&
+                                   (bp.Stock < bp.MaxQuantity) //&&
+                                   //(od == null)
 
-                          select new ProductViewModel
-                          {
-                              ProductId = bp.ProductId,
-                              Name = bp.Product.Name,
-                              Code = bp.Product.Code,
-                              BranchId = bp.BranchId,
-                              TradeMark = bp.Product.TradeMark,
-                              LockDate = bp.LockDate,
-                              UserLock = bp.UserLock,
-                              MaxQuantity = bp.MaxQuantity,
-                              MinQuantity = bp.MinQuantity,
-                              Quantity = bp.Stock + bp.Reserved,
-                              AddQuantity = its != null ? its.Quantity : bp.MaxQuantity - bp.Stock,
-                              BranchName = bp.Branch.Name,
-                              ProviderCode = eq != null ? eq.Code : "No asignado",
-                              BuyPrice = eq != null ? eq.BuyPrice : Cons.Zero,
-                              AddToPurchaseDisabled = (its != null)
+                            select new ProductViewModel
+                            {
+                                ProductId = bp.ProductId,
+                                Name = p.Name,
+                                Code = p.Code,
+                                BranchId = bp.BranchId,
+                                TradeMark = bp.Product.TradeMark,
+                                LockDate = bp.LockDate,
+                                UserLock = bp.UserLock,
+                                MaxQuantity = bp.MaxQuantity,
+                                MinQuantity = bp.MinQuantity,
+                                Quantity = bp.Stock + bp.Reserved,
+                                AddQuantity = od != null ? od.OrderQty : bp.MaxQuantity - bp.Stock,
+                                BranchName = bp.Branch.Name,
+                                ProviderCode = eq != null ? eq.Code : "No asignado",
+                                BuyPrice = eq != null ? eq.BuyPrice : Cons.Zero,
+                                Discount = od !=null ? od.Discount : Cons.Zero,
+                                AddToPurchaseDisabled = (od != null)
 
-                          }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).GroupBy(i => i.ProductId).ToList();
+                            }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).ToList();
 
-
-            List<RequiredProductGroupViewModel> productGroups = new List<RequiredProductGroupViewModel>();
-
-            foreach (var group in groups)
-            {
-                RequiredProductGroupViewModel pGroup = new RequiredProductGroupViewModel
-                {
-                    Code = group.First().Code,
-                    Description = group.First().Name,
-                    ProviderCode = group.First().ProviderCode,
-                    ProductId = group.First().ProductId,
-                    Unit = group.First().Unit,
-                    TradeMark = group.First().TradeMark,
-                    Branches = group
-                };
-
-                productGroups.Add(pGroup);
-            }
-
-
-            return productGroups;
+            return products;
         }
+
         #endregion
 
-        [HttpPost]
-        public ActionResult EditDetail(int productId, int branchId)
-        {
-            try
-            {
 
-                var userId = HttpContext.User.Identity.GetUserId();
 
-                var model = (from itm in db.PurchaseItems.Where(i => i.ProductId == productId && i.BranchId == branchId && i.UserId == userId)
-                             join p in db.Products on itm.ProductId equals p.ProductId
-                             join b in db.BranchProducts on new { itm.BranchId, itm.ProductId } equals new { b.BranchId, b.ProductId }
 
-                             join e in db.Equivalences on new { itm.ProviderId, itm.ProductId } equals new { e.ProviderId, e.ProductId } into em
-                             from eq in em.DefaultIfEmpty()
-
-                             select new ProductViewModel
-                             {
-                                 ProductId = p.ProductId,
-                                 Name = p.Name,
-                                 Code = p.Code,
-                                 TradeMark = p.TradeMark,
-                                 MaxQuantity = b.MaxQuantity,
-                                 MinQuantity = b.MinQuantity,
-                                 Quantity = b.Stock,
-                                 BranchName = b.Branch.Name,
-                                 BranchId = itm.BranchId,
-                                 AddQuantity = itm.Quantity,
-                                 ProviderId = itm.ProviderId,
-                                 ProviderName = itm.Provider.Name,
-                                 TotalLine = itm.TotalLine,
-                                 ProviderCode = eq.Code,
-                                 BuyPrice = itm.Price,
-                                 Discount = itm.Discount
-
-                             }).FirstOrDefault();
-
-
-
-                return PartialView("_EditEstimationDetail", model);
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al obtener datos",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult SetDatailChange(int productId, int branchId, double quantity, double discount)
-        {
-            try
-            {
-                var userId = HttpContext.User.Identity.GetUserId();
-
-                var detail = db.PurchaseItems.FirstOrDefault(i => i.ProductId == productId && i.BranchId == branchId && i.UserId == userId);
-
-                detail.Quantity = quantity;
-                detail.Discount = discount;
-                detail.TotalLine = discount == Cons.Zero ? (quantity * detail.Price) : (quantity * detail.Price) - ((quantity * detail.Price) * (discount / Cons.OneHundred));
-
-                db.Entry(detail).Property(p => p.Quantity).IsModified = true;
-                db.Entry(detail).Property(p => p.TotalLine).IsModified = true;
-                db.Entry(detail).Property(p => p.Discount).IsModified = true;
-
-                db.SaveChanges();
-
-                var model = GetEstimationDetails(userId);
-
-                return PartialView("_PurchaseEstimationDetails", model);
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al guardar",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult BeginSetCode(int productId, int providerId)
-        {
-            try
-            {
-                var model = (from p in db.Products
-
-                             join e in db.Equivalences.Where(ie => ie.ProviderId == providerId) on p.ProductId equals e.ProductId into em
-                             from eq in em.DefaultIfEmpty()
-
-                                 //join ex in db.ExternalProducts on new { eq.ProviderId, eq.Code } equals new { ex.ProviderId, ex.Code } into exm
-                                 //from ep in exm.DefaultIfEmpty()
-
-                             where (p.ProductId == productId)
-
-                             select new SetProviderCodeViewModel
-                             {
-                                 ProviderCode = eq != null ? eq.Code : string.Empty,
-                                 InternalCode = p.Code,
-                                 ProductId = p.ProductId,
-                                 ProviderId = providerId,
-                                 Price = eq != null ? eq.BuyPrice : Cons.Zero
-                             }
-                            ).FirstOrDefault();
-
-
-                return PartialView("_SetProviderCode", model);
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al obtener datos",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult SetProviderCode(SetProviderCodeViewModel model)
-        {
-            try
-            {
-                var eqv = db.Equivalences.FirstOrDefault(eq => eq.ProviderId == model.ProviderId && eq.ProductId == model.ProductId);
-
-                //si no hay una relación de equivalencia
-                if (eqv == null)
-                {
-                    eqv = new Equivalence { Code = model.ProviderCode, ProductId = model.ProductId, ProviderId = model.ProviderId, BuyPrice = model.Price.RoundMoney() };
-                    db.Equivalences.Add(eqv);
-                }
-                else
-                {
-                    eqv.Code = model.ProviderCode;
-                    eqv.BuyPrice = model.Price.RoundMoney();
-                    eqv.UpdDate = DateTime.Now.ToLocal();
-                    eqv.UpdUser = HttpContext.User.Identity.Name;
-
-                    db.Entry(eqv).Property(p => p.Code).IsModified = true;
-                }
-
-                var items = db.PurchaseItems.Where(i => i.ProductId == model.ProductId && i.ProviderId == model.ProviderId && i.Price != model.Price).ToList();
-
-                //si hay alguna partidas de orden de compra en proceso, se ajusta el costo
-                items.ForEach(item =>
-                {
-                    item.Price = model.Price;
-                    item.TotalLine = (item.Price * item.Quantity).RoundMoney();
-
-                    db.Entry(item).Property(i => i.TotalLine).IsModified = true;
-                    db.Entry(item).Property(i => i.Price).IsModified = true;
-                });
-
-                db.SaveChanges();
-
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Success,
-                    Code = Cons.Responses.Codes.Success,
-                    Header = "Relación establecida",
-                    Body = "la relación con el código del proveedor ha sido actualizada correctamente",
-                    JProperty = new { Price = model.Price, ProviderCode = model.ProviderCode }
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al crear realación",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult RemoveAll(int providerId)
-        {
-            try
-            {
-                var userId = User.Identity.GetUserId();
-
-                var items = db.PurchaseItems.Where(i => i.ProviderId == providerId && i.UserId == userId).ToList();
-
-                if (items.Count > Cons.Zero)
-                {
-                    db.PurchaseItems.RemoveRange(items);
-                    db.SaveChanges();
-                }
-                return Json(new JResponse { Result = Cons.Responses.Info, Code = Cons.Responses.Codes.Success, Header = "Elementos removidos", Body = "Se removieros todas las partidas" });
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al remover partidas",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult RemoveFromEstimation(int branchId, int productId)
-        {
-            try
-            {
-                var userId = User.Identity.GetUserId();
-
-                var item = db.PurchaseItems.FirstOrDefault(i => i.BranchId == branchId && i.ProductId == productId && i.UserId == userId);
-
-                if (item != null)
-                {
-                    db.PurchaseItems.Remove(item);
-                    db.SaveChanges();
-                }
-
-                var model = GetEstimationDetails(userId);
-
-                return PartialView("_PurchaseEstimationDetails", model);
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al eliminar partida",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-        [HttpPost]
-        public ActionResult AddToEstimation(PurchaseItem item)
-        {
-            try
-            {
-                item.UserId = User.Identity.GetUserId();
-
-                var bProduct = db.BranchProducts.FirstOrDefault(bp => bp.BranchId == item.BranchId && bp.ProductId == item.ProductId);
-
-                var totalQty = bProduct.Stock + bProduct.Reserved + item.Quantity;
-
-                //valído no exceder el máximo
-                if (totalQty > bProduct.MaxQuantity)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Header = "Cantidad Excedente!",
-                        Body = "La cantidad de a comprar mas la cantidad en inventario superan el máximo permitido, por favor verifica"
-                    });
-                }
-
-                //si hay descuento lo aplico
-                item.TotalLine = item.Discount > Cons.Zero ? (item.Quantity * item.Price) - ((item.Quantity * item.Price) * (item.Discount / Cons.OneHundred)) : (item.Quantity * item.Price).RoundMoney();
-
-
-                db.PurchaseItems.Add(item);
-                db.SaveChanges();
-
-                var model = GetEstimationDetails(item.UserId);
-
-                return PartialView("_PurchaseEstimationDetails", model);
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al agregar producto",
-                    Body = "Detalle del error " + ex.Message
-                });
-            }
-        }
-
-
-        [HttpPost]
-        public ActionResult CreateOrders(PurchaseCartViewModel model)
-        {
-            try
-            {
-                var userId = User.Identity.GetUserId();
-
-                var items = db.PurchaseItems.Where(i => i.ProviderId == model.ProviderId && i.UserId == userId).ToList();
-
-                var vari = db.Variables.FirstOrDefault(v => v.Name == ConfigVariable.Pricing.IVA);
-
-                var iva = Convert.ToDouble(vari.Value);
-
-                if (items.Count == Cons.Zero)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.RecordNotFound,
-                        Header = "Datos no encontrados",
-                        Body = "No se encontraron elementos para generar alguna orden de compra"
-                    });
-                }
-
-
-                var itemGroups = items.GroupBy(i => i.BranchId).ToList();
-
-                List<PurchaseOrder> purchaseOrders = new List<PurchaseOrder>();
-
-                foreach (var group in itemGroups)
-                {
-                    var first = group.First();
-
-                    PurchaseOrder order = new PurchaseOrder
-                    {
-                        BranchId = first.BranchId,
-                        ProviderId = model.ProviderId,
-                        PurchaseTypeId = model.PurchaseType,
-                        PurchaseOrderDetails = new List<PurchaseOrderDetail>(),
-                        Comment = model.Comment,
-                        DaysToPay = model.DaysToPay,
-                        Freight = model.Freight,
-                        Insurance = model.Insurance,
-                        Discount = model.Discount,
-                        ShipMethodId = model.ShipmentMethodId
-                    };
-
-                    foreach (var item in group)
-                    {
-                        PurchaseOrderDetail detail = new PurchaseOrderDetail
-                        {
-                            LineTotal = item.TotalLine,
-                            OrderQty = item.Quantity,
-                            UnitPrice = item.Price,
-                            ProductId = item.ProductId,
-                            Discount = item.Discount
-                        };
-
-                        order.PurchaseOrderDetails.Add(detail);
-                    }
-
-
-                    order.TaxRate = iva;
-                    order.PurchaseStatusId = PStatus.InRevision;
-
-                    //total de partidas
-                    order.SubTotal = order.PurchaseOrderDetails.Sum(d => d.LineTotal).RoundMoney();
-
-                    //monto de iva
-                    order.TaxAmount = (order.SubTotal * (iva / Cons.OneHundred)).RoundMoney();
-
-                    //calculo el total global, incluye envío y seguro
-                    var total = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance);
-
-                    //si hay descuento global lo aplico a todo
-                    if (order.Discount > Cons.Zero)
-                    {
-                        total = total - (total * (order.Discount / Cons.OneHundred));
-                    }
-
-
-                    //total de la mercancía con descuento e Iva mas envío y seguro
-                    order.TotalDue = total.RoundMoney();
-
-                    purchaseOrders.Add(order);
-                }
-
-
-                db.PurchaseOrder.AddRange(purchaseOrders);
-
-                db.PurchaseItems.RemoveRange(items);
-
-                db.SaveChanges();
-
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Success,
-                    Code = Cons.Responses.Codes.Success,
-                    Header = "Orden generada",
-                    Body = string.Format("Se generaron {0} ordernes de compra", purchaseOrders.Count)
-                });
-
-            }
-            catch (Exception ex)
-            {
-                return Json(new JResponse
-                {
-                    Result = Cons.Responses.Danger,
-                    Code = Cons.Responses.Codes.ServerError,
-                    Header = "Error al generar orden",
-                    Body = "Detalle del error: " + ex.Message
-                });
-            }
-        }
-
-
-
+        [HttpGet]
         public ActionResult PurchaseOrder(int id)
         {
             ViewBag.PurchaseTypes = db.PurchaseTypes.ToSelectList();
             ViewBag.ShipMethodes = db.ShipMethodes.ToSelectList();
 
-            var model = db.PurchaseOrder.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).Include(o => o.PurchaseOrderHistories).
+            var model = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).
+                Include(o => o.PurchaseOrderHistories).Include(p => p.Purchases).
                                                 FirstOrDefault(o => o.PurchaseOrderId == id);
 
             foreach (var detail in model.PurchaseOrderDetails)
@@ -660,7 +164,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             ViewBag.PurchaseTypes = db.PurchaseTypes.ToSelectList();
             ViewBag.ShipMethodes = db.ShipMethodes.ToSelectList();
 
-            var model = db.PurchaseOrder.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).Include(o => o.PurchaseOrderHistories).
+            var model = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).
+                Include(o => o.PurchaseOrderHistories).Include(p => p.Purchases).
                                                FirstOrDefault(o => o.PurchaseOrderId == id);
 
             foreach (var detail in model.PurchaseOrderDetails)
@@ -689,6 +194,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 ComplementQty = detail.ComplementQty,
                 Discount = detail.Discount,
                 IsCompleated = detail.IsCompleated,
+                UnitPrice = detail.UnitPrice,
                 IsTrackable = detail.Product.IsTrackable,
                 Serials = new List<SerialItemViewModel>(),
             };
@@ -699,9 +205,9 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (detail.PurchaseOrder.PurchaseStatusId == PStatus.Partial && !detail.IsCompleated)
             {
                 model.ComplementQty = model.RequestedQty - model.ReceivedQty;
-                model.StockedQty    = model.RequestedQty;
+                model.StockedQty = model.RequestedQty;
             }
-                
+
 
             model.SerialsSaved = detail.StockMovements.Where(m => m.TrackingItem != null).
                 Select(m => new SerialItemViewModel
@@ -719,6 +225,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model.ReceivedQty = item.ReceivedQty;
                 model.StockedQty = item.StockedQty;
                 model.IsCompleated = item.IsCompleated;
+                model.Discount = item.Discount;
+                model.UnitPrice = item.UnitPrice;
                 model.Serials = item.Serials != null ? item.Serials : new List<SerialItemViewModel>();
             }
             else
@@ -742,6 +250,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 StockedQty = detail.StockedQty,
                 ComplementQty = detail.ComplementQty,
                 Discount = detail.Discount,
+                UnitPrice = detail.UnitPrice,
                 IsCompleated = detail.IsCompleated,
                 IsTrackable = detail.Product.IsTrackable,
                 Comment = detail.Comment,
@@ -766,7 +275,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //obtengo el registro de la orden de compra guardado
-                var order = db.PurchaseOrder.Include(o => o.PurchaseOrderDetails.Select(d => d.Product)).Include(o => o.PurchaseOrderHistories).
+                var order = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product)).
                                                 FirstOrDefault(o => o.PurchaseOrderId == purchaseOrderId);
 
 
@@ -788,109 +297,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //busco el inventario de todos los productos de la orden de compra
                 var inventories = db.BranchProducts.Where(bp => bp.BranchId == order.BranchId && prodIds.Contains(bp.ProductId)).ToList();
 
-                //recorro las partidas para generar los movimientos
-                foreach (var detail in order.PurchaseOrderDetails)
-                {
-                    var item = items.FirstOrDefault(i => i.DetailId == detail.PurchaseOrderDetailId);
+                //Movimientos y seriales
+                SetMovements(order, inventories, items);
 
-                    if (item != null)
-                    {
-                        detail.Discount      = item.Discount;
-                        detail.ReceivedQty   = item.ReceivedQty;
-                        detail.ComplementQty = item.ComplementQty;
-                        detail.StockedQty    = item.StockedQty;
-                        detail.UpdDate       = DateTime.Now.ToLocal();
-                        detail.UpdUser       = HttpContext.User.Identity.Name;
-                        detail.Comment       = item.Comment;
-                        detail.IsCompleated  = item.IsCompleated;
-
-
-                        var inventory = inventories.FirstOrDefault(i => i.ProductId == detail.ProductId);
-
-                        if (inventory.Product.StockRequired)
-                        {
-                            #region Numeros de serie y movimientos de inventario
-                            List<TrackingItem> trackingItems = new List<TrackingItem>();
-                            //si hay numeros de serie, se crean las instancias 
-                            if (item.Serials != null)
-                            {
-                                item.Serials.ForEach(s =>
-                                {
-                                    //item rastreable por número de serie
-                                    TrackingItem ti = new TrackingItem
-                                    {
-                                        SerialNumber = s.SerialNumber,
-                                        ProductId = detail.ProductId,
-                                        ItemLocations = new List<ItemLocation>(),
-                                        StockMovements = new List<StockMovement>()
-                                    };
-
-                                    //se crea la relación del Item con el respectivo inventario
-                                    ti.ItemLocations.Add(new ItemLocation { ProductId = detail.ProductId, BranchId = order.BranchId });
-
-
-                                    //se crea el movimiento de inventario para el item
-                                    ti.StockMovements.Add(new StockMovement
-                                    {
-                                        ProductId = detail.ProductId,
-                                        BranchId = order.BranchId,
-                                        MovementType = MovementType.Entry,
-                                        PurchaseOrderDetailId = detail.PurchaseOrderDetailId,
-                                        Comment = string.Format("ORDEN DE COMPRA [{0}]", order.Folio.ToUpper()),
-                                        Quantity = Cons.One
-                                    });
-
-                                    trackingItems.Add(ti);
-                                });
-                            }
-
-                            //si no hubo numeros de serie, registro un solo movimiento de inventario para la partida
-                            if (trackingItems.Count == Cons.Zero)
-                            {
-                                var stockMovement = new StockMovement
-                                {
-                                    ProductId = detail.ProductId,
-                                    BranchId = order.BranchId,
-                                    MovementType = MovementType.Entry,
-                                    PurchaseOrderDetailId = detail.PurchaseOrderDetailId,
-                                    Comment = string.Format("ORDEN DE COMPRA [{0}]", order.Folio.ToUpper()),
-                                    Quantity = (order.PurchaseStatusId == PStatus.Watting ? detail.ReceivedQty : detail.ComplementQty)
-                                };
-
-                                //agrego el movimiento al contexto
-                                db.StockMovements.Add(stockMovement);
-                            }
-                            else
-                            {
-                                //agrego los objetos al contexto
-                                db.TrackingItems.AddRange(trackingItems);
-                            }
-                            #endregion
-                        }
-
-                        if (order.PurchaseStatusId == PStatus.Watting)
-                        {
-                            var amount = detail.UnitPrice * (detail.IsCompleated ? detail.StockedQty : detail.OrderQty);
-
-                            detail.LineTotal = (detail.Discount == (double)Cons.Zero ? amount.RoundMoney() : (amount - (amount * (detail.Discount / Cons.OneHundred)))).RoundMoney();
-
-                            db.Entry(detail).Property(d => d.LineTotal).IsModified = true;
-                        }
-
-                        db.Entry(detail);
-
-                        //db.Entry(detail).Property(d => d.Discount).IsModified = true;
-                        //db.Entry(detail).Property(d => d.ReceivedQty).IsModified = true;
-                        //db.Entry(detail).Property(d => d.ComplementQty).IsModified = true;
-                        //db.Entry(detail).Property(d => d.StockedQty).IsModified = true;
-                        //db.Entry(detail).Property(d => d.UpdDate).IsModified = true;
-                        //db.Entry(detail).Property(d => d.UpdUser).IsModified = true;
-                        //db.Entry(detail).Property(d => d.Comment).IsModified = true;
-                        //db.Entry(detail).Property(d => d.IsCompleated).IsModified = true;
-                    }
-                }
-
-                //agrego historico
                 PurchaseOrderHistory history = new PurchaseOrderHistory
                 {
                     PurchaseOrderId = order.PurchaseOrderId,
@@ -905,22 +314,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.PurchaseOrderHistories.Add(history);
 
-                //se calculan precios y cantidades en stock
+                //calculo de precios y actualización de stock
                 SetPricesAndStock(order, inventories, discount, freight, insurance, shipMethodId);
-                
+
 
                 order.Comment = comment;
                 order.UpdDate = DateTime.Now.ToLocal();
                 order.UpdUser = HttpContext.User.Identity.Name;
                 order.DeliveryDate = DateTime.Now.ToLocal();
                 order.PurchaseStatusId = order.PurchaseOrderDetails.Count(d => !d.IsCompleated) > Cons.Zero ? PStatus.Partial : PStatus.Received;
-
-
-                //db.Entry(order).Property(o => o.Comment).IsModified = true;
-                //db.Entry(order).Property(o => o.UpdDate).IsModified = true;
-                //db.Entry(order).Property(o => o.UpdUser).IsModified = true;
-                //db.Entry(order).Property(o => o.DeliveryDate).IsModified = true;
-                //db.Entry(order).Property(o => o.PurchaseStatusId).IsModified = true;
 
                 db.Entry(order);
 
@@ -943,6 +345,102 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Code = Cons.Responses.Codes.ServerError,
                     Result = Cons.Responses.Danger
                 });
+            }
+        }
+
+        private void SetMovements(PurchaseOrder order, List<BranchProduct> inventories, List<ProductReceptionViewModel> items)
+        {
+            foreach (var detail in order.PurchaseOrderDetails)
+            {
+                var item = items.FirstOrDefault(i => i.DetailId == detail.PurchaseOrderDetailId);
+
+                if (item != null)
+                {
+                    detail.Discount = item.Discount;
+                    detail.ReceivedQty = item.ReceivedQty;
+                    detail.UnitPrice = item.UnitPrice;
+                    detail.ComplementQty = item.ComplementQty;
+                    detail.StockedQty = item.StockedQty;
+                    detail.UpdDate = DateTime.Now.ToLocal();
+                    detail.UpdUser = HttpContext.User.Identity.Name;
+                    detail.Comment = item.Comment;
+                    detail.IsCompleated = item.IsCompleated;
+
+
+                    var inventory = inventories.FirstOrDefault(i => i.ProductId == detail.ProductId);
+
+                    if (inventory.Product.StockRequired)
+                    {
+                        #region Numeros de serie y movimientos de inventario
+                        List<TrackingItem> trackingItems = new List<TrackingItem>();
+                        //si hay numeros de serie, se crean las instancias 
+                        if (item.Serials != null)
+                        {
+                            item.Serials.ForEach(s =>
+                            {
+                                //item rastreable por número de serie
+                                TrackingItem ti = new TrackingItem
+                                {
+                                    SerialNumber = s.SerialNumber,
+                                    ProductId = detail.ProductId,
+                                    ItemLocations = new List<ItemLocation>(),
+                                    StockMovements = new List<StockMovement>()
+                                };
+
+                                //se crea la relación del Item con el respectivo inventario
+                                ti.ItemLocations.Add(new ItemLocation { ProductId = detail.ProductId, BranchId = order.BranchId });
+
+
+                                //se crea el movimiento de inventario para el item
+                                ti.StockMovements.Add(new StockMovement
+                                {
+                                    ProductId = detail.ProductId,
+                                    BranchId = order.BranchId,
+                                    MovementType = MovementType.Entry,
+                                    PurchaseOrderDetailId = detail.PurchaseOrderDetailId,
+                                    Comment = string.Format("ORDEN DE COMPRA [{0}]", order.Folio.ToUpper()),
+                                    Quantity = Cons.One
+                                });
+
+                                trackingItems.Add(ti);
+                            });
+                        }
+
+                        //si no hubo numeros de serie, registro un solo movimiento de inventario para la partida
+                        if (trackingItems.Count == Cons.Zero)
+                        {
+                            var stockMovement = new StockMovement
+                            {
+                                ProductId = detail.ProductId,
+                                BranchId = order.BranchId,
+                                MovementType = MovementType.Entry,
+                                PurchaseOrderDetailId = detail.PurchaseOrderDetailId,
+                                Comment = string.Format("ORDEN DE COMPRA [{0}]", order.Folio.ToUpper()),
+                                Quantity = (order.PurchaseStatusId == PStatus.Watting ? detail.ReceivedQty : detail.ComplementQty)
+                            };
+
+                            //agrego el movimiento al contexto
+                            db.StockMovements.Add(stockMovement);
+                        }
+                        else
+                        {
+                            //agrego los objetos al contexto
+                            db.TrackingItems.AddRange(trackingItems);
+                        }
+                        #endregion
+                    }
+
+                    if (order.PurchaseStatusId == PStatus.Watting)
+                    {
+                        var amount = detail.UnitPrice * (detail.IsCompleated ? detail.StockedQty : detail.OrderQty);
+
+                        detail.LineTotal = (detail.Discount == (double)Cons.Zero ? amount.RoundMoney() : (amount - (amount * (detail.Discount / Cons.OneHundred)))).RoundMoney();
+
+                        db.Entry(detail).Property(d => d.LineTotal).IsModified = true;
+                    }
+
+                    db.Entry(detail);
+                }
             }
         }
 
@@ -1093,23 +591,108 @@ namespace CerberusMultiBranch.Controllers.Operative
                 order.SubTotal = subTotal;
                 order.TaxAmount = taxAmount;
                 order.TotalDue = (totalParts + expenses).RoundMoney();
+            }
+        }
 
-                //db.Entry(order).Property(o => o.Freight).IsModified = true;
-                //db.Entry(order).Property(o => o.ShipMethodId).IsModified = true;
-                //db.Entry(order).Property(o => o.SubTotal).IsModified = true;
-                //db.Entry(order).Property(o => o.TaxAmount).IsModified = true;
-                //db.Entry(order).Property(o => o.TotalDue).IsModified = true;
+        [HttpPost]
+        public ActionResult BeginBilling(int id)
+        {
+            var model = db.PurchaseOrders.Select(o => new BillingViewModel
+            {
+                OrderId = o.PurchaseOrderId,
+                BillTotal = o.TotalDue
+            }).FirstOrDefault(o => o.OrderId == id);
+
+            return PartialView("_CreateBill", model);
+        }
+
+        [HttpPost]
+        public ActionResult CreateBill(BillingViewModel model)
+        {
+            try
+            {
+                var order = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).
+                                            FirstOrDefault(o => o.PurchaseOrderId == model.OrderId);
+
+                order.Bill = model.BillNumber;
+
+                Purchase pBill = new Purchase
+                {
+                    Bill = model.BillNumber,
+                    Comment = model.BillComment,
+                    Status = TranStatus.Reserved,
+                    TransactionDate = order.DeliveryDate.Value,
+                    Expiration = order.DeliveryDate.Value.AddDays(order.DaysToPay),
+                    ProviderId = order.ProviderId,
+                    BranchId = order.BranchId,
+                    LastStatus = TranStatus.InProcess,
+                    TransactionType = order.PurchaseTypeId == PType.Credit ? TransactionType.Credito : TransactionType.Contado,
+                    UserId = HttpContext.User.Identity.GetUserId(),
+                    PurchaseOrderId = order.PurchaseOrderId,
+                    Freight = order.Freight,
+                    Insurance = order.Insurance,
+                    DiscountPercentage = order.Discount,
+                    FinalAmount = order.TotalDue,
+                    TotalAmount = order.SubTotal.RoundMoney(),
+                    TotalTaxAmount = order.TaxAmount,
+                    TotalTaxedAmount = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance).RoundMoney(),
+                };
+
+                if (pBill.DiscountPercentage > Cons.Zero)
+                    pBill.DiscountedAmount = (pBill.TotalTaxedAmount * (pBill.DiscountPercentage / Cons.OneHundred)).RoundMoney();
+
+                pBill.FinalAmount = (pBill.TotalTaxedAmount - pBill.DiscountedAmount).RoundMoney();
+
+                pBill.PurchaseDetails = (from det in order.PurchaseOrderDetails
+                                         where (det.StockedQty > 0d && det.IsCompleated) || (!det.IsCompleated)
+                                         select new PurchaseDetail
+                                         {
+                                             Amount = det.LineTotal,
+                                             Quantity = det.IsCompleated ? det.StockedQty : det.OrderQty,
+                                             Price = (det.UnitPrice - (det.Discount > Cons.Zero ? (det.UnitPrice * (det.Discount / Cons.OneHundred)) : Cons.Zero)).RoundMoney(),
+                                             ProductId = det.ProductId,
+
+                                         }).ToList();
+
+                db.Entry(order).Property(o => o.Bill).IsModified = true;
+                db.Purchases.Add(pBill);
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Code = Cons.Responses.Codes.Success,
+                    Id = pBill.PurchaseId,
+                    Body = string.Format("Se agrego la factura {0} a la order de compra", model.BillNumber.ToUpper()),
+                    Header = "Factura Generada",
+                    Result = Cons.Responses.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Code = Cons.Responses.Codes.ErroSaving,
+                    Body = "Detalle del error" + ex.Message,
+                    Header = "Error al generar factura",
+                    Result = Cons.Responses.Danger
+                });
             }
 
         }
 
+
+
         [HttpPost]
-        public ActionResult BeginAction(int id)
+        public ActionResult BeginAction(int id, bool? changeRequested)
         {
-            var model = db.PurchaseOrder.FirstOrDefault(o => o.PurchaseOrderId == id);
+            var model = db.PurchaseOrders.FirstOrDefault(o => o.PurchaseOrderId == id);
 
             if (model.PurchaseStatusId == PStatus.Watting || model.PurchaseStatusId == PStatus.Watting)
                 ViewBag.ShipMethodes = db.ShipMethodes.ToSelectList();
+
+
+            if (changeRequested != null)
+                model.PurchaseStatusId = PStatus.Expired;
 
 
             //mando el comentario en blanco para que sea capturado uno nuevo
@@ -1123,7 +706,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                var purchaseOrder = db.PurchaseOrder.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).Include(o => o.PurchaseOrderHistories).
+                var purchaseOrder = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).Include(o => o.PurchaseOrderHistories).
                                                FirstOrDefault(o => o.PurchaseOrderId == id);
 
                 foreach (var detail in purchaseOrder.PurchaseOrderDetails)
@@ -1254,22 +837,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
                 //si la orden fue autorizada, creo un folio
-                if (authorized)
+                if (authorized && !string.IsNullOrEmpty(purchaseOrder.Folio))
                 {
                     //año en curso
                     var year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
 
-                    //status con folio
-                    List<PStatus> slist = new List<PStatus>();
-                    slist.Add(PStatus.Authorized);
-                    slist.Add(PStatus.Canceled);
-                    slist.Add(PStatus.Watting);
-                    slist.Add(PStatus.SendingFailed);
-                    slist.Add(PStatus.Received);
-                    slist.Add(PStatus.Partial);
-
-                    var lasOrder = db.PurchaseOrder.Where(o => slist.Contains(o.PurchaseStatusId) &&
-                                                          o.BranchId == purchaseOrder.BranchId && o.Year == year).
+                  
+                    var lasOrder = db.PurchaseOrders.Where(o => !string.IsNullOrEmpty(o.Folio) && o.BranchId == purchaseOrder.BranchId && o.Year == year).
                                                           OrderByDescending(s => s.Sequential).FirstOrDefault();
 
                     var seq = lasOrder != null ? lasOrder.Sequential : Cons.Zero;
@@ -1448,6 +1022,135 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Result = Cons.Responses.Danger,
                     JProperty = false
                 };
+            }
+        }
+
+       
+        [HttpPost]
+        public ActionResult BeginAddDetail(List<ProductViewModel> items, int id)
+        {
+            var model = db.PurchaseOrderDetails.Where(o => o.PurchaseOrderId == id).Include(o => o.Product).ToList();
+
+            var order = model.First().PurchaseOrder;
+
+            if (items != null)
+            {
+                var pIds = items.Select(i => i.ProductId);
+
+                var products = db.Products.Where(p => pIds.Contains(p.ProductId)).ToList();
+
+                foreach (var product in products)
+                {
+                    var item = items.FirstOrDefault(i => i.ProductId == product.ProductId);
+
+                    var detail = new PurchaseOrderDetail
+                    {
+                        Product = product,
+                        UnitPrice = item.BuyPrice,
+                        Discount = item.Discount,
+                        OrderQty = item.AddQuantity,
+                        ProductId = item.ProductId,
+                        PurchaseOrderId = id,
+                        LineTotal = (item.AddQuantity * item.BuyPrice),
+                    };
+
+                    if (detail.Discount > Cons.Zero)
+                        detail.LineTotal = detail.LineTotal - (detail.LineTotal * (detail.Discount / Cons.OneHundred));
+
+                    model.Add(detail);
+                }
+            }
+            order.SubTotal = model.Sum(d => d.LineTotal);
+            order.TaxAmount = (order.SubTotal * (order.TaxRate / Cons.OneHundred));
+            order.TotalDue = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance).RoundMoney();
+
+            if (order.Discount > Cons.Zero)
+                order.TotalDue = order.TotalDue - (order.TotalDue * (order.Discount / Cons.OneHundred));
+
+            var peIds = model.Select(m => m.ProductId);
+
+            var eqList = db.Equivalences.Where(e => peIds.Contains(e.ProductId) && e.ProductId == order.ProviderId);
+
+            foreach (var detail in model)
+            {
+                var eq = eqList.FirstOrDefault(e => e.ProviderId == order.ProviderId);
+                detail.ProviderCode = eq != null ? eq.Code : "NO ASIGNADO";
+            }
+
+            return PartialView("_PurchaseOrderDetails", model);
+        }
+
+        [HttpPost]
+        public ActionResult RequestChange(List<ProductViewModel> items, string comment, int id)
+        {
+            try
+            {
+                var order = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails).Include(o=> o.PurchaseOrderHistories).FirstOrDefault(o => o.PurchaseOrderId == id);
+
+                var history = new PurchaseOrderHistory
+                {
+                    BeginDate = order.UpdDate,
+                    Comment = order.Comment,
+                    ModifyByUser = order.UpdUser,
+                    EndDate = DateTime.Now.ToLocal(),
+                    PurchaseOrderId = order.PurchaseOrderId,
+                    Status = order.PurchaseStatus.Name,
+                    ShipMethod = order.ShipMethod.Name,
+                    Type = order.PurchaseType.Name
+                };
+
+                order.PurchaseOrderHistories.Add(history);
+
+                foreach (var item in items)
+                {
+                    var detail = new PurchaseOrderDetail
+                    {
+                        UnitPrice = item.BuyPrice,
+                        Discount = item.Discount,
+                        OrderQty = item.AddQuantity,
+                        ProductId = item.ProductId,
+                        PurchaseOrderId = id,
+                        LineTotal = (item.AddQuantity * item.BuyPrice)
+                    };
+
+                    if (detail.Discount > Cons.Zero)
+                        detail.LineTotal = detail.LineTotal - (detail.LineTotal * (detail.Discount / Cons.OneHundred));
+
+                    order.PurchaseOrderDetails.Add(detail);
+                }
+
+                order.Comment = comment;
+                order.PurchaseStatusId = PStatus.InRevision;
+                order.SubTotal  = order.PurchaseOrderDetails.Sum(d => d.LineTotal);
+                order.TaxAmount = (order.SubTotal * (order.TaxRate / Cons.OneHundred));
+                order.TotalDue  = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance).RoundMoney();
+
+                if (order.Discount > Cons.Zero)
+                    order.TotalDue = order.TotalDue - (order.TotalDue * (order.Discount / Cons.OneHundred));
+
+                order.UpdDate = DateTime.Now.ToLocal();
+                order.UpdUser = User.Identity.Name;
+
+                db.Entry(order).State = EntityState.Modified;
+                db.SaveChanges();
+
+                return Json(new JResponse
+                {
+                    Header = "Cambio solicitado",
+                    Body   = "Los cambios de la orden de compra se han solicitado con exito",
+                    Code = Cons.Responses.Codes.Success,
+                    Result = Cons.Responses.Success
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new JResponse
+                {
+                    Header = "Error al modificar",
+                    Body = "detalle " + ex.Message,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Result = Cons.Responses.Danger
+                });
             }
         }
 

@@ -1,11 +1,11 @@
-﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.PurchaseDetail>
+﻿@model ICollection<CerberusMultiBranch.Models.Entities.Purchasing.PurchaseDetail>
 @using CerberusMultiBranch.Support
 
 @Html.ValidationMessage("AddDetail", "", new { @class = "text-danger" })
 <table id="tbPurchaseDetails" class="table dt-responsive nowrap table-bordered small"  style="width:100%">
     <thead>
         <tr>
-            <th class="col-md-1"></th>
+            <th style="min-width:50px"></th>
             <th>
                 @Html.DisplayName("Código")
             </th>

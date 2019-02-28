@@ -65,11 +65,11 @@ namespace CerberusMultiBranch.Support
 
         public struct Formats
         {
-            public const string PurchaseFolioMask = "{0}-{1}-{2}";
+            public const string PurchaseFolioMask = "{0}-{1}-{2}C";
 
             public const string YearFolioFormat = "00";
 
-            public const string PurchaseSeqFormat = "000000";
+            public const string PurchaseSeqFormat = "00000";
         }
 
         public const int QuickResults = 300;
@@ -104,19 +104,18 @@ namespace CerberusMultiBranch.Support
 
         public const string VariableIVA = "IVA";
 
-        public const string CodeMask = "{0}{1}{2}";
+        public const string CodeMask = "{0}-{1}-{2}V";
 
         public const string BranchSession = "BranchSession";
 
         public const string SaleSession   = "SaleSession";
 
-        public const string EmployeeProfilePath = "/Content/EmployeeProfile";
+        public const string EmployeeProfilePath = "/Files/EmployeeProfile";
 
-        public const string UserProfilePath = "/Content/UserProfile";
+        public const string UserProfilePath = "/Files/UserProfile";
 
-        public const string ProductImagesPath = "/Content/ProductImages";
+        public const string ProductImagesPath = "/Files/ProductImages";
 
-        public const string ResponseOK = "OK";
 
         public const string DefaultPassword = "ADn9JXAPolz3R1QmEjw7chz42neVTLn426+eRtgaG2TvE2mR03Ri7TtoKH8iWJyuVw==";
 

@@ -1,0 +1,76 @@
+﻿
+<div id="adFilters" class="row">
+
+    <div class="form-group col-md-6">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-industry"></i></span>
+            @Html.DropDownList("branchId", (SelectList)ViewBag.Branches, "Sucursal", new { @class = "form-control input-sm" })
+        </div>
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-signal"></i></span>
+         
+            <div class="dropdown form-control input-sm" style="z-index:unset !important">
+                <div class="dropdown-toggle" data-toggle="dropdown" style="width:100%">
+                   Estatus
+                    <span class="caret pull-right"></span>
+                </div>
+                <div class="dropdown-menu" >
+                    <form id="formCheckBox">
+                        @foreach (var item in (SelectList)ViewBag.PurchaseStatuses)
+                        {
+                            <div class="checkbox">
+
+                                <label for="@item.Value">
+                                    <input type="checkbox" id="@item.Value" value="@item.Value" />
+                                    @item.Text
+                                </label>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    
+    <div class="form-group col-md-6">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar-minus-o"></i></span>
+            @Html.TextBox("beginDate", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Fecha Inicial", @type = "date", title = "fecha inicial" })
+        </div>
+    </div>
+
+    <div class="form-group col-md-6">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
+            @Html.TextBox("endDate", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Fecha Final", @type = "date", title = "fecha final" })
+        </div>
+    </div>
+
+
+    <div class="form-group col-md-6">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+            @Html.TextBox("folio", "", htmlAttributes: new { @class = "form-control input-sm", placeholder = "Folio" })
+        </div>
+    </div>
+
+</div>
+<div class="form-group col-md-12">
+    <div class="pull-right">
+        <button class="btn btn-primary btn-sm" type="button" title="Aplica los filtros avanzados a la búsqueda" onclick="AdvanceSearch()">
+            <span class="fa fa-check"></span>
+            Aplicar filtros
+        </button>
+        <button class="btn btn-warning btn-sm" type="button" onclick="Export()">
+            <span class="fa fa-file-excel-o"></span>
+            Exportar
+        </button>
+    </div>
+</div>
+
+
+

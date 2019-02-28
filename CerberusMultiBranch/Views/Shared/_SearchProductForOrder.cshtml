@@ -1,13 +1,16 @@
 ﻿
-@model IEnumerable<RequiredProductGroupViewModel>
+@model IEnumerable<ProductViewModel>
 
 @using CerberusMultiBranch.Support
 @using CerberusMultiBranch.Models.ViewModels.Purchasing
+@using CerberusMultiBranch.Models.ViewModels.Catalog
+
+@*BÚSQUEDA DE PRODUCTOS SOBRE ORDEN DE COMPRA*@
 
 <div class="panel panel-primary">
 
     <div class="panel-heading">
-        <button type="button" class="close" onclick="CloseQuickSearch()">
+        <button type="button" class="close" onclick="CloseSearch()">
             <span class="fa fa-times"></span>
         </button>
         <h4 class="panel-title">
@@ -21,7 +24,7 @@
                     <div class="input-group">
                         @Html.TextBox("FProductName", "", htmlAttributes: new { @class = "form-control", placeholder = "Descripción o códidgo" })
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-primary" onclick="QuickSearchProduct()">
+                            <button type="button" class="btn btn-primary" onclick="SearchProduct()">
                                 <span class="glyphicon glyphicon-search"></span>
                                 Buscar
                             </button>
@@ -34,43 +37,11 @@
                 </div>
             </div>
         </div>
-
-
-        <div id="divProductQuickSearchList">
-            @Html.Partial("_RequiredProductSearchList", Model)
+        <div class="panel panel-default">
+            <div id="divProductList" class="panel-body table-responsive">
+                @Html.Partial("_SearchProductForOrderList", Model)
+            </div>
         </div>
-
+      
     </div>
 </div>
-
-<script>
-
-    var onCloseQuickSearch;
-
-    var recordSelected;
-
-    function QuickSearchProduct() {
-        ShowModLoading();
-
-        ExecuteAjax('@Url.Action("SearchRequiredProduct", "Purchasing")', { filter: $("#FProductName").val(), providerId: $("#ProviderId").val() }, function (view) {
-            HideModLoading(function () {
-                $("#divProductQuickSearchList").html(view);
-            });
-        });
-    }
-
-
-
-    function CloseQuickSearch() {
-        HideModal(onCloseQuickSearch, true);
-    }
-
-    function CreateProduct() {
-        HideModal(function () {
-            ShowCatalogModal(null, null, 'Product', 0);
-
-        }, true);
-
-    }
-
-</script>

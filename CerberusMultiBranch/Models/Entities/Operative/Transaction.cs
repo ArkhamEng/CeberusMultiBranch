@@ -17,10 +17,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [ForeignKey("Branch")]
         public int BranchId { get; set; }
 
-        [Required]
-        [MaxLength(128)]
-        [Index("IDX_UserId", IsUnique = false)]
-        public string UserId { get; set; }
+        public TranStatus LastStatus { get; set; }
+
 
         [Required]
         [Display(Name = "Fecha de Operación")]
@@ -28,6 +26,13 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
+
+
+        [Required]
+        [MaxLength(128)]
+        [Index("IDX_UserId", IsUnique = false)]
+        public string UserId { get; set; }
+
 
 
         [Display(Name = "Total")]
@@ -59,8 +64,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Index("IDX_Status", IsUnique = false)]
         public TranStatus Status { get; set; }
 
-        public TranStatus LastStatus { get; set; }
-
+     
         public TransactionType TransactionType { get; set; }
 
         [MaxLength(100)]
@@ -89,10 +93,12 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public string InsUser { get; set; }
 
 
+        public virtual Branch Branch { get; set; }
+
+
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
-        public virtual Branch Branch { get; set; }
 
         public Transaction()
         {

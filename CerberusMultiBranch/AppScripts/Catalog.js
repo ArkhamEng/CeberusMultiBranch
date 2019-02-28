@@ -139,7 +139,8 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
 
-function SubmitPerson(SuccessCallBack, form, idField) {
+function SubmitPerson(SuccessCallBack, form, idField)
+{
     $(form).off('submit').on('submit', function (e)
     {
         e.preventDefault();
@@ -152,7 +153,8 @@ function SubmitPerson(SuccessCallBack, form, idField) {
 
         var inputF = $(form).find('[type="file"]');
 
-        if (inputF[0] != 'undefined' && inputF[0] != null) {
+        if (inputF[0] != 'undefined' && inputF[0] != null)
+        {
             var file = inputF[0].files[0];
 
             if (file != 'undefined' && file != null)

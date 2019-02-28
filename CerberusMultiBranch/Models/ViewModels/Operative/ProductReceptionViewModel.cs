@@ -27,6 +27,10 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [Display(Name = "Descuento")]
         public double Discount { get; set; }
 
+        [Display(Name = "Precio compra")]
+        [DataType(DataType.Currency)]
+        public double UnitPrice { get; set; }
+
         [Display(Name = "Complemento")]
         public double ComplementQty { get; set; }
 
@@ -41,6 +45,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public bool HasValues { get; set; }
 
+        [Display(Name = "Partida cerrada")]
         public bool IsCompleated { get; set; }
 
         public bool ReceiveDisabled { get; set; }

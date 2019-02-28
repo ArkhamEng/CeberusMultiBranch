@@ -17,7 +17,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int ClientId { get; set; }
 
-
         [Display(Name = "Folio Venta")]
         [MaxLength(30)]
         [Required]

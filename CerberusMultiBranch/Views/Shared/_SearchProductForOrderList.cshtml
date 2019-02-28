@@ -1,0 +1,101 @@
+﻿
+@model IEnumerable<ProductViewModel>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Purchasing
+@using CerberusMultiBranch.Models.ViewModels.Catalog
+
+<table id="tbProducts" class="table table-bordered small" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayName("Códigos")
+            </th>
+            <th>
+                @Html.DisplayName("Descripción")
+            </th>
+            <th>
+                @Html.DisplayName("Precio")
+            </th>
+            <th>
+                @Html.DisplayName("Descuento")
+            </th>
+            <th>
+                @Html.DisplayName("Máximo")
+            </th>
+
+            <th>
+                @Html.DisplayName("Actual")
+            </th>
+            <th>
+                @Html.DisplayName("Ordenar")
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var sItem in Model)
+        {
+            <tr class='@sItem.PurchasRowStyle'>
+                <td class="text-uppercase" style="white-space:nowrap">
+                    @Html.HiddenFor(modelItem => sItem.ProductId)
+                    @Html.HiddenFor(modelItem => sItem.ProviderCode)
+
+                   <a data-toggle="tooltip" title="Código Interno">@Html.DisplayFor(modelItem => sItem.Code)</a> <br />
+
+                    <a class="btn-link" onclick="BeginProviderCode('@sItem.ProductId')"  onmouseover="SetPointer(this)" data-toggle="tooltip" title="Código de proveedor" data-placement="right">
+                        @Html.DisplayFor(modelItem => sItem.ProviderCode)
+                        <span class="fa fa-edit"></span>
+                    </a>
+                </td>
+
+                <td class="text-uppercase" style="max-width:300px; min-width:250px">
+                    @Html.DisplayFor(modelItem => sItem.Name)<br />
+                    <strong>Marca </strong>@sItem.TradeMark
+                </td>
+
+                <td style="max-width:80px">
+                    <input type="number" autocomplete="off"  min="0" 
+                           class="form-control text-uppercase input-sm" id="sItem_BuyPrice" value="@sItem.BuyPrice" />
+                </td>
+                <td style="max-width:50px">
+                    <input type="number" autocomplete="off" max="100" min="0" 
+                           class="form-control text-uppercase input-sm" id="sItem_Discount" value="@sItem.Discount" />
+                </td>
+
+                <td style="max-width:50px">
+                    @Html.DisplayFor(modelItem => sItem.MaxQuantity)
+                    @Html.HiddenFor(modelItem => sItem.MaxQuantity)
+                </td>
+
+
+                <td style="max-width:50px">
+                    @Html.DisplayFor(modelItem => sItem.Quantity)
+                    @Html.HiddenFor(modelItem => sItem.Quantity)
+                </td>
+
+                <td class="text-uppercase  text-center" style="max-width:50px">
+
+                    <input type="number"  autocomplete="off" max="@sItem.Quantity" min="0" 
+                           class="form-control text-uppercase input-sm" id="sItem_AddQuantity" value="@sItem.AddQuantity" disabled="@sItem.AddToPurchaseDisabled" />
+                </td>
+
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="AddProduct(this)" title="Agregar a la compra" data-toggle="tooltip" data-placement="left" disabled='@sItem.AddToPurchaseDisabled'>
+                        <span class="fa fa-cart-plus"></span>
+                    </button>
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        LoadSearchProductList();
+    });
+</script>

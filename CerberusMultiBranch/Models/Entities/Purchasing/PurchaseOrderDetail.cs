@@ -70,7 +70,10 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
         public ICollection<StockMovement> StockMovements { get; set; }
 
-
+        public bool IsStored
+        {
+            get { return this.PurchaseOrder != null; }
+        }
         #endregion
 
         public PurchaseOrderDetail()

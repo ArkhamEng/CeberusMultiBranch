@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CerberusMultiBranch.Models.Entities.Finances

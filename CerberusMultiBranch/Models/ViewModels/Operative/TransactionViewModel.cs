@@ -1,5 +1,6 @@
 ﻿
 using CerberusMultiBranch.Models.Entities.Operative;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;

@@ -35,31 +35,39 @@
             <th class="text-center">
                 @Html.DisplayNameFor(model => model.LineTotal)
             </th>
-            <th></th>
+            <th>
+                @if (Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.PurchaseStatusId == PStatus.Watting)
+                {
+                    <button class="btn btn-sm btn-default" data-toggle="tooltip" title="Agrega partida a la orden" onclick="OpenSearchProducts()">
+                        <span class="fa fa-plus"></span>
+                    </button>
+                }
+            </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            var cls =  Model.First().PurchaseOrder.DeliveryDate != null ? (item.IsCompleated ?  "alert alert-success" : "alert alert-attention") : "";
+            var cls = Model.First().PurchaseOrder.DeliveryDate != null ? (item.IsCompleated ? "alert alert-success" : "alert alert-attention") : "";
             <tr class="@cls">
                 <td>
                     @Html.HiddenFor(modelItem => item.PurchaseOrderDetailId)
                     @Html.DisplayFor(modelItem => item.Product.Code) <br />
                     @Html.DisplayFor(modelItem => item.ProviderCode)
-                    
+                    @Html.HiddenFor(modelItem => item.LineTotal)
+
                 </td>
                 <td>
                     @Html.DisplayUpperFor(modelItem => item.Product.Name) <br />
-                    <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark) <strong>Unidad</strong> @Html.DisplayUpperFor(modelItem => item.Product.Unit)
+                    <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark) 
+                    <strong>Unidad</strong> @Html.DisplayUpperFor(modelItem => item.Product.Unit)
                 </td>
 
-                <td class="text-right">
+                <td id="tdUnitPrice" class="text-right">
                     @Html.DisplayFor(modelItem => item.UnitPrice)
-                    @Html.HiddenFor(modelItem => item.UnitPrice)
-                    @Html.HiddenFor(modelItem => item.LineTotal)
+
                 </td>
-                <td class="text-center"> 
+                <td id="tdDiscountLine" class="text-center">
                     @Html.DisplayFor(modelItem => item.Discount) %
                 </td>
                 <td class="text-center">
@@ -79,16 +87,25 @@
                     @Html.DisplayFor(modelItem => item.LineTotal)
                 </td>
                 <th>
-                    @if (item.PurchaseOrder.CanReceive && !item.IsCompleated)
+                    @if (item.IsStored && item.PurchaseOrder.CanReceive && !item.IsCompleated)
                     {
-                        <button class="btn btn-primary btn-sm" type="button" onclick="ReceiveProduct('@item.PurchaseOrderDetailId')" title="Recibe articulos de la partida">
-                            <span class="fa fa-plus-circle"></span>
+                        <button id="btnReceiveItem" class="btn btn-primary btn-sm" type="button" onclick="ReceiveProduct('@item.PurchaseOrderDetailId')"
+                                data-toggle="tooltip" title="Recibe articulos de la partida">
+                            <span class="fa fa-cart-arrow-down"></span>
                         </button>
                     }
-                    else if (item.PurchaseOrder.CanViewDetail)
+                    else if (item.IsStored && item.PurchaseOrder.CanViewDetail)
                     {
-                        <button class="btn btn-default btn-sm" type="button" onclick="ViewDetail('@item.PurchaseOrderDetailId')" title="Ver el detalle de la recepción">
+                        <button  class="btn btn-default btn-sm" type="button" onclick="ViewDetail('@item.PurchaseOrderDetailId')"
+                                data-toggle="tooltip" title="Ver el detalle de la recepción">
                             <span class="fa fa-eye"></span>
+                        </button>
+                    }
+                    else if (!item.IsStored)
+                    {
+                        <button class="btn btn-danger btn-sm" type="button" onclick="RemoveDetail('@item.ProductId')"
+                                data-toggle="tooltip" title="quitar partida adional">
+                            <span class="fa fa-trash"></span>
                         </button>
                     }
 
@@ -102,11 +119,11 @@
                 <div class="col-md-12 form-group text-capitalize">
                     <h5>
                         @Html.Label("Observaciones", htmlAttributes: new { @class = "control-label" })<br />
-                        @Model.First().PurchaseOrder.Comment.ToLower()
+                        @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.Comment.ToLower()
                     </h5>
                     <h5>
-                        <strong>Por</strong> @Model.First().PurchaseOrder.UpdUser
-                        , @Model.First().PurchaseOrder.UpdDate.ToString("dd/MM/yyyy HH:mm")
+                        <strong>Por</strong> @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.UpdUser
+                        @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.UpdDate.ToString("dd/MM/yyyy HH:mm")
                     </h5>
                 </div>
             </td>
@@ -124,7 +141,7 @@
             </td>
             <td class="text-right">
                 <h5 id="tdTaxAmount">
-                    @Model.First().PurchaseOrder.TaxAmount.ToMoney()
+                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.TaxAmount.ToMoney()
                 </h5>
             </td>
             <td></td>
@@ -138,7 +155,7 @@
             </td>
             <td class="text-right">
                 <h5>
-                    @Model.First().PurchaseOrder.Expenses
+                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.Expenses
                 </h5>
             </td>
             <td></td>
@@ -152,7 +169,7 @@
             </td>
             <td class="text-right">
                 <h5 id="tdTotalDue">
-                    @Model.First().PurchaseOrder.DiscountAmount
+                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.DiscountAmount
                 </h5>
             </td>
             <td></td>
@@ -163,9 +180,9 @@
                     <strong>Total</strong>
                 </h5>
             </td>
-            <td class="text-right" >
+            <td class="text-right">
                 <h5 id="tdTotalDue">
-                    @Model.First().PurchaseOrder.TotalDue.ToMoney()
+                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.TotalDue.ToMoney()
                 </h5>
             </td>
             <td></td>
@@ -177,46 +194,10 @@
     var ReceivedDetails = [];
     var itemsCount = parseInt('@Model.Where(m=> !m.IsCompleated).Count()');
 
-    function Received(input)
+    $(document).ready(function ()
     {
-        var row = $(input).parent().parent();
-
-        var orderQty = parseFloat($(row).find("#item_OrderQty").val());
-
-        var received = parseFloat($(input).val());
-
-        if (received > orderQty)
-            $(input).val(orderQty);
-
-        if (received < 0)
-            $(input).val(0);
-    }
-
-    function ReceiveProduct(id)
-    {
-        var detail;
-
-        $(ReceivedDetails).each(function (index, item)
-        {
-            if (item.DetailId == id) {
-                detail = item;
-            }
-        });
-
-        if (detail == null) {
-            detail = { DetailId: parseInt(id) };
-        }
-
-        ExecuteAjax('@Url.Action("ReceiveProduct", "Purchasing")', { item: detail }, function (response) {
-            ShowModal(response, 'static');
-        });
-    }
-
-    function ViewDetail(id)
-    {
-        ExecuteAjax('@Url.Action("ViewDetail", "Purchasing")', { id: id }, function (response) {
-            ShowModal(response, 'static');
-        });
-    }
+        var pendingCount = parseInt('@Model.Count(m => !m.IsStored)');
+        LoadDetails(pendingCount);
+    });
 
 </script>

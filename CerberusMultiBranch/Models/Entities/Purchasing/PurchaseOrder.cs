@@ -31,7 +31,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Display(Name = "Estado de Compra")]
         public PStatus PurchaseStatusId { get; set; }
 
-        [Display(Name="Tipo de Compra")]
+        [Display(Name = "Tipo de Compra")]
         public PType PurchaseTypeId { get; set; }
 
         [Display(Name = "Método de Envío")]
@@ -88,7 +88,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public DateTime InsDate { get; set; }
 
         [Display(Name = "Creador por")]
-        public string   InsUser { get; set; }
+        public string InsUser { get; set; }
 
         [Display(Name = "Editado")]
         public DateTime UpdDate { get; set; }
@@ -117,6 +117,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         public ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
 
         public ICollection<PurchaseOrderHistory> PurchaseOrderHistories { get; set; }
+
+        public ICollection<Purchase> Purchases { get; set; }
         #endregion
 
 
@@ -130,7 +132,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
 
                 if (this.Discount > Cons.Zero)
                     return (sub * (this.Discount / Cons.OneHundred)).ToMoney();
-             
+
                 else
                     return ((double)Cons.Zero).ToMoney();
             }
@@ -146,7 +148,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
             get
             {
                 return (this.PurchaseStatusId == PStatus.Authorized ||
-                        this.PurchaseStatusId == PStatus.SendingFailed && 
+                        this.PurchaseStatusId == PStatus.SendingFailed &&
                         HttpContext.Current.User.IsInRole("Capturista"));
             }
         }
@@ -164,8 +166,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         {
             get
             {
-                return (this.PurchaseStatusId == PStatus.Revised && 
-                    (HttpContext.Current.User.IsInRole("Supervisor") || HttpContext.Current.User.IsInRole("Administrador")) );
+                return (this.PurchaseStatusId == PStatus.Revised &&
+                    (HttpContext.Current.User.IsInRole("Supervisor") || HttpContext.Current.User.IsInRole("Administrador")));
             }
         }
 
@@ -174,8 +176,8 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
             get
             {
                 return ((this.PurchaseStatusId == PStatus.Watting ||
-                         this.PurchaseStatusId == PStatus.Partial) && 
-                         (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador")) );
+                         this.PurchaseStatusId == PStatus.Partial) &&
+                         (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador")));
             }
         }
 
@@ -183,11 +185,59 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         {
             get
             {
-                return ((this.PurchaseStatusId >= PStatus.Watting && 
+                return ((this.PurchaseStatusId >= PStatus.Watting &&
                     (HttpContext.Current.User.IsInRole("Capturista") || HttpContext.Current.User.IsInRole("Administrador"))));
             }
         }
 
+        public string StatusStyle
+        {
+            get
+            {
+                //el si ya esta revisado y sigue el flujo normal, todo es verde, 
+                //si se manda a revisar despues de haber sido autorizado el flujo será azul
+                var style = "alert alert-success";
+
+                switch (this.PurchaseStatusId)
+                {
+                    case PStatus.InRevision:
+                        style = "alert alert-dark";
+                        break;
+
+                    case PStatus.Partial:
+                        style = "alert alert-attention";
+                        break;
+
+                    case PStatus.SendingFailed:
+                        style = "alert alert-warning";
+                        break;
+
+                    case PStatus.NotAuthorized:
+                    case PStatus.Canceled:
+                        style = "alert alert-danger";
+                        break;
+
+                    case PStatus.Authorized:
+                    case PStatus.Revised:
+                        if (!string.IsNullOrEmpty(this.Folio))
+                            style = "alert alert-info";
+                        break;
+                }
+
+                return style;
+            }
+        }
+
+        public string FolioStyle
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(this.Folio))
+                    return "alert alert-dark";
+                else
+                    return "alert alert-success";
+            }
+        }
 
         #endregion
 

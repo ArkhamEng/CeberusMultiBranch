@@ -44,6 +44,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
      
         public SelectList ShipmentMethodes { get; set; }
 
+        public SelectList Branches { get; set; }
+
+        [Display(Name ="Sucursal")]
+        public int BranchId { get; set; }
+
         public bool SearchProviderDisabled
         {
             get { return (this.PurchaseItems.Count() > Cons.Zero); }

@@ -47,6 +47,13 @@ namespace CerberusMultiBranch
                    "~/Content/pnotify/pnotify.buttons.css",
                    "~/Content/pnotify/pnotify.nonblock.css"));
 
+
+            bundles.Add(new ScriptBundle("~/bundles/PurchaseOrder").Include(
+                    "~/AppScripts/PurchaseOrder.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/PurchaseEstimation").Include(
+                   "~/AppScripts/PurchaseEstimation.js"));
+
         }
     }
 }

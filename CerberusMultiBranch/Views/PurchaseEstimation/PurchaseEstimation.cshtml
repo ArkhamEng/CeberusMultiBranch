@@ -9,6 +9,8 @@
     ViewBag.Class = "fa fa-clipboard";
 }
 
+
+@Scripts.Render("~/bundles/PurchaseEstimation")
 @Scripts.Render("~/bundles/jqueryval")
 
 
@@ -19,8 +21,6 @@
 
 
 <br />
-
-
 <div class="panel panel-default">
     <div class="panel-body small">
 
@@ -32,11 +32,11 @@
                 <span class="input-group-addon"><i class="fa fa-handshake-o"></i></span>
                 @Html.EditorFor(model => model.ProviderName, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
                 @Html.ValidationMessageFor(model => model.ProviderId, "", new { @class = "text-danger" })
-                <span class="input-group-btn">
-                    <button class="btn btn-default btn-sm" type="button" title="Buscar proveedores" onclick="ShowProviderQuickSearch()" id="btnQuickSearchProvider">
+                <div class="input-group-btn">
+                    <button class="btn btn-default btn-sm" type="button" title="Buscar proveedores" onclick="ShowProviderQuickSearch()" id="btnQuickSearchProvider" data-toggle="tooltip" data-placement="right">
                         <span class="glyphicon glyphicon-search"></span>
                     </button>
-                </span>
+                </div>
             </div>
         </div>
 
@@ -44,7 +44,7 @@
             @Html.LabelFor(m => m.PurchaseType, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-map"></i></span>
-                @Html.DropDownListFor(model => model.PurchaseType,Model.PurchaseTypes, htmlAttributes:
+                @Html.DropDownListFor(model => model.PurchaseType, Model.PurchaseTypes, htmlAttributes:
                new { @class = "form-control text-uppercase input-sm" })
             </div>
         </div>
@@ -58,7 +58,7 @@
             </div>
         </div>
 
-     
+
         <div class="form-group col-md-2">
             @Html.LabelFor(m => m.Freight, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
@@ -79,7 +79,7 @@
             @Html.LabelFor(m => m.DaysToPay, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-calendar-check-o"></i></span>
-                @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type="number" } })
+                @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number" } })
             </div>
         </div>
 
@@ -87,7 +87,7 @@
             @Html.LabelFor(m => m.Discount, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number", id="GlobalDiscount" } })
+                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", type = "number", id = "GlobalDiscount" } })
             </div>
         </div>
 
@@ -100,21 +100,29 @@
             </div>
         </div>
 
+        <div class="form-group col-md-4 col-md-offset-1">
+            @Html.LabelFor(m => m.BranchId, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-map"></i></span>
+                @Html.DropDownListFor(model => model.BranchId, Model.Branches, htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+               
+            </div>
+        </div>
+
     </div>
     <div class="panel-footer clearfix">
         <div class="pull-right">
-          
-            <button class="btn btn-primary btn-sm" type="button" title="Agrega productos con bajo stock" id="btnBeginAddProduct" onclick="ShowProductQuickSearch()">
+            <button class="btn btn-primary btn-sm" type="button" title="Buscar productos para la sucursal" id="btnBeginAddProduct" onclick="ShowProductQuickSearch()" data-toggle="tooltip" data-placement="left">
                 <span class="fa fa-search"></span>
-                Buscar productos
-            </button>
-
-            <button class="btn btn-success btn-sm" type="button" title="Generar las ordenes de compra"  id="btnGenerate" onclick="GenerateOrders()">
+                Buscar Productos
+            </button> 
+            <button class="btn btn-success btn-sm" type="button" title="Generar las ordenes de compra" id="btnGenerate" onclick="GenerateOrders()" data-toggle="tooltip" data-placement="left">
                 <span class="fa fa-check"></span>
                 Generar pedido(s)
             </button>
-         
-            <button class="btn btn-danger btn-sm" type="button" title="Remueve todas las partidas agregadas" id="btnCancelAll" onclick="RemoveAll()">
+
+            <button class="btn btn-danger btn-sm" type="button" title="Remueve todas las partidas agregadas" id="btnCancelAll" onclick="RemoveAll()" data-toggle="tooltip" data-placement="left">
                 <span class="fa fa-trash"></span>
                 Eliminar todo
             </button>
@@ -123,72 +131,15 @@
     </div>
 </div>
 
-<div class="panel panel-default">
-    <div id="divPurchaseDetails" class="panel-body  dtContainer">
-       @Html.Partial("_PurchaseEstimationDetails",Model.PurchaseItems)
-    </div>
+
+<div id="divPurchaseDetails" class="panel-group">
+    @Html.Partial("_PurchaseEstimationDetails", Model.PurchaseItems)
 </div>
 
 
 <script>
-
-    function ShowProviderQuickSearch()
+    $(document).ready(function ()
     {
-        ShowQuickSearch('@Url.Action("ShowQuickSearch", "Providers")', function (id, name, ftr)
-        {
-            $("#ProviderId").val(id);
-            $("#ProviderName").val(name);
-
-            $("#btnBeginAddProduct").removeAttr("disabled");
-        });
-    }
-
-    function RemoveAll()
-    {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("RemoveAll", "Purchasing")', {providerId: $("#ProviderId").val()}, function (response)
-        {
-            ShowNotify(response.Header, response.Result, response.Body, 3000);
-            window.location = '@Url.Action("PurchaseEstimation","Purchases")';
-        });
-    }
-
-    function ShowProductQuickSearch()
-    {
-        ShowQuickSearch('@Url.Action("ShowRequiredProductSearch", "Purchasing")', function (id, name, ftr) { }, function () {  }, { providerId: $("#ProviderId").val() });
-    }
-
-    function GenerateOrders()
-    {
-
-        var model = {
-            ProviderId: $("#ProviderId").val(),
-            Comment: $("#Comment").val(),
-            PurchaseType: $("#PurchaseType").val(),
-            DaysToPay: $("#DaysToPay").val(),
-            Insurance: $("#Insurance").val(),
-            Freight: $("#Freight").val(),
-            Discount: $("#GlobalDiscount").val(),
-            ShipmentMethodId: $("#ShipmentMethodId").val(),
-        };
-
-        if(model.Comment.length < 5)
-        {
-            ShowNotify("Datos incorrectos","warning","Necesitas ingresar un comentario de 5 caracteres como mínimo",3000);
-            return;
-        }
-
-        if (model.PurchaseTypeId == '@Convert.ToInt16(PType.Credit)' && (!$.isNumeric(model.DaysToPay) ||  parseInt(model.DaysToPay) <= 0))
-        {
-            ShowNotify("Datos incorrectos","warning","Necesitas ingresar los dias de crédito",3000);
-            return;
-        }
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("CreateOrders", "Purchasing")', { model: model}, function (response)
-        {
-            window.location = '@Url.Action("PurchaseOrders", "Purchasing")';
-        });
-    }
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 </script>

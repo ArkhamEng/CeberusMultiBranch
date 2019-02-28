@@ -14,17 +14,14 @@
                 </strong>
             </h5>
         </div>
-        <div class="panel-body">
-            <table class="table table-bordered small">
+        <div class="panel-body dtContainer table-responsive">
+            <table class="table table-bordered small"  style="width:100%">
                 <thead>
                     <tr>
                         <th>
-                            @Html.DisplayName("Códigos")
+                            @Html.DisplayName("Producto")
                         </th>
-                        <th>
-                            @Html.DisplayName("Descripción")
-                        </th>
-
+                      
                         <th>
                             @Html.DisplayName("Costo")
                         </th>
@@ -47,21 +44,26 @@
                             @Html.DisplayName("Total")
                         </th>
                         <th>
-
                         </th>
                 </thead>
                 <tbody>
                     @foreach (var item in group.Value)
                     {
                         <tr>
-                            <td>
-                                Int: [@Html.DisplayFor(modelItem => item.Code)]<br />
-                                Prov:[@Html.DisplayFor(modelItem => item.ProviderCode)]
-                            </td>
-                            <td style="min-width:280px">
+                            <td style="max-width:380px; min-width:280px; white-space:normal" class="text-uppercase">
 
                                 @Html.HiddenFor(modelItem => item.ProductId)
+                                <h5 style="white-space:nowrap">
+                                    <a data-toggle="tooltip" title="Código Interno">
+                                        @Html.DisplayFor(modelItem => item.Code)
+                                    </a>
+                                    | |
 
+                                    <a data-toggle="tooltip" title="Código de proveedor">
+                                        <strong> @Html.DisplayFor(modelItem => item.ProviderCode)</strong>
+                                    </a>
+                                </h5>
+                                
                                 @Html.DisplayUpperFor(modelItem => item.Name) <br />
                                 <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.TradeMark)
                             </td>
@@ -88,12 +90,12 @@
                                 @Html.DisplayFor(modelItem => item.TotalLine)
                             </td>
 
-                            <td>
-                                <button type="button" class="btn btn-warning btn-sm" onclick="EditDetail('@item.BranchId','@item.ProductId')" title="has click para editar esta partida">
+                            <td style="max-width:80px">
+                                <button type="button" class="btn btn-warning btn-sm" onclick="EditDetail('@item.BranchId','@item.ProductId')" title="has click para editar esta partida" data-toggle="tooltip">
                                     <span class="fa fa-edit"></span>
                                 </button>
 
-                                <button type="button" class="btn btn-danger btn-sm" onclick="RemoveFromEstimation('@item.BranchId','@item.ProductId')" title="has click para remover esta partida">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="RemoveFromEstimation('@item.BranchId','@item.ProductId')" title="has click para remover esta partida" data-toggle="tooltip">
                                     <span class="fa fa-trash"></span>
                                 </button>
                               
@@ -113,61 +115,11 @@
 <script>
     $(document).ready(function ()
     {
-        $("#PuschaseType").change(function ()
-        {
-            var value = this.value;
+        var hasItems = ('@hasItems' == 'True');
 
-            if ($("#PuschaseType").val() != '@Convert.ToInt16(PType.Credit)')
-            {
-                $("#DaysToPay").attr("disabled", true);
-                $("#DaysToPay").val(0);
-            }
-            else
-                $("#DaysToPay").removeAttr("disabled");
-        });
-
-        var hasItems = '@hasItems';
-
-        if (hasItems == 'True')
-        {
-            $("#btnGenerate").removeAttr("disabled");
-            $("#btnCancelAll").removeAttr("disabled");
-            $("#btnQuickSearchProvider").attr("disabled", true);
-        }
-        else {
-            $("#btnGenerate").attr("disabled", true);
-            $("#btnCancelAll").attr("disabled", true);
-            $("#btnQuickSearchProvider").removeAttr("disabled");
-        }
-
-        if ($("#ProviderId").val() == '' || $("#ProviderId").val() == 0)
-            $("#btnBeginAddProduct").attr("disabled", true);
-        else
-            $("#btnBeginAddProduct").removeAttr("disabled");
-
+        LoadEstimationDetails(hasItems);
     });
 
 
-    function RemoveFromEstimation(branchId, productId)
-    {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("RemoveFromEstimation", "Purchasing")', { branchId: branchId, productId: productId }, function (response) {
-            HideLoading(function () {
-                $("#divPurchaseDetails").html(response);
-            });
-        });
-    }
-
-    function EditDetail(branchId, productId)
-    {
-        ShowLoading('static');
-
-        ExecuteAjax('@Url.Action("EditDetail", "Purchasing")', { branchId: branchId, productId: productId }, function (response) {
-            HideLoading(function ()
-            {
-                ShowModal(response, 'static');
-            });
-        });
-    }
+   
 </script>

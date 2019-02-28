@@ -2,17 +2,22 @@
 @using CerberusMultiBranch.Models.Entities.Purchasing
 
 
-<table id="tbPurchaseOrders" class="table  small" style="width:100%;">
+<table id="tbPurchaseOrders" class="table small table-bordered" style="width:100%" >
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.PurchaseStatusId)
             </th>
+
             <th>
                 @Html.DisplayNameFor(model => model.BranchId)
             </th>
+         
             <th>
                 @Html.DisplayNameFor(model => model.ProviderId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Bill)
             </th>
             <th style="white-space:nowrap">
                 @Html.DisplayNameFor(model => model.ShipMethodId)
@@ -27,7 +32,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.TotalDue)
             </th>
-            <th>
+            <th style="white-space:nowrap">
                 @Html.DisplayNameFor(model => model.TaxAmount)
             </th>
 
@@ -41,7 +46,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.DaysToPay)
             </th>
-            <th>
+            <th style="white-space:nowrap">
                 @Html.DisplayNameFor(model => model.Freight)
             </th>
             <th>
@@ -95,16 +100,21 @@
             }
 
             <tr>
-                <td style="min-width:100px" class="@cls">
+                <td style="min-width:100px"  class="@cls">
                     @Html.DisplayFor(modelItem => item.PurchaseStatus.Name) <br />
                     @Html.DisplayFor(modelItem => item.Folio)
                 </td>
 
                 <td style="min-width:100px">
-                    @Html.ActionLink(item.Branch.Name, "PurchaseOrder", new { id = item.PurchaseOrderId })
+                    @Html.ActionLink(item.Branch.Name, "PurchaseOrder", new { id = item.PurchaseOrderId },
+                   new { title = "Ir a al detalle", data_toggle = "tooltip", onclick = "ShowLoading('static')" })
                 </td>
                 <td style="min-width:200px">
-                    @Html.ActionLink(item.Provider.Name, "PurchaseOrder", new { id = item.PurchaseOrderId })
+                    @Html.ActionLink(item.Provider.Name, "PurchaseOrder", new { id = item.PurchaseOrderId },
+                   new { title = "Ir a al detalle", data_toggle = "tooltip", onclick = "ShowLoading('static')" })
+                </td>
+                <td  style="white-space:nowrap">
+                    @Html.DisplayFor(modelItem => item.Bill)
                 </td>
 
                 <td>
@@ -165,8 +175,7 @@
 <script>
     $(document).ready(function ()
     {
-        Paginate("#tbPurchaseOrders", 10, true, "#txtMainFilter", false, "#tbButtons")
-
-        
+       Paginate("#tbPurchaseOrders", 10, true, "#txtMainFilter", false, "#tbButtons")
+ 
     });
 </script>

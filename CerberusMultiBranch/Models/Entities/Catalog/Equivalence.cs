@@ -14,15 +14,18 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Column(Order = 0),Key]
         public int EquivalenceId { get; set; }
 
-        [Index("IDX_ProviderId", IsUnique = false)]
+        [Index("IDX_Provider_Product", Order = 0, IsUnique = false)]
         public int ProviderId { get; set; }
+
+        [ForeignKey("Product")]
+        [Index("IDX_Provider_Product", Order = 1, IsUnique = false)]
+        public int ProductId { get; set; }
 
         [Index("IDX_Code", IsUnique = false)]
         [MaxLength(30)]
         public string  Code { get; set; }
 
-        [ForeignKey("Product")]
-        public int ProductId { get; set; }
+        
 
         public double BuyPrice { get; set; }
 

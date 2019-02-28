@@ -13,59 +13,83 @@
     </div>
     <div class="panel-body">
         <div class="panel panel-default">
-            <div class="panel-body">
+            <div class="panel-body small">
                 @Html.HiddenFor(model => model.DetailId)
-                @Html.HiddenFor(model => model.Discount)
-                <table class="table small">
-                    <tr>
-                        <td colspan="4">
-                            <h4 class="form-group col-md-12 text-center">
-                                @Model.Description <br />
-                                <strong><span class="fa fa-cubes"></span></strong> @Model.MeasureUnit
-                            </h4>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            <div id="divAlert" class="alert alert-attention hidden">
 
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            @Html.LabelFor(m => m.RequestedQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.RequestedQty, new { htmlAttributes = new { @class = "form-control  input-sm", autocomplete = "off", @readonly = true } })
-                        </td>
-                        <td>
-                            @Html.LabelFor(m => m.ReceivedQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.ReceivedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetReceiveQty()", @readonly = true } })
-                        </td>
-                        <td>
-                            @Html.LabelFor(m => m.ComplementQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.ComplementQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", onkeyup = "SetComplement()", @readonly = true } })
-                        </td>
-                        <td>
-                            @Html.LabelFor(m => m.StockedQty, htmlAttributes: new { @class = "control-label" })
-                            @Html.EditorFor(model => model.StockedQty, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off", @readonly = true } })
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+                <div class="row">
+                    <h4 class="text-center">
+                        @Model.Description <br />
+                        <strong><span class="fa fa-cubes"></span></strong> @Model.MeasureUnit
+                    </h4>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.UnitPrice, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                            @Html.EditorFor(model => model.UnitPrice, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @type = "number", @readonly = true } })
+                        </div>
+                    </div>
 
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.Discount, htmlAttributes: new { @class = "control-label" })
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+                            @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @type = "number", @readonly = true } })
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.RequestedQty, htmlAttributes: new { @class = "control-label" })
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                            @Html.EditorFor(model => model.RequestedQty, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @type = "number", @readonly=true } })
+                        </div>
+                    </div>
+
+               
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.ReceivedQty, htmlAttributes: new { @class = "control-label" })
+
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                            @Html.EditorFor(model => model.ReceivedQty, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm",
+                            onkeyup = "SetReceiveQty()", autocomplete = "off", @type = "number", @readonly = true } })
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.ComplementQty, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                            @Html.EditorFor(model => model.ComplementQty, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm",
+                            onkeyup = "SetComplement()", autocomplete = "off", @type = "number", @readonly = true } })
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 form-group">
+                        @Html.LabelFor(m => m.StockedQty, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-cubes"></i></span>
+                            @Html.EditorFor(model => model.StockedQty, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @type = "number", @readonly = true } })
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Comment, htmlAttributes: new { @class = "control-label" })
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-comment"></i></span>
                             @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes:
                               new { @class = "form-control text-uppercase input-sm", autocomplete = "off", placeholder = "Escribe un comentario..", })
-
-                            <div class="checkbox" title="Cierra la partida con pendientes y recalcula los montos">
-                                <label class="control-label">
-                                    @Html.CheckBoxFor(model => model.IsCompleated, new { htmlAttributes = new { @class = "form-control" } })
-                                    <strong> Recepción completa </strong>
-                                </label>
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+                        </div>
+                    </div>
+                    <div id="divCompleated" class="form-group col-md-4">
+                        @Html.LabelFor(m => m.IsCompleated, htmlAttributes: new { @class = "control-label" })
+                        @Html.CheckBoxFor(model => model.IsCompleated, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -118,27 +142,42 @@
         }
 
     </div>
-    <div class="panel-footer">
-        <button class="btn btn-sm btn-primary" type="button" onclick="ApplyReception()">
-            <span class="fa fa-check"></span>
-            Aceptar
-        </button>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button class="btn btn-sm btn-primary" type="button" onclick="ApplyReception()">
+                <span class="fa fa-check"></span>
+                Aceptar
+            </button>
 
-        <button class="btn btn-sm btn-danger pull-right" type="button" onclick="HideModal(null,true)">
-            <span class="fa fa-times"></span>
-            Cerrar
-        </button>
+            <button class="btn btn-sm btn-danger" type="button" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+                Cerrar
+            </button>
+        </div>
     </div>
 </div>
+ <input type="hidden" id="SerialsCount" value="@Model.Serials.Count" />
+
+<input type="hidden" id="ReceiveDisabled" value="@Model.ReceiveDisabled" />
+
+<input type="hidden" id="IsTrackable" value="@Model.IsTrackable" />
 
 <script>
     $(document).ready(function ()
     {
-        if (parseInt('@Model.Serials.Count') > 0)
+        if (parseInt($("#SerialsCount").val()) > 0)
             $("#pnlItems").removeClass("hidden");
 
-        if ('@Model.ReceiveDisabled' == 'False')
+        if ($("#ReceiveDisabled").val() == 'False')
+        {
+            $("#UnitPrice").attr("readonly", false);
+            $("#Discount").attr("readonly", false);
             $("#ReceivedQty").attr("readonly", false);
+        }
+        else
+        {
+            $("#divCompleated").attr("hidden", true);
+        }
     });
 
 
@@ -146,7 +185,8 @@
     {
         var received = parseFloat($("#ReceivedQty").val());
 
-        if (received < 0) {
+        if (received < 0)
+        {
             $("#ReceivedQty").val(0);
             received = 0;
         }
@@ -155,7 +195,8 @@
         SetRowsForSerial(received);
     }
 
-    function SetComplement() {
+    function SetComplement()
+    {
         var complement = parseFloat($("#ComplementQty").val());
         var received = parseFloat($("#ReceivedQty").val());
 
@@ -170,13 +211,16 @@
         SetRowsForSerial(complement);
     }
 
-    function SetRowsForSerial(quantity) {
-        if ('@Model.IsTrackable' == 'True' && parseFloat(quantity) > 0) {
+    function SetRowsForSerial(quantity)
+    {
+        if ($("#IsTrackable").val() == 'True' && parseFloat(quantity) > 0)
+        {
             $("#tbItems tbody").empty();
 
             $("#pnlItems").removeClass('hidden');
 
-            for (i = 0; i < quantity; i++) {
+            for (i = 0; i < quantity; i++)
+            {
                 var consecutive = parseInt(i) + 1;
                 $("#tbItems tbody").append("<tr><td>" + consecutive + "</td><td><input id='serialNumber' type='text' class='form-control input-sm' /></td><td></td></tr>");
             }
@@ -187,9 +231,31 @@
     }
 
 
-    function ApplyReception() {
+    function ApplyReception()
+    {
+        var unitPrice = parseFloat($("#UnitPrice").val());
+        var isCompleated = $("#IsCompleated").prop("checked");
+        var receivedQty = parseFloat($("#ReceivedQty").val());
+        var requestedQty = parseFloat($("#RequestedQty").val());
+        var stockedQty = parseFloat($("#StockedQty").val());
+
+        var isPartial = requestedQty > stockedQty;
+
+        if (stockedQty > 0 && unitPrice <= 0 )
+        {
+            ShowNotify("Precio requerido", "warning", "Estas recibiendo producto, para esto requieres un precio de compra, Nota: si la partida es gratis utiliza el porcentaje de descuento a 100%", '3000');
+            return;
+        }
+
+        if (isPartial && !isCompleated && unitPrice <=0)
+        {
+            ShowNotify("Precio requerido", "warning", "Estas dejando la partida abierta para recepción, para esto se requiere un precio de compra,  Nota: si la partida es gratis utiliza el porcentaje de descuento a 100%", '3000');
+            return;
+        }
+
         var serials = [];
-        $("#tbItems tbody tr").each(function (index, row) {
+        $("#tbItems tbody tr").each(function (index, row)
+        {
             var item = { SerialNumber: $(row).find("#serialNumber").val(), Consecutive: index + 1 }
             serials.push(item);
         });
@@ -197,17 +263,17 @@
         var detail =
         {
             DetailId: $("#DetailId").val(),
-            ReceivedQty: $("#ReceivedQty").val(),
+            ReceivedQty: receivedQty,
             ComplementQty: $("#ComplementQty").val(),
-            RequestedQty: $("#RequestedQty").val(),
-            StockedQty: $("#StockedQty").val(),
+            RequestedQty: requestedQty,
+            StockedQty: stockedQty,
             Discount: $("#Discount").val(),
+            UnitPrice: unitPrice,
             Comment: $("#Comment").val(),
-            IsCompleated: (parseFloat($("#StockedQty").val()) >= parseFloat($("#RequestedQty").val())) || $("#IsCompleated").prop("checked"),
+            IsCompleated: ((stockedQty >= requestedQty) || isCompleated),
             Serials: serials,
             HasValues: true,
         };
-
 
         var subTotal = 0;
 
@@ -217,8 +283,8 @@
             var id = $(row).find("#item_PurchaseOrderDetailId").val();
             var option = $("#ddlAction").val();
 
-            if (id == detail.DetailId) {
-                var unitPrice = parseFloat($(row).find("#item_UnitPrice").val());
+            if (id == detail.DetailId)
+            {
 
                 var lineTotal = detail.IsCompleated ? (detail.StockedQty * unitPrice) : ((detail.RequestedQty * unitPrice));
 
@@ -228,6 +294,9 @@
                 $(row).find("#tdReceivedQty").text(detail.ReceivedQty);
                 $(row).find("#tdRejectedQty").text(detail.ComplementQty);
                 $(row).find("#tdStockedQty").text(detail.StockedQty);
+
+                $(row).find("#tdUnitPrice").text(GetCurrency(unitPrice));
+                $(row).find("#tdDiscountLine").text(detail.Discount+" %");
 
                 $(row).find("#tdLineTotal").text(GetCurrency(lineTotal));
 
@@ -256,17 +325,14 @@
 
         var totalDue = parseFloat(parseFloat(subTotal) + taxAmount);
 
-        var disPer = parseFloat($("#Discount").val());
+        var disPer = parseFloat($("#txtDiscount").val());
 
         var discount = 0.0;
 
-        if (disPer > 0 && disPer < 100)
+        if (disPer > 0 )
             discount = totalDue - (totalDue * (disPer / 100));
-        else if (disPer == 100)
-            discount = totalDue;
-      
 
-      
+
         $("#tdSubTotal").text(GetCurrency(subTotal));
 
         $("#tdTaxAmount").text(GetCurrency(taxAmount));
@@ -283,7 +349,8 @@
 
         $(ReceivedDetails).each(function (index, item)
         {
-            if (item.DetailId == detail.DetailId) {
+            if (item.DetailId == detail.DetailId)
+            {
                 item.ReceivedQty = detail.ReceivedQty;
                 item.RequestedQty = detail.RequestedQty;
                 item.ComplementQty = detail.ComplementQty;
@@ -297,8 +364,6 @@
 
         if (!added)
             ReceivedDetails.push(detail);
-
-        console.log(detail);
 
         HideModal(null, true);
     }

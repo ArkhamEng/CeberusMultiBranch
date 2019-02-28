@@ -17,6 +17,7 @@ using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.ViewModels.Catalog;
 using System.Text.RegularExpressions;
 using CerberusMultiBranch.Models.Entities.Finances;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {

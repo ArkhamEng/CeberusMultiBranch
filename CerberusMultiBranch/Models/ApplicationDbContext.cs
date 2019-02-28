@@ -116,7 +116,7 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<PurchaseItem> PurchaseItems { get; set; }
 
-        public DbSet<PurchaseOrder> PurchaseOrder { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
 
         public DbSet<PurchaseOrderHistory> PurchaseOrderHistories { get; set; }
 

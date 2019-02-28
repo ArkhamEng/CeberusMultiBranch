@@ -26,25 +26,49 @@
                     <span class="fa fa-cubes"></span>
                     <a>Recepción de Orden de Compra</a>
                     break;
+                case PStatus.Expired:
+                    <span class="fa fa-paper-plane"></span>
+                    <a>Solicitar cambio</a>
+                    break;
             }
 
         </h4>
     </div>
     <div class="panel-body small">
 
-        <div class="form-group col-md-12 text-center">
-            <h3>
-                <span class="fa fa-handshake-o"></span>
-                @Model.Provider.Name
-            </h3>
-        </div>
+        @if (Model.PurchaseStatusId == PStatus.Expired)
+        {
+            <div class="form-group col-md-12 text-center">
+                <h3>
+                    Estas a punto de solicitar un cambio en la orden de compra, no podras recibir ninguna partida hasta que el cambio sea autorizado
+                </h3>
+            </div>
+        }
+        else if (Model.PurchaseStatusId == PStatus.Watting)
+        {
+            <div class="form-group col-md-12 text-center">
+                <h3>
+                    Estas por realizar una recepción, los costos y descuentos ya no podran ser modificados
+                </h3>
+            </div>
+        }
+        else
+        {
+            <div class="form-group col-md-12 text-center">
+                <h3>
+                    <span class="fa fa-handshake-o"></span>
+                    @Model.Provider.Name
+                </h3>
+            </div>
 
-        <div class="form-group col-md-12 text-center">
-            <h4>
-                Monto Total
-                @Model.TotalDue.ToMoney()
-            </h4>
-        </div>
+            <div class="form-group col-md-12 text-center">
+                <h4>
+                    Monto Total
+                    @Model.TotalDue.ToMoney()
+                </h4>
+            </div>
+        }
+
         @if (Model.PurchaseStatusId == PStatus.Authorized || Model.PurchaseStatusId == PStatus.SendingFailed)
         {
             <div class="form-group col-md-12">
@@ -151,8 +175,14 @@
                     <span class="fa fa-cubes"></span>
                     Almacenar
                 </button>
-
                 break;
+            case PStatus.Expired:
+                <button class="btn  btn-sm btn-warning" title="Solicitar cambio en la orden" onclick="RequestChange('@Model.PurchaseOrderId')">
+                    <span class="fa fa-paper-plane"></span>
+                    Solicitar
+                </button>
+                break;
+
         }
 
         <button class="btn btn-sm btn-danger pull-right" title="Cierra la ventana" onclick="HideModal(null,true)">
@@ -162,70 +192,3 @@
     </div>
 </div>
 
-<script>
-
-
-
-    function SetAction(id, authorized, send) {
-        if (send && !authorized && $("#txtComment").val().length < 5 || !send && $("#txtComment").val().length < 5) {
-            ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
-            return;
-        }
-
-        if (send && authorized && $("#Provider_Email").val().length < 5) {
-            ShowNotify("Correo requerido", "warning", "Se requiere una dirección de correo válida", 3000);
-            return;
-        }
-
-        var model = { id: id, comment: $("#txtComment").val(), authorized: authorized, to: $("#Provider_Email").val() };
-
-        ShowModLoading();
-
-        ExecuteAjax('@Url.Action("SetAction", "Purchasing")', model, function (response) {
-            HideModLoading(function () {
-                ShowNotify(response.Header, response.Result, response.Body, 3000);
-
-                HideModal(function () {
-                    Reload();
-                }, true);
-
-            });
-        });
-    }
-
-    function Receive(id)
-    {
-        if ($("#txtComment").val().length < 5)
-        {
-            ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
-            return;
-        }
-     
-        if (ReceivedDetails.length < itemsCount)
-        {
-            ShowNotify("Revisión pendiente", "warning", "aun hay partidas pendientes de revisar", 3000);
-            return;
-        }
-
-        ShowModLoading();
-
-        var model = {
-            items: ReceivedDetails,
-            purchaseOrderId: id,
-            comment: $("#txtComment").val(),
-            shipMethodId: $("#ShipMethodId").val(),
-            freight: $("#addFreight").val(),
-            discount: $("#addDiscount").val(),
-            insurance: $("#addInsurance").val(),
-        };
-
-        ExecuteAjax('@Url.Action("CompleateReception", "Purchasing")', model, function (response)
-        {
-            HideModLoading(function ()
-            {
-                HideModal(function () { Reload(); }, true);
-            });
-        });
-    }
-
-</script>

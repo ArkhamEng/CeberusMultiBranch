@@ -69,22 +69,24 @@
 
         @if (Model.SerialsSaved.Count > 0)
         {
-            <table class="table table-bordered small">
-                <tr>
-                    <td>No Serie</td>
-                    <td>Fecha Ingreso</td>
-                    <td>Usuario</td>
-                </tr>
-
-                @foreach (var item in Model.SerialsSaved)
-                {
+            <div class="table-responsive">
+                <table class="table table-bordered small">
                     <tr>
-                        <td>@item.SerialNumber</td>
-                        <td>@item.InsDate.ToShortDateString()</td>
-                        <td>@item.InsUser</td>
+                        <td>No Serie</td>
+                        <td>Fecha Ingreso</td>
+                        <td>Usuario</td>
                     </tr>
-                }
-            </table>
+
+                    @foreach (var item in Model.SerialsSaved)
+                {
+                        <tr>
+                            <td>@item.SerialNumber</td>
+                            <td>@item.InsDate.ToShortDateString()</td>
+                            <td>@item.InsUser</td>
+                        </tr>
+                    }
+                </table>
+            </div>
         }
 
     </div>

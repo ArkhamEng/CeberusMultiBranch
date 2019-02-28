@@ -2,8 +2,8 @@
 @using CerberusMultiBranch.Models.Entities.Operative;
 
 @{
-    ViewBag.Title = "Compras";
-    ViewBag.Class = "fa fa-shopping-basket";
+    ViewBag.Title = "Facturas de compra";
+    ViewBag.Class = "fa fa-file-excel-o";
 }
 
 <h4 id="Debts" class="alert alert-warning col-md-offset-5 col-md-3"></h4>
@@ -72,8 +72,10 @@
 
 
 <div class="panel panel-default">
-    <div id="divPurchases" class="panel-body dtContainer">
-        @Html.Partial("_PurchaseList", Model.Purchases)
+    <div class="panel-body">
+        <div id="divPurchases"  class="dtContainer table-responsive">
+            @Html.Partial("_PurchaseList", Model.Purchases)
+        </div>
     </div>
 </div>
 

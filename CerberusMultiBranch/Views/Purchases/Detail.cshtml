@@ -1,10 +1,10 @@
-﻿@model CerberusMultiBranch.Models.Entities.Operative.Purchase
+﻿@model CerberusMultiBranch.Models.Entities.Purchasing.Purchase
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Models.ViewModels.Operative
 @using CerberusMultiBranch.Support
 @{
-    ViewBag.Title = "Registro de compras";
-    ViewBag.Class = "fa fa-shopping-basket";
+    ViewBag.Title = "Factura de compra";
+    ViewBag.Class = "fa fa-file-excel-o";
 }
 
 @Scripts.Render("~/bundles/jqueryval")
@@ -98,7 +98,27 @@
                             </div>
 
                             <div class="col-md-2 form-group">
-                                @Html.Label("Sub-Total", htmlAttributes: new { @class = "control-label small" })
+                                @Html.Label("Envio (Con IVA)", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-ship"></i></span>
+                                    <div class="form-control input-sm" >
+                                        @Model.Freight.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Seguro (Con IVA)", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-medkit"></i></span>
+                                    <div class="form-control input-sm" >
+                                        @Model.Insurance.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Total Partidas", htmlAttributes: new { @class = "control-label small" })
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                     <div class="form-control input-sm" id="divTotalAmount">
@@ -107,7 +127,18 @@
                                 </div>
                             </div>
                             <div class="col-md-2 form-group">
-                                @Html.Label("Total", htmlAttributes: new { @class = "control-label small" })
+                                @Html.Label("IVA (Partidas)", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                    <div class="form-control input-sm" >
+                                        @Model.TotalTaxAmount.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Partidas y gastos", htmlAttributes: new { @class = "control-label small" })
                                 <div class="input-group">
                                     <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
                                     <div class="form-control input-sm" id="divTaxedAmount">
@@ -115,6 +146,17 @@
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="col-md-2 form-group">
+                                @Html.Label("Monto descuento", htmlAttributes: new { @class = "control-label small" })
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+                                    <div class="form-control input-sm" >
+                                        @Model.DiscountedAmount.ToMoney()
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="col-md-2 form-group">
                                 @Html.Label("Monto Final", htmlAttributes: new { @class = "control-label small" })
                                 <div class="input-group">

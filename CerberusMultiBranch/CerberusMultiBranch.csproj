@@ -207,6 +207,7 @@
     <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
+    <Compile Include="Controllers\Operative\PurchaseEstimationController.cs" />
     <Compile Include="Controllers\Operative\PurchasingController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
@@ -410,6 +411,18 @@
     <Compile Include="Migrations\201902081921393_FixPurchaseItems.Designer.cs">
       <DependentUpon>201902081921393_FixPurchaseItems.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902222100097_Purchase_PurchaseOrder.cs" />
+    <Compile Include="Migrations\201902222100097_Purchase_PurchaseOrder.Designer.cs">
+      <DependentUpon>201902222100097_Purchase_PurchaseOrder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902230447223_BillFields.cs" />
+    <Compile Include="Migrations\201902230447223_BillFields.Designer.cs">
+      <DependentUpon>201902230447223_BillFields.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902230612380_EquivalenceIndex.cs" />
+    <Compile Include="Migrations\201902230612380_EquivalenceIndex.Designer.cs">
+      <DependentUpon>201902230612380_EquivalenceIndex.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -498,6 +511,7 @@
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\WithdrawalViewModel.cs" />
+    <Compile Include="Models\ViewModels\Purchasing\BillingViewModel.cs" />
     <Compile Include="Models\ViewModels\Purchasing\RequiredProductGroupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -516,6 +530,8 @@
     <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Global.js" />
     <Content Include="AppScripts\Operative.js" />
+    <Content Include="AppScripts\PurchaseEstimation.js" />
+    <Content Include="AppScripts\PurchaseOrder.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -1042,13 +1058,13 @@
     <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
     <Content Include="Views\Products\_ProductEditionImages.cshtml" />
     <Content Include="Views\Shared\_ChildLoading.cshtml" />
-    <Content Include="Views\Purchasing\PurchaseEstimation.cshtml" />
+    <Content Include="Views\PurchaseEstimation\PurchaseEstimation.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
     <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearch.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearchList.cshtml" />
-    <Content Include="Views\Purchasing\_PurchaseEstimationDetails.cshtml" />
-    <Content Include="Views\Purchasing\_SetProviderCode.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_PurchaseEstimationDetails.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_SetProviderCode.cshtml" />
     <Content Include="Views\Purchasing\PurchaseOrder.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderDetails.cshtml" />
     <Content Include="Views\Purchasing\_ReceivePurchaseItem.cshtml" />
@@ -1056,13 +1072,14 @@
     <Content Include="Views\Purchasing\_PurchaseOrderRevision.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrder.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderHistories.cshtml" />
-    <Content Include="Views\Purchasing\_RequiredProductSearch.cshtml" />
-    <Content Include="Views\Purchasing\_RequiredProductSearchList.cshtml" />
-    <Content Include="Views\Purchasing\_RequiredProductSearchGroup.cshtml" />
-    <Content Include="Views\Purchasing\_EditEstimationDetail.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_EditEstimationDetail.cshtml" />
     <Content Include="Views\Purchasing\PurchaseOrders.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderList.cshtml" />
     <Content Include="Views\Purchasing\_ReceptionDetail.cshtml" />
+    <Content Include="Views\Purchasing\_CreateBill.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderFilter.cshtml" />
+    <Content Include="Views\Shared\_SearchProductForOrder.cshtml" />
+    <Content Include="Views\Shared\_SearchProductForOrderList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1226,6 +1243,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902081921393_FixPurchaseItems.resx">
       <DependentUpon>201902081921393_FixPurchaseItems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902222100097_Purchase_PurchaseOrder.resx">
+      <DependentUpon>201902222100097_Purchase_PurchaseOrder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902230447223_BillFields.resx">
+      <DependentUpon>201902230447223_BillFields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902230612380_EquivalenceIndex.resx">
+      <DependentUpon>201902230612380_EquivalenceIndex.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
