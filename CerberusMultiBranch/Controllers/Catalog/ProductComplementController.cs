@@ -15,6 +15,31 @@ namespace CerberusMultiBranch.Controllers.Catalog
 {
     public partial class ProductsController : Controller
     {
+        public ActionResult SearchPagin()
+        {
+            var model = GetPagin(Cons.One, 10);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult SearchP(int page, int records)
+        {
+            var model = GetPagin(page, records);
+
+            return PartialView("_SearchPagin", model);
+        }
+
+        private PagedResult<Product> GetPagin(int page, int records)
+        {
+            var model = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
+                   Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
+                   Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
+
+                         select p).OrderBy(p => p.ProductId).GetPaged<Product>(page, records);
+
+            return model;
+        }
 
         #region QuickSearch
 

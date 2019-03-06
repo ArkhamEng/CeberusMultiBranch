@@ -1,0 +1,26 @@
+﻿
+@model PagedResult<CerberusMultiBranch.Models.Entities.Catalog.Product>
+
+@using CerberusMultiBranch.Support
+
+<div id="divPagin">
+    @Html.Partial("_SearchPagin", Model);
+</div>
+
+
+<script>
+
+    function GoTo(page)
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("SearchP")', { page: page, records:8 }, function (response)
+        {
+            HideLoading(function ()
+            {
+                $("#divPagin").html(response);
+            });
+        });
+    }
+
+</script>

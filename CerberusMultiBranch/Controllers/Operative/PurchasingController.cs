@@ -837,7 +837,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
                 //si la orden fue autorizada, creo un folio
-                if (authorized && !string.IsNullOrEmpty(purchaseOrder.Folio))
+                if (authorized && string.IsNullOrEmpty(purchaseOrder.Folio))
                 {
                     //año en curso
                     var year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));

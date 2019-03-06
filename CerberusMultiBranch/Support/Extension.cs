@@ -25,6 +25,37 @@ namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query,
+                                        int page, int pageSize) where T : class
+        {
+
+            var pagesToShow = 5d;
+
+            var result = new PagedResult<T>();
+            result.CurrentPage = page;
+            result.PageSize = pageSize;
+            result.RowCount = query.Count();
+
+
+            var pageCount = (double)result.RowCount / pageSize;
+            result.PageCount = (int)Math.Ceiling(pageCount);
+
+            var skip = (page - Cons.One) * pageSize;
+
+            result.Results = query.Skip(skip).Take(pageSize).ToList();
+
+            double _pageCount = ((double)((result.RowCount - Cons.One) / result.PageSize));
+            result.PagesCount = _pageCount - (Math.Round(_pageCount)) != Cons.Zero ? (int)(_pageCount + Cons.One) : (int)_pageCount;
+
+
+            var group = (int)Math.Ceiling(Convert.ToDouble(page / pagesToShow));
+
+            result.CurrentMax = group * (int)pagesToShow;
+            result.CurrentMin = result.CurrentMax - ((int)pagesToShow - Cons.One);
+             
+            return result;
+        }
+
         public static string GetTitle(string title)
         {
            return "<h1>Refaccionaria Autobien<h1><h2>"+title+"<h2/><h5>Sims 1.5 by ArkhamNet<h5/>";

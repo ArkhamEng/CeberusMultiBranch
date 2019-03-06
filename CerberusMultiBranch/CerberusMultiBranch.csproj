@@ -523,6 +523,7 @@
     <Compile Include="Support\GzipWrapper.cs" />
     <Compile Include="Support\JResponse.cs" />
     <Compile Include="Support\MailSender.cs" />
+    <Compile Include="Support\PageResult.cs" />
     <Compile Include="Support\record.cs" />
     <Compile Include="Support\Shift.cs" />
   </ItemGroup>
@@ -1080,12 +1081,12 @@
     <Content Include="Views\Purchasing\_PurchaseOrderFilter.cshtml" />
     <Content Include="Views\Shared\_SearchProductForOrder.cshtml" />
     <Content Include="Views\Shared\_SearchProductForOrderList.cshtml" />
+    <Content Include="Views\Products\SearchPagin.cshtml" />
+    <Content Include="Views\Products\_SearchPagin.cshtml" />
+    <Content Include="Views\Products\_Pagination.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Content\EmployeeProfile\" />
-    <Folder Include="Content\ProductImages\" />
-    <Folder Include="Content\UserProfile\" />
     <Folder Include="Views\Inventory\" />
     <Folder Include="Views\ProductComplement\" />
   </ItemGroup>

@@ -1,0 +1,52 @@
+﻿@model PagedResultBase
+
+@using CerberusMultiBranch.Support
+
+<div class="row">
+    
+    <div class="col-sm-5">
+        <div class="dataTables_info" aria-live="polite">
+            Pagina @Model.CurrentPage  de @Model.PagesCount
+        </div>
+        
+    </div>
+
+    <div class="col-sm-7">
+        <div class="dataTables_paginate pull-right" style="margin-top:-30px">
+            <ul class="pagination">
+                <li class="@Model.PrevClass paginate_button">
+                    <a onclick="GoTo('@(Model.CurrentPage - 1)')">
+                        Anterior
+                    </a>
+                </li>
+
+                @for (int page = Model.CurrentMin; page <= Model.CurrentMax; page++)
+            {
+                string active = "";
+
+                if (page == Model.CurrentPage)
+                {
+                    active = "active";
+                }
+
+                <li class="@active  paginate_button">
+                    <a onclick="GoTo('@page')">
+                        @page
+                    </a>
+                </li>
+                }
+                <li class="@Model.NextClass  paginate_button">
+                    <a onclick="GoTo('@(Model.CurrentMin + 5)')">
+                        ...
+                    </a>
+                </li>
+                <li class="@Model.NextClass  paginate_button">
+                    <a onclick="GoTo('@(Model.CurrentPage + 1)')">
+                        Siguiente
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
