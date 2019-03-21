@@ -31,7 +31,6 @@
             </div>
         </div>
         @Html.HiddenFor(m => Model.ProductId)
-        @Html.HiddenFor(m => Model.BuyPrice)
         @Html.HiddenFor(m => Model.Quantity)
         @Html.HiddenFor(m => Model.MaxQuantity)
 
@@ -42,7 +41,17 @@
                     @Html.Label("Costo", htmlAttributes: new { @class = "control-label" })
                     <div class="input-group">
                         <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
-                        <input type="text" class="form-control text-uppercase input-sm" value="@Model.BuyPrice.ToMoney()" readonly="readonly" />
+                       
+                        @Html.EditorFor(model => model.BuyPrice, new
+                    {
+                        htmlAttributes = new
+                        {
+                            type = "number",
+                            @class = "form-control text-uppercase input-sm",
+                            autocomplete = "off",
+                            onblur = "SetDiscount()"
+                        }
+                    })
                     </div>
 
                 </div>

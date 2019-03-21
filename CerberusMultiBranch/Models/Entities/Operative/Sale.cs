@@ -142,6 +142,17 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             }
         }
 
+        public string CompleatedState
+        {
+            get { return this.Status != TranStatus.InProcess ? "hidden" : ""; }
+        }
+
+       
+        public string CanCancell
+        {
+            get { return "hidden"; }
+        }
+
         public Sale() : base()
         {
             this.SaleDetails = new List<SaleDetail>();

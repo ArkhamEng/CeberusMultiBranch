@@ -9,11 +9,13 @@
     ViewBag.Class = "fa fa-shopping-cart";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+<script src="~/Scripts/printThis.js"></script>
 
 
 <div id="divPurchaseOrder">
     @Html.Partial("_PurchaseOrder", Model)
 </div>
 
-
+<div class="hidden">
+    <div  id="divPrintOrder"></div>
+</div>

@@ -2,39 +2,47 @@
 //global variables
 selectedProducts = [];
 
+selectedIds = [];
+
+removeQueu = [];
+
 
 //Inicia la acciones de revisión, autorización, recepción 
 //segun el estado actual de la orden de compra
-function BeginAction(changeRequested)
-{
+function BeginAction(changeRequested) {
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/BeginAction', { id: $("#PurchaseOrderId").val(), changeRequested: changeRequested }, function (response)
-    {
-        HideLoading(function ()
-        {
-            if ($.isPlainObject(response))
-            {
+    ExecuteAjax('/Purchasing/BeginAction', { id: $("#PurchaseOrderId").val(), changeRequested: changeRequested }, function (response) {
+        HideLoading(function () {
+            if ($.isPlainObject(response)) {
                 ShowNotify(response.Header, response.Result, response.Body, 3000);
                 Reload();
             }
-            else
-            {
+            else {
                 ShowModal(response, 'static');
             }
         });
     });
 }
 
-
-function SendPurchaseOrder()
-{
+function Print() {
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/SendPurchaseOrder', { id: $("#PurchaseOrderId").val() }, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/PrintPurchaseOrder', { id: $("#PurchaseOrderId").val() }, function (response) {
+        HideLoading(function () {
+            $("#divPrintOrder").html(response);
+            $("#imgOrder").attr("src", "/Content/Images/logo2.png");
+            $("#divPrintOrder").printThis();
+
+        });
+    });
+}
+
+function SendPurchaseOrder() {
+    ShowLoading('static');
+
+    ExecuteAjax('/Purchasing/SendPurchaseOrder', { id: $("#PurchaseOrderId").val() }, function (response) {
+        HideLoading(function () {
             ShowNotify(response.Header, response.Result, response.Body, 3000);
             Reload();
 
@@ -43,12 +51,10 @@ function SendPurchaseOrder()
 }
 
 //recarga la vista parcial _PurchasOrder.cshtml
-function Reload()
-{
+function Reload() {
     ShowLoading();
 
-    ExecuteAjax('/Purchasing/ReloadPurchaseOrder', { id: $("#PurchaseOrderId").val() }, function (response)
-    {
+    ExecuteAjax('/Purchasing/ReloadPurchaseOrder', { id: $("#PurchaseOrderId").val() }, function (response) {
         HideLoading(function () {
             $("#divPurchaseOrder").html(response);
         });
@@ -56,12 +62,10 @@ function Reload()
 }
 
 //Inicia la captura de la fatura para una orden de compra
-function BeginBilling()
-{
+function BeginBilling() {
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/BeginBilling', { id: $("#PurchaseOrderId").val() }, function (response)
-    {
+    ExecuteAjax('/Purchasing/BeginBilling', { id: $("#PurchaseOrderId").val() }, function (response) {
         HideLoading(function () {
             ShowModal(response);
         });
@@ -74,14 +78,21 @@ function BeginBilling()
 //acciones en la carga de la vista parcial _PurchaseOrderDetails.cshtml
 function LoadDetails(pendingCount)
 {
+    selectedIds = [];
+
     if (pendingCount > 0)
     {
         $("#btnReceive").addClass("hidden");
         $("#btnChange").removeClass("hidden");
 
-        $("#tbPurchaseDetails tr").each(function ()
+        $("#tbPurchaseDetails tr").each(function (index, row)
         {
             $(this).find("#btnReceiveItem").addClass("hidden");
+
+            var id = $(this).find("#item_ProductId").val();
+
+            if (id != undefined)
+                selectedIds.push(id);
         });
     }
 
@@ -90,11 +101,21 @@ function LoadDetails(pendingCount)
         $("#btnreceived").removeClass("hidden");
         $("#btnChange").addClass("hidden");
 
-        $("#tbPurchaseDetails tr").each(function ()
+        $("#tbPurchaseDetails tr").each(function (index, row)
         {
             $(this).find("#btnReceiveItem").removeClass("hidden");
+
+            var id = $(this).find("#item_ProductId").val();
+
+            if (id != undefined)
+                selectedIds.push(id);
         });
     }
+
+    if (selectedProducts.length > 0 || removeQueu.length > 0)
+        $("#btnChange").removeClass("hidden");
+    else
+        $("#btnChange").addClass("hidden");
 
     $('[data-toggle="tooltip"]').tooltip();
 }
@@ -121,77 +142,68 @@ function ReceiveProduct(id)
 
     $(ReceivedDetails).each(function (index, item)
     {
-        if (item.DetailId == id)
-        {
+        if (item.DetailId == id) {
             detail = item;
         }
     });
 
-    if (detail == null)
-    {
+    if (detail == null) {
         detail = { DetailId: parseInt(id) };
     }
 
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/ReceiveProduct', { item: detail }, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/ReceiveProduct', { item: detail }, function (response) {
+        HideLoading(function () {
             ShowModal(response, 'static', 'lg');
         });
     });
 }
 
 //Abre la ventana de detalle de recepcion de la partida (solo partidas recibidas cerradas)
-function ViewDetail(id)
-{
+function ViewDetail(id) {
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/ViewDetail', { id: id }, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/ViewDetail', { id: id }, function (response) {
+        HideLoading(function () {
             ShowModal(response, 'static', 'lg');
         });
     });
 }
 
 //Abre la ventana de búsqueda de productos
-function OpenSearchProducts()
-{
+function OpenSearchProducts() {
     ShowLoading('static');
 
     var filters = { providerId: $("#ProviderId").val(), branchId: $("#BranchId").val(), purchaseOrderId: $("#PurchaseOrderId").val() };
 
-    ExecuteAjax('/Purchasing/OpenSearchProducts', filters, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/OpenSearchProducts', filters, function (response) {
+        HideLoading(function () {
             ShowModal(response, 'static', 'ul');
         });
     });
 }
+
 
 //remueve una partida pendiente de guardar
 function RemoveDetail(productId)
 {
     var i = -1;
 
-    $(selectedProducts).each(function (index, value)
-    {
+    $(selectedProducts).each(function (index, value) {
         if (value.ProductId == productId)
             i = index;
     });
 
-    selectedProducts.splice(i, 1);;
+    if (i != -1)
+        selectedProducts.splice(i, 1);
+    else
+        removeQueu.push(productId);
 
     ShowLoading('static');
 
-    ExecuteAjax('/Purchasing/BeginAddDetail', { items: selectedProducts, id: $("#PurchaseOrderId").val() }, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/BeginAddDetail', { items: selectedProducts, toRemove: removeQueu, id: $("#PurchaseOrderId").val() }, function (response) {
+        HideLoading(function () {
             $("#divPurchaseDetails").html(response);
         });
     });
@@ -201,31 +213,25 @@ function RemoveDetail(productId)
 /*************************Search Product For Order*******************************************************/
 
 //realiza búsqueda de productos por medio de los parametros
-function SearchProduct()
-{
+function SearchProduct() {
     ShowModLoading();
 
     var filter = { filter: $("#FProductName").val(), providerId: $("#ProviderId").val(), branchId: $("#BranchId").val(), purchaseOrderId: $("#PurchaseOrderId").val() }
 
-    ExecuteAjax('/Purchasing/SearchProducts', filter, function (response)
-    {
-        HideModLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/SearchProducts', filter, function (response) {
+        HideModLoading(function () {
             $("#divProductList").html(response);
         });
     });
 }
 
 
-function CloseSearch()
-{
+function CloseSearch() {
     HideModal(null, true);
 }
 
-function CreateProduct()
-{
-    HideModal(function ()
-    {
+function CreateProduct() {
+    HideModal(function () {
         ShowCatalogModal(null, null, 'Product', 0);
 
     }, true);
@@ -238,23 +244,30 @@ function LoadSearchProductList()
     Paginate("#tbProducts", 10, false, "#FProductName");
     $('[data-toggle="tooltip"]').tooltip();
 
-    $(selectedProducts).each(function (index, value)
+    $(selectedIds).each(function (index, pId)
     {
         $("#tbProducts tr").each(function (index, row)
         {
             var id = $(row).find("#sItem_ProductId").val();
 
-            $(row).find("#sItem_Discount").val(value.Discount);
-            $(row).find("#sItem_BuyPrice").val(value.BuyPrice);
-            $(row).find("#sItem_AddQuantity").val(value.AddQuantity);
-
-            if (id == value.ProductId)
+            if (id != undefined && id == pId)
             {
+                $(selectedProducts).each(function (index, value)
+                {
+                    if (id = value.ProductId)
+                    {
+                        $(row).find("#sItem_Discount").val(value.Discount);
+                        $(row).find("#sItem_BuyPrice").val(value.BuyPrice);
+                        $(row).find("#sItem_AddQuantity").val(value.AddQuantity);
+                    }
+                });
+
+               
                 $(row).find("td input").each(function ()
                 {
                     $(this).prop("disabled", true);
                 });
-
+                
                 $(row).find("td button").prop("disabled", true);
 
                 $(row).addClass("alert alert-info");
@@ -294,8 +307,7 @@ function AddProduct(button)
 
     ShowModLoading();
 
-    ExecuteAjax('/Purchasing/BeginAddDetail', { items: selectedProducts, id: $("#PurchaseOrderId").val() }, function (response)
-    {
+    ExecuteAjax('/Purchasing/BeginAddDetail', { items: selectedProducts,toRemove: removeQueu, id: $("#PurchaseOrderId").val() }, function (response) {
         HideModLoading(function ()
         {
             $("#divPurchaseDetails").html(response);
@@ -304,23 +316,19 @@ function AddProduct(button)
 }
 
 
-function BeginProviderCode(productId)
-{
+function BeginProviderCode(productId) {
     ShowProviderCode(productId, SearchProduct);
 }
 
 /************** Purchase Order Revision ****************************/
 
-function SetAction(id, authorized, send)
-{
-    if (send && !authorized && $("#txtComment").val().length < 5 || !send && $("#txtComment").val().length < 5)
-    {
+function SetAction(id, authorized, send) {
+    if (send && !authorized && $("#txtComment").val().length < 5 || !send && $("#txtComment").val().length < 5) {
         ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
         return;
     }
 
-    if (send && authorized && $("#Provider_Email").val().length < 5)
-    {
+    if (send && authorized && $("#Provider_Email").val().length < 5) {
         ShowNotify("Correo requerido", "warning", "Se requiere una dirección de correo válida", 3000);
         return;
     }
@@ -329,10 +337,8 @@ function SetAction(id, authorized, send)
 
     ShowModLoading();
 
-    ExecuteAjax('/Purchasing/SetAction', model, function (response)
-    {
-        HideModLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/SetAction', model, function (response) {
+        HideModLoading(function () {
             ShowNotify(response.Header, response.Result, response.Body, 3000);
 
             HideModal(function () {
@@ -343,16 +349,13 @@ function SetAction(id, authorized, send)
     });
 }
 
-function Receive(id)
-{
-    if ($("#txtComment").val().length < 5)
-    {
+function Receive(id) {
+    if ($("#txtComment").val().length < 5) {
         ShowNotify("Comentario requerido", "warning", "Se requiere un comentario mayor a 5 caracteres", 3000);
         return;
     }
 
-    if (ReceivedDetails.length < itemsCount)
-    {
+    if (ReceivedDetails.length < itemsCount) {
         ShowNotify("Revisión pendiente", "warning", "aun hay partidas pendientes de revisar", 3000);
         return;
     }
@@ -369,10 +372,8 @@ function Receive(id)
         insurance: $("#addInsurance").val(),
     };
 
-    ExecuteAjax('/Purchasing/CompleateReception', model, function (response)
-    {
-        HideModLoading(function ()
-        {
+    ExecuteAjax('/Purchasing/CompleateReception', model, function (response) {
+        HideModLoading(function () {
             HideModal(function () { Reload(); }, true);
         });
     });
@@ -380,9 +381,15 @@ function Receive(id)
 
 function RequestChange(purchaseOrderId)
 {
+    if (selectedIds.length <= 0)
+    {
+        ShowNotify("Orden sin partidas", 'danger', "No puedes dejar una orden de compra sin partidas", 3000);
+        return;
+    }
+        
     ShowModLoading('static');
 
-    ExecuteAjax('/Purchasing/RequestChange', { id: purchaseOrderId, items: selectedProducts, comment: $("#txtComment").val() }, function (response)
+    ExecuteAjax('/Purchasing/RequestChange', { id: purchaseOrderId, items:selectedProducts, toRemove: removeQueu, comment: $("#txtComment").val() }, function (response)
     {
         ShowNotify(response.Header, response.Result, response.Body, 3000);
         window.location = '/Purchasing/PurchaseOrder/' + purchaseOrderId;

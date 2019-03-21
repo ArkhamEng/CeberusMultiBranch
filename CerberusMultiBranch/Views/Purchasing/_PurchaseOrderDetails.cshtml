@@ -3,6 +3,7 @@
 @using CerberusMultiBranch.Models.Entities.Purchasing
 
 
+@{var parent = Model.FirstOrDefault(d => d.IsStored) != null ? Model.FirstOrDefault(d => d.IsStored).PurchaseOrder : new PurchaseOrder { Comment = "", PurchaseStatusId = PStatus.NotAuthorized }; }
 
 <table id="tbPurchaseDetails" class="table small">
     <thead>
@@ -10,7 +11,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Product.Code)
             </th>
-
             <th>
                 @Html.DisplayNameFor(model => model.Product.Name)
             </th>
@@ -36,7 +36,7 @@
                 @Html.DisplayNameFor(model => model.LineTotal)
             </th>
             <th>
-                @if (Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.PurchaseStatusId == PStatus.Watting)
+                @if (parent.PurchaseStatusId == PStatus.NotAuthorized || parent.PurchaseStatusId == PStatus.Watting)
                 {
                     <button class="btn btn-sm btn-default" data-toggle="tooltip" title="Agrega partida a la orden" onclick="OpenSearchProducts()">
                         <span class="fa fa-plus"></span>
@@ -48,6 +48,7 @@
     <tbody>
         @foreach (var item in Model)
         {
+
             var cls = Model.First().PurchaseOrder.DeliveryDate != null ? (item.IsCompleated ? "alert alert-success" : "alert alert-attention") : "";
             <tr class="@cls">
                 <td>
@@ -55,11 +56,13 @@
                     @Html.DisplayFor(modelItem => item.Product.Code) <br />
                     @Html.DisplayFor(modelItem => item.ProviderCode)
                     @Html.HiddenFor(modelItem => item.LineTotal)
+                    @Html.HiddenFor(modelItem => item.ProductId)
+            
 
                 </td>
                 <td>
                     @Html.DisplayUpperFor(modelItem => item.Product.Name) <br />
-                    <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark) 
+                    <strong>Por</strong>  @Html.DisplayUpperFor(modelItem => item.Product.TradeMark)
                     <strong>Unidad</strong> @Html.DisplayUpperFor(modelItem => item.Product.Unit)
                 </td>
 
@@ -96,34 +99,35 @@
                     }
                     else if (item.IsStored && item.PurchaseOrder.CanViewDetail)
                     {
-                        <button  class="btn btn-default btn-sm" type="button" onclick="ViewDetail('@item.PurchaseOrderDetailId')"
+                        <button class="btn btn-success btn-sm" type="button" onclick="ViewDetail('@item.PurchaseOrderDetailId')"
                                 data-toggle="tooltip" title="Ver el detalle de la recepción">
                             <span class="fa fa-eye"></span>
                         </button>
                     }
-                    else if (!item.IsStored)
+                    else if ((parent.PurchaseStatusId == PStatus.NotAuthorized && (parent.OrderDate == null || !string.IsNullOrEmpty(item.Comment))) || (parent.PurchaseStatusId == PStatus.Watting && !item.IsStored))
                     {
                         <button class="btn btn-danger btn-sm" type="button" onclick="RemoveDetail('@item.ProductId')"
-                                data-toggle="tooltip" title="quitar partida adional">
+                                data-toggle="tooltip" title="quitar partida">
                             <span class="fa fa-trash"></span>
                         </button>
                     }
-
+                 
                 </th>
             </tr>
         }
     </tbody>
+
     <tfoot>
         <tr>
             <td colspan="6" rowspan="5">
                 <div class="col-md-12 form-group text-capitalize">
                     <h5>
                         @Html.Label("Observaciones", htmlAttributes: new { @class = "control-label" })<br />
-                        @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.Comment.ToLower()
+                        @parent.Comment.ToLower()
                     </h5>
                     <h5>
-                        <strong>Por</strong> @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.UpdUser
-                        @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.UpdDate.ToString("dd/MM/yyyy HH:mm")
+                        <strong>Por</strong> @parent.UpdUser
+                        @parent.UpdDate.ToString("dd/MM/yyyy HH:mm")
                     </h5>
                 </div>
             </td>
@@ -141,7 +145,7 @@
             </td>
             <td class="text-right">
                 <h5 id="tdTaxAmount">
-                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.TaxAmount.ToMoney()
+                    @parent.TaxAmount.ToMoney()
                 </h5>
             </td>
             <td></td>
@@ -155,7 +159,7 @@
             </td>
             <td class="text-right">
                 <h5>
-                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.Expenses
+                    @parent.Expenses
                 </h5>
             </td>
             <td></td>
@@ -169,7 +173,7 @@
             </td>
             <td class="text-right">
                 <h5 id="tdTotalDue">
-                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.DiscountAmount
+                    @parent.DiscountAmount
                 </h5>
             </td>
             <td></td>
@@ -182,7 +186,7 @@
             </td>
             <td class="text-right">
                 <h5 id="tdTotalDue">
-                    @Model.FirstOrDefault(d => d.IsStored).PurchaseOrder.TotalDue.ToMoney()
+                    @parent.TotalDue.ToMoney()
                 </h5>
             </td>
             <td></td>
@@ -197,7 +201,9 @@
     $(document).ready(function ()
     {
         var pendingCount = parseInt('@Model.Count(m => !m.IsStored)');
+
         LoadDetails(pendingCount);
+
     });
 
 </script>

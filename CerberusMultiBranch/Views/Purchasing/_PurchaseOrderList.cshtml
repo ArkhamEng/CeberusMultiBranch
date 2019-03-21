@@ -76,31 +76,8 @@
     <tbody>
         @foreach (var item in Model)
         {
-            string cls = "alert alert-info";
-
-            switch(item.PurchaseStatusId)
-            {
-                case PStatus.InRevision:
-                    cls = "alert alert-dark";
-                    break;
-                case PStatus.Canceled:
-                    cls = "alert alert-danger";
-                    break;
-                case PStatus.NotAuthorized:
-                case PStatus.SendingFailed:
-                    cls = "alert alert-warning";
-                    break;
-                case PStatus.Partial:
-                    cls = "alert alert-attention";
-                    break;
-                case PStatus.Received:
-                    cls = "alert alert-success";
-                    break;
-
-            }
-
             <tr>
-                <td style="min-width:100px"  class="@cls">
+                <td style="min-width:100px"  class="@item.StatusStyle">
                     @Html.DisplayFor(modelItem => item.PurchaseStatus.Name) <br />
                     @Html.DisplayFor(modelItem => item.Folio)
                 </td>

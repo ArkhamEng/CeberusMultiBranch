@@ -119,8 +119,6 @@
                 </ul>
             </li>
 
-
-            
             @if (User.IsInRole("Administrador"))
             {
                 <li>
@@ -136,7 +134,9 @@
                 </li>
             }
 
+            <li><a href="http://mail.autobien.com.mx" onclick="ShowLoading()">&nbsp;Web Mail<span class="fa fa-envelope" style="float:left" /></a></li>
             <li><a href="/Home/About" onclick="ShowLoading()">&nbsp;Acerca de<span class="glyphicon glyphicon-question-sign" style="float:left" /></a></li>
+            
         </ul>
     </div>
 </nav>

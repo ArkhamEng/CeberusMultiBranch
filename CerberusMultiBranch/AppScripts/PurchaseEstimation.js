@@ -79,6 +79,11 @@ function SetDiscount()
     var price = parseFloat($("#BuyPrice").val());
     var discount = parseFloat($("#Discount").val());
 
+    if (!$.isNumeric(price) || price < 0)
+    {
+        price = 0;
+        $("#BuyPrice").val(price);
+    }
 
     if (!$.isNumeric(discount) || discount < 0 || discount > 100)
     {
@@ -94,6 +99,8 @@ function SetDiscount()
 
     $("#divTotal").text("Total Partida " + GetCurrency(total));
 }
+
+
 
 function SetTotal()
 {
@@ -123,7 +130,7 @@ function SetDetailChange(productId, branchId)
 {
     ShowModLoading();
 
-    var model = { productId: productId, branchId: branchId, quantity: $("#AddQuantity").val(), discount: $("#Discount").val() };
+    var model = { productId: productId, branchId: branchId, quantity: $("#AddQuantity").val(), discount: $("#Discount").val(), price: $("#BuyPrice").val() };
 
    
     ExecuteAjax('/PurchaseEstimation/SetDatailChange', model, function (response)

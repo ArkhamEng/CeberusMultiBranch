@@ -634,7 +634,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //creo un detalle por cada item del carrito
                     var detail = new SaleDetail
                     {
-                        Amount = item.Amount,
+                        Amount    = item.Amount,
                         Price = item.Price,
                         ProductId = item.ProductId,
                         Quantity = item.Quantity,

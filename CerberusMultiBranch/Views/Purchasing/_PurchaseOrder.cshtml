@@ -1,31 +1,32 @@
 ﻿@model PurchaseOrder
 @using CerberusMultiBranch.Models.Entities.Purchasing
 @using CerberusMultiBranch.Models
-
+@using CerberusMultiBranch.Support
 
 
 
 @Scripts.Render("~/bundles/PurchaseOrder")
 
-
-<h4 id="divFolio" class="@Model.FolioStyle col-md-3 col-lg-2" title="Folio de la orden de compra" data-toggle="tooltip">
-    @Model.Folio
-</h4>
-<h4 id="divStatus" class= "@Model.StatusStyle col-lg-offset-8 col-lg-2 col-md-offset-7 col-md-2" title="@Model.PurchaseStatus.Description" data-toggle="tooltip">
-    @Model.PurchaseStatus.Name<br />
-</h4>
-
+@if (Model.PurchaseOrderId != Cons.Zero)
+{
+    <h4 id="divFolio" class="@Model.FolioStyle col-md-3 col-lg-2" title="Folio de la orden de compra" data-toggle="tooltip">
+        @Model.Folio
+    </h4>
+    <h4 id="divStatus" class="@Model.StatusStyle col-lg-offset-8 col-lg-2 col-md-offset-7 col-md-2" title="@Model.PurchaseStatus.Description" data-toggle="tooltip">
+        @Model.PurchaseStatus.Name<br />
+    </h4>
+}
 <hr />
 
 <div class="panel panel-default">
-    
+
     @Html.HiddenFor(m => m.PurchaseOrderId)
     @Html.HiddenFor(model => model.BranchId)
     @Html.HiddenFor(model => model.ProviderId)
 
     @Html.HiddenFor(model => model.TaxAmount)
     @Html.HiddenFor(model => model.TotalDue)
-   
+
 
     <div class="panel-body small">
         <div class="form-group col-md-4">
@@ -116,7 +117,7 @@
             @Html.LabelFor(model => model.Discount, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-percent"></i></span>
-                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true, id="txtDiscount" } })
+                @Html.EditorFor(model => model.Discount, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true, id = "txtDiscount" } })
             </div>
         </div>
 
@@ -124,27 +125,32 @@
             @Html.LabelFor(model => model.Bill, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-file-excel-o"></i></span>
-                
+
                 @if (!string.IsNullOrEmpty(Model.Bill))
                 {
-                    @Html.ActionLink(Model.Bill, "Detail", "Purchases", new { id = Model.Purchases.FirstOrDefault().PurchaseId }, 
-                   new { @class = "form-control text-uppercase input-sm", onclick="ShowLoading('static')" })
+                    @Html.ActionLink(Model.Bill, "Detail", "Purchases", new { id = Model.Purchases.FirstOrDefault().PurchaseId },
+                   new { @class = "form-control text-uppercase input-sm", onclick = "ShowLoading('static')" })
                 }
                 else
                 {
                     @Html.EditorFor(model => model.Bill, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
                 }
-                
+
             </div>
         </div>
-       
+
     </div>
-    <div class="panel-footer">
-        
-        @Html.ActionLink(" Buscar", "PurchaseOrders", "Purchasing", null,new { @class= "fa fa-search btn btn-info",
-       title ="volver a pantalla de búsqueda", data_toggle = "tooltip", onclick="ShowLoading('static')" })
-        
-        
+    <div class="panel-footer clearfix">
+
+        @Html.ActionLink(" Buscar", "PurchaseOrders", "Purchasing", null, new
+   {
+       @class = "fa fa-search btn btn-info",
+       title = "volver a pantalla de búsqueda",
+       data_toggle = "tooltip",
+       onclick = "ShowLoading('static')"
+   })
+
+
         @if (Model.CanRevise)
         {
             <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Revisia la orden para envíarla a autorización" onclick="BeginAction()">
@@ -155,7 +161,7 @@
 
         @if (Model.CanAuthorize)
         {
-            <button  class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Autoriza la orden de compra" onclick="BeginAction()">
+            <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Autoriza la orden de compra" onclick="BeginAction()">
                 <span class="fa fa-check"></span>
                 Autorización
             </button>
@@ -170,16 +176,17 @@
         }
         @if (Model.CanReceive)
         {
-            <button id="btnReceive" class="btn btn-success btn-sm" type="button"  data-toggle="tooltip" title="Recibe los articulos en el almacen" onclick="BeginAction()">
+            <button id="btnReceive" class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" title="Recibe los articulos en el almacen" onclick="BeginAction()">
                 <span class="fa fa-cubes"></span>
                 Recibir
             </button>
-
-            <button id="btnChange" class="btn btn-warning btn-sm hidden" type="button" title="Solicita autorización para agregar partidas" data-toggle="tooltip" onclick="BeginAction(true)">
-                <span class="fa fa-paper-plane-o"></span>
-                Solicitar Cambio
-            </button>
         }
+
+        <button id="btnChange" class="btn btn-warning btn-sm hidden" type="button" title="Solicita autorización para agregar partidas" data-toggle="tooltip" onclick="BeginAction(true)">
+            <span class="fa fa-paper-plane-o"></span>
+            Solicitar Cambio
+        </button>
+
         @if (string.IsNullOrEmpty(Model.Bill) && (Model.PurchaseStatusId == PStatus.Received || Model.PurchaseStatusId == PStatus.Partial))
         {
             <button class="btn btn-success btn-sm" type="button" data-toggle="tooltip" title="Genera una factura de compra asociada a la orden de compra" onclick="BeginBilling()">
@@ -187,7 +194,12 @@
                 Facturar
             </button>
         }
-        
+
+        <button class="btn btn-success btn-sm" type="button" data-toggle="tooltip" title="Imprime la orden de compra" onclick="Print()">
+            <span class="fa fa-print"></span>
+            Imprimir
+        </button>
+
     </div>
 </div>
 
@@ -197,18 +209,18 @@
 </ul>
 
 <div class="tab-content">
-    <div id="Details" class="tab-pane fade in active panel-group">
+    <div id="Details" class="tab-pane fade in active">
         <div class="panel panel-default">
             <div id="divPurchaseDetails" class="panel-body dtContainer table-responsive">
-                    @Html.Partial("_PurchaseOrderDetails", Model.PurchaseOrderDetails)
+                @Html.Partial("_PurchaseOrderDetails", Model.PurchaseOrderDetails)
             </div>
         </div>
     </div>
-  
+
     <div id="History" class="tab-pane fade">
         <div class="panel panel-default">
             <div class="panel-body dtContainer table-responsive">
-                    @Html.Partial("_PurchaseOrderHistories", Model.PurchaseOrderHistories)
+                @Html.Partial("_PurchaseOrderHistories", Model.PurchaseOrderHistories)
             </div>
         </div>
     </div>

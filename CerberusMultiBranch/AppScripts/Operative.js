@@ -87,8 +87,10 @@ function ShowProviderCode(productId, compleateCallBack)
 }
 
 //Validata la partida que agregara a la orden de compra
-function ValidateDetails(model) {
-    if ((model.MaxQuantity - model.Quantity) < model.AddQuantity) {
+function ValidateDetails(model)
+{
+    if ((model.MaxQuantity - model.Quantity) < model.AddQuantity)
+    {
         ShowNotify("Cantidad excedente", "danger", "estas intentando comprar mas producto del requerido", 3000);
         return false;
     }

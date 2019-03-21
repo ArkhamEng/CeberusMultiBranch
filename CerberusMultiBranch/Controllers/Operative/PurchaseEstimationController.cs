@@ -250,7 +250,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult SetDatailChange(int productId, int branchId, double quantity, double discount)
+        public ActionResult SetDatailChange(int productId, int branchId, double quantity, double discount, double price)
         {
             try
             {
@@ -258,10 +258,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var detail = db.PurchaseItems.FirstOrDefault(i => i.ProductId == productId && i.BranchId == branchId && i.UserId == userId);
 
+                detail.Price = price;
                 detail.Quantity = quantity;
                 detail.Discount = discount;
                 detail.TotalLine = discount == Cons.Zero ? (quantity * detail.Price) : (quantity * detail.Price) - ((quantity * detail.Price) * (discount / Cons.OneHundred));
 
+                db.Entry(detail).Property(p => p.Price).IsModified = true;
                 db.Entry(detail).Property(p => p.Quantity).IsModified = true;
                 db.Entry(detail).Property(p => p.TotalLine).IsModified = true;
                 db.Entry(detail).Property(p => p.Discount).IsModified = true;

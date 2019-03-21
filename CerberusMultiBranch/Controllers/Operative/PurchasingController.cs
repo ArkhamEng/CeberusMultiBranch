@@ -30,6 +30,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             st.Add(PStatus.Canceled);
             st.Add(PStatus.Received);
+            st.Add(PStatus.NotAuthorized);
+
 
             ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
             ViewBag.PurchaseStatuses = db.PurchaseStatuses.ToSelectList();
@@ -100,16 +102,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             join bp in db.BranchProducts on p.ProductId equals bp.ProductId
 
-                            join d in db.PurchaseOrderDetails.Where(d=> d.PurchaseOrderId == purchaseOrderId) on p.ProductId equals d.ProductId into dm
+                            join d in db.PurchaseOrderDetails.Where(d => d.PurchaseOrderId == purchaseOrderId) on p.ProductId equals d.ProductId into dm
                             from od in dm.DefaultIfEmpty()
-                            
+
                             join e in db.Equivalences.Where(ev => ev.ProviderId == providerId) on bp.ProductId equals e.ProductId into em
                             from eq in em.DefaultIfEmpty()
 
                             where
                                    (bp.BranchId == branchId) &&
-                                   (bp.Stock < bp.MaxQuantity) //&&
-                                   //(od == null)
+                                   (bp.Stock < bp.MaxQuantity)
 
                             select new ProductViewModel
                             {
@@ -126,9 +127,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 AddQuantity = od != null ? od.OrderQty : bp.MaxQuantity - bp.Stock,
                                 BranchName = bp.Branch.Name,
                                 ProviderCode = eq != null ? eq.Code : "No asignado",
-                                BuyPrice = eq != null ? eq.BuyPrice : Cons.Zero,
-                                Discount = od !=null ? od.Discount : Cons.Zero,
-                                AddToPurchaseDisabled = (od != null)
+                                BuyPrice = od != null ? od.UnitPrice : Cons.Zero,
+                                Discount = od != null ? od.Discount : Cons.Zero,
+                                //AddToPurchaseDisabled = (od != null)
 
                             }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).ToList();
 
@@ -141,14 +142,24 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpGet]
-        public ActionResult PurchaseOrder(int id)
+        public ActionResult PurchaseOrder(int? id)
         {
             ViewBag.PurchaseTypes = db.PurchaseTypes.ToSelectList();
             ViewBag.ShipMethodes = db.ShipMethodes.ToSelectList();
 
-            var model = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).
-                Include(o => o.PurchaseOrderHistories).Include(p => p.Purchases).
-                                                FirstOrDefault(o => o.PurchaseOrderId == id);
+            PurchaseOrder model = null;
+
+            if (id != null)
+                model = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).
+                   Include(o => o.PurchaseOrderHistories).Include(p => p.Purchases).
+                                                   FirstOrDefault(o => o.PurchaseOrderId == id);
+            else
+            {
+                model = new PurchaseOrder();
+                model.PurchaseOrderDetails = new List<PurchaseOrderDetail>();
+                model.PurchaseOrderHistories = new List<PurchaseOrderHistory>();
+            }
+
 
             foreach (var detail in model.PurchaseOrderDetails)
             {
@@ -526,7 +537,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                         //si el producto subio de precio o bajó y no hay stock , actualizo el nuevo precio 
                         if (buyPrice > inventory.BuyPrice || (buyPrice < inventory.BuyPrice && buyPrice > 0d && currentStock == 0d))
-                            inventory.BuyPrice = buyPrice.RoundMoney();
+                            inventory.BuyPrice = Math.Round(buyPrice, 2);
 
                         else
                         {
@@ -534,7 +545,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                             var newAmount = buyPrice * (detail.IsCompleated ? detail.StockedQty : detail.OrderQty);
 
-                            inventory.BuyPrice = ((newAmount + currentAmount) / (inventory.Stock + inventory.Reserved + (detail.IsCompleated ? detail.StockedQty : detail.OrderQty))).RoundMoney();
+                            inventory.BuyPrice = Math.Round((newAmount + currentAmount) / (inventory.Stock + inventory.Reserved + (detail.IsCompleated ? detail.StockedQty : detail.OrderQty)), 2);
                         }
 
 
@@ -559,6 +570,16 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                         isModified = true;
                     }
+                }
+
+                var equ = db.Equivalences.FirstOrDefault(p => p.ProductId == detail.ProductId && p.ProviderId == order.ProviderId);
+
+                if (equ != null && equ.BuyPrice != detail.UnitPrice)
+                {
+                    equ.BuyPrice = detail.UnitPrice;
+                    equ.UpdDate = DateTime.Now.ToLocal();
+                    equ.UpdUser = User.Identity.Name;
+                    db.Entry(equ);
                 }
 
 
@@ -680,7 +701,19 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         }
 
+        [HttpPost]
+        public ActionResult PrintPurchaseOrder(int id)
+        {
+            var model = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails.Select(d => d.Product.Equivalences)).Include(o => o.PurchaseOrderHistories).
+                                             FirstOrDefault(o => o.PurchaseOrderId == id);
 
+            foreach (var detail in model.PurchaseOrderDetails)
+            {
+                detail.ProviderCode = detail.Product.Equivalences.FirstOrDefault(e => e.ProviderId == model.ProviderId).Code;
+            }
+
+            return PartialView("_PurchaseOrderRequest", model);
+        }
 
         [HttpPost]
         public ActionResult BeginAction(int id, bool? changeRequested)
@@ -842,7 +875,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //año en curso
                     var year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy"));
 
-                  
+
                     var lasOrder = db.PurchaseOrders.Where(o => !string.IsNullOrEmpty(o.Folio) && o.BranchId == purchaseOrder.BranchId && o.Year == year).
                                                           OrderByDescending(s => s.Sequential).FirstOrDefault();
 
@@ -860,8 +893,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.Entry(purchaseOrder).Property(p => p.Folio).IsModified = true;
                 }
 
+                //si ya tiene una fecha de pedido, lo coloco status de recepción
+                purchaseOrder.PurchaseStatusId = authorized ? purchaseOrder.OrderDate != null ? PStatus.Watting : PStatus.Authorized : PStatus.NotAuthorized;
+
                 purchaseOrder.Comment = comment;
-                purchaseOrder.PurchaseStatusId = authorized ? PStatus.Authorized : PStatus.NotAuthorized;
                 purchaseOrder.UpdDate = DateTime.Now.ToLocal();
                 purchaseOrder.UpdUser = HttpContext.User.Identity.Name;
 
@@ -1025,13 +1060,40 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-       
-        [HttpPost]
-        public ActionResult BeginAddDetail(List<ProductViewModel> items, int id)
-        {
-            var model = db.PurchaseOrderDetails.Where(o => o.PurchaseOrderId == id).Include(o => o.Product).ToList();
 
-            var order = model.First().PurchaseOrder;
+        [HttpPost]
+        public ActionResult BeginAddDetail(List<ProductViewModel> items, List<int> toRemove, int id)
+        {
+            //var model = db.PurchaseOrderDetails.Where(o => o.PurchaseOrderId == id).Include(o => o.Product).ToList();
+
+            var order = db.PurchaseOrders.Include(p => p.PurchaseOrderDetails).FirstOrDefault(p => p.PurchaseOrderId == id);
+
+            var model = order.PurchaseOrderDetails.ToList();
+
+            if (toRemove != null)
+            {
+                foreach (var rId in toRemove)
+                {
+                    var item = items != null ? items.FirstOrDefault(i => i.ProductId == rId) : null;
+
+                    if (item != null)
+                    {
+                        var det = model.FirstOrDefault(d => d.ProductId == item.ProductId);
+                        det.UnitPrice = item.BuyPrice;
+                        det.OrderQty = item.AddQuantity;
+                        det.Discount = item.Discount;
+                        det.LineTotal = (item.AddQuantity * item.BuyPrice);
+                        det.Comment = order.OrderDate != null ? "ChangeRequested" : null; //debo identificar las partidas que se agregan despues de que la orden ha sido envíada por correo, para que 
+                                                                                          // que solo esas puedan removerse en caso de un rechazo al autorizar o revisar
+                        items.Remove(item);
+                    }
+                    else
+                    {
+                        var det = model.FirstOrDefault(d => d.ProductId == rId);
+                        model.Remove(det);
+                    }
+                }
+            }
 
             if (items != null)
             {
@@ -1052,6 +1114,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                         ProductId = item.ProductId,
                         PurchaseOrderId = id,
                         LineTotal = (item.AddQuantity * item.BuyPrice),
+                        Comment = order.OrderDate != null ? "ChangeRequested" : null //debo identificar las partidas que se agregan despues de que la orden ha sido envíada por correo, para que 
+                                                                                         // que solo esas puedan removerse en caso de un rechazo al autorizar o revisar
                     };
 
                     if (detail.Discount > Cons.Zero)
@@ -1067,13 +1131,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (order.Discount > Cons.Zero)
                 order.TotalDue = order.TotalDue - (order.TotalDue * (order.Discount / Cons.OneHundred));
 
-            var peIds = model.Select(m => m.ProductId);
+            var peIds = model.Select(m => m.ProductId).ToList();
 
-            var eqList = db.Equivalences.Where(e => peIds.Contains(e.ProductId) && e.ProductId == order.ProviderId);
+            var eqList = db.Equivalences.Where(e => peIds.Contains(e.ProductId) && e.ProviderId == order.ProviderId).ToList();
 
             foreach (var detail in model)
             {
-                var eq = eqList.FirstOrDefault(e => e.ProviderId == order.ProviderId);
+                var eq = eqList.FirstOrDefault(e => e.ProductId == detail.ProductId && e.ProviderId == order.ProviderId);
                 detail.ProviderCode = eq != null ? eq.Code : "NO ASIGNADO";
             }
 
@@ -1081,11 +1145,11 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult RequestChange(List<ProductViewModel> items, string comment, int id)
+        public ActionResult RequestChange(List<ProductViewModel> items, List<int> toRemove, string comment, int id)
         {
             try
             {
-                var order = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails).Include(o=> o.PurchaseOrderHistories).FirstOrDefault(o => o.PurchaseOrderId == id);
+                var order = db.PurchaseOrders.Include(o => o.PurchaseOrderDetails).Include(o => o.PurchaseOrderHistories).FirstOrDefault(o => o.PurchaseOrderId == id);
 
                 var history = new PurchaseOrderHistory
                 {
@@ -1101,29 +1165,63 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 order.PurchaseOrderHistories.Add(history);
 
-                foreach (var item in items)
+
+                if (toRemove != null)
                 {
-                    var detail = new PurchaseOrderDetail
+                    foreach (var rId in toRemove)
                     {
-                        UnitPrice = item.BuyPrice,
-                        Discount = item.Discount,
-                        OrderQty = item.AddQuantity,
-                        ProductId = item.ProductId,
-                        PurchaseOrderId = id,
-                        LineTotal = (item.AddQuantity * item.BuyPrice)
-                    };
+                        var item = items != null ? items.FirstOrDefault(i => i.ProductId == rId) : null;
 
-                    if (detail.Discount > Cons.Zero)
-                        detail.LineTotal = detail.LineTotal - (detail.LineTotal * (detail.Discount / Cons.OneHundred));
+                        if (item != null)
+                        {
+                            var det = order.PurchaseOrderDetails.FirstOrDefault(d => d.ProductId == item.ProductId);
+                            det.UnitPrice = item.BuyPrice;
+                            det.OrderQty = item.AddQuantity;
+                            det.Discount = item.Discount;
+                            det.LineTotal = (item.AddQuantity * item.BuyPrice);
+                            det.Comment = order.OrderDate != null ? "ChangeRequested" : null; //debo identificar las partidas que se agregan despues de que la orden ha sido envíada por correo, para que 
+                                                                                          // que solo esas puedan removerse en caso de un rechazo al autorizar o revisar
 
-                    order.PurchaseOrderDetails.Add(detail);
+                            //ya no lo agrego solo modifico
+                            items.Remove(item);
+                        }
+                        else
+                        {
+                            var det = order.PurchaseOrderDetails.FirstOrDefault(d => d.ProductId == rId);
+                            order.PurchaseOrderDetails.Remove(det);
+                            db.PurchaseOrderDetails.Remove(det);
+                        }
+                    }
+                }
+
+                if (items != null)
+                {
+                    foreach (var item in items)
+                    {
+                        var detail = new PurchaseOrderDetail
+                        {
+                            UnitPrice = item.BuyPrice,
+                            Discount = item.Discount,
+                            OrderQty = item.AddQuantity,
+                            ProductId = item.ProductId,
+                            PurchaseOrderId = id,
+                            LineTotal = (item.AddQuantity * item.BuyPrice),
+                            Comment   = order.OrderDate != null ? "ChangeRequested" : null //debo identificar las partidas que se agregan despues de que la orden ha sido envíada por correo, para que 
+                                                                                          // que solo esas puedan removerse en caso de un rechazo al autorizar o revisar.
+                        };
+
+                        if (detail.Discount > Cons.Zero)
+                            detail.LineTotal = detail.LineTotal - (detail.LineTotal * (detail.Discount / Cons.OneHundred));
+
+                        order.PurchaseOrderDetails.Add(detail);
+                    }
                 }
 
                 order.Comment = comment;
                 order.PurchaseStatusId = PStatus.InRevision;
-                order.SubTotal  = order.PurchaseOrderDetails.Sum(d => d.LineTotal);
+                order.SubTotal = order.PurchaseOrderDetails.Sum(d => d.LineTotal);
                 order.TaxAmount = (order.SubTotal * (order.TaxRate / Cons.OneHundred));
-                order.TotalDue  = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance).RoundMoney();
+                order.TotalDue = (order.SubTotal + order.TaxAmount + order.Freight + order.Insurance).RoundMoney();
 
                 if (order.Discount > Cons.Zero)
                     order.TotalDue = order.TotalDue - (order.TotalDue * (order.Discount / Cons.OneHundred));
@@ -1137,7 +1235,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new JResponse
                 {
                     Header = "Cambio solicitado",
-                    Body   = "Los cambios de la orden de compra se han solicitado con exito",
+                    Body = "Los cambios de la orden de compra se han solicitado con exito",
                     Code = Cons.Responses.Codes.Success,
                     Result = Cons.Responses.Success
                 });

@@ -53,6 +53,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
 
         [Display(Name="En pedido")]
         public double QtyOrdered { get; set; }
+
+        public bool ToRemove { get; set; }
     
 
         public ProductViewModel()

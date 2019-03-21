@@ -46,107 +46,117 @@
         <thead>
             <tr>
                 <th colspan="7">
-                    <table style="width:100%">
-                        <tr>
-                            <td colspan="3" class="text-center OrderHeader">
-                                <label>Orden de compra</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td width="300px">
-                                <table style="width:100%">
-                                    <tr>
-                                        <td>
-                                            <img src="cid:PurchasingLogo" style="width:150px" />
-                                        </td>
-                                    </tr>
-                                    <tr><td colspan="2" style="height:10px"></td></tr>
-                                    <tr>
-                                        <td>
-                                            <label class="control-label">
-                                                Autopartes Bicentenario S.A. de C.V.
-                                            </label><br />
-                                            APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
-                                            LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="292px" align="center">
-                                <div style="width:250px">
-                                    <label>Expedida en sucursal</label><br />
-                                    @Model.Branch.Address
-                                </div>
-                            </td>
-                            <td width="244px">
-                                <table style="width:100%;">
-                                    <tr>
-                                        <td class="text-center CellHeader">
-                                            <label>Folio</label>
-                                        </td>
-                                        <td class="text-center CellHeader">
-                                            <label>Fecha</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center CellContent">
-                                            @Model.Folio
-                                        </td>
-                                        <td class="text-center CellContent">
-                                            @DateTime.Now.TodayLocal().ToString("dd/MM/yyyy")
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="2" class="text-center CellHeader">
-                                            Condiciones de Pago
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-center CellContent">
-                                            <strong>@Model.PurchaseType.Name.</strong>
-                                        </td>
-                                        <td class="text-center CellContent">
-                                            <strong>@Model.DaysToPay días</strong>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <table style="width:100%">
-                                    <tr>
-                                        <td class="CellHeader">
-                                            Metodo de envío
-                                        </td>
-                                        <td class="CellHeader">
-                                            Costo de Envío
-                                        </td>
-                                        <td class="CellHeader">
-                                            Seguro
-                                        </td>
-                                        <td class="CellHeader">
-                                            Descuento
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="CellContent">
-                                            @Model.ShipMethod.Name
-                                        </td>
-                                        <td class="CellContent">
-                                            @Model.Freight.ToMoney()
-                                        </td>
-                                        <td class="CellContent">
-                                            @Model.Insurance.ToMoney()
-                                        </td>
-                                        <td class="CellContent">
-                                            @Model.Discount %
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
+                    <div style="width:100%">
+                        <table style="width:100%; page-break-inside:avoid;">
+                            <tr>
+                                <td colspan="3" class="text-center OrderHeader">
+                                    <label>Orden de compra</label>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="300px">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td>
+                                                <img id="imgOrder" src="cid:PurchasingLogo" style="width:150px" />
+                                            </td>
+                                        </tr>
+                                        <tr><td colspan="2" style="height:10px"></td></tr>
+                                        <tr>
+                                            <td>
+                                                <label class="control-label">
+                                                    Autopartes Bicentenario S.A. de C.V.
+                                                </label><br />
+                                                APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                                                LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="292px" align="center">
+                                    <div style="width:250px">
+                                        <label>Expedida en sucursal</label><br />
+                                        @Model.Branch.Address
+                                    </div>
+                                </td>
+                                <td width="244px">
+                                    <table style="width:100%;">
+                                        <tr>
+                                            <td class="text-center CellHeader">
+                                                <strong>Folio</strong>
+                                            </td>
+                                            <td class="text-center CellHeader">
+                                                <strong>Fecha</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center CellContent">
+                                                @Model.Folio
+                                            </td>
+                                            <td class="text-center CellContent">
+                                                @DateTime.Now.TodayLocal().ToString("dd/MM/yyyy")
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2" class="text-center CellHeader">
+                                                <strong>Condiciones de Pago</strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-center CellContent">
+                                                @Model.PurchaseType.Name
+                                            </td>
+                                            <td class="text-center CellContent">
+                                                @Model.DaysToPay días
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3">
+                                    <table style="width:100%">
+                                        <tr>
+                                            <td class="CellHeader">
+                                                <strong>
+                                                    Metodo de envío
+                                                </strong>
+                                            </td>
+                                            <td class="CellHeader">
+                                                <strong>
+                                                    Costo de Envío
+                                                </strong>
+                                            </td>
+                                            <td class="CellHeader">
+                                                <strong>
+                                                    Seguro
+                                                </strong>
+                                            </td>
+                                            <td class="CellHeader">
+                                                <strong>
+                                                    Descuento
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="CellContent">
+                                                @Model.ShipMethod.Name
+                                            </td>
+                                            <td class="CellContent">
+                                                @Model.Freight.ToMoney()
+                                            </td>
+                                            <td class="CellContent">
+                                                @Model.Insurance.ToMoney()
+                                            </td>
+                                            <td class="CellContent">
+                                                @Model.Discount %
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
                 </th>
             </tr>
         </thead>

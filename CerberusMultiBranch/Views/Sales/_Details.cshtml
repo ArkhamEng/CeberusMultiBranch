@@ -24,7 +24,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.First().Amount)
             </th>
-           <td></td>
+           <td class="Compleated"></td>
         </tr>
     </thead>
     <tbody>
@@ -115,8 +115,8 @@
 
         ExecuteAjax('@Url.Action("OpenChangePrice")', param, function (response)
         {
-
-            if ($.isPlainObject(response)) {
+            if ($.isPlainObject(response))
+            {
                 ShowMessage(response.Result, response.Message, 'warning');
             }
             else

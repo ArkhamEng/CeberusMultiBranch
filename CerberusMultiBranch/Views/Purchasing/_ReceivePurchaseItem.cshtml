@@ -158,13 +158,17 @@
 </div>
  <input type="hidden" id="SerialsCount" value="@Model.Serials.Count" />
 
-<input type="hidden" id="ReceiveDisabled" value="@Model.ReceiveDisabled" />
 
-<input type="hidden" id="IsTrackable" value="@Model.IsTrackable" />
+@Html.HiddenFor(m=> m.ReceiveDisabled)
+
+@Html.HiddenFor(m => m.IsTrackable)
+
+
 
 <script>
     $(document).ready(function ()
     {
+        
         if (parseInt($("#SerialsCount").val()) > 0)
             $("#pnlItems").removeClass("hidden");
 

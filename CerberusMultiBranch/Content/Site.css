@@ -271,7 +271,64 @@ ul ul a {
         color: #FFFFFF !important;
         -webkit-print-color-adjust: exact;
     }
+
+            .CellHeader {
+            color: #fff !important;
+            background-color: #c9302c !important;
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+            border-color: black;
+            
+        }
+            .CellHeader > strong
+            {
+                color: #fff !important;
+
+            }
+
+              .CellHeader > label
+            {
+                color: #fff !important;
+
+            }
+
+        .CellContent {
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+        }
+
+        .OrderHeader  {
+            font-size: 30px;
+            color: #fff !important;
+            background-color: #c9302c !important;
+            border: 1px;
+            border-style: solid;
+            padding: 5px;
+            border-color: black;
+            
+        }
+
+           .OrderHeader > label
+            {
+                color: #fff !important;
+
+            }
+
+        .Footer
+        {
+            border-bottom:1px;
+            border-bottom-style:solid;
+            font-size:20px;
+        }   
 }
+
+thead {
+   display: table-header-group !important;
+}
+
+
 
 
 .tab-content > .tab-pane:not(.active),
@@ -444,3 +501,4 @@ input[type=date] {
 {
     width:90vw !important;
 }
+
