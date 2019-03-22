@@ -25,30 +25,81 @@ namespace CerberusMultiBranch.Controllers.Operative
         /// Obtiene la sesión de compra del usuario en turno
         /// </summary>
         /// <returns></returns>
-        public ActionResult PurchaseEstimation()
+        public ActionResult PurchaseEstimation(int? id)
         {
             var userId = User.Identity.GetUserId();
 
-            var model = new PurchaseCartViewModel();
-            model.PurchaseTypes = db.PurchaseTypes.ToSelectList();
+            var model              = new PurchaseCartViewModel();
+            model.PurchaseTypes    = db.PurchaseTypes.ToSelectList();
             model.ShipmentMethodes = db.ShipMethodes.ToSelectList();
-            model.Branches = User.Identity.GetBranches().OrderBy(b=> b.Name).ToSelectList();
+            model.Branches         = User.Identity.GetBranches().OrderBy(b => b.Name).ToSelectList();
 
-            var items = GetEstimationDetails(userId);
 
-            if (items.Count > Cons.Zero)
+            var cartGroups = db.PurchaseItems.Where(i => i.UserId == userId && (id == null || i.ProviderId != id)).GroupBy(i => i.Provider);
+
+            model.ProviderCarts = new List<ProviderCartViewModel>();
+
+            foreach (var group in cartGroups)
             {
-                model.ProviderId = items.FirstOrDefault().Value.First().ProviderId;
-                model.ProviderName = items.FirstOrDefault().Value.First().ProviderName;
-                model.PurchaseItems = items;
+                var providerCart = new ProviderCartViewModel
+                {
+                    ProviderIdent = group.Key.ProviderId,
+                    ProviderName = group.Key.Name,
+                    Branches = group.GroupBy(i => i.BranchId).Count(),
+                    TotalAmount = group.Sum(i => i.Price)
+                };
+
+                model.ProviderCarts.Add(providerCart);
+            }
+
+          
+            if (id !=null)
+            {
+                var items = GetEstimationDetails(userId, id.Value);
+
+                if (items.Count > Cons.Zero)
+                {
+                    model.ProviderId    = items.FirstOrDefault().Value.First().ProviderId;
+                    model.ProviderName  = items.FirstOrDefault().Value.First().ProviderName;
+                    model.PurchaseItems = items;
+                }
+                else
+                {
+                    var provider = db.Providers.Find(id);
+                    model.ProviderId = provider.ProviderId;
+                    model.ProviderName = provider.Name;
+                }
             }
 
             return View(model);
         }
 
+       
+        public ActionResult CheckEstimations()
+        {
+            var userId = User.Identity.GetUserId();
+            var estimationGroups = db.PurchaseItems.Where(i => i.UserId == userId).GroupBy(i => i.Provider);
+
+            List<ProviderCartViewModel> estimations = new List<ProviderCartViewModel>();
+
+            foreach (var group in estimationGroups)
+            {
+                var providerCart = new ProviderCartViewModel
+                {
+                    ProviderIdent = group.Key.ProviderId,
+                    ProviderName = group.Key.Name,
+                    Branches     = group.GroupBy(i => i.BranchId).Count(),
+                    TotalAmount  = group.Sum(i => i.Price)
+                };
+
+                estimations.Add(providerCart);
+            }
+
+            return PartialView("_AvailableCarts", estimations);
+        }
 
 
-        private Dictionary<string, IEnumerable<ProductViewModel>> GetEstimationDetails(string userId)
+        private Dictionary<string, IEnumerable<ProductViewModel>> GetEstimationDetails(string userId, int providerId)
         {
             var branches = User.Identity.GetBranches().Select(b => b.BranchId);
 
@@ -61,6 +112,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
                           where (itm.UserId == userId) &&
+                                (itm.ProviderId == providerId) &&
                                 (branches.Contains(itm.Branch.BranchId))
 
                           select new ProductViewModel
@@ -127,7 +179,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", "");
             }
 
-           
+
             var userId = User.Identity.GetUserId();
 
             var products = (from p in db.Products.Where(p => (string.IsNullOrEmpty(filter) || arr.All(s => (p.Code + " " + p.Name).Contains(s))) && p.IsActive)
@@ -160,7 +212,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 AddQuantity = its != null ? its.Quantity : bp.MaxQuantity - bp.Stock,
                                 BranchName = bp.Branch.Name,
                                 ProviderCode = eq != null ? eq.Code : "No asignado",
-                                BuyPrice = eq != null ? eq.BuyPrice : Cons.Zero,
+                                BuyPrice = its != null ? its.Price : eq != null ? eq.BuyPrice : Cons.Zero,
                                 Discount = its != null ? its.Discount : Cons.Zero,
 
                                 AddToPurchaseDisabled = (its != null)
@@ -250,7 +302,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult SetDatailChange(int productId, int branchId, double quantity, double discount, double price)
+        public ActionResult SetDatailChange(int productId, int branchId, double quantity, double discount, double price, int providerId)
         {
             try
             {
@@ -270,7 +322,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 db.SaveChanges();
 
-                var model = GetEstimationDetails(userId);
+                var model = GetEstimationDetails(userId, providerId);
 
                 return PartialView("_PurchaseEstimationDetails", model);
 
@@ -414,7 +466,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpPost]
-        public ActionResult RemoveFromEstimation(int branchId, int productId)
+        public ActionResult RemoveFromEstimation(int branchId, int productId, int providerId)
         {
             try
             {
@@ -428,7 +480,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.SaveChanges();
                 }
 
-                var model = GetEstimationDetails(userId);
+                var model = GetEstimationDetails(userId,productId);
 
                 return PartialView("_PurchaseEstimationDetails", model);
             }
@@ -475,7 +527,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 db.PurchaseItems.Add(item);
                 db.SaveChanges();
 
-                var model = GetEstimationDetails(item.UserId);
+                var model = GetEstimationDetails(item.UserId, item.ProviderId);
 
                 return PartialView("_PurchaseEstimationDetails", model);
             }

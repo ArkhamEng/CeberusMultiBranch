@@ -15,7 +15,7 @@ namespace CerberusMultiBranch
 
             routes.MapRoute(
               name: "PurchaseEstimation",
-              url: "Purchasing/PurchaseEstimation",
+              url: "Purchasing/PurchaseEstimation/{id}",
               defaults: new { controller = "PurchaseEstimation", action = "PurchaseEstimation", id = UrlParameter.Optional });
 
          

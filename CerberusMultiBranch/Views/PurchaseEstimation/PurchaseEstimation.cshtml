@@ -23,13 +23,15 @@
 <br />
 <div class="panel panel-default">
     <div class="panel-body small">
-
         @Html.HiddenFor(m => m.ProviderId)
 
         <div class="form-group col-md-7">
             @Html.LabelFor(m => m.ProviderName, htmlAttributes: new { @class = "control-label" })
             <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-handshake-o"></i></span>
+                <span id="aPopOver" class="input-group-addon btn" popover-content="@Html.Partial("_AvailableCarts", Model.ProviderCarts).ToHtmlString()"
+                       tooltip-title="Estimaciones en curso">
+                    <i class="fa fa-handshake-o"></i>
+                </span>
                 @Html.EditorFor(model => model.ProviderName, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
                 @Html.ValidationMessageFor(model => model.ProviderId, "", new { @class = "text-danger" })
                 <div class="input-group-btn">
@@ -39,6 +41,8 @@
                 </div>
             </div>
         </div>
+
+
 
         <div class="form-group col-md-4 col-md-offset-1">
             @Html.LabelFor(m => m.PurchaseType, htmlAttributes: new { @class = "control-label" })
@@ -106,7 +110,7 @@
                 <span class="input-group-addon"><i class="fa fa-map"></i></span>
                 @Html.DropDownListFor(model => model.BranchId, Model.Branches, htmlAttributes:
                new { @class = "form-control text-uppercase input-sm" })
-               
+
             </div>
         </div>
 
@@ -116,7 +120,7 @@
             <button class="btn btn-primary btn-sm" type="button" title="Buscar productos para la sucursal" id="btnBeginAddProduct" onclick="ShowProductQuickSearch()" data-toggle="tooltip" data-placement="left">
                 <span class="fa fa-search"></span>
                 Buscar Productos
-            </button> 
+            </button>
             <button class="btn btn-success btn-sm" type="button" title="Generar las ordenes de compra" id="btnGenerate" onclick="GenerateOrders()" data-toggle="tooltip" data-placement="left">
                 <span class="fa fa-check"></span>
                 Generar pedido(s)
@@ -131,15 +135,11 @@
     </div>
 </div>
 
+<div class="col-md-8 filter">
+</div>
 
 <div id="divPurchaseDetails" class="panel-group">
     @Html.Partial("_PurchaseEstimationDetails", Model.PurchaseItems)
 </div>
 
 
-<script>
-    $(document).ready(function ()
-    {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-</script>

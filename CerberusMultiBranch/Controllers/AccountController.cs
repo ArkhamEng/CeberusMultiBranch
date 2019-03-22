@@ -15,6 +15,7 @@ using System.Data.Entity;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using Microsoft.AspNet.Identity.EntityFramework;
 using CerberusMultiBranch.Models.Entities.Config;
+using System.Web.Security;
 
 namespace CerberusMultiBranch.Controllers
 {
@@ -106,7 +107,7 @@ namespace CerberusMultiBranch.Controllers
             // To enable password failures to trigger account lockout, change to shouldLockout: true
             var result = await SignInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, shouldLockout: true);
 
-        
+
             switch (result)
             {
                 case SignInStatus.Success:

@@ -30,8 +30,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             st.Add(PStatus.Canceled);
             st.Add(PStatus.Received);
-            st.Add(PStatus.NotAuthorized);
-
+            
 
             ViewBag.Branches = User.Identity.GetBranches().ToSelectList();
             ViewBag.PurchaseStatuses = db.PurchaseStatuses.ToSelectList();
@@ -124,11 +123,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 MaxQuantity = bp.MaxQuantity,
                                 MinQuantity = bp.MinQuantity,
                                 Quantity = bp.Stock + bp.Reserved,
-                                AddQuantity = od != null ? od.OrderQty : bp.MaxQuantity - bp.Stock,
+                                AddQuantity = bp.MaxQuantity - bp.Stock,
                                 BranchName = bp.Branch.Name,
                                 ProviderCode = eq != null ? eq.Code : "No asignado",
-                                BuyPrice = od != null ? od.UnitPrice : Cons.Zero,
-                                Discount = od != null ? od.Discount : Cons.Zero,
+                                BuyPrice = eq != null ? eq.BuyPrice  : Cons.Zero,
+                                Discount =  Cons.Zero,
                                 //AddToPurchaseDisabled = (od != null)
 
                             }).OrderBy(p => p.Code).Take(Cons.MaxProductResult).ToList();

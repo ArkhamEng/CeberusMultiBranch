@@ -1,0 +1,45 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.ViewModels.Operative.ProviderCartViewModel>
+
+<div class="table-responsive">
+
+    <table class="table table-striped small small" style="width:100%">
+        <thead>
+            <tr>
+                <th style="min-width:300px">
+                    @Html.DisplayNameFor(model => model.ProviderName)
+                </th>
+                <th style="min-width:100px">
+                    @Html.DisplayNameFor(model => model.Branches)
+                </th>
+                <th style="min-width:100px">
+                    @Html.DisplayNameFor(model => model.TotalAmount)
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProviderName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Branches)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalAmount)
+                    </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" type="button" data-toggle="tooltip" data-placement="right" title="Trabajar con este proveedor" onclick="GoToEstimation(@item.ProviderIdent)">
+                            <span class="fa fa-check"></span>Ir
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+

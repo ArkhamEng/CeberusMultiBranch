@@ -423,6 +423,10 @@
     <Compile Include="Migrations\201902230612380_EquivalenceIndex.Designer.cs">
       <DependentUpon>201902230612380_EquivalenceIndex.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903220146029_EstimationKeys.cs" />
+    <Compile Include="Migrations\201903220146029_EstimationKeys.Designer.cs">
+      <DependentUpon>201903220146029_EstimationKeys.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1084,6 +1088,7 @@
     <Content Include="Views\Products\SearchPagin.cshtml" />
     <Content Include="Views\Products\_SearchPagin.cshtml" />
     <Content Include="Views\Products\_Pagination.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_AvailableCarts.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1253,6 +1258,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902230612380_EquivalenceIndex.resx">
       <DependentUpon>201902230612380_EquivalenceIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903220146029_EstimationKeys.resx">
+      <DependentUpon>201903220146029_EstimationKeys.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

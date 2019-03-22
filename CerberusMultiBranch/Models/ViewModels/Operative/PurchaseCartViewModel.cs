@@ -49,6 +49,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [Display(Name ="Sucursal")]
         public int BranchId { get; set; }
 
+        public ICollection<ProviderCartViewModel> ProviderCarts { get; set; }
+
+
         public bool SearchProviderDisabled
         {
             get { return (this.PurchaseItems.Count() > Cons.Zero); }
@@ -66,5 +69,20 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         {
             this.PurchaseItems = new Dictionary<string, IEnumerable<ProductViewModel>>();
         }
+    }
+
+    public class ProviderCartViewModel
+    {
+        [Display(Name ="Sucursales")]
+        public int Branches { get; set; }
+
+        [Display(Name = "Monto total")]
+        [DataType(DataType.Currency)]
+        public double TotalAmount { get; set; }
+
+        [Display(Name = "Proveedor")]
+        public string ProviderName { get; set; }
+
+        public int ProviderIdent { get; set; }
     }
 }

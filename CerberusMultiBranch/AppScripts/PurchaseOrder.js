@@ -92,7 +92,18 @@ function LoadDetails(pendingCount)
             var id = $(this).find("#item_ProductId").val();
 
             if (id != undefined)
-                selectedIds.push(id);
+            {
+                var obj =
+                    {
+                        ProductId: id,
+                        OrderQty: $(this).find("#item_OrderQty").val(),
+                        UnitPrice: $(this).find("#item_UnitPrice").val(),
+                        Discount: $(this).find("#item_Discount").val(),
+
+                    }
+                selectedIds.push(obj);
+            }
+                
         });
     }
 
@@ -108,7 +119,17 @@ function LoadDetails(pendingCount)
             var id = $(this).find("#item_ProductId").val();
 
             if (id != undefined)
-                selectedIds.push(id);
+            {
+                var obj =
+                    {
+                        ProductId: id,
+                        OrderQty: $(this).find("#item_OrderQty").val(),
+                        UnitPrice: $(this).find("#item_UnitPrice").val(),
+                        Discount: $(this).find("#item_Discount").val(),
+
+                    }
+                selectedIds.push(obj);
+            }
         });
     }
 
@@ -250,19 +271,15 @@ function LoadSearchProductList()
         {
             var id = $(row).find("#sItem_ProductId").val();
 
-            if (id != undefined && id == pId)
+            if (id != undefined && id == pId.ProductId)
             {
-                $(selectedProducts).each(function (index, value)
+                if (id = pId.ProductId)
                 {
-                    if (id = value.ProductId)
-                    {
-                        $(row).find("#sItem_Discount").val(value.Discount);
-                        $(row).find("#sItem_BuyPrice").val(value.BuyPrice);
-                        $(row).find("#sItem_AddQuantity").val(value.AddQuantity);
-                    }
-                });
+                    $(row).find("#sItem_Discount").val(pId.Discount);
+                    $(row).find("#sItem_BuyPrice").val(pId.UnitPrice);
+                    $(row).find("#sItem_AddQuantity").val(pId.OrderQty);
+                }
 
-               
                 $(row).find("td input").each(function ()
                 {
                     $(this).prop("disabled", true);

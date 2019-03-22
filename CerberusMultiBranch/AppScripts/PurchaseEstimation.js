@@ -1,5 +1,31 @@
 ﻿var creditType = 1;
 
+$(document).ready(function ()
+{
+    $('[data-toggle="tooltip"]').tooltip();
+
+    var id = parseInt($("#ProviderId").val());
+
+    if (id > 0)
+        $("#btnBeginAddProduct").removeAttr("disabled");
+  
+    $("#aPopOver").popover({
+        html: true,
+        container: '.filter',
+        trigger: 'click',
+        placement: 'bottom auto',
+        content: $("#aPopOver").attr("popover-content"),
+        title: '<span class="fa fa-clipboard"></span> Estimaciones en curso',
+    });//.off('shown.bs.popover').on('shown.bs.popover', SetInputs);
+
+    $("#aPopOver").tooltip({
+        placement: 'bottom',
+        title: $("#aPopOver").attr("tooltip-title")
+    })
+});
+
+
+
 function ShowProviderQuickSearch()
 {
     ShowQuickSearch('/Providers/ShowQuickSearch', function (id, name, ftr)
@@ -7,8 +33,14 @@ function ShowProviderQuickSearch()
         $("#ProviderId").val(id);
         $("#ProviderName").val(name);
 
-        $("#btnBeginAddProduct").removeAttr("disabled");
+        GoToEstimation(id);
     });
+}
+
+function GoToEstimation(id)
+{
+    ShowLoading('static');
+    window.location = '/Purchasing/PurchaseEstimation/' + id
 }
 
 function RemoveAll()
@@ -130,7 +162,7 @@ function SetDetailChange(productId, branchId)
 {
     ShowModLoading();
 
-    var model = { productId: productId, branchId: branchId, quantity: $("#AddQuantity").val(), discount: $("#Discount").val(), price: $("#BuyPrice").val() };
+    var model = { productId: productId, branchId: branchId, quantity: $("#AddQuantity").val(), discount: $("#Discount").val(), price: $("#BuyPrice").val(), providerId: $("#ProviderId").val() };
 
    
     ExecuteAjax('/PurchaseEstimation/SetDatailChange', model, function (response)
@@ -150,12 +182,12 @@ function RemoveFromEstimation(branchId, productId)
 {
     ShowLoading('static');
 
-    ExecuteAjax('/PurchaseEstimation/RemoveFromEstimation', { branchId: branchId, productId: productId }, function (response)
+    ExecuteAjax('/PurchaseEstimation/RemoveFromEstimation', { branchId: branchId, productId: productId, providerId: $("#ProviderId").val() }, function (response)
     {
         HideLoading(function ()
         {
             $("#divPurchaseDetails").html(response);
-        });
+        }); 
     });
 }
 
@@ -163,7 +195,7 @@ function EditDetail(branchId, productId)
 {
     ShowLoading('static');
 
-    ExecuteAjax('/PurchaseEstimation/EditDetail', { branchId: branchId, productId: productId }, function (response)
+    ExecuteAjax('/PurchaseEstimation/EditDetail', { branchId: branchId, productId: productId, providerId: $("#ProviderId").val() }, function (response)
     {
         HideLoading(function ()
         {

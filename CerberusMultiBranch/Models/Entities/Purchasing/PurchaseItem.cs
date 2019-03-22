@@ -18,6 +18,7 @@ namespace CerberusMultiBranch.Models.Entities.Purchasing
         [Column(Order = 2), Key, ForeignKey("Product")]
         public int ProductId { get; set; }
 
+        [Column(Order = 3), Key, ForeignKey("Provider")]
         public int ProviderId { get; set; }
 
         public double Price { get; set; }

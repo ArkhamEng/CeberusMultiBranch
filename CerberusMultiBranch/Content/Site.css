@@ -502,3 +502,8 @@ input[type=date] {
     width:90vw !important;
 }
 
+.popover-title
+{
+    background-color:#428bca !important;
+    color: #fff !important;
+}
