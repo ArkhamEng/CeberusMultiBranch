@@ -1,14 +1,73 @@
-﻿$(document).ready(function () {
-    $('#sidebarCollapse').on('click', function () {
+﻿$(document).ready(function ()
+{
+    $('#sidebarCollapse').on('click', function ()
+    {
         $('#sidebar').toggleClass('active');
     });
 });
 
+const TranStatus = {
+    OnChange:  { Name: "OnChange",  Value: -3, Display:  "En Modificación" },
+    PreCancel: { Name: "PreCancel", Value: -2, Display:  "En Cancelación" },
+    Canceled:  { Name: "Canceled",  Value: -1, Display:  "Cancelado" },
+    InProcess: { Name: "InProcess", Value:  0,  Display: "En Proceso" },
+    Reserved:  { Name: "Reserved",  Value:  1,  Display: "Reservador" },
+    Revision:  { Name: "Revision",  Value:  2,  Display: "En Seguimieto" },
+    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completado" }
+}
 
+const TranType =
+ {
+     Cash: { Name: "Cash", Value: 0, Display: "Efectivo" },
+     Credit: { Name: "Credit", Value: 1, Display: "Crédito" },
+     Presale: { Name: "Presale", Value: 2, Display: "Preventa" },
+     Reservation: { Name: "Reservation", Value: 3, Display: "Apartado" }
+}
 
-function GetCurrency(value)
+const ClientType =
 {
+    Store: { Name: "Store", Value: 0, Display: "Mostrador" },
+    Dealer: { Name: "Dealer", Value: 1, Display: "Distribuidor" },
+    Wholesaler: { Name: "Wholesaler", Value: 2, Display: "Mayorista" }
+}
+
+const PopOverTemplatePrimary = '<div class="popover panel panel-primary fade" role="tooltip">' +
+           '<div class="arrow"></div>' +
+           '<div class="popover-title"></div>' +
+           '<div class="panel-body popover-content"></div></div>'
+
+
+/**
+*convierte un string a fecha
+*@param {string} value fecha en formado dd/MM/yyyy
+*/
+function StrgToDate(value) {
+
+    var date = new Date(value.substring(6, 10), value.substring(3, 5), value.substring(0, 2));
+    return date;
+}
+
+/**
+*convierte un string a fecha
+*@param {string} value fecha en formado dd/MM/yyyy
+*/
+function ToDate(value) {
+    var date = new Date(value.substring(6, 10), value.substring(3, 5), value.substring(0, 2));
+    return date;
+}
+
+function DateToString(date) {
+    return date.getDay() + "/" + date.getMonth() + "/" + date.getYear();
+}
+
+//Aplica formato de moneda a un valor de punto flotante
+function GetCurrency(value) {
     return "$" + value.toFixed(2).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+}
+
+//convierte un texto en formato moneda a un valor de punto flotante
+function CurrencyToNumber(value) {
+    return parseFloat(value.trim().replace("$", "").replace(",", ""));
 }
 
 function SetPointer(element) {
@@ -22,8 +81,7 @@ function ShowNotify(title, type, message, delay) {
     if (isNaN(delay) || typeof (delay) != 'undefined')
         dly = delay;
 
-    if (typeof (PNotify) === 'undefined')
-    {
+    if (typeof (PNotify) === 'undefined') {
         return;
     }
 
@@ -115,16 +173,13 @@ function LoadPopOver(button, callback) {
 
 
 //AJAX CALL
-function ExecuteAjax(url, parameters, callback, errorCallBack)
-{
+function ExecuteAjax(url, parameters, callback, errorCallBack) {
     $.ajax({
         url: url,
         type: "POST",
         data: parameters,
-        success: function (response)
-        {
-            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200)
-            {
+        success: function (response) {
+            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200) {
                 HideLoading();
                 HideModLoading();
                 ShowNotify(response.Header, response.Result, response.Body, 3500);
@@ -132,31 +187,60 @@ function ExecuteAjax(url, parameters, callback, errorCallBack)
                 if (errorCallBack != null)
                     errorCallBack(response);
 
-                switch (response.Code)
-                {
+                switch (response.Code) {
                     case 401:
                         window.location = response.Extra;
                         break;
                 }
 
             }
-            else
-            {
+            else {
                 callback(response);
             }
         },
-        error: function (err)
-        {
+        error: function (err) {
             HideLoading();
-            HideModLoading();            
+            HideModLoading();
             ShowNotify("Sin respuesta del servidor!", "danger", "El servidor no respondio en el tiempo esperado, revisa tu conexión a internet", 3500);
         }
     });
 }
 
+//sends a Get Ajax request
+function GetAjax(url, parameters, callback, errorCallBack) {
+    $.ajax({
+        url: url,
+        type: "GET",
+        data: parameters,
+        success: function (response) {
+            if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200) {
+                HideLoading();
+                HideModLoading();
+                ShowNotify(response.Header, response.Result, response.Body, 3500);
 
-function SubmitAjax(url, formData, callback, errorCallBack)
-{
+                if (errorCallBack != null)
+                    errorCallBack(response);
+
+                switch (response.Code) {
+                    case 401:
+                        window.location = response.Extra;
+                        break;
+                }
+
+            }
+            else {
+                callback(response);
+            }
+        },
+        error: function (err) {
+            HideLoading();
+            HideModLoading();
+            ShowNotify("Sin respuesta del servidor!", "danger", "El servidor no respondio en el tiempo esperado, revisa tu conexión a internet", 3500);
+        }
+    });
+}
+
+function SubmitAjax(url, formData, callback, errorCallBack) {
     $.ajax({
         url: url,
         type: "POST",
@@ -164,8 +248,7 @@ function SubmitAjax(url, formData, callback, errorCallBack)
         contentType: false,
         processData: false,
         cache: false,
-        success: function (response)
-        {
+        success: function (response) {
             if ($.isPlainObject(response) && typeof (response.Code) != "undefined" && response.Code != 200) {
                 HideLoading();
                 HideModLoading();
@@ -183,8 +266,7 @@ function SubmitAjax(url, formData, callback, errorCallBack)
                 callback(response);
             }
         },
-        error: function ()
-        {
+        error: function () {
             HideLoading();
             ShowNotify("Error Inesperado!", "danger", "ocurrio un error, quiza has perdido la conexion a internet!", 3500);
 
@@ -223,8 +305,7 @@ function SetCascade(ddlParent, ddlChild, url) {
 
 
 //Realiza paginación  sobre una tabla
-function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContainer, printOp, rows)
-{
+function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContainer, printOp, rows) {
     var searching = false;
 
     if (typeof (filter) != 'undefined')
@@ -279,14 +360,14 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
         var printButton = "";
 
         if (printOp != null && printOp != 'undefined') {
-            
+
             var printButton = {
                 extend: 'print',
                 text: '<i class="fa fa-print"></i> Imprimir',
                 titleAttr: 'print',
                 className: "btn btn-default",
                 exportOptions: { columns: printOp.Columns },
-                title : printOp.Title
+                title: printOp.Title
             };
         }
 
@@ -298,13 +379,11 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
             className: "btn btn-default"
         };
 
-        if (printButton != '')
-        {
+        if (printButton != '') {
             new $.fn.dataTable.Buttons(oTable,
          { buttons: [copyButton, printButton, excelButton] }).container().appendTo($(buttonContainer));
         }
-        else
-        {
+        else {
             new $.fn.dataTable.Buttons(oTable,
             { buttons: [copyButton, excelButton] }).container().appendTo($(buttonContainer));
         }
@@ -338,7 +417,7 @@ function ShowModal(html, backdrop, size, closeCallback)
     {
         if (closeCallback != null)
             closeCallback();
-        
+
         $("#SiteModalContent").html('');
     });
 }
@@ -346,8 +425,7 @@ function ShowModal(html, backdrop, size, closeCallback)
 //Hide Main Modal
 function HideModal(callback, removeContent)
 {
-    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e)
-    {
+    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
         if (callback != null)
             callback();
 
@@ -360,8 +438,7 @@ function HideModal(callback, removeContent)
 }
 
 //Show Child Modal 
-function ShowChildModal(content, openCallBack, size)
-{
+function ShowChildModal(content, openCallBack, size) {
     $("#ChildModalDialog").removeClass('modal-sm');
     $("#ChildModalDialog").removeClass('modal-lg');
 
@@ -386,10 +463,8 @@ function ShowChildModal(content, openCallBack, size)
 }
 
 //Hide Child Modal 
-function HideChildModal(closCallBack)
-{
-    $('#ChildModal').off('hidden.bs.modal').on('hidden.bs.modal', function ()
-    {
+function HideChildModal(closCallBack) {
+    $('#ChildModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
         $('#SiteModal').css('opacity', 1);
         $('#SiteModal').removeData("modal").modal({});
         $('body').addClass("modal-open");
@@ -408,10 +483,8 @@ function ShowLoading(backdrop) {
     $("#Loading").modal({ backdrop: backdrop });
 }
 
-function HideLoading(callback)
-{
-    $("#Loading").off("hidden.bs.modal").on("hidden.bs.modal", function (e)
-    {
+function HideLoading(callback) {
+    $("#Loading").off("hidden.bs.modal").on("hidden.bs.modal", function (e) {
         if (callback != null)
             callback();
     });
@@ -421,23 +494,19 @@ function HideLoading(callback)
 
 
 //Loading In Modal
-function ShowModLoading()
-{
-    $("#ChildLoading").off("shown.bs.modal").on('shown.bs.modal', function ()
-    {
+function ShowModLoading() {
+    $("#ChildLoading").off("shown.bs.modal").on('shown.bs.modal', function () {
         $('#SiteModal').css('opacity', .7);
         $('#SiteModal').unbind();
     });
 
-  
+
     $("#ChildLoading").css("margin-top", "100px");
     $("#ChildLoading").modal({ backdrop: 'static' });
 }
 
-function HideModLoading(callback)
-{
-    $('#ChildLoading').off('hidden.bs.modal').on('hidden.bs.modal', function ()
-    {
+function HideModLoading(callback) {
+    $('#ChildLoading').off('hidden.bs.modal').on('hidden.bs.modal', function () {
         $('#SiteModal').css('opacity', 1);
         $('#SiteModal').removeData("modal").modal({});
         $('body').addClass("modal-open");
@@ -453,7 +522,8 @@ function HideModLoading(callback)
 
 
 //CONFIRM CONTROL FUNCTIONS
-function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack, backdrop) {
+function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack, backdrop)
+{
     //header and body text
     $("#MessageHeader").text(textHeader);
     $("#MessageBody").text(textBody);
@@ -462,17 +532,20 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
     $("#MessageOk").show();
 
     //setting Image and header color
-    if (type == 'success') {
+    if (type == 'success')
+    {
         $("#MessageContent").attr("class", 'modal-content panel panel-success');
         $("#MessageImage").attr("src", '/Images/success.png');
         $("#MessageOk").attr('class', 'btn btn-success');
     }
-    else if (type == 'warning') {
+    else if (type == 'warning')
+    {
         $("#MessageContent").attr("class", 'modal-content panel panel-warning');
         $("#MessageImage").attr("src", '/Images/warning.png');
         $("#MessageOk").attr('class', 'btn btn-warning');
     }
-    else if (type == 'confirm') {
+    else if (type == 'confirm')
+    {
         $("#MessageContent").attr("class", 'modal-content panel panel-info');
         $("#MessageImage").attr("src", '/Images/question.png');
         $("#MessageGroup").children().show();
@@ -481,8 +554,10 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
 
 
     //binding button acctions
-    $("#MessageConfirm").unbind('click').click(function (e) {
-        HideMessage(true, function () {
+    $("#MessageConfirm").off('click').on("click", function (e)
+    {
+        HideMessage(true, function ()
+        {
             ShowLoading('static');
 
             if (confirmCallBack != null)
@@ -490,7 +565,8 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
         });
     });
 
-    $("#MessageCancel").unbind('click').click(function (e) {
+    $("#MessageCancel").unbind('click').click(function (e)
+    {
         HideMessage(true, cancelCallBack);
     });
 
@@ -507,8 +583,7 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
 
 
 //Pagina agrupando filas
-function GroupRow(table, iniRecords, filter, index, colspan)
-{
+function GroupRow(table, iniRecords, filter, index, colspan) {
     var searching = false;
 
     if (typeof (filter) != 'undefined')
@@ -516,7 +591,7 @@ function GroupRow(table, iniRecords, filter, index, colspan)
 
     var oTable = $(table).DataTable(
        {
-           destroy:true,
+           destroy: true,
            fixedHeader: true,
            responsive: false,
            "aaSorting": [],
@@ -540,20 +615,17 @@ function GroupRow(table, iniRecords, filter, index, colspan)
            "columnDefs": [
                { "visible": false, "targets": index }
            ],
-         
+
            "displayLength": 25,
-           "drawCallback": function (settings)
-           {
+           "drawCallback": function (settings) {
                var api = this.api();
                var rows = api.rows({ page: 'current' }).nodes();
                var last = null;
 
                apCd = api.column(index, { page: 'current' }).data();
 
-               if (apCd != 'undefined')
-               {
-                   apCd.each(function (group, i)
-                   {
+               if (apCd != 'undefined') {
+                   apCd.each(function (group, i) {
                        if (last !== group) {
                            $(rows).eq(i).before(
                                '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
@@ -565,10 +637,8 @@ function GroupRow(table, iniRecords, filter, index, colspan)
                }
            }
        });
-    if (typeof (filter) != 'undefined')
-    {
-        $(filter).keyup(function ()
-        {
+    if (typeof (filter) != 'undefined') {
+        $(filter).keyup(function () {
             oTable.data().search(this.value).draw();
         });
 

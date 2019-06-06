@@ -29,7 +29,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public double ComAmount { get; set; }
 
         [Display(Name = "Entrega")]
-        public int SendingType { get; set; }
+        public DispatchMethod SendingType { get; set; }
 
         [Index("IDX_Year")]
         public int Year { get; set; }
@@ -43,6 +43,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public ICollection<SalePayment> SalePayments { get; set; }
 
+        [Display(Name ="Cliente")]
         public virtual Client Client { get; set; }
 
         public virtual SaleCreditNote SaleCreditNote { get; set; }
@@ -73,6 +74,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
                     case TranStatus.PreCancel:
                         style = "alert-warning";
                         break;
+
+                    case TranStatus.OnChange:
+                        style = "alert-warning";
+                        break;
                 }
 
                 return style;
@@ -83,6 +88,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         {
             get
             {
+                if (this.Status == TranStatus.Compleated)
+                    return "Completado";
+
                 var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
 
                 if (days > Cons.Zero)
@@ -106,29 +114,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         {
             get
             {
-                var name = string.Empty;
-
-                switch (this.Status)
-                {
-                    case TranStatus.Compleated:
-                        name = "Pagado";
-                        break;
-                    case TranStatus.Revision:
-                        name = "Pago Pendiente";
-                        break;
-                    case TranStatus.Reserved:
-                        name = "Reservado";
-                        break;
-                    case TranStatus.Canceled:
-                        name = "Cancelado";
-                        break;
-
-                    case TranStatus.PreCancel:
-                        name = "Por Cancelar";
-                        break;
-                }
-
-                return name;
+                return this.Status.GetName();
             }
         }
 
@@ -157,6 +143,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         {
             this.SaleDetails = new List<SaleDetail>();
             this.TransactionDate = DateTime.Now.ToLocal();
+            this.SalePayments = new List<SalePayment>();
         }
     }
 

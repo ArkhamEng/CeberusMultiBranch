@@ -1,0 +1,79 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+@using CerberusMultiBranch.Support
+
+@{
+    ViewBag.Title = "Detalle de venta";
+    ViewBag.Class = "fa fa-dollar";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Scripts.Render("~/bundles/Searches")
+@Scripts.Render("~/bundles/SaleOrder")
+@Scripts.Render("~/bundles/jqueryval")
+
+<br />
+
+<div class="@Model.Status.GetAlert() col-md-3" style="padding-bottom:0px">
+    <h4>
+        <i class="fa fa-tag"></i>
+        @Model.Folio
+    </h4>
+</div>
+
+<div class="@Model.Status.GetAlert() col-md-3 col-md-offset-6" style="padding-bottom:0px">
+    <h4>
+        <i class="@Model.Status.GetIcon()"></i>
+        @Model.Status.GetName()
+    </h4>
+</div>
+
+
+
+
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-body">
+      @Html.Partial("SaleOrderHeader",Model)
+    </div>
+</div>
+
+<ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#tabProducts">Articulos</a></li>
+
+    <li>
+        <a data-toggle="tab" href="#tabPayments">
+            Pagos <span id="TotalPayments" class="badge"></span>
+        </a>
+    </li>
+    <li class="pull-right">
+       <button type="button" class="btn btn-success btn-sm" onclick="SendOrder()">
+           <i class="fa fa-check"></i>
+           Terminar
+       </button>
+
+        <button type="button" class="btn btn-success btn-sm">
+            <i class="fa fa-check"></i>
+            Cotización
+        </button>
+
+        <button type="button" class="btn btn-primary btn-sm">
+            <i class="fa fa-print"></i>
+        </button>
+        <button type="button" class="btn btn-danger btn-sm">
+            <i class="fa fa-ban"></i>
+        </button>
+    </li>
+</ul>
+
+
+<div class="tab-content panel panel-default">
+    <div id="tabProducts" class="tab-pane fade in active panel-body dtContainer table-responsive">
+            @Html.Partial("SaleOrderDetail", Model.SaleDetails)
+    </div>
+
+    <div id="tabPayments" class="tab-pane panel-body dtContainer">
+    </div>
+</div>
+
+

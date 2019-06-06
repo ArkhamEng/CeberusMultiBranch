@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CerberusMultiBranch.Support;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,12 +9,34 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 {
     public enum TranStatus : int
     {
-        PreCancel = -2,//se termina
-        Canceled = -1, //Cancelado en venta y compra
-        InProcess = 0, //Abierto-venta, En proceso -compra
-        Reserved = 1, // compra / venta concluida pero no pagada | (compra inventariada, venta con producto reservado)
-        Revision = 2,
+        [Display(Name ="En modificación")]
+        [DisplayStyle(Alert ="alert alert-warning", Icon = "fa fa-edit")]
+        OnChange = -3,
+
+        [Display(Name = "En Cancelación")]
+        [DisplayStyle(Alert = "alert alert-danger", Icon = "fa fa-exclamation-triangle")]
+        PreCancel  = -2,//se termina
+
+        [Display(Name = "Cancelado")]
+        [DisplayStyle(Alert = "alert alert-danger", Icon = "fa fa-ban")]
+        Canceled   = -1, //Cancelado en venta y compra
+
+        [Display(Name = "En Proceso")]
+        [DisplayStyle(Alert = "alert alert-dark", Icon = "fa fa-pencil")]
+        InProcess  = 0, //Abierto-venta, En proceso -compra
+
+        [Display(Name = "Reservado")]
+        [DisplayStyle(Alert = "alert alert-info", Icon = "fa fa-gift")]
+        Reserved   = 1, // compra / venta concluida pero no pagada | (compra inventariada, venta con producto reservado)
+
+        [Display(Name = "En Seguimiento")]
+        [DisplayStyle(Alert = "alert alert-attention", Icon = "fa fa-eye")]
+        Revision   = 2, // venta / compra en revisión
+
+        [Display(Name = "Completado")]
+        [DisplayStyle(Alert = "alert alert-success", Icon = "fa fa-thumbs-up")]
         Compleated = 3, //Compra-Venta pagada en su totalidad
+        
     }
 
     public enum PaymentMethod
@@ -29,10 +52,21 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
     public enum TransactionType
     {
-        Contado  = 0,
-        Credito  = 1,
-        Preventa = 2,
-        Apartado = 3,
+        [Display(Name = "Contado")]
+        [DisplayStyle(Alert = "alert alert-success", Icon = "fa fa-dollar")]
+        Cash       = 0,
+
+        [Display(Name = "Crédito")]
+        [DisplayStyle(Alert = "alert alert-info", Icon = "fa fa-credit-card-alt")]
+        Credit      = 1,
+
+        [Display(Name = "Preventa")]
+        [DisplayStyle(Alert = "alert alert-dark", Icon = "glyphicon glyphicon-time")]
+        Presale     = 2,
+
+        [Display(Name = "Apartado")]
+        [DisplayStyle(Alert = "alert alert-warning", Icon = "fa fa-archive")]
+        Reservation = 3,
     }
 
     public enum MovementType
@@ -42,7 +76,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Display(Name = "Salida")]
         Exit = 2,
+
+        [Display(Name = "Reservación")]
         Reservation = 3,
+
+        [Display(Name = "Liberación")]
         Release = 4
+    }
+
+    public enum DispatchMethod : int
+    {
+        [Display(Name ="En Sucursal")]
+        OnSite = 0,
+
+        [Display(Name = "A Domicilio")]
+        HomeDelivery = 1
     }
 }

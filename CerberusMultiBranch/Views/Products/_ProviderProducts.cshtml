@@ -76,21 +76,11 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         Paginate("#tbProviderProducts", 7);
     });
 
-    function BeginCopy(provId, code)
-    {
-        HideModal(function ()
-        {
-            ShowCatalogModal(function () {
-                ShowCatalogModal(SearchBy, function () { SearchBy(id); }, 'Product', id);
-
-            }, null, 'ProductCopy', { providerId: provId, code: code });
-
-        });
-       
-    }
+    
 
 </script>

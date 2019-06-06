@@ -57,7 +57,13 @@
         </div>
         <div class="panel-footer clearfix">
             <div class="pull-right">
-                <button class="btn btn-primary btn-sm" type="button" id="btnConfirmCancel" title="Confirmar cancelación" onclick="CancelSale()">
+
+                <button class="btn btn-primary btn-sm" type="button" title="Solicitar cambio al vendedor" onclick="CancelSale(true)">
+                    <span class="fa fa-trash-o"></span>
+                    Solicitar Cambio
+                </button>
+
+                <button class="btn btn-warning btn-sm" type="button" id="btnConfirmCancel" title="Confirmar cancelación" onclick="CancelSale(false)">
                     <span class="fa fa-trash-o"></span>
                     Cancelar venta
                 </button>
@@ -91,7 +97,7 @@
     var OnCancelCompleated = 'undefined';
 
     //Cancela la venta
-    function CancelSale()
+    function CancelSale(changeRequest)
     {
         var form = $("#CancelSaleForm");
 
@@ -105,7 +111,7 @@
         {
             ShowLoading("static");
 
-            var param = { saleId: $("#SaleCancelId").val(), comment: $("#CancelComment").val() }
+            var param = { saleId: $("#SaleCancelId").val(), comment: $("#CancelComment").val(), changeRequest: changeRequest }
 
             ExecuteAjax('@Url.Action("Cancel","Sales")', param, function (response)
             {

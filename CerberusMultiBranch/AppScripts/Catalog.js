@@ -2,8 +2,7 @@
 //Muestra la ventada emergente de Edición /Captura de catalogos, dependiendo del 
 //tipo dado en el parametro Entity (Client,Employee,Supplier, Product, etc), si se envía un disable call back
 //se considerara que la ventana no esta en modo de edición
-function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBack)
-{
+function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBack) {
     ShowLoading('static');
 
     var param = {};
@@ -11,13 +10,11 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
     var unlockUrl = "";
     var idField = "";
     //si es para Editar
-    
-    if (!isNaN(id) && id > 0)
-    {
+
+    if (!isNaN(id) && id > 0) {
         param = { id: id };
 
-        switch (Entity)
-        {
+        switch (Entity) {
             case "Client":
                 url = "/Clients/BeginAdd";
                 unlockUrl = "/Clients/UnLock/";
@@ -40,10 +37,8 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                 break;
         }
     }
-    else if(id == 0)
-    {
-        switch (Entity)
-        {
+    else if (id == 0) {
+        switch (Entity) {
             case "Client":
                 url = "/Clients/BeginAdd";
                 break;
@@ -58,11 +53,9 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
                 break;
         }
     }
-    else
-    {
+    else {
         param = id;
-        switch (Entity)
-        {
+        switch (Entity) {
             case "ProductCopy":
                 url = "/Products/BeginCopy";
                 break;
@@ -70,20 +63,14 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
     }
     var form = "#SaveForm";
 
-    ExecuteAjax(url, param, function (response)
-    {
-        HideLoading(function ()
-        {
-            if (!$.isPlainObject(response))
-            {
+    ExecuteAjax(url, param, function (response) {
+        HideLoading(function () {
+            if (!$.isPlainObject(response)) {
                 //esto se debe hacer siempre que se oculte la ventana
-                var onHidden = function ()
-                {
+                var onHidden = function () {
                     //si el se tiene un id y no hay callback de deshabilitación remuevo el bloqueo
-                    if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined')
-                    {
-                        ExecuteAjax(unlockUrl, { id: param.id }, function (response)
-                        {
+                    if (parseInt(param.id) > 0 && typeof (disableCallBack) == 'undefined') {
+                        ExecuteAjax(unlockUrl, { id: param.id }, function (response) {
                             ShowNotify(response.Header, response.Result, response.Body, 3000);
                         });
                     }
@@ -97,36 +84,31 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
                 //si se recibe un id
-                if (typeof (param.id) != 'undefined')
-                {
+                if (typeof (param.id) != 'undefined') {
                     //si se recibe un callback de deshabilitación.. entro a modo visualización
                     if (typeof (disableCallBack) != 'undefined')
                         disableCallBack();
                         //de lo contrario, entro a modo edición y bloqueo el registro
-                    else
-                    {
+                    else {
                         ShowNotify("Registro bloqueado!", "warning", "Dispones de 5 min para realizar cambios, sobre este registro", 4000);
                     }
                 }
 
-                if (Entity != "Product")
-                    SubmitPerson(OnCompleate, form, idField);
-                else
+
+                if (Entity == "Product" || Entity == "ProductCopy")
                     SubmitProduct(OnCompleate, form, idField);
+                else
+                    SubmitPerson(OnCompleate, form, idField);
 
                 //evento del boton cancel
-                $("#EditCancel").off('click').click(function (e)
-                {
-                    HideModal(function ()
-                    {
+                $("#EditCancel").off('click').click(function (e) {
+                    HideModal(function () {
                         onHidden();
                     }, true)
                 });
 
-                $("#btnCloseEdit").off('click').click(function (e)
-                {
-                    HideModal(function ()
-                    {
+                $("#btnCloseEdit").off('click').click(function (e) {
+                    HideModal(function () {
                         onHidden();
                     }, true)
                 });
@@ -139,10 +121,8 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
 
-function SubmitPerson(SuccessCallBack, form, idField)
-{
-    $(form).off('submit').on('submit', function (e)
-    {
+function SubmitPerson(SuccessCallBack, form, idField) {
+    $(form).off('submit').on('submit', function (e) {
         e.preventDefault();
 
         var $form = $(e.target),
@@ -153,8 +133,7 @@ function SubmitPerson(SuccessCallBack, form, idField)
 
         var inputF = $(form).find('[type="file"]');
 
-        if (inputF[0] != 'undefined' && inputF[0] != null)
-        {
+        if (inputF[0] != 'undefined' && inputF[0] != null) {
             var file = inputF[0].files[0];
 
             if (file != 'undefined' && file != null)
@@ -217,10 +196,8 @@ function SubmitPerson(SuccessCallBack, form, idField)
 
 
 
-function SubmitProduct(SuccessCallBack, form, idField)
-{
-    $(form).off('submit').on('submit', function (e)
-    {
+function SubmitProduct(SuccessCallBack, form, idField) {
+    $(form).off('submit').on('submit', function (e) {
         e.preventDefault();
 
         var $form = $(e.target),
@@ -229,9 +206,8 @@ function SubmitProduct(SuccessCallBack, form, idField)
         files = [],
         addresses = [];
 
-       
-        if (!$form.valid())
-        {
+
+        if (!$form.valid()) {
             ShowNotify("Error de validación", "danger", "Existen errores en lo datos capturados, por favor verifica", 3500);
             return;
         }
@@ -242,7 +218,7 @@ function SubmitProduct(SuccessCallBack, form, idField)
             formData.append(val.name, val.value);
         });
 
-     
+
         ShowModLoading();
 
         $.ajax({
@@ -252,12 +228,10 @@ function SubmitProduct(SuccessCallBack, form, idField)
             contentType: false,
             processData: false,
             type: 'POST',
-            success: function (response)
-            {
+            success: function (response) {
                 HideModLoading();
 
-                if ($.isPlainObject(response) && response.Code != 200)
-                {
+                if ($.isPlainObject(response) && response.Code != 200) {
                     ShowNotify(response.Header, response.Result, response.Body, 3500);
 
                     switch (response.Code) {
@@ -267,10 +241,13 @@ function SubmitProduct(SuccessCallBack, form, idField)
                     }
                 }
                 else {
-                    HideModal(function ()
-                    {
+                    HideModal(function () {
                         ShowNotify(response.Header, response.Result, response.Body, 3500);
-                        SuccessCallBack(response.Id);
+
+                        if (SuccessCallBack != 'undefined') {
+                            SuccessCallBack(response.Id);
+                        }
+
                     }, true);
                 }
             },
@@ -280,38 +257,31 @@ function SubmitProduct(SuccessCallBack, form, idField)
 }
 
 
-function ShowConfirm(text, url, id, CompleatedCallBack)
+function ShowConfirm(header, body, aceptCallback, cancelCallback)
 {
+    $("#ConfirmText").html(body);
+    $("#ConfirmHeader").html(header);
 
-    $("#ConfirmText").html(text);
-
-    $("#ConfirmAccept").off('click').click(function ()
+    $("#ConfirmAccept").off('click').on("click", function ()
     {
         HideConfirm(function ()
         {
-            ShowLoading();
-
-            console.log("url:" + url + "Id:" + id);
-
-            ExecuteAjax(url, { id: id }, function (response)
-            {
-                HideLoading(function ()
-                {
-                    if (CompleatedCallBack != null && CompleatedCallBack != 'undefined' && response.Code == 200)
-                    {
-                        CompleatedCallBack();
-                    }
-
-                    ShowNotify(response.Header, response.Result, response.Body, 3000);
-                });
-            });
+            if (aceptCallback != undefined)
+                aceptCallback();
         });
     });
 
-    $("#ConfirmCancel").off('click').click(function () {
-        HideConfirm();
+    $("#ConfirmCancel").off('click').on("click", function ()
+    {
+        HideConfirm(function ()
+        {
+            if (aceptCallback != undefined)
+                cancelCallback();
+        });
     });
 
+    $("#ModalConfirm").off("shown.bs.modal").on("shown.bs.modal", function () { $("#ConfirmAccept").focus(); });
+ 
     $("#ModalConfirm").modal({ backdrop: 'static' });
 }
 
@@ -330,15 +300,13 @@ function HideConfirm(callback)
 function ShowQuickSearch(url, onRecordSelected, onClosed, param)
 {
     ShowLoading('static');
-    
+
 
     if (param == null)
         param = { quickSearch: true }
 
-    ExecuteAjax(url, param, function (response)
-    {
-        HideLoading(function ()
-        {
+    ExecuteAjax(url, param, function (response) {
+        HideLoading(function () {
             recordSelected = onRecordSelected;
 
             onCloseQuickSearch = onClosed;

@@ -6,6 +6,20 @@ selectedIds = [];
 
 removeQueu = [];
 
+//Se ejecuta cuando se copia un producto de proveedor
+function BeginCopy(provId, code)
+{
+    HideModal(function ()
+    {
+        ShowCatalogModal(function (id)
+        {
+            ShowCatalogModal(null, null, 'Product', id);
+
+        }, null, 'ProductCopy', { providerId: provId, code: code });
+
+    }, true);
+}
+
 
 //Inicia la acciones de revisión, autorización, recepción 
 //segun el estado actual de la orden de compra

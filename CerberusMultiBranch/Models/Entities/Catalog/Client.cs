@@ -114,6 +114,8 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public ICollection<Address> Addresses { get; set; }
 
 
+        public string ClientType { get { return this.Type.GetName(); } }
+
         public Client()
         {
             this.IsActive  = true;
@@ -143,8 +145,13 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
     public enum ClientType
     {
+        [Display(Name = "Mostrador")]
         Store  = 0,
+
+        [Display(Name = "Distribuidor")]
         Dealer = 1,
+
+        [Display(Name = "Mayorista")]
         Wholesaler =2
     }
 }

@@ -24,6 +24,9 @@
                     <div class="input-group">
                         @Html.TextBox("FProductName", "", htmlAttributes: new { @class = "form-control", placeholder = "Descripción o códidgo" })
                         <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" onclick="SearchProviderProduct('#FProductName',true)">
+                                <span class="fa fa-binoculars"></span>
+                            </button>
                             <button type="button" class="btn btn-primary" onclick="SearchProduct()">
                                 <span class="glyphicon glyphicon-search"></span>
                                 Buscar

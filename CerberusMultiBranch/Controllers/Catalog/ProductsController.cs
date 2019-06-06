@@ -61,7 +61,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
             products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
                         Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
                         Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
-                        where (id == null || p.ProductId == id)
+                        
+                        where (p.IsActive) &&
+                        (id == null || p.ProductId == id)
                         && (categoryId == null || p.CategoryId == categoryId)
                         && (partSystemId == null || p.PartSystemId == partSystemId)
                         && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
@@ -239,7 +241,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 //si el producto es nuevo
                 if (product.ProductId == Cons.Zero)
                 {
-                    var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
+                    var pc = db.Products.Count(p => p.Code == product.Code.Trim() && p.IsActive);
 
                     if (pc == Cons.Zero)
                     {
@@ -269,8 +271,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         return Json(new JResponse
                         {
                             Header = "El código de producto ya existe",
-                            Body = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code,
-                            Result = Cons.Responses.Warning,
+                            Body = "Ya existen un producto con este código, por favor verifica" + product.Code,
+                            Result = Cons.Responses.Danger,
                             Code = Cons.Responses.Codes.InvalidData
                         });
                     }
@@ -298,7 +300,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     return Json(new JResponse
                     {
-                        Header = "Prodcuto actualizado",
+                        Header = "Producto actualizado",
                         Body = "Los datos del product " + product.Code + " fueron actualizados correctamente",
                         Result = Cons.Responses.Success,
                         Code = Cons.Responses.Codes.Success,
@@ -398,16 +400,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var ep = db.ExternalProducts.Find(providerId, code);
 
             ProductViewModel vm = new ProductViewModel();
-
-            vm.IsActive = true;
+            
+            vm.IsActive   = true;
             vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
-            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
-            vm.Name = ep.Description;
-            vm.TradeMark = ep.TradeMark;
-            vm.Unit = ep.Unit;
-            vm.BuyPrice = ep.Price;
+            vm.Systems    = db.Systems.OrderBy(s => s.Name).ToSelectList();
+            vm.Name       = ep.Description.ToUpper();
+            vm.TradeMark  = ep.TradeMark.ToUpper();
+            vm.Unit       = ep.Unit.ToUpper();
+            vm.BuyPrice    = Math.Round(ep.Price,Cons.Two);
             vm.MinQuantity = Cons.One;
-            vm.Code = ep.Code;//Regex.Replace(ep.Code, @"^[a-zA-Z0-9]+$", "");
+            vm.Code             = Regex.Replace(ep.Code, @"[^0-9a-zA-Z]+", "").ToUpper();
+            vm.ProviderCode     = ep.Code;
+            vm.FromProviderId   = ep.ProviderId;
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -418,6 +422,47 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
             return PartialView("_ProductEdition", vm);
         }
+
+        [HttpPost]
+        public ActionResult Copy(Product product, int providerId, string code)
+        {
+            product.UpdDate = DateTime.Now;
+            product.UpdUser = User.Identity.GetUserName();
+            product.IsActive = true;
+            try
+            {
+                var pc = db.Products.Where(p => p.Code == product.Code.Trim() && p.IsActive).Count();
+
+                if (pc == Cons.Zero)
+                {
+                    //creo la equivalencia
+                    SaveSingle(product);
+                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
+                    db.Equivalences.Add(eq);
+                    db.SaveChanges();
+                }
+                else
+                {
+                    return Json(new
+                    {
+                        Result = "El código de producto ya existe",
+                        Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
+                    });
+                }
+
+                return Json("OK"); //Edit(product.ProductId);
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    Result = "Error al asociar el producto",
+                    Message = ex.Message
+                });
+            }
+        }
+
+
 
         #endregion
 
@@ -506,6 +551,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             //si es producto nuevo lo guardo de inmediato para generar un ID
             if (product.ProductId == Cons.Zero)
             {
+                if(!string.IsNullOrEmpty(product.ProviderCode))
+                {
+                    Equivalence eq = new Equivalence
+                    { ProviderId = product.FromProviderId, Code = product.ProviderCode, BuyPrice = product.BuyPrice,
+                        UpdDate = DateTime.Now.ToLocal(), UpdUser = User.Identity.Name, InsDate = DateTime.Now.ToLocal(),
+                        InsUser = User.Identity.Name, IsDefault = true
+                    };
+
+                    product.Equivalences = new List<Equivalence>();
+                    product.Equivalences.Add(eq);
+                }
+
                 db.Products.Add(product);
                 db.SaveChanges();
             }
@@ -1309,49 +1366,6 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 vm.CarMakes = db.CarMakes.ToSelectList();
 
             return PartialView("_QuickAddProduct", vm);
-        }
-
-
-
-
-
-        [HttpPost]
-        public ActionResult Copy(Product product, int providerId, string code)
-        {
-            product.UpdDate = DateTime.Now;
-            product.UpdUser = User.Identity.GetUserName();
-            product.IsActive = true;
-            try
-            {
-                var pc = db.Products.Where(p => p.Code == product.Code.Trim()).Count();
-
-                if (pc == Cons.Zero)
-                {
-                    //creo la equivalencia
-                    SaveSingle(product);
-                    var eq = new Equivalence { ProviderId = providerId, Code = code, ProductId = product.ProductId };
-                    db.Equivalences.Add(eq);
-                    db.SaveChanges();
-                }
-                else
-                {
-                    return Json(new
-                    {
-                        Result = "El código de producto ya existe",
-                        Message = "Se aplico formato y se encontro que ya existe el código de producto " + product.Code
-                    });
-                }
-
-                return Json("OK"); //Edit(product.ProductId);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    Result = "Error al asociar el producto",
-                    Message = ex.Message
-                });
-            }
         }
 
 

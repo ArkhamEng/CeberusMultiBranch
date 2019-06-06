@@ -54,6 +54,20 @@ namespace CerberusMultiBranch
             bundles.Add(new ScriptBundle("~/bundles/PurchaseEstimation").Include(
                    "~/AppScripts/PurchaseEstimation.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/SaleOrder").Include(
+                "~/AppScripts/SaleOrder.js"));
+
+            #region Search Scripts
+            bundles.Add(new ScriptBundle("~/bundles/SearchCustomer").Include(
+              "~/AppScripts/Controls/SearchCustomer.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/SearchProduct").Include(
+            "~/AppScripts/Controls/SearchProduct.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/Searches").Include(
+             "~/AppScripts/Searches.js"));
+
+            #endregion
         }
     }
 }

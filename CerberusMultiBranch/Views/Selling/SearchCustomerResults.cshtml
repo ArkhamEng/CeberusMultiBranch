@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Client>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Catalog
+
+
+<table id="tbSearchCustomerResults" class="table dt-responsive  table-bordered small" style="width:100%">
+    <thead>
+        <tr>
+            <th class="hidden"></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FTR)
+            </th>
+            <th >
+                @Html.DisplayNameFor(model => model.CreditAvailable)
+            </th>
+            <th >
+                @Html.DisplayNameFor(model => model.CreditDays)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in Model)
+        {
+            <tr>
+                <td class="hidden">
+                    @Html.HiddenFor(modelItem => customer.ClientId)
+                    @Html.HiddenFor(modelItem => customer.Name)
+                    @Html.HiddenFor(modelItem => customer.CreditAvailable)
+                    @Html.HiddenFor(modelItem => customer.CreditDays)
+
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => customer.Name)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => customer.FTR)
+                </td>
+                <td class="text-lowercase">
+                    @Html.DisplayFor(modelItem => customer.CreditAvailable)
+                </td>
+                <td class="text-uppercase">
+                    @Html.DisplayFor(modelItem => customer.CreditDays)
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-xs pull-right" id="btnSelectCustomer">
+                        <span class="fa fa-check"></span>
+                        Seleccionar
+                    </button>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -38,9 +38,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
             List<SelectListItem> list = new List<SelectListItem>
              {
-             new SelectListItem { Text = TransactionType.Contado.ToString(), Value = ((int)TransactionType.Contado).ToString() },
-             new SelectListItem { Text = TransactionType.Credito.ToString(), Value = ((int)TransactionType.Credito).ToString() },
-             new SelectListItem { Text = TransactionType.Preventa.ToString(), Value = ((int)TransactionType.Preventa).ToString() }
+             new SelectListItem { Text = TransactionType.Cash.ToString(), Value = ((int)TransactionType.Cash).ToString() },
+             new SelectListItem { Text = TransactionType.Credit.ToString(), Value = ((int)TransactionType.Credit).ToString() },
+             new SelectListItem { Text = TransactionType.Presale.ToString(), Value = ((int)TransactionType.Presale).ToString() }
              };
 
             this.TransTypes = new SelectList(list,"Value","Text");

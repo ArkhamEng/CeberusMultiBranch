@@ -165,11 +165,16 @@
 <label class="text-danger" id="lblQuickAddError"></label>
 @Html.HiddenFor(model => model.ProductId)
 @Html.HiddenFor(model => model.IsActive)
+@Html.HiddenFor(model => model.FromProviderId)
+@Html.HiddenFor(model => model.ProviderCode)
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         ValidateStock();
+
+        $("#Code").val('@Model.Code');
 
         $("#StockRequired").change(function (a)
         {

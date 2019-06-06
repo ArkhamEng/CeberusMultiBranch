@@ -25,6 +25,20 @@ $(document).ready(function ()
 });
 
 
+//Se ejecuta cuando se copia un producto de proveedor
+function BeginCopy(provId, code)
+{
+    HideModal(function ()
+    {
+        ShowCatalogModal(function (id)
+        {
+            ShowCatalogModal(null, null, 'Product', id);
+
+        }, null, 'ProductCopy', { providerId: provId, code: code });
+
+    }, true);
+}
+
 
 function ShowProviderQuickSearch()
 {

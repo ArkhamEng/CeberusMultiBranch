@@ -82,6 +82,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.BarCode = product.BarCode;
             this.BuyPrice = product.BuyPrice;
             this.Code = product.Code;
+            this.FromProviderId = product.FromProviderId;
+            this.ProviderCode = product.ProviderCode;
             this.DealerPercentage = product.DealerPercentage;
             this.DealerPrice = product.DealerPrice;
             this.Images = product.Images;

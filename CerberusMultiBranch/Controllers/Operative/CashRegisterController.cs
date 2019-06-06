@@ -708,13 +708,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                 };
 
                 //si la venta es a crédito establesco el moto en efectivo como el total de la venta
-                if (details.First().Sale.TransactionType == TransactionType.Contado)
+                if (details.First().Sale.TransactionType == TransactionType.Cash)
                     model.CashAmount = details.Sum(d => d.TaxedAmount);
 
-                if (details.First().Sale.TransactionType == TransactionType.Preventa)
+                if (details.First().Sale.TransactionType == TransactionType.Presale)
                     model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
 
-                if (details.First().Sale.TransactionType == TransactionType.Apartado)
+                if (details.First().Sale.TransactionType == TransactionType.Reservation)
                     model.CashAmount = (details.Sum(d => d.TaxedAmount) * 0.1).RoundMoney();
 
                 return PartialView("_RegistPayment", model);
@@ -967,7 +967,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                     sale.Status = TranStatus.Revision;
 
-                if (sale.TransactionType == TransactionType.Credito)
+                if (sale.TransactionType == TransactionType.Credit)
                     sale.Client.UsedAmount -= (cPayments + wholePayment);
 
 
@@ -1088,7 +1088,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
 
-                if (sale.TransactionType == TransactionType.Contado && wholePayment < toPay)
+                if (sale.TransactionType == TransactionType.Cash && wholePayment < toPay)
                 {
                     return Json(new JResponse
                     {
@@ -1100,7 +1100,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
-                if (sale.TransactionType == TransactionType.Preventa && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
+                if (sale.TransactionType == TransactionType.Presale && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
                 {
                     return Json(new JResponse
                     {
@@ -1112,7 +1112,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
-                if (sale.TransactionType == TransactionType.Apartado && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
+                if (sale.TransactionType == TransactionType.Reservation && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
                 {
                     return Json(new JResponse
                     {

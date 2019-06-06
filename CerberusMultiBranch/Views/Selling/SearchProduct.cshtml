@@ -1,0 +1,48 @@
+﻿
+@model IEnumerable<SearchProductResultViewModel>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.ViewModels.Catalog
+
+
+@Scripts.Render("~/bundles/SearchProduct")
+
+
+<div class="panel panel-primary">
+
+    <div class="panel-heading">
+        <button type="button" class="close" id="btnCloseSearchProduct">
+            <span class="fa fa-times"></span>
+        </button>
+        <h4 class="panel-title">
+            <span class="fa fa-user"></span> Busquede de Productos
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        @Html.TextBox("SearchProductFilter", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre ó código de producto" })
+                        <span class="input-group-btn">
+                            <button  type="button" class="btn btn-primary" id="btnSearchProduct">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-default">
+            <div class="panel panel-default">
+                <div id="divSearchProductResults" class="panel-body">
+                    @Html.Partial("SearchProductResults", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

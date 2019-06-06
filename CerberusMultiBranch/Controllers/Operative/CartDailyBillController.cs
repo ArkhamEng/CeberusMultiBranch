@@ -250,7 +250,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Result = Cons.Responses.Success,
                     Code = Cons.Responses.Codes.Success,
                     Header = "Producto agregado",
-                    Body = "Se agregaron "+quantity+" unidades del producto "+ bp.Product.Code+" a la venta"
+                    Body = "Se agregaron " + quantity + " unidades del producto " + bp.Product.Code + " a la venta"
                 });
             }
             catch (Exception ex)
@@ -486,11 +486,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [CustomAuthorize(Roles = "Vendedor")]
-        public JsonResult CompleateSale(int sending, TransactionType type)
+        public JsonResult CompleateSale(DispatchMethod sending, TransactionType type)
         {
             try
             {
-                if(!User.IsCashRegisterOpen())
+                if (!User.IsCashRegisterOpen())
                 {
                     return Json(new JResponse
                     {
@@ -511,7 +511,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 #region Validaciones para preventas y ventas a credito
 
                 //validación de cliente valido
-                if (type != TransactionType.Contado && client.ClientId == Cons.Zero)
+                if (type != TransactionType.Cash && client.ClientId == Cons.Zero)
                 {
                     return Json(new JResponse
                     {
@@ -527,15 +527,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 int days = Cons.DaysToCancel;
 
                 //validaciones de crédito
-                if (type == TransactionType.Credito)
+                if (type == TransactionType.Credit)
                 {
                     var dt = DateTime.Now.TodayLocal();
 
                     //verifico si el cliente tiene alguna venta a credito pendiente de pago
-                    var pendingSales = db.Sales.Where(s => s.Expiration < dt && 
-                                       s.TransactionType == TransactionType.Credito && s.Status == TranStatus.Reserved);
+                    var pendingSales = db.Sales.Where(s => s.Expiration < dt &&
+                                       s.TransactionType == TransactionType.Credit && s.Status == TranStatus.Reserved);
 
-                    if(pendingSales != null && pendingSales.Count() > Cons.Zero)
+                    if (pendingSales != null && pendingSales.Count() > Cons.Zero)
                     {
                         return Json(new JResponse
                         {
@@ -578,7 +578,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     days = client.CreditDays;
                 }
                 //preventa, solo permite productos sin existencias
-                if (type == TransactionType.Preventa)
+                if (type == TransactionType.Presale)
                 {
                     var item = cartItems.FirstOrDefault(i => i.InStock > Cons.Zero);
 
@@ -600,15 +600,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //creo la venta
                 Sale sale = new Sale
                 {
-                    Year     = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
+                    Year = Convert.ToInt32(DateTime.Now.TodayLocal().ToString("yy")),
                     BranchId = User.Identity.GetBranchId(),
-                    UserId   = User.Identity.GetUserId(),
+                    UserId = User.Identity.GetUserId(),
                     SendingType = sending,
                     ClientId = cartItems.FirstOrDefault().ClientId,
                     LastStatus = TranStatus.InProcess,
                     Status = TranStatus.Reserved,
                     TransactionType = type,
-                    Expiration = type == TransactionType.Contado ? DateTime.Now.ToLocal() : DateTime.Now.ToLocal().AddDays(days)
+                    Expiration = type == TransactionType.Cash ? DateTime.Now.ToLocal() : DateTime.Now.ToLocal().AddDays(days)
                 };
 
 
@@ -619,7 +619,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 foreach (var item in cartItems)
                 {
                     //se valida que los productos tengan existencias suficiente, salvo para preventa
-                    if (type != TransactionType.Preventa && !item.CanSell)
+                    if (type != TransactionType.Presale && !item.CanSell)
                     {
                         return Json(new JResponse
                         {
@@ -634,7 +634,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //creo un detalle por cada item del carrito
                     var detail = new SaleDetail
                     {
-                        Amount    = item.Amount,
+                        Amount = item.Amount,
                         Price = item.Price,
                         ProductId = item.ProductId,
                         Quantity = item.Quantity,
@@ -685,28 +685,23 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 ParentId = pckDet.PackageId,
                             };
 
-                            //las preventas no generan movimiento de inventario al ser creadas
-                            if (type != TransactionType.Preventa)
-                            {
-                                //busco el stock del detalle en sucursal y resto el producto de los reservados
-                                var detBP = db.BranchProducts.Find(pckDet.DetailtId);
 
-                                detBP.LastStock = (detBP.Stock + detBP.Reserved);
-                                detBP.Reserved -= pckDet.Quantity;
-                                detBP.UpdDate = DateTime.Now.ToLocal();
-                                detBP.UpdUser = User.Identity.Name;
+                            //busco el stock del detalle en sucursal y resto el producto de los reservados
+                            var detBP = db.BranchProducts.Find(pckDet.DetailtId);
 
-                                //agrego el detalle (del paquete) a la venta
+                            detBP.Reserved -= pckDet.Quantity;
+                            detBP.UpdDate = DateTime.Now.ToLocal();
+                            detBP.UpdUser = User.Identity.Name;
 
-                                sale.SaleDetails.Add(tDeatil);
-                                db.Entry(detBP).State = EntityState.Modified;
-                            }
+                            //agrego el detalle (del paquete) a la venta
+
+                            sale.SaleDetails.Add(tDeatil);
+                            db.Entry(detBP).State = EntityState.Modified;
+
                         }
                     }
 
-                    //las preventas no generan movimiento de inventario al ser creadas
-                    //if (type != TransactionType.Preventa)
-                    //{
+                   
                     //agrego el moviento al inventario
                     StockMovement sm = new StockMovement
                     {
@@ -718,7 +713,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Quantity = detail.Quantity,
                     };
                     movements.Add(sm);
-                    //}
+                   
                     sortOrder++;
                 }
 
@@ -756,7 +751,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.Sequential = (seq + Cons.One);
                 sale.Folio = User.Identity.GetFolio(sale.Sequential);
 
-                if (type != TransactionType.Preventa)
+                if (type != TransactionType.Presale)
                 {
                     movements.ForEach(m => { m.Comment = "SALIDA AUTOMATICA, VENTA CON FOLIO: " + sale.Folio.ToUpper(); });
                     db.StockMovements.AddRange(movements);

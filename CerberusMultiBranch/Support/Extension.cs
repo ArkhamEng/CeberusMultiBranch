@@ -1,30 +1,74 @@
 ﻿using CerberusMultiBranch.Models;
 using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
-using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.UI;
-using System.Web.Util;
 
 namespace CerberusMultiBranch.Support
 {
     public static class Extension
     {
+        public  static TAttribute GetAttribute<TAttribute>(this Enum value) where TAttribute : Attribute
+        {
+            return value.GetType().GetMember(value.ToString()).First().GetCustomAttribute<TAttribute>();
+        }
+
+        public static string GetName(this Enum value)
+        {
+            try
+            {
+                return value.GetAttribute<DisplayAttribute>().Name;
+            }
+            catch 
+            {
+                return string.Empty;
+            }
+            
+        }
+
+        public static string GetAlert(this Enum value)
+        {
+            try
+            {
+                return value.GetAttribute<DisplayStyle>().Alert;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+            
+        }
+
+        public static string GetIcon(this Enum value)
+        {
+            try
+            {
+                return value.GetAttribute<DisplayStyle>().Icon;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+            
+        }
+
         public static PagedResult<T> GetPaged<T>(this IQueryable<T> query,
                                         int page, int pageSize) where T : class
         {

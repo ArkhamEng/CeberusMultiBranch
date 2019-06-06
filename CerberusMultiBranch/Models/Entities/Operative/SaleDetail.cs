@@ -18,6 +18,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int? ParentId { get; set; }
 
+        [Display(Name ="Devolución")]
+        public double Refund { get; set; }
+
         public virtual Sale Sale { get; set; }
     }
 }

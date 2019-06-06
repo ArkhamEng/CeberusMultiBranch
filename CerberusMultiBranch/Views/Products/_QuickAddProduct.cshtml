@@ -256,29 +256,5 @@
         ExecuteAjax('@Url.Action("SearchEdit")', { code: code }, function (response) {
             $("#divProducts").html(response);
         });
-    }
-
-    @*function Copy()
-    {
-        $("#imgProd").attr("class", "img-responsive");
-        $("#divProd").hide();
-
-        var param =
-        {
-            Code: $("#Code").val(), CategoryId: $("#CategoryId").val(), TradeMark: $("#TradeMark").val(), Name: $("#Name").val(), PartSystemId: $("#SystemId").val(),
-            WholesalerPrice: $("#WholesalerPrice").val(), DealerPrice: $("#DealerPrice").val(), BuyPrice: $("#BuyPrice").val(),
-            StorePrice: $("#StorePrice").val(), Unit: $("#Unit").val()
-        }
-
-        ExecuteAjax('@Url.Action("Copy")', { product: param, providerId: $("#ProviderId").val(), code: $("#ExCode").val() }, function (j) {
-            if (j.Result != "OK") {
-                $("#imgProd").attr("class", "img-responsive hide");
-                $("#lblMessage").text(j.Result + '==>' + j.Message);
-                $("#divProd").show();
-            }
-            else {
-                $("#ModalCloneProduct").modal("hide");
-            }
-        });
-    }*@
+    }   
 </script>

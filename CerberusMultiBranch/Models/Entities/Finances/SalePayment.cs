@@ -30,7 +30,7 @@ namespace CerberusMultiBranch.Models.Entities.Finances
         {
             get
             {
-                return (base.CanDelete && this.Sale.TransactionType != TransactionType.Contado);
+                return (base.CanDelete && this.Sale.TransactionType != TransactionType.Cash);
             }
         }
     }

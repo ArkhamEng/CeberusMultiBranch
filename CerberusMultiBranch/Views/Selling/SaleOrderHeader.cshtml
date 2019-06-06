@@ -1,0 +1,90 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Sale
+@using CerberusMultiBranch.Support
+
+<div class="row col-md-12">
+    @Html.HiddenFor(model => model.ClientId)
+    @Html.HiddenFor(model => model.Status)
+    @Html.HiddenFor(model => model.LastStatus)
+    @Html.HiddenFor(model => model.SaleId)
+    @Html.HiddenFor(model => model.BranchId)
+    @Html.HiddenFor(model => model.UserId)
+    @Html.HiddenFor(model => model.Folio)
+
+    @Html.HiddenFor(model => model.Client.CreditAvailable)
+    @Html.HiddenFor(model => model.Client.CreditDays)
+    @Html.HiddenFor(model => model.Client.CreditLimit)
+    @Html.HiddenFor(model => model.Client.ClientType)
+    
+
+
+    <div class="col-md-6 form-group">
+        @Html.LabelFor(model => model.Client, htmlAttributes: new { @class = "control-label small" })
+        <div class="input-group">
+            <span id="spanPopOver" class="input-group-addon" popover-content="@Html.Partial("CustomerInfo").ToHtmlString()"
+                  tooltip-title="Ver detalle del cliente">
+                <i class="fa fa-user"></i>
+            </span>
+
+            @Html.EditorFor(model => model.Client.Name, new { htmlAttributes =
+                     new { @class = "form-control input-sm text-uppercase", autocomplete = "off", } })
+            <span class="input-group-btn">
+                <button type="button" class="btn btn-default btn-sm" id="btnBegingSearchCustomer"  tooltip-title="Búsqueda de cliente">
+                    <i id="iSearch" class="fa fa-refresh"></i>
+                </button>
+            </span>
+        </div>
+    </div>
+
+   
+    <div class="col-md-3">
+        @Html.Label("Fecha de Venta", htmlAttributes: new { @class = "control-label small" })
+        <div>
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                @Html.EditorFor(model => model.TransactionDate, new
+           {
+               htmlAttributes = new { @class = "form-control input-sm text-uppercase", autocomplete = "off", @readonly = "true" }
+           })
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        @Html.Label("Fecha de Expiración", htmlAttributes: new { @class = "control-label small" })
+
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+
+            @Html.EditorFor(model => model.Expiration, new
+       {
+           htmlAttributes = new { @class = "form-control input-sm text-uppercase", autocomplete = "off", @readonly = "true" }
+       })
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row col-md-12">
+   
+    <div class="col-md-3" >
+        @Html.Label("Tipo de Venta", htmlAttributes: new { @class = "control-label small" })
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-asterisk"></i></span>
+            @Html.EnumDropDownListFor(model => model.TransactionType, htmlAttributes: new { @class = "form-control input-sm" })
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        @Html.Label("Despacho", htmlAttributes: new { @class = "control-label small" })
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-ship"></i></span>
+            @Html.EnumDropDownListFor(model => model.SendingType, htmlAttributes: new { @class = "form-control input-sm" })
+        </div>
+    </div>
+</div>
+
+
+<div class="col-md-6 customerInfo">
+</div>
+

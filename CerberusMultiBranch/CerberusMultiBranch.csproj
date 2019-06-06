@@ -212,6 +212,7 @@
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
+    <Compile Include="Controllers\Operative\SellingController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -427,6 +428,14 @@
     <Compile Include="Migrations\201903220146029_EstimationKeys.Designer.cs">
       <DependentUpon>201903220146029_EstimationKeys.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201903222141585_removeUniqueCode.cs" />
+    <Compile Include="Migrations\201903222141585_removeUniqueCode.Designer.cs">
+      <DependentUpon>201903222141585_removeUniqueCode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201906051908285_RefundSale.cs" />
+    <Compile Include="Migrations\201906051908285_RefundSale.Designer.cs">
+      <DependentUpon>201906051908285_RefundSale.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -492,6 +501,7 @@
     <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchPersonViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\SearchProductResultViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\TransferViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\JCarModelYear.cs" />
@@ -520,6 +530,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
+    <Compile Include="Support\CustomAttributes.cs" />
     <Compile Include="Support\CustomAuthorize.cs" />
     <Compile Include="Support\DBHelper.cs" />
     <Compile Include="Support\Extension.cs" />
@@ -533,10 +544,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
+    <Content Include="AppScripts\Controls\SearchProduct.js" />
+    <Content Include="AppScripts\Searches.js" />
     <Content Include="AppScripts\Global.js" />
     <Content Include="AppScripts\Operative.js" />
     <Content Include="AppScripts\PurchaseEstimation.js" />
     <Content Include="AppScripts\PurchaseOrder.js" />
+    <Content Include="AppScripts\SaleOrder.js" />
+    <Content Include="AppScripts\Controls\SearchCustomer.js" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -1007,7 +1022,6 @@
     <Content Include="Views\Products\_Compatibilities.cshtml" />
     <Content Include="Views\Shared\_BranchOption.cshtml" />
     <Content Include="Views\Products\_ProviderProducts.cshtml" />
-    <Content Include="Views\Products\_QuickAddProduct.cshtml" />
     <Content Include="Views\Shared\_Confirm.cshtml" />
     <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
     <Content Include="Views\Shared\_PaymentOption.cshtml" />
@@ -1089,6 +1103,14 @@
     <Content Include="Views\Products\_SearchPagin.cshtml" />
     <Content Include="Views\Products\_Pagination.cshtml" />
     <Content Include="Views\PurchaseEstimation\_AvailableCarts.cshtml" />
+    <Content Include="Views\Selling\SaleOrder.cshtml" />
+    <Content Include="Views\Selling\SaleOrderDetail.cshtml" />
+    <Content Include="Views\Selling\SaleOrderHeader.cshtml" />
+    <Content Include="Views\Selling\SearchCustomer.cshtml" />
+    <Content Include="Views\Selling\SearchCustomerResults.cshtml" />
+    <Content Include="Views\Selling\CustomerInfo.cshtml" />
+    <Content Include="Views\Selling\SearchProduct.cshtml" />
+    <Content Include="Views\Selling\SearchProductResults.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1261,6 +1283,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201903220146029_EstimationKeys.resx">
       <DependentUpon>201903220146029_EstimationKeys.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201903222141585_removeUniqueCode.resx">
+      <DependentUpon>201903222141585_removeUniqueCode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201906051908285_RefundSale.resx">
+      <DependentUpon>201906051908285_RefundSale.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

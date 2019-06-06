@@ -53,8 +53,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         Result = Cons.Responses.Warning,
                         Header = "Registro no encontrado",
-                        Body = "No se encontro la venta solicitada",
-                        Code = Cons.Responses.Codes.RecordNotFound
+                        Body   = "No se encontro la venta solicitada",
+                        Code   = Cons.Responses.Codes.RecordNotFound
                     });
                 }
 
@@ -71,10 +71,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var model = new SaleCancelViewModel
                 {
-                    SaleFolio = sale.Folio,
+                    SaleFolio    = sale.Folio,
                     SaleCancelId = sale.SaleId,
-                    PaymentCard = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Tarjeta).Sum(s => s.Amount),
-                    PaymentCash = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Efectivo).Sum(s => s.Amount),
+                    PaymentCard  = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Tarjeta).Sum(s => s.Amount),
+                    PaymentCash  = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Efectivo).Sum(s => s.Amount),
                     PaymentCreditNote = sale.SalePayments.Where(s => s.PaymentMethod == PaymentMethod.Vale).Sum(s => s.Amount),
                 };
 
@@ -93,9 +93,11 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+
+
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor, Cajero")]
-        public JsonResult Cancel(int saleId, string comment)
+        public JsonResult Cancel(int saleId, string comment, bool changeRequest = false)
         {
             try
             {
@@ -144,14 +146,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var payments = sale.SalePayments.Sum(p => p.Amount);
 
                 //si la venta es credito, se resta el monto deudo de la cuenta del cliente
-                if (sale.TransactionType == TransactionType.Credito)
+                if (sale.TransactionType == TransactionType.Credit)
                     sale.Client.UsedAmount -= (sale.TotalTaxedAmount - payments).RoundMoney();
 
                 sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Canceled; //status cancelado
-                sale.UpdUser = User.Identity.Name;
-                sale.UpdDate = DateTime.Now.ToLocal();
-                sale.Comment = comment;
+                sale.Status     = changeRequest  ? TranStatus.OnChange : TranStatus.Canceled; //status cancelado
+                sale.UpdUser    = User.Identity.Name;
+                sale.UpdDate    = DateTime.Now.ToLocal();
+                sale.Comment    = comment;
 
                 var message = string.Format("Se cancelo la venta {0}, el producto ha sido regreado al inventario", sale.Folio);
 
@@ -187,6 +189,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
+ 
         [HttpPost]
         [CustomAuthorize(Roles = "Supervisor,Vendedor")]
         public ActionResult Search(int? branchId, DateTime? beginDate, DateTime? endDate,
@@ -265,7 +268,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (model == null)
                 return RedirectToAction("History");
 
-            return View(model);
+            return View("SaleOrder",model);
         }
         #endregion
 

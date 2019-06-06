@@ -25,7 +25,6 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         [MaxLength(30)]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "El código solo admite letras y numeros (sin espacios en blanco)")]
-        [Index("UNQ_Code", IsUnique = true)]
         [Index("IDX_Ident_TradeMark", Order =0)]
         public string Code { get; set; }
 
@@ -226,6 +225,9 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         [NotMapped]
         public string ProviderCode { get; set; }
+
+        [NotMapped]
+        public int FromProviderId { get; set; }
 
         public Product()
         {

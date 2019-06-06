@@ -1,10 +1,8 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
-using System;
-using System.Collections.Generic;
+using CerberusMultiBranch.Support;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -46,5 +44,26 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public double TaxedAmount { get; set; }
 
         public virtual Product Product { get; set; }
+
+        #region Not Mapped
+
+        [NotMapped]
+        public string Image
+        {
+            get
+            {
+                return this.Product == null | this.Product.Images.Count == 0 ?
+                  Cons.NoImagePath : this.Product.Images.First().Path;
+            }
+        }
+
+        [NotMapped]
+        public bool IsModified
+        {
+            get;set;
+        }
+
+       
+        #endregion
     }
 }

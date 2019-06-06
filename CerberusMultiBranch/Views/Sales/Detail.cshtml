@@ -141,21 +141,21 @@
                     </div>
                 </div>
 
-                <div class="panel panel-default">
-                    <div id="divDetails" class="panel-body dtContainer">
+                @*<div class="panel panel-default">*@
+                    <div id="divDetails" class="dtContainer">
                         @Html.Partial("_Details", Model.SaleDetails)
                     </div>
-                </div>
+                @*</div>*@
             </div>
         </div>
     </div>
 
     <div id="tabPayments" class="tab-pane">
-        <div class="panel panel-default">
+        @*<div class="panel panel-default">*@
             <div id="divSalePayments" class="panel-body dtContainer">
                 @Html.Partial("_SalePayments", Model.SalePayments)
             </div>
-        </div>
+        @*</div>*@
     </div>
 </div>
 
@@ -165,17 +165,21 @@
 
 <script>
     $(document).ready(function () {
-        $("#btnShowQuick").click(function () {
+        $("#btnShowQuick").click(function ()
+        {
             $("#ModalProduct").modal('show');
         });
 
-        $("#btnCompleate").click(function () {
+        $("#btnCompleate").click(function ()
+        {
             ShowConfirm("Terminar y Reservar?", "Deseas concluir la venta y retirar los productos del inventario?", 'static', SubmitCompleate);
         });
 
-        if ('@Model.Status' != '@TranStatus.InProcess') {
+        if ('@Model.Status' != '@TranStatus.InProcess' && '@Model.Status' != '@TranStatus.OnChange')
+        {
             $(".Compleated").hide();
         }
+
     });
 
 

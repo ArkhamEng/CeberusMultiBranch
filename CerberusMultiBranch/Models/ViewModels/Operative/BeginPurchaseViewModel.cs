@@ -52,10 +52,10 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
             this.TransactionType = new TransactionType();
 
             this.TransactionTypes = new List<TransactionType>();
-            this.TransactionTypes.Add(TransactionType.Contado);
-            this.TransactionTypes.Add(TransactionType.Credito);
+            this.TransactionTypes.Add(TransactionType.Cash);
+            this.TransactionTypes.Add(TransactionType.Credit);
 
-            this.TransactionType = TransactionType.Contado;
+            this.TransactionType = TransactionType.Cash;
 
             this.PurchaseDate = DateTime.Today;
         }

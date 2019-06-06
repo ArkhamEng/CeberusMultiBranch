@@ -35,11 +35,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public BeginSaleViewModel()
         {
-            this.TransactionType = TransactionType.Credito;
+            this.TransactionType = TransactionType.Credit;
 
             TransactionTypes = new List<TransactionType>();
-            this.TransactionTypes.Add(TransactionType.Credito);
-            this.TransactionTypes.Add(TransactionType.Preventa);
+            this.TransactionTypes.Add(TransactionType.Credit);
+            this.TransactionTypes.Add(TransactionType.Presale);
             this.SaleDate = DateTime.Today;
         }
     }

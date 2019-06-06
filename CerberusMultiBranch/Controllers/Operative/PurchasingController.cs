@@ -646,7 +646,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     ProviderId = order.ProviderId,
                     BranchId = order.BranchId,
                     LastStatus = TranStatus.InProcess,
-                    TransactionType = order.PurchaseTypeId == PType.Credit ? TransactionType.Credito : TransactionType.Contado,
+                    TransactionType = order.PurchaseTypeId == PType.Credit ? TransactionType.Credit : TransactionType.Cash,
                     UserId = HttpContext.User.Identity.GetUserId(),
                     PurchaseOrderId = order.PurchaseOrderId,
                     Freight = order.Freight,

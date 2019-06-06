@@ -1,0 +1,48 @@
+﻿
+@model IEnumerable<Client>
+
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Catalog
+
+
+@Scripts.Render("~/bundles/SearchCustomer")
+
+
+<div class="panel panel-primary">
+
+    <div class="panel-heading">
+        <button type="button" class="close" id="btnCloseSearchCustomer">
+            <span class="fa fa-times"></span>
+        </button>
+        <h4 class="panel-title">
+            <span class="fa fa-user"></span> Busquede de clientes
+        </h4>
+    </div>
+    <div class="panel-body">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        @Html.TextBox("SearchCustomerFilter", "", htmlAttributes: new { @class = "form-control", placeholder = "Nombre del cliente" })
+                        <span class="input-group-btn">
+                            <button  type="button" class="btn btn-primary" id="btnSearchCustomer">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-default">
+            <div class="panel panel-default">
+                <div id="divSearchCustomerResults" class="panel-body">
+                    @Html.Partial("SearchCustomerResults", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

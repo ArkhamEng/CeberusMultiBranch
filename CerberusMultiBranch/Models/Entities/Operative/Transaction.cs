@@ -23,7 +23,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         [Display(Name = "Fecha de Operación")]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         [Index("IDX_TransactionDate", IsUnique = false)]
         public DateTime TransactionDate { get; set; }
 
@@ -72,7 +72,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         [Display(Name = "Vencimiento")]
         [DataType(DataType.Date)]
-        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:dd/MM/yyyy hh:mm}")]
+        [DisplayFormat(ApplyFormatInEditMode = true, ConvertEmptyStringToNull = true, DataFormatString = "{0:yyyy-MM-dd}")]
         public DateTime Expiration { get; set; }
 
 
@@ -99,6 +99,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [ForeignKey("UserId")]
         public ApplicationUser User { get; set; }
 
+      
 
         public Transaction()
         {

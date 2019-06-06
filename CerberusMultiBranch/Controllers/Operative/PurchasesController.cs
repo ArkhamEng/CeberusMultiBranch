@@ -236,7 +236,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult BeginPurchase()
         {
             BeginPurchaseViewModel model = new BeginPurchaseViewModel();
-            model.TransactionType = TransactionType.Credito;
+            model.TransactionType = TransactionType.Credit;
 
             return PartialView("_BeginPurchase", model);
         }

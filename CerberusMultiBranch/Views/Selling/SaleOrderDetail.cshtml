@@ -1,0 +1,145 @@
+﻿@model IEnumerable<SaleDetail>
+
+@using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
+
+
+<div id="AddProductZone" class="col-md-4 row">
+    <div class="input-group">
+        @Html.TextBox("ProductFilter", null, new
+  {
+      @class = "form-control input-sm text-uppercase",
+      autocomplete = "off",
+      placeholder = "Clave o nombre de producto"
+  })
+        <span class="input-group-btn">
+            <button type="button" class="btn btn-primary btn-sm" id="btnBegingSearchProduct" tooltip-title="Agregar Productos">
+                <i id="iSearchProduct" class="fa fa-plus"></i>
+            </button>
+        </span>
+    </div>
+</div>
+
+
+<table id="tbSaleDetails" class="table table table-striped small" style="border-top:solid; border-top-width:thin">
+    <thead>
+        <tr>
+            <td class="hidden"></td>
+            <td></td>
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Product.Name)
+            </th>
+
+            <th align="center">
+                @Html.DisplayNameFor(model => model.TaxedPrice)
+            </th>
+            <th align="center">
+                @Html.DisplayNameFor(model => model.Quantity)
+            </th>
+
+            <th align="center">
+                @Html.DisplayNameFor(model => model.Refund)
+            </th>
+
+            <th align="right">
+                <div class="pull-right">
+                    @Html.DisplayNameFor(model => model.TaxedAmount)
+                </div>
+            </th>
+            <th class="btnDelete"></th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td class="hidden">
+                    @Html.HiddenFor(modelItem => item.ProductId)
+                    @Html.HiddenFor(modelItem => item.SaleId)
+                </td>
+                <td style="width:80px">
+                    <img src="@item.Image" class="img-responsive" />
+                </td>
+                <td>
+                    @Html.DisplayUpperFor(modelItem => item.Product.Code)
+                </td>
+                <td>
+                    @Html.DisplayUpperFor(modelItem => item.Product.Name)
+                </td>
+                <td style="width:100px; padding:0px 2px 0px 2px" align="center">
+                    @Html.EditorFor(modelItem => item.TaxedPrice, new { htmlAttributes = 
+                        new { @class = "form-control input-sm txtQuantity", autocomplete = "off", @type="number" } })
+                </td>
+
+                <td style="width:80px; padding:0px 2px 0px 2px" align="center">
+                    @Html.EditorFor(modelItem => item.Quantity, new { htmlAttributes = 
+                        new { @class = "form-control input-sm txtQuantity", autocomplete = "off", @type="number" } })
+                </td>
+                <td style="width:80px; padding:0px 2px 0px 2px" align="center">
+                    @Html.EditorFor(modelItem => item.Refund, new { htmlAttributes = 
+                        new { @class = "form-control input-sm txtRefund", autocomplete = "off", @type = "number", disabled="true" } })
+                </td>
+
+                <td id="tdRowAmount" align="right" style="width:150px;">
+                    @Html.DisplayFor(modelItem => item.TaxedAmount)
+                </td>
+
+                <td  class="btnDelete" style="max-width:60px">
+                    <button id="btnDeleteDetail" class="btn btn-sm btn-danger pull-right btnDelete" type="button" title="Eliminar partida">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5"></td>
+            <td align="right">
+                <h3>
+                    Total
+                </h3>
+            </td>
+            <td align="right">
+                <h3 id="tdAmount"></h3>
+            </td>
+            <td class="btnDelete"></td>
+        </tr>
+    </tfoot>
+</table>
+
+<table class="hidden">
+    <tr id="rowTemplate">
+        <td class="hidden">
+            @Html.Hidden("item_ProductId")
+            @Html.Hidden("item_SaleId")
+        </td>
+        <td style="max-width:50px">
+            <img id="imgProduct" src="" class="img-rounded img-responsive" />
+        </td>
+        <td id="tdCode"></td>
+        <td id="tdName"></td>
+        <td style="width:100px; padding:0px 2px 0px 2px">
+            @Html.TextBox("item_TaxedPrice", "", htmlAttributes: new { @class = "form-control input-sm", autocomplete = "off",@type="number" })
+        </td>
+
+        <td style="width:80px; padding:0px 2px 0px 2px">
+            @Html.TextBox("item_Quantity", "", htmlAttributes: new { @class = "form-control input-sm", autocomplete = "off", @type="number" })
+        </td>
+        <td style="width:80px; padding:0px 2px 0px 2px">
+            @Html.TextBox("item_Refund", "0", htmlAttributes:
+           new { @class = "form-control input-sm", autocomplete = "off", @type = "number", disabled = "true" })
+        </td>
+        <td id="tdRowAmount" align="right" style="width:150px;"></td>
+
+        <td style="max-width:60px">
+            <button id="btnDeleteDetail" class="btn btn-sm btn-danger pull-right" type="button" title="Eliminar partida">
+                <i class="fa fa-trash"></i>
+            </button>
+        </td>
+    </tr>
+</table>
