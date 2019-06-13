@@ -86,6 +86,8 @@ namespace CerberusMultiBranch.Models
 
         public DbSet<SaleDetail> SaleDetails { get; set; }
 
+        public DbSet<SaleHistory> SaleHistories { get; set; }
+
         public DbSet<CashRegister> CashRegisters { get; set; }
 
         public DbSet<CashDetail> CashDetails { get; set; }

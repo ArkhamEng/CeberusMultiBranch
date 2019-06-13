@@ -9,7 +9,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 {
     public enum TranStatus : int
     {
-        [Display(Name ="En modificación")]
+        [Display(Name ="En Modificación")]
         [DisplayStyle(Alert ="alert alert-warning", Icon = "fa fa-edit")]
         OnChange = -3,
 
@@ -17,7 +17,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DisplayStyle(Alert = "alert alert-danger", Icon = "fa fa-exclamation-triangle")]
         PreCancel  = -2,//se termina
 
-        [Display(Name = "Cancelado")]
+        [Display(Name = "Cancelada")]
         [DisplayStyle(Alert = "alert alert-danger", Icon = "fa fa-ban")]
         Canceled   = -1, //Cancelado en venta y compra
 

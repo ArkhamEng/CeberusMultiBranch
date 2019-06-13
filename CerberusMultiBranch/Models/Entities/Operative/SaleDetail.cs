@@ -22,5 +22,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public double Refund { get; set; }
 
         public virtual Sale Sale { get; set; }
+
+        [NotMapped]
+        [Display(Name ="Cantidad")]
+        public double DueQuantity { get { return (this.Quantity - this.Refund); } }
     }
 }

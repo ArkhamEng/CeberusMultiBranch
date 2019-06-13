@@ -10,7 +10,6 @@
             <th class="text-center">@Html.DisplayName("Fecha venta")</th>
 
             <th class="text-center">@Html.DisplayNameFor(m => m.First().TotalAmount)</th>
-            <th class="text-center">@Html.DisplayName("Tipo")</th>
 
             <th />
         </tr>
@@ -19,32 +18,18 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>@Html.DisplayFor(m => item.Folio)</td>
+                <td class="@item.TransactionType.GetAlert()">
+                   @item.TransactionType.GetName() <br />
+                   @Html.DisplayFor(m => item.Folio)
+                </td>
+
                 <td style="white-space:normal">@Html.DisplayUpperFor(m => item.Client.Name)</td>
 
                 <td align="center">@item.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
 
                 <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
 
-                <td align="center">
-                    @{
-                        var alr = "alert-success";
-
-                        switch (item.TransactionType)
-                        {
-                            case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                                alr = "alert-warning";
-                                break;
-                            case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
-                                alr = "alert-info";
-                                break;
-                        }
-                    }
-                    <div class="form-control input-sm @alr">
-                        @item.TransactionType.ToString()
-                    </div>
-                </td>
-
+            
                 <td>
                     @if (item.Status == CerberusMultiBranch.Models.Entities.Operative.TranStatus.Revision)
                     {
@@ -63,7 +48,7 @@
                     </button>
                 </td>
             </tr>
-                        }
+            }
     </tbody>
     @{
         var totalQuantity = Model.Sum(sale => sale.SaleDetails.Sum(s => s.Quantity));

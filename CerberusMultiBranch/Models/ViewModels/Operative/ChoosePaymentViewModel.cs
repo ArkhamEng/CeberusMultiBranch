@@ -11,6 +11,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
     {
         public int SaleId { get; set; }
 
+        public string User { get; set; }
+
+        public string Delivery { get; set; }
+
+        public string Client { get; set; }
+
         [DataType(DataType.Currency)]
         public double CashAmount { get; set; }
 
@@ -39,6 +45,14 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         public List<PaymentMethod> PaymentMethods { get; set; }
 
         public ICollection<SaleDetail> Details { get; set; }
+
+        public double RefundCash { get; set; }
+
+        public double RefundCredit { get; set; }
+
+        public string Ident { get; set; }
+
+        public string ReceivedBy { get; set; }
 
         public ChoosePaymentViewModel()
         {

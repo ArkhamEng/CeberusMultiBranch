@@ -38,9 +38,9 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td class="@item.StatusStyle">
-                    @Html.DisplayFor(m => item.TransactionType) <br />
-                    @Html.DisplayFor(m => item.SaleStatus)
+                <td class="@item.Status.GetAlert()">
+                    @item.TransactionType.GetName() <br />
+                    @item.Status.GetName()
                 </td>
                 <td>
                     @Html.DisplayUpperFor(m => item.Folio) <br />
@@ -72,7 +72,7 @@
                 </td>
                 <td>
                     <button class="btn btn-warning btn-sm" title="Editar Venta"
-                            onclick="ShowLoading(); window.location = '@Url.Action("Detail", new { id = item.SaleId })'">
+                            onclick="ShowLoading(); window.location = '@Url.Action("SaleOrder","Selling", new { id = item.SaleId })'">
                         <span class="fa fa-edit"></span>Editar
                     </button>
                 </td>
@@ -89,7 +89,8 @@
 
 
 <script>
-    $(document).ready(function () {
+    $(document).ready(function ()
+    {
         $("#tbSales").removeClass("hidden");
 
         var printSalesOp = { Title: '@Html.Raw(Extension.GetTitle("Historial de Ventas"))', Columns: [0, 1, 2, 3, 4, 5, 6, 7] };

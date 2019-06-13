@@ -43,6 +43,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public ICollection<SalePayment> SalePayments { get; set; }
 
+        public ICollection<SaleHistory> SaleHistories { get; set; }
+
         [Display(Name ="Cliente")]
         public virtual Client Client { get; set; }
 
@@ -139,11 +141,20 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             get { return "hidden"; }
         }
 
+        [NotMapped]
+        public double CurrentDebt
+        {
+            get;set;
+        }
+
+       
+
         public Sale() : base()
         {
             this.SaleDetails = new List<SaleDetail>();
             this.TransactionDate = DateTime.Now.ToLocal();
             this.SalePayments = new List<SalePayment>();
+            this.SaleHistories = new List<SaleHistory>();
         }
     }
 

@@ -14,7 +14,6 @@
 
             <th class="text-center">@Html.DisplayName("Tipo")</th>
             <th class="text-center" />
-            <th class="text-center">@Html.DisplayName("Fecha")</th>
             <th class="text-center" />
         </tr>
     </thead>
@@ -31,19 +30,12 @@
                     @Html.DisplayUpperFor(m => item.User.UserName)
                 </td>
                 <td align="center">
-                    @{ var sending = "Mostrador"; }
-
-                    @if (item.SendingType != 0)
-                    {
-                        sending = "Domicilio";
-                    }
-
-                    @Html.DisplayFor(m => sending)
+                   @item.SendingType.GetName()
                 </td>
                 <td align="center">@Html.DisplayFor(m => item.TotalTaxedAmount)</td>
 
                 <td align="center">
-                    @item.TransactionType.ToString()
+                    @item.TransactionType.GetName()
                 </td>
             
                 <td align="center">
@@ -52,11 +44,12 @@
                         Cobrar
                     </button>
                 </td>
-                <td align="center">
-                    @Html.DisplayFor(m => item.TransactionDate)
-                </td>
                 <td>
-                    <button class="btn btn-danger btn-sm" type="button" onclick="BeginCancel('@item.SaleId')">
+                    <button class="btn btn-warning btn-sm" type="button" onclick="BeginCancel('@item.SaleId',false)">
+                        <span class="fa fa-refresh"></span>
+                        Modificar
+                    </button>
+                    <button class="btn btn-danger btn-sm" type="button" onclick="BeginCancel('@item.SaleId',true)">
                         <span class="fa fa-trash-o"></span>
                         Cancelar
                     </button>
@@ -78,7 +71,7 @@
     {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
+        GetAjax('@Url.Action("BeginRegistPayment")', { id: id }, function (response)
         {
             HideLoading(function ()
             {
@@ -87,13 +80,26 @@
         });
     }
 
-    function BeginCancel(id)
+    function BeginCancel(id, isCancelation)
     {
-        BeginCancelSale(id, function ()
-        {
-            CheckPendingPayments();
+        ShowLoading('static');
 
-            CheckRefunding();
+        param = { saleId: id, isCancelation: isCancelation };
+        
+        GetAjax('/Selling/BeginRequestChange', param, function (response)
+        {
+            HideLoading(function ()
+            {
+                ShowModal(response, 'static');
+
+                OnChangeCompleate = function ()
+                {
+                    CheckPendingPayments();
+
+                    CheckRefunding();
+                };
+            });
+
         });
     }
 

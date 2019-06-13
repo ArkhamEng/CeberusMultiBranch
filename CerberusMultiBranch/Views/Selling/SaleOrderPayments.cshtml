@@ -1,0 +1,57 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Finances.SalePayment>
+@using CerberusMultiBranch.Models.Entities.Operative
+@using CerberusMultiBranch.Support
+
+
+
+<table id="tbSalePayments" class="table table-striped small" style="width:100%">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comment)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reference)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentMethod)
+            </th>
+            <th>
+                @Html.DisplayName("Capturo")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reference)
+                </td>
+                <td>
+                    @item.PaymentMethod.ToString()
+                </td>
+                <td>
+                    @item.UpdUser
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

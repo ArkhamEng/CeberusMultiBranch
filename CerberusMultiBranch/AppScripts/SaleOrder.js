@@ -1,15 +1,16 @@
 ﻿var Details = [];
 
 var totalAmount = 0;
-var totalItems  = 0;
+var totalItems = 0;
 
 var popOverTitle = '<button id="btnClosePop" type="button"  class="close"><i class="fa fa-times"></i> </button>' +
                    '<i class="fa fa-user"></i> Detalle del cliente'
 
-const PresaleDays    = 30;
+const PresaleDays = 30;
 const ReservationDays = 30;
 
-$(document).ready(function () {
+$(document).ready(function ()
+{
     //sumo totales y cargo el detalle inicial en memoria
     SumAmount(true);
 
@@ -27,12 +28,12 @@ $(document).ready(function () {
     {
         $("#btnBegingSearchCustomer").attr("disabled", true);
 
-        $("#Expiration").attr("readonly",      true);
-        $("#SendingType").attr("disabled",     true);
+        $("#Expiration").attr("readonly", true);
+        $("#SendingType").attr("disabled", true);
         $("#TransactionType").attr("disabled", true);
-        $(".txtQuantity").attr("disabled",     true);
+        $(".txtQuantity").attr("disabled", true);
 
-        //si se encuentra en modo cambio, se puede registrar devoliciones
+        //si se encuentra en modo cambio, se puede registrar devoluciones
         if ($("#Status").val() == TranStatus.OnChange.Name)
             $(".btnDelete").attr("disabled", true);
         else
@@ -44,6 +45,9 @@ $(document).ready(function () {
     {
         $("#btnBegingSearchProduct").off("click").on("click", BeginSearchProduct);
         $("#ProductFilter").off("keyup").on("keyup", function (e) { if (e.keyCode == 13) $("#btnBegingSearchProduct").click(); });
+
+        $("#btnSendOrder").removeClass("hidden");
+        $("#btnSendOrder").off("click").on("click", SendOrder);
     }
     else //es imposile modificar las partidas en cualquier otro status
         $("#AddProductZone").hide();
@@ -51,9 +55,51 @@ $(document).ready(function () {
     //siempre se tiene un cliente por lo que es necesario removerlo con el proceso de asignación
     $("#Client_Name").attr("readonly", true);
 
+    var status = $("#Status").val();
+
+    if (status == TranStatus.OnChange.Name || status == TranStatus.Compleated.Name ||
+        (status == TranStatus.InProcess.Name && $("#SaleId").val() > 0) || status == TranStatus.Revision.Name)
+    {
+        $("#btnCancelSale").removeClass("hidden");
+        $("#btnCancelSale").off("click").on("click", function () { BeginRequestChange(true); })
+    }
+
+    if ( $("#Status").val() == TranStatus.Compleated.Name || $("#Status").val() == TranStatus.Revision.Name)
+    {
+        $("#btnChange").removeClass("hidden");
+        $("#btnChange").off("click").on("click", function () { BeginRequestChange(false); })
+    }
+
     //colo los popover y tooltips
     SetPopOver();
+
 });
+
+
+
+function BeginRequestChange(isCancelation)
+{
+    ShowLoading('static');
+
+    GetAjax("/Selling/BeginRequestChange", { saleId: $("#SaleId").val(), isCancelation: isCancelation }, function (response)
+    {
+        HideLoading(function ()
+        {
+            if (!$.isPlainObject(response))
+            {
+                ShowModal(response, 'static', "", null);
+                OnChangeCompleate = function (response)
+                {
+                    ShowConfirm(response.Header, response.Body + " ¿Deseas Capturar otra venta?",
+                        function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder'); },
+                        function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder/' + $("#SaleId").val()); });
+                }
+            }
+            else
+                ShowNotify(response.Header, response.Result, response.Body, 4000);
+        });
+    });
+}
 
 //Cambia la fecha de expiración en función del tipo de venta y tipo de cliente
 function SetExpirationDate(e)
@@ -79,8 +125,7 @@ function SetExpirationDate(e)
 }
 
 //comienza búsqueda de cliente
-function BegingSearchCustomer(e)
-{
+function BegingSearchCustomer(e) {
     var clientId = parseInt($("#ClientId").val());
 
     if (isNaN(clientId))
@@ -103,8 +148,7 @@ function BegingSearchCustomer(e)
 }
 
 //se ejecuta al encontrar una coincidencia de cliente o bien al seleccionar uno del listado
-function SetCustomer(customer)
-{
+function SetCustomer(customer) {
     $("#ClientId").val(customer.ClientId);
     $("#Client_Name").val(customer.Name);
 
@@ -122,18 +166,13 @@ function SetCustomer(customer)
 
 
 //comienza búsqueda de producto
-function BeginSearchProduct(e)
-{
-    SearchProduct("#ProductFilter", SetProduct, function ()
-    {
-        $("#tbSearchProductResults tbody tr").each(function (index, row)
-        {
+function BeginSearchProduct(e) {
+    SearchProduct("#ProductFilter", SetProduct, function () {
+        $("#tbSearchProductResults tbody tr").each(function (index, row) {
             var pId = $(row).find("#product_ProductId").val();
 
-            $(Details).each(function (index, detail)
-            {
-                if (parseInt(pId) == detail.ProductId)
-                {
+            $(Details).each(function (index, detail) {
+                if (parseInt(pId) == detail.ProductId) {
                     $(row).addClass("alert alert-info");
                     $(row).find("#btnSelectProduct").attr("disabled", true);
                 }
@@ -164,8 +203,8 @@ function SetProduct(product)
         ShowNotify("Producto Agotado", "danger",
             "Este producto se encuentra agotado, solo podra ser agregado a una prevena o cotización", 4000);
 
-        row.attr("style", "background-color:lightgray");
-
+         row.attr("style", "background-color:lightgray");
+      
         if ($("#Status").val() != TranStatus.InProcess.Name)
             return;
     }
@@ -195,20 +234,19 @@ function SetProduct(product)
 
         SumAmount();
 
-    } catch (e) {
+    } catch (e)
+    {
         console.log(e);
     }
 }
 
 
 //suma totales y carga en memoria las partidas de la venta
-function SumAmount(isFirstLoad)
-{
+function SumAmount(isFirstLoad) {
     totalAmount = 0;
     totalItems = 0;
 
-    $("#tbSaleDetails tbody tr").each(function (index, row)
-    {
+    $("#tbSaleDetails tbody tr").each(function (index, row) {
         var quantityTxt = $(row).find("#item_Quantity");
         var priceTxt = $(row).find("#item_TaxedPrice");
         var refundTxt = $(row).find("#item_Refund");
@@ -239,8 +277,7 @@ function SumAmount(isFirstLoad)
 
         var exist = false;
 
-        $(Details).each(function (index, product)
-        {
+        $(Details).each(function (index, product) {
             if (product.ProductId == detail.ProductId)
                 exist = true;
         })
@@ -249,15 +286,14 @@ function SumAmount(isFirstLoad)
             Details.push(detail);
 
         //si es la primera carga de una venta en cambio y no hay devoluciones en la partida, aun se puede recibir
-        if (isFirstLoad && $("#Status").val() == TranStatus.OnChange.Name && detail.Refund == 0)
-        {
+        if (isFirstLoad && $("#Status").val() == TranStatus.OnChange.Name && detail.Refund == 0) {
             console.log($("#Status").val());
             console.log(detail.Refund);
             $(refundTxt).attr("disabled", false);
         }
 
         totalAmount += detail.Amount;
-        totalItems  += sale.Quantity - sale.Refund;
+        totalItems += detail.Quantity - detail.Refund;
     });
 
     $("#tdAmount").text(GetCurrency(totalAmount));
@@ -293,18 +329,16 @@ function SetQuantity(input)
             {
                 ShowNotify("Cantidad Incorrecta", "danger",
                     "la cantidad requerida, supera la disponible en inventario! Cantidad actual: "
-                    + GetCurrency(response.JProperty[0].Stock), 4000);
+                    + response.JProperty[0].Stock, 4000);
 
-                //coloco la cantidad que hay en memoria
-                $(input).val(Details[idx].Quantity);
-                $(input).off("blur");
-                $(input).focus();
-                $(input).on("blur", function () { SetQuantity(this); });
-
-                return;
+                row.attr("style", "background-color:lightgray");
+            }
+            else
+            {
+                row.attr("style", "background-color:transparent");
             }
 
-            var textPrice  = $(row).find("#item_TaxedPrice").val();
+            var textPrice = $(row).find("#item_TaxedPrice").val();
             var amountCell = $(row).find("#tdRowAmount");
 
             var newAmount = parseFloat(textPrice) * quantity;
@@ -329,8 +363,7 @@ function SetPrice(input)
 
     var price = parseFloat($(input).val());
 
-    if (isNaN(price) || price <= 0)
-    {
+    if (isNaN(price) || price <= 0) {
         ShowNotify("Precio Incorrecto", "warning",
                    "El precio debe ser un número positivo " + GetCurrency(response.JProperty[0].StorePrice), 4000);
 
@@ -346,12 +379,9 @@ function SetPrice(input)
     //validación de precio
     ShowLoading('static');
 
-    GetAjax('/Selling/GetProductsInfo', { "productIds[0]": pId }, function (response)
-    {
-        HideLoading(function ()
-        {
-            if (price > parseFloat(response.JProperty[0].StorePrice))
-            {
+    GetAjax('/Selling/GetProductsInfo', { "productIds[0]": pId }, function (response) {
+        HideLoading(function () {
+            if (price > parseFloat(response.JProperty[0].StorePrice)) {
                 ShowNotify("Precio Incorrecto", "warning",
                     "El precio no puede ser mayor a " + GetCurrency(response.JProperty[0].StorePrice), 4000);
 
@@ -364,8 +394,7 @@ function SetPrice(input)
                 return;
             }
 
-            if (price < parseFloat(response.JProperty[0].WholesalerPrice))
-            {
+            if (price < parseFloat(response.JProperty[0].WholesalerPrice)) {
                 ShowNotify("Precio Incorrecto", "warning",
                     "El precio no puede ser menor a " + GetCurrency(response.JProperty[0].WholesalerPrice), 4000);
 
@@ -395,16 +424,14 @@ function SetPrice(input)
 }
 
 
-function SetRefund(input)
-{
+function SetRefund(input) {
     row = $(input).parent().parent();
 
     var idx = $("#tbSaleDetails tbody tr").index(row);
 
     var refund = parseFloat($(input).val());
 
-    if (isNaN(refund) || refund < 0)
-    {
+    if (isNaN(refund) || refund < 0) {
         ShowNotify("Devolución Inválida", "danger", "La devolución debe ser un número positivo", 3000);
         //coloco la cantidad que hay en memoria
         $(input).val(Details[idx].Refund);
@@ -416,7 +443,7 @@ function SetRefund(input)
         return;
     }
 
-    
+
     pId = row.find("#item_ProductId").val();
 
 
@@ -424,8 +451,7 @@ function SetRefund(input)
     var quantity = $(row).find("#item_Quantity").val();
     var amountCell = $(row).find("#tdRowAmount");
 
-    if (refund > quantity)
-    {
+    if (refund > quantity) {
         ShowNotify("Devolución Inválida", "danger", "La devolución no puede ser mayor a la cantidad de productos comprados", 3000);
         //coloco la cantidad que hay en memoria
         $(input).val(Details[idx].Refund);
@@ -449,8 +475,7 @@ function SetRefund(input)
     SumAmount(false);
 }
 
-function DeleteRow(button)
-{
+function DeleteRow(button) {
     var row = $(button).parent().parent();
 
     var inx = $("#tbSaleDetails tbody tr").index(row);
@@ -462,9 +487,8 @@ function DeleteRow(button)
     SumAmount();
 }
 
-
-
-function SetPopOver() {
+function SetPopOver()
+{
     $("#spanPopOver").popover({
         html: true,
         container: '.customerInfo',
@@ -504,6 +528,26 @@ function SetPopOver() {
         title: $("#btnBegingSearchProduct").attr("tooltip-title")
     })
 
+    $("#btnChange").tooltip({
+        placement: 'bottom',
+        title: $("#btnChange").attr("tooltip-title")
+    })
+
+    $("#btnCancelSale").tooltip({
+        placement: 'bottom',
+        title: $("#btnCancelSale").attr("tooltip-title")
+    })
+
+    $("#btnPrint").tooltip({
+        placement: 'bottom',
+        title: $("#btnPrint").attr("tooltip-title")
+    })
+
+    $("#btnSendOrder").tooltip({
+        placement: 'bottom',
+        title: $("#btnSendOrder").attr("tooltip-title")
+    })
+
 }
 
 
@@ -514,11 +558,8 @@ function SendOrder()
         {
             SaleId: $("#SaleId").val(),
             ClientId: $("#ClientId").val(),
-            UserId: $("#UserId").val(),
-            BranchId: $("#BranchId").val(),
-            Folio: $("#Folio").val(),
             TransactionDate: $("#TransactionDate").val(),
-            Expiration: $("#TransactionDate").val(),
+            Expiration: $("#Expiration").val(),
             TransactionType: $("#TransactionType").val(),
             SendingType: $("#SendingType").val(),
             LastStatus: $("#LastStatus").val(),
@@ -530,19 +571,18 @@ function SendOrder()
     if (totalItems == 0)
     {
         ShowNotify("Venta sin artículos", "danger",
-            "No puedes guardar datos de una venta sin articulos, si estas haciendo devolución de todos los articulos realiza una cancelación total", 4000);
+            "No puedes guardar datos de una venta sin articulos, " +
+            "si estas haciendo devolución de todos los articulos realiza una cancelación total", 4000);
         return;
     }
 
-    if (sale.TransactionType != TranType.Cash.Value && sale.ClientId == 0)
-    {
+    if (sale.TransactionType != TranType.Cash.Value && sale.ClientId == 0) {
         ShowNotify("Se requiere un cliente", "warning",
             "Las ventas de tipo, crédito, preventa y apartado requiere un cliente asignado", 4000);
         return;
     }
 
-    if (sale.ClientId == "")
-    {
+    if (sale.ClientId == "") {
         ShowNotify("Se requiere un cliente", "warning",
             "Debes asignarnad un cliente a la venta", 4000);
         return;
@@ -550,7 +590,7 @@ function SendOrder()
 
     ShowConfirm("Envío de Venta", "Estas a punto de envíar las modificaciones de la venta <br/> ¿Deseas continuar?",
         function () { CompleateSendOrder(sale); });
-   
+
 }
 
 function CompleateSendOrder(sale)
@@ -561,9 +601,6 @@ function CompleateSendOrder(sale)
     {
         HideLoading(function ()
         {
-            console.log(window.location.pathname);
-            console.log(window.location.pathname);
-
             ShowConfirm(response.Header, "<p>" + response.Body + "<br/> ¿Deseas agregar otra venta? <p/>",
                 function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder'); },
                 function () { ShowLoading('static'); window.location.replace("/Selling/SaleOrder/" + response.Id) });

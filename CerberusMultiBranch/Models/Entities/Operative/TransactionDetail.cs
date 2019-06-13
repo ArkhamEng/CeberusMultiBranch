@@ -63,7 +63,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             get;set;
         }
 
-       
+        
+
+
         #endregion
     }
 }

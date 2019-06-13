@@ -46,7 +46,8 @@ function BeginCancelSale(id, onCancelCompleated)
 
     ExecuteAjax("/Sales/BeginCancel", { id: id }, function (response)
     {
-        HideLoading(function () {
+        HideLoading(function ()
+        {
             ShowModal(response, 'static');
 
             OnCancelCompleated = onCancelCompleated;

@@ -432,9 +432,9 @@
     <Compile Include="Migrations\201903222141585_removeUniqueCode.Designer.cs">
       <DependentUpon>201903222141585_removeUniqueCode.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\201906051908285_RefundSale.cs" />
-    <Compile Include="Migrations\201906051908285_RefundSale.Designer.cs">
-      <DependentUpon>201906051908285_RefundSale.cs</DependentUpon>
+    <Compile Include="Migrations\201906061616102_RefundDetail_SaleHistory.cs" />
+    <Compile Include="Migrations\201906061616102_RefundDetail_SaleHistory.Designer.cs">
+      <DependentUpon>201906061616102_RefundDetail_SaleHistory.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -482,6 +482,7 @@
     <Compile Include="Models\Entities\Operative\Sale.cs" />
     <Compile Include="Models\Entities\Operative\SaleCreditNote.cs" />
     <Compile Include="Models\Entities\Operative\SaleDetail.cs" />
+    <Compile Include="Models\Entities\Operative\SaleHistory.cs" />
     <Compile Include="Models\Entities\Operative\ShoppingCart.cs" />
     <Compile Include="Models\Entities\Operative\StockMovement.cs" />
     <Compile Include="Models\Entities\Operative\TrackingItem.cs" />
@@ -544,6 +545,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
+    <Content Include="AppScripts\Controls\SaleOrderChange.js" />
     <Content Include="AppScripts\Controls\SearchProduct.js" />
     <Content Include="AppScripts\Searches.js" />
     <Content Include="AppScripts\Global.js" />
@@ -1111,6 +1113,9 @@
     <Content Include="Views\Selling\CustomerInfo.cshtml" />
     <Content Include="Views\Selling\SearchProduct.cshtml" />
     <Content Include="Views\Selling\SearchProductResults.cshtml" />
+    <Content Include="Views\Selling\SaleOrderHistories.cshtml" />
+    <Content Include="Views\Selling\SaleOrderChange.cshtml" />
+    <Content Include="Views\Selling\SaleOrderPayments.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1287,8 +1292,8 @@
     <EmbeddedResource Include="Migrations\201903222141585_removeUniqueCode.resx">
       <DependentUpon>201903222141585_removeUniqueCode.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\201906051908285_RefundSale.resx">
-      <DependentUpon>201906051908285_RefundSale.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201906061616102_RefundDetail_SaleHistory.resx">
+      <DependentUpon>201906061616102_RefundDetail_SaleHistory.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -9,11 +9,11 @@
 const TranStatus = {
     OnChange:  { Name: "OnChange",  Value: -3, Display:  "En Modificación" },
     PreCancel: { Name: "PreCancel", Value: -2, Display:  "En Cancelación" },
-    Canceled:  { Name: "Canceled",  Value: -1, Display:  "Cancelado" },
+    Canceled:  { Name: "Canceled",  Value: -1, Display:  "Cancelada" },
     InProcess: { Name: "InProcess", Value:  0,  Display: "En Proceso" },
-    Reserved:  { Name: "Reserved",  Value:  1,  Display: "Reservador" },
-    Revision:  { Name: "Revision",  Value:  2,  Display: "En Seguimieto" },
-    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completado" }
+    Reserved:  { Name: "Reserved",  Value:  1,  Display: "Reservada" },
+    Revision:  { Name: "Revision",  Value:  2,  Display: "En Seguimiento" },
+    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completada" }
 }
 
 const TranType =

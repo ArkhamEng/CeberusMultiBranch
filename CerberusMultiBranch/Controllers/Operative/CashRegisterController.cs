@@ -604,7 +604,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                if(end != null)
+                if (end != null)
                     end = end.Value.AddHours(23).AddMinutes(59);
 
                 if (begin != null && end != null && (begin > end))
@@ -617,7 +617,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Header = "Fechas invalidas"
                     });
                 }
-     
+
 
                 var sales = LookForNotes(begin, end, folio, client, status);
                 return PartialView("_SalesToPayList", sales);
@@ -632,7 +632,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Header = "Error General"
                 });
             }
-       
+
         }
 
         private List<Sale> LookForNotes(DateTime? begin, DateTime? end, string folio, string client, TranStatus? status)
@@ -644,7 +644,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 Where(s => s.BranchId == branchId &&
                 (begin == null || s.TransactionDate >= begin) &&
                 (end == null || s.TransactionDate <= end) &&
-                (folio == null || folio == string.Empty || s.Folio == folio) &&
+                (string.IsNullOrEmpty(folio) || s.Folio.Contains(folio)) &&
                 (client == null || client == string.Empty || s.Client.Name.Contains(client)) &&
                 (status == null && (s.Status == TranStatus.Compleated || s.Status == TranStatus.Revision) || s.Status == status)).
                 OrderByDescending(s => s.TransactionDate).ToList();
@@ -673,7 +673,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-        [HttpPost]
+        [HttpGet]
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult BeginRegistPayment(int id)
         {
@@ -681,13 +681,12 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 var branchId = User.Identity.GetBranchId();
 
-                //obtengo los detalles de la venta, incluyendo imagenes y pagos
-                var details = db.SaleDetails.Include(sd => sd.Sale.SalePayments).Include(sd => sd.Sale.User).Include(sd => sd.Product.Images).
-                           Where(sd => sd.SaleId == id && (sd.Sale.Status == TranStatus.Reserved || sd.Sale.Status == TranStatus.Revision)
-                           && sd.Sale.BranchId == branchId).ToList();
+                var sale = db.Sales.Include(s=> s.User).Include(sd => sd.SaleDetails.Select(d => d.Product.Images)).
+                    Include(s=> s.SalePayments).FirstOrDefault(s => s.SaleId == id && (s.Status == TranStatus.Reserved || s.Status == TranStatus.Revision));
 
+              
                 //si no encuentro detalles de venta, envío un error
-                if (details == null || details.Count == Cons.Zero)
+                if (sale == null)
                 {
                     return Json(new JResponse
                     {
@@ -695,41 +694,47 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Code = Cons.Responses.Codes.RecordNotFound,
                         Body = "no se encontro la venta para cobrar",
                         Header = "Registro no encontrado"
-                    });
+                    }, JsonRequestBehavior.AllowGet);
                 }
 
+               
+           
                 //construyo el modelo para recibir el pago
                 var model = new ChoosePaymentViewModel
                 {
-                    Details = details,
-                    AmountToPay = details.Sum(d => d.TaxedAmount) - details.First().Sale.SalePayments.Sum(sp => sp.Amount),
+                    Details = sale.SaleDetails,
+                    AmountToPay = Math.Round(sale.FinalAmount - sale.SalePayments.Sum(sp => sp.Amount),Cons.Two),
                     PaymentMethod = PaymentMethod.Efectivo,
-                    SaleId = id
+                    SaleId = id,
+                    User = sale.User.UserName.ToUpper(),
+                    Delivery = sale.SendingType.GetName().ToUpper(),
+                    Client = sale.Client.Name.ToUpper()
                 };
 
                 //si la venta es a crédito establesco el moto en efectivo como el total de la venta
-                if (details.First().Sale.TransactionType == TransactionType.Cash)
-                    model.CashAmount = details.Sum(d => d.TaxedAmount);
+                if (sale.TransactionType == TransactionType.Cash)
+                    model.CashAmount = sale.FinalAmount;
 
-                if (details.First().Sale.TransactionType == TransactionType.Presale)
-                    model.CashAmount = (details.Sum(d => d.TaxedAmount) / Cons.Two).RoundMoney();
+                if (sale.TransactionType == TransactionType.Presale)
+                    model.CashAmount = (sale.FinalAmount / Cons.Two).RoundMoney();
 
-                if (details.First().Sale.TransactionType == TransactionType.Reservation)
-                    model.CashAmount = (details.Sum(d => d.TaxedAmount) * 0.1).RoundMoney();
+                if (sale.TransactionType == TransactionType.Reservation)
+                    model.CashAmount = (sale.FinalAmount * 0.1).RoundMoney();
 
                 return PartialView("_RegistPayment", model);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "Ocurrio un error al obtener iniciar el cobro",
+                    Body = ex.Message,
                     Header = "Errro al obtener datos"
-                });
+                }, JsonRequestBehavior.AllowGet);
             }
         }
+
 
         [HttpPost]
         [CustomAuthorize(Roles = "Cajero")]
@@ -776,6 +781,17 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var cPayments = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
 
+                var SaleHistory = new SaleHistory
+                {
+                    Comment = sale.Comment,
+                    InsDate = sale.UpdDate,
+                    User = sale.UpdUser,
+                    SaleId = sale.SaleId,
+                    Status = sale.Status.GetName(),
+                    TotalDue = sale.FinalAmount
+                };
+
+
                 //monto en dinero
                 var money = payment.CashAmount + payment.CardAmount;
 
@@ -783,18 +799,21 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var wholePayment = payment.CreditNoteAmount + money;
 
                 //monto maximo a pagar
-                var toPay = sale.TotalTaxedAmount - cPayments;
-
+                var toPay = sale.FinalAmount - cPayments;
 
                 var hasFolio = (payment.CreditNoteAmount > Cons.Zero);
 
+                //si la venta fue modificada
+                if (sale.LastStatus != TranStatus.OnChange)
+                {
+                    var valResponse = ValidatePayment(sale, payment, toPay, wholePayment);
 
-                var valResponse = ValidatePayment(sale, payment, toPay, wholePayment);
-
-                //si la respueste es diferente de null, algo falló
-                if (valResponse != null)
-                    return valResponse;
-
+                    //si la respueste es diferente de null, algo falló
+                    if (valResponse != null)
+                        return valResponse;
+                }
+              
+            
 
                 #region Logica para el uso de folio
                 SaleCreditNote note = null;
@@ -895,6 +914,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 sale.UpdDate = DateTime.Now.ToLocal();
                 sale.UpdUser = User.Identity.Name;
+
                 sale.SalePayments = sale.SalePayments ?? new List<SalePayment>();
 
                 #region Registro de pagos
@@ -912,7 +932,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         PaymentMethod = PaymentMethod.Efectivo,
                         UpdDate = DateTime.Now.ToLocal(),
                         UpdUser = User.Identity.Name,
-                        Comment = "ABONO A VENTA "+sale.Folio.ToUpper()
+                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper()
                     };
 
                     sale.SalePayments.Add(p);
@@ -958,14 +978,24 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 #endregion
 
+                var changeRequired = false;
 
-                //marco la venta con el status correspondiente
-                sale.LastStatus = sale.Status;
-
-                if (folioChanged || sale.TotalTaxedAmount == (cPayments + wholePayment))
+                if (folioChanged || toPay <= Cons.Zero || sale.FinalAmount == Math.Round(cPayments + wholePayment,Cons.Two))
+                {
+                    sale.LastStatus = sale.Status;
                     sale.Status = TranStatus.Compleated;
-                else
+                    sale.Comment = "Venta cobrada totalmente";
+                    db.SaleHistories.Add(SaleHistory);
+
+                    changeRequired = toPay < Cons.Zero;
+                }
+                else if (sale.Status == TranStatus.Reserved)
+                {
+                    sale.LastStatus = sale.Status;
                     sale.Status = TranStatus.Revision;
+                    sale.Comment = sale.TransactionType == TransactionType.Credit ? "Venta despachada" : "Venta reservada";
+                    db.SaleHistories.Add(SaleHistory);
+                }
 
                 if (sale.TransactionType == TransactionType.Credit)
                     sale.Client.UsedAmount -= (cPayments + wholePayment);
@@ -1016,6 +1046,14 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (folioChanged)
                     model.SaleCreditNote = note;
 
+                //evito la impresion de detalles en cantidad 0
+                var noPrintDetails = sale.SaleDetails.Where(d => d.DueQuantity == Cons.Zero).ToList();
+
+                noPrintDetails.ForEach(d =>
+                {
+                    sale.SaleDetails.Remove(d);
+                });
+
                 model.PrintType = payment.PrintType;
                 model.Sale = sale;
 
@@ -1027,7 +1065,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "detale :"+ex.Message,
+                    Body = "detale :" + ex.Message,
                     Header = "Error al cobrar!"
                 });
             }
@@ -1049,6 +1087,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
+                if (sale.Status == TranStatus.InProcess || sale.Status == TranStatus.OnChange)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta esta siendo modificada, no puede recibir pagos hasta que la edición concluya",
+
+                        Header = "Venta en modificación"
+                    });
+                }
+
+                //si el monto a pagar es cero y la venta no fue modificada
                 if (toPay == Cons.Zero)
                 {
                     return Json(new JResponse
@@ -1056,7 +1107,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "Esta venta ya ha sido cobrada en su totalidad",
-
                         Header = "Cobro no requerido"
                     });
                 }
@@ -1075,14 +1125,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 //si se excede el monto de la deuda y se esa usando efectivo o tarjeta se envía un aviso (se puede exceder el monto si y solo si se usa vale)
-                if (wholePayment > toPay && (payment.CashAmount > Cons.Zero || payment.CashAmount > Cons.Zero))
+                if (wholePayment > toPay && (payment.CashAmount > Cons.Zero || payment.CardAmount > Cons.Zero))
                 {
                     return Json(new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
-
                         Header = "Pago excedente!"
                     });
                 }
@@ -1126,13 +1175,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 return null;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Warning,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "Ocurrio un error mientras se validaban los datos",
+                    Body = ex.Message,
                     Header = "Error al validar!"
                 });
             }
@@ -1150,7 +1199,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                          Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
                          Include(s => s.Branch).FirstOrDefault();
 
+
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
+
+                //se remueven las partidas en ceros
+                var toRemove = sale.SaleDetails.Where(d => d.DueQuantity == Cons.Zero).ToList();
+
+                toRemove.ForEach(d => { sale.SaleDetails.Remove(d); });
 
 
                 if (printType == Cons.One)

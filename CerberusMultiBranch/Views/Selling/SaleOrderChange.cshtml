@@ -1,0 +1,75 @@
+﻿@model CerberusMultiBranch.Models.ViewModels.Operative.SaleCancelViewModel
+@using CerberusMultiBranch.Support
+
+@Scripts.Render("~/bundles/jqueryval")
+
+<script src="~/AppScripts/Controls/SaleOrderChange.js"></script>
+
+<form id="SaleOrderChangeForm">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <button id="SaleOrderChangeClose" type="button" class="close" >
+                <span class="fa fa-times"></span>
+            </button>
+            <h4 id="SaleOrderChangeTitle" class="panel-title">
+               <i class="fa fa-recycle"></i> Solicitar modificación
+            </h4>
+        </div>
+        <div class="panel-body">
+            <table id="SaleOrderChangePayment" class="panel panel-default table table-bordered small hidden">
+                <thead class="panel-heading">
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(m => m.PaymentCash)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(m => m.PaymentCard)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(m => m.PaymentCreditNote)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="panel-body">
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => m.PaymentCash)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => m.PaymentCard)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => m.PaymentCreditNote)
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            @Html.HiddenFor(model => model.SaleCancelId)
+            @Html.HiddenFor(model=> model.IsCancelation)
+            <div class="col-md-12 form-group row">
+                @Html.LabelFor(model => model.CancelComment, htmlAttributes: new { @class = "control-label" })
+                <div class="input-group">
+                    <span class="input-group-addon"><i class="fa fa-comment-o"></i></span>
+                    @Html.TextAreaFor(model => model.CancelComment, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+                </div>
+                @Html.ValidationMessageFor(model => model.CancelComment, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="panel-footer clearfix">
+            <div class="pull-right">
+
+                <button id="SaleOrderChangeAccept" class="btn btn-primary btn-sm" type="button" title="Solicitar cambio o cancelación">
+                    <span class="fa fa-check"></span>
+                    Aceptar
+                </button>
+
+                <button id="SaleOrderChangeCancel" class="btn btn-danger btn-sm" type="button" title="cerra ventana" >
+                    <span class="fa fa-times"></span>
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+

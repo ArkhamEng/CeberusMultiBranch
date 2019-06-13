@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace CerberusMultiBranch.Models.ViewModels.Operative
 {
@@ -29,6 +25,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
         [Display(Name = "Pagos Vales")]
         [DataType(DataType.Currency)]
         public double PaymentCreditNote { get; set; }
+
+        public bool IsCancelation { get; set; }
     }
 
 
