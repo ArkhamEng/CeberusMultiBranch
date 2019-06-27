@@ -138,13 +138,22 @@
 
     function BeginDelete(id, name)
     {
-        var text = "Estas a punto de eliminar al empleado <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
+        var header = "Borrado de empleado";
 
-        ShowConfirm(text, '@Url.Action("Deactivate","Employees")', id, function ()
+        var body = "<p> Estas a punto de eliminar al empleado <br/>" + name + "<br/> Esta acción es irreversible ¿Estas seguro que deseas continuar? </p>";
+
+        ShowConfirm(header, body, function ()
         {
-            ExecuteAjax('@Url.Action("Search")', {}, function (view)
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("Deactivate", "Employees")', { id: id }, function (json)
             {
-                $("#divEmployees").html(view);
+                ExecuteAjax('@Url.Action("Search")', {}, function (view)
+                {
+                    $("#divEmployees").html(view);
+
+                    HideLoading(null);
+                });
             });
         });
     }

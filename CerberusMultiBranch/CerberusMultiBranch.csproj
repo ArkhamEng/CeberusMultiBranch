@@ -436,6 +436,14 @@
     <Compile Include="Migrations\201906061616102_RefundDetail_SaleHistory.Designer.cs">
       <DependentUpon>201906061616102_RefundDetail_SaleHistory.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201906260258597_CreditNoteHistoryRemoveDependecies.cs" />
+    <Compile Include="Migrations\201906260258597_CreditNoteHistoryRemoveDependecies.Designer.cs">
+      <DependentUpon>201906260258597_CreditNoteHistoryRemoveDependecies.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201906260320538_CreditNoteChangeRelation.cs" />
+    <Compile Include="Migrations\201906260320538_CreditNoteChangeRelation.Designer.cs">
+      <DependentUpon>201906260320538_CreditNoteChangeRelation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
@@ -1294,6 +1302,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201906061616102_RefundDetail_SaleHistory.resx">
       <DependentUpon>201906061616102_RefundDetail_SaleHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201906260258597_CreditNoteHistoryRemoveDependecies.resx">
+      <DependentUpon>201906260258597_CreditNoteHistoryRemoveDependecies.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201906260320538_CreditNoteChangeRelation.resx">
+      <DependentUpon>201906260320538_CreditNoteChangeRelation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

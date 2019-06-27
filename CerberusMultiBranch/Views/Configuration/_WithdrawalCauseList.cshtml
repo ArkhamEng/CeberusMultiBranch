@@ -74,8 +74,17 @@
         });
     }
 
-    function DeleteCause(id) {
-        ShowConfirm("¿Estas seguro de querer eliminar esta causa de retiro?", '@Url.Action("DeleteCause","Configuration")', id, function () { SearchCauses(); });
+    function DeleteCause(id)
+    {
+        ShowConfirm("Eliminacion de causas", "¿Estas seguro de querer eliminar esta causa de retiro?", function ()
+        {
+            ShowLoading("static");
+
+            ExecuteAjax('@Url.Action("DeleteCause","Configuration")', { id: id }, function (json)
+            {
+                SearchCauses();
+            });
+        })
     }
 
 </script>

@@ -18,7 +18,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int? ParentId { get; set; }
 
-        [Display(Name ="Devolución")]
+        [Display(Name ="Devuelto")]
         public double Refund { get; set; }
 
         public virtual Sale Sale { get; set; }
@@ -26,5 +26,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [NotMapped]
         [Display(Name ="Cantidad")]
         public double DueQuantity { get { return (this.Quantity - this.Refund); } }
+
+        [NotMapped]
+        [Display(Name = "Devolver")]
+        public double NewRefund { get; set; }
     }
 }

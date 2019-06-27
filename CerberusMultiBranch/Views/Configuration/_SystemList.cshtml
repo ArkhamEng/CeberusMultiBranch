@@ -84,6 +84,14 @@
 
     function DeleteSystem(id)
     {
-        ShowConfirm("¿Estas seguro de querer eliminar este sistema?",'@Url.Action("DeleteSystem","Configuration")', id, function () { SearchSystem(); });
+        ShowConfirm("Eliminacion de sistema", "¿Estas seguro de querer eliminar este sistema?", function ()
+        {
+            ShowLoading("static");
+
+            ExecuteAjax('@Url.Action("DeleteSystem", "Configuration")', { id: id }, function (json)
+            {
+                SearchSystem();
+            });
+        })
     }
 </script>

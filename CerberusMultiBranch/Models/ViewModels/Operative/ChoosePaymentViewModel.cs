@@ -34,6 +34,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public int CreditNoteId { get; set; }
 
+        public int CreditNoteFolio { get; set; }
+
         public string Folio { get; set; }
 
         public string Expiration { get; set; }
@@ -50,8 +52,11 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public double RefundCredit { get; set; }
 
+        [MaxLength(15, ErrorMessage = "este campo no puede exceder de 15 caractéres")]
+        [Required(ErrorMessage = "Es necesario ingrese el número de IFE para generar nota de credito")]
         public string Ident { get; set; }
 
+        [Required(ErrorMessage = "Escribe el nombre de quien recibe")]
         public string ReceivedBy { get; set; }
 
         public ChoosePaymentViewModel()

@@ -48,7 +48,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name ="Cliente")]
         public virtual Client Client { get; set; }
 
-        public virtual SaleCreditNote SaleCreditNote { get; set; }
+        public virtual ICollection<SaleCreditNote> SaleCreditNotes { get; set; }
         #endregion
 
 
@@ -92,6 +92,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
             {
                 if (this.Status == TranStatus.Compleated)
                     return "Completado";
+
+                if (this.Status == TranStatus.Canceled || this.Status == TranStatus.PreCancel)
+                    return "Cancelado";
 
                 var days = DateTime.Now.TodayLocal().Subtract(this.Expiration).Days;
 

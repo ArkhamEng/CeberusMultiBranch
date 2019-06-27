@@ -73,6 +73,27 @@ $(document).ready(function ()
     //colo los popover y tooltips
     SetPopOver();
 
+    if(status == TranStatus.OnChange.Name)
+    {
+        $(".newRefund").removeClass("hidden");
+    }
+
+    Compleate("#Folio", "#Folios", '/Selling/AutoCompleateSale', function (id, label, value)
+    {
+        ShowLoading('static');
+        window.location.replace('/Selling/SaleOrder/' + id);
+    });
+
+    $("#btnNew").off('click').on('click', function (e)
+    {
+        ShowLoading('static');
+        window.location.replace("/Selling/SaleOrder");
+    });
+
+    $("#btnGoTo").off('click').on('click', function (e) {
+        ShowLoading('static');
+        window.location.replace("/Sales/Report");
+    });
 });
 
 
@@ -148,10 +169,11 @@ function BegingSearchCustomer(e) {
 }
 
 //se ejecuta al encontrar una coincidencia de cliente o bien al seleccionar uno del listado
-function SetCustomer(customer) {
+function SetCustomer(customer)
+{
     $("#ClientId").val(customer.ClientId);
     $("#Client_Name").val(customer.Name);
-
+    
     $("#Client_ClientType").val(customer.Type);
     $("#Client_CreditAvailable").val(customer.CreditAvailable);
     $("#Client_CreditDays").val(customer.CreditDays);
@@ -162,13 +184,56 @@ function SetCustomer(customer) {
     $("#iSearch").removeClass("fa-search").addClass("fa-refresh");
 
     $("#Client_Name").attr("readonly", true);
+
+    SetPrices();
 }
 
+function SetPrices()
+{
+    ShowLoading('static');
+
+    //obtengo los ids de productos en la venta
+    var ids = [];
+
+    var param = '';
+
+    $("#tbSaleDetails tbody tr").each(function (index, row)
+    {
+        ids.push($(row).find("#item_ProductId").val());
+    });
+
+   
+    //obtengo los precios
+    ExecuteAjax('/Selling/GetProductsInfo', { productIds: ids }, function (json)
+    {
+        $(json.JProperty).each(function (pIndex, product)
+        {
+            //ajusto los precios en base al cliente
+            $("#tbSaleDetails tbody tr").each(function (index, row)
+            {
+                var rowProductId = $(row).find("#item_ProductId").val();
+
+                if(rowProductId == product.ProductId)
+                {
+                    var price = parseFloat( $("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
+                                $("#Client_ClientType").val() == ClientType.Dealer.Display ? product.DealerPrice : product.WholesalerPrice);
+
+                   
+                    var input = $(row).find("#item_TaxedPrice");
+                    input.val(price);
+
+                    SetPrice(input);
+                }
+            });
+        });
+    });
+}
 
 //comienza búsqueda de producto
 function BeginSearchProduct(e) {
     SearchProduct("#ProductFilter", SetProduct, function () {
-        $("#tbSearchProductResults tbody tr").each(function (index, row) {
+        $("#tbSearchProductResults tbody tr").each(function (index, row)
+        {
             var pId = $(row).find("#product_ProductId").val();
 
             $(Details).each(function (index, detail) {
@@ -210,10 +275,10 @@ function SetProduct(product)
     }
 
     try {
-
+        
         var saleId = 0;
-        var price = parseFloat($("#Client_ClientType").val() == ClientType.Store ? product.StorePrice :
-                    $("#Client_ClientType").val() == ClientType.Dealer ? product.DealerPrice : product.WholesalerPrice);
+        var price = parseFloat($("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
+                    $("#Client_ClientType").val() == ClientType.Dealer.Display ? product.DealerPrice : product.WholesalerPrice);
 
         row.find("#item_ProductId").val(product.ProductId);
         row.find("#item_SaleId").val(saleId);
@@ -253,6 +318,7 @@ function SumAmount(isFirstLoad) {
         var productIdTxt = $(row).find("#item_ProductId");
         var saleIdTxt = $(row).find("#item_SaleId");
         var amountCell = $(row).find("#tdRowAmount");
+        var newRefundTxt = $(row).find("#item_NewRefund");
 
         var deleteDetailBtn = $(row).find("#btnDeleteDetail");
 
@@ -263,7 +329,7 @@ function SumAmount(isFirstLoad) {
 
         $(deleteDetailBtn).off('click').on('click', function (e) { DeleteRow(this); });
 
-        $(refundTxt).off("blur").on("blur", function (e) { SetRefund(this); });
+        $(newRefundTxt).off("blur").on("blur", function (e) { SetRefund(this); });
 
         var detail = {
             ProductId: parseInt(productIdTxt.val()),
@@ -272,12 +338,14 @@ function SumAmount(isFirstLoad) {
             Quantity: parseFloat(quantityTxt.val()),
             SaleId: parseInt(saleIdTxt.val()),
             Refund: parseFloat(refundTxt.val()),
+            NewRefund: parseFloat(newRefundTxt.val()),
             IsModified: false
         }
 
         var exist = false;
 
-        $(Details).each(function (index, product) {
+        $(Details).each(function (index, product)
+        {
             if (product.ProductId == detail.ProductId)
                 exist = true;
         })
@@ -286,14 +354,11 @@ function SumAmount(isFirstLoad) {
             Details.push(detail);
 
         //si es la primera carga de una venta en cambio y no hay devoluciones en la partida, aun se puede recibir
-        if (isFirstLoad && $("#Status").val() == TranStatus.OnChange.Name && detail.Refund == 0) {
-            console.log($("#Status").val());
-            console.log(detail.Refund);
-            $(refundTxt).attr("disabled", false);
-        }
+        if (isFirstLoad && $("#Status").val() == TranStatus.OnChange.Name)
+            $(newRefundTxt).attr("disabled", false);
 
         totalAmount += detail.Amount;
-        totalItems += detail.Quantity - detail.Refund;
+        totalItems += (detail.Quantity - detail.Refund) - detail.NewRefund;
     });
 
     $("#tdAmount").text(GetCurrency(totalAmount));
@@ -363,7 +428,9 @@ function SetPrice(input)
 
     var price = parseFloat($(input).val());
 
-    if (isNaN(price) || price <= 0) {
+   
+    if (isNaN(price) || price <= 0)
+    {
         ShowNotify("Precio Incorrecto", "warning",
                    "El precio debe ser un número positivo " + GetCurrency(response.JProperty[0].StorePrice), 4000);
 
@@ -373,13 +440,14 @@ function SetPrice(input)
         $(input).on("blur", function () { SetPrice(this); });
         return;
     }
-
+   
     pId = row.find("#item_ProductId").val();
 
     //validación de precio
     ShowLoading('static');
 
-    GetAjax('/Selling/GetProductsInfo', { "productIds[0]": pId }, function (response) {
+    GetAjax('/Selling/GetProductsInfo', { "productIds[0]": pId }, function (response)
+    {
         HideLoading(function () {
             if (price > parseFloat(response.JProperty[0].StorePrice)) {
                 ShowNotify("Precio Incorrecto", "warning",
@@ -394,7 +462,8 @@ function SetPrice(input)
                 return;
             }
 
-            if (price < parseFloat(response.JProperty[0].WholesalerPrice)) {
+            if (price < parseFloat(response.JProperty[0].WholesalerPrice))
+            {
                 ShowNotify("Precio Incorrecto", "warning",
                     "El precio no puede ser menor a " + GetCurrency(response.JProperty[0].WholesalerPrice), 4000);
 
@@ -424,17 +493,19 @@ function SetPrice(input)
 }
 
 
-function SetRefund(input) {
+function SetRefund(input)
+{
     row = $(input).parent().parent();
 
     var idx = $("#tbSaleDetails tbody tr").index(row);
 
-    var refund = parseFloat($(input).val());
+    var newRefund = parseFloat($(input).val());
 
-    if (isNaN(refund) || refund < 0) {
+    if (isNaN(newRefund) || newRefund < 0)
+    {
         ShowNotify("Devolución Inválida", "danger", "La devolución debe ser un número positivo", 3000);
         //coloco la cantidad que hay en memoria
-        $(input).val(Details[idx].Refund);
+        $(input).val(Details[idx].NewRefund);
 
         $(input).off("blur");
         $(input).focus();
@@ -442,19 +513,19 @@ function SetRefund(input) {
 
         return;
     }
-
 
     pId = row.find("#item_ProductId").val();
 
-
-    var price = parseFloat($(row).find("#item_TaxedPrice").val());
-    var quantity = $(row).find("#item_Quantity").val();
+    var price      = parseFloat($(row).find("#item_TaxedPrice").val());
+    var quantity   = parseFloat( $(row).find("#item_Quantity").val()) - parseFloat( $(row).find("#item_Refund").val());
+    
     var amountCell = $(row).find("#tdRowAmount");
 
-    if (refund > quantity) {
+    if (newRefund > quantity)
+    {
         ShowNotify("Devolución Inválida", "danger", "La devolución no puede ser mayor a la cantidad de productos comprados", 3000);
         //coloco la cantidad que hay en memoria
-        $(input).val(Details[idx].Refund);
+        $(input).val(Details[idx].NewRefund);
 
         $(input).off("blur");
         $(input).focus();
@@ -463,12 +534,11 @@ function SetRefund(input) {
         return;
     }
 
-
-    var newAmount = parseFloat(price) * (quantity - refund);
+    var newAmount = parseFloat(price) * (quantity - newRefund);
 
     $(amountCell).html(GetCurrency(newAmount));
 
-    Details[idx].Refund = refund;
+    Details[idx].NewRefund = newRefund;
     Details[idx].Amount = newAmount;
     Details[idx].IsModified = true;
 
@@ -497,7 +567,8 @@ function SetPopOver()
         content: $("#spanPopOver").attr("popover-content"),
         title: popOverTitle,
         template: PopOverTemplatePrimary
-    }).off('shown.bs.popover').on('shown.bs.popover', function () {
+    }).off('shown.bs.popover').on('shown.bs.popover', function ()
+    {
         $("#btnClosePop").off("click").on("click", function () { $("#spanPopOver").click() });
 
         var cLimit = parseFloat($("#Client_CreditLimit").val());
@@ -517,6 +588,13 @@ function SetPopOver()
         title: $("#spanPopOver").attr("tooltip-title")
     })
 
+    $("#divFolio").tooltip({
+        placement: 'right',
+        title: $("#divFolio").attr("tooltip-title")
+    });
+
+   
+
     $("#btnBegingSearchCustomer").tooltip({
         placement: 'bottom',
         title: $("#btnBegingSearchCustomer").attr("tooltip-title")
@@ -533,6 +611,11 @@ function SetPopOver()
         title: $("#btnChange").attr("tooltip-title")
     })
 
+    $("#btnNew").tooltip({
+        placement: 'bottom',
+        title: $("#btnNew").attr("tooltip-title")
+    });
+
     $("#btnCancelSale").tooltip({
         placement: 'bottom',
         title: $("#btnCancelSale").attr("tooltip-title")
@@ -542,6 +625,12 @@ function SetPopOver()
         placement: 'bottom',
         title: $("#btnPrint").attr("tooltip-title")
     })
+
+    $("#btnGoTo").tooltip({
+        placement: 'bottom',
+        title: $("#btnGoTo").attr("tooltip-title")
+    })
+
 
     $("#btnSendOrder").tooltip({
         placement: 'bottom',

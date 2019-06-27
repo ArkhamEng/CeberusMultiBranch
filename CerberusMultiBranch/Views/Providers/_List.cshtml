@@ -181,11 +181,18 @@
 
     function BeginDelete(id, name)
     {
-        var text = "Estas a punto de eliminar al proveedor <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
+        var header = "Borrado de proveedor";
 
-        ShowConfirm(text, '@Url.Action("Deactivate","Providers")', id, function ()
+        var body = "<p> Estas a punto de eliminar al proveedor <br/>" + name + "<br/> Esta acción es irreversible ¿Estas seguro que deseas continuar? </p>";
+
+        ShowConfirm(header, body, function ()
         {
-            SearchProviders();
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("Deactivate", "Providers")', { id: id }, function (json)
+            {
+                 SearchProviders();
+            });
         });
     }
 </script>

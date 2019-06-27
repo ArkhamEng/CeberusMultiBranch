@@ -359,7 +359,7 @@ namespace CerberusMultiBranch.Support
             var um = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
             var userId = user.GetUserId();
             var claim = um.GetClaims(userId).FirstOrDefault(c => c.Type == Cons.BranchSession);
-
+            
             JCatalogEntity session;
 
             if (claim != null)

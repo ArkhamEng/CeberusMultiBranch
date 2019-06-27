@@ -20,14 +20,12 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public string RefundClient { get; set; }
 
-        
-
-
-        [MaxLength(15,ErrorMessage ="este campo no puede exceder de 15 caractéres")]
+        [StringLength(15, MinimumLength = 1, ErrorMessage = "Solo se permiten 15 caractéres")]
         [Required(ErrorMessage ="Es necesario ingrese el número de IFE para generar nota de credito")]
         public string Ident { get; set; }
 
         [Display(Name ="Recibe")]
+        [StringLength(100, MinimumLength = 10, ErrorMessage = "Se requiren por lo menos 10 caractéres")]
         [Required(ErrorMessage = "Se requiere el nombre de la persona que recibe el rembolso")]
         public string ReceivedBy { get; set; }
 

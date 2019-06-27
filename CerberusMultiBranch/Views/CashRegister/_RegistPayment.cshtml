@@ -2,6 +2,7 @@
 @using CerberusMultiBranch.Models.Entities.Operative;
 @using CerberusMultiBranch.Support
 
+@Scripts.Render("~/bundles/jqueryval")
 
 <div id="RegistPaymentContent" class="panel panel-success">
     <div class="panel-heading clearfix">
@@ -169,40 +170,42 @@
         </div>
 
 
+        <form id="formRefund">
+            <div id="divRefund" class="panel panel-default hidden">
 
-        <div id="divRefund" class="panel panel-default hidden">
-            <div class="panel-heading clearfix">
-                <label>Aplicación de devolución</label>
+                <div class="panel-heading clearfix">
+                    <label>Aplicación de devolución</label>
 
-                <div class="pull-right">
-                    <label class="text-danger"> Devolución $ @(Model.AmountToPay * -1)</label>
-                </div>
-            </div>
-            <div class="panel-body">
-                <div class="col-md-12 small">
-                    <div class="form-group col-md-3">
-                        <label>En efectivo</label>
-                        @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>En vale</label>
-                        @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
-                    </div>
-
-                    <div class="form-group col-md-6 center-block">
-                        <label>IFE (solo para vale)</label>
-                        @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
-                        @Html.ValidationMessageFor(model => model.Ident, "", new { @class = "text-danger" })
-                    </div>
-
-                    <div class="form-group col-md-12">
-                        <label>Recibido por</label>
-                        @Html.EditorFor(model => model.ReceivedBy, new { htmlAttributes = new { @class = "form-control text-uppercase  input-sm", autocomplete = "off" } })
-                        @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
+                    <div class="pull-right">
+                        <label class="text-danger"> Devolución $ @(Model.AmountToPay * -1)</label>
                     </div>
                 </div>
+                <div class="panel-body">
+                    <div class="col-md-12 small">
+                        <div class="form-group col-md-3">
+                            <label>En efectivo</label>
+                            @Html.EditorFor(model => model.RefundCash, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label>En vale</label>
+                            @Html.EditorFor(model => model.RefundCredit, new { htmlAttributes = new { @class = "form-control  input-sm", type = "number" } })
+                        </div>
+
+                        <div class="form-group col-md-6 center-block">
+                            <label>IFE (solo para vale)</label>
+                            @Html.EditorFor(model => model.Ident, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                            @Html.ValidationMessageFor(model => model.Ident, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="form-group col-md-12">
+                            <label>Recibido por</label>
+                            @Html.EditorFor(model => model.ReceivedBy, new { htmlAttributes = new { @class = "form-control text-uppercase  input-sm", autocomplete = "off" } })
+                            @Html.ValidationMessageFor(model => model.ReceivedBy, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </form>
 
 
         @Html.HiddenFor(model => model.AmountToPay)
@@ -230,15 +233,19 @@
         </div>
     </div>
     @Html.HiddenFor(m => m.CreditNoteId)
+    
 </div>
 
 
 <script>
-    $(document).ready(function () {
+    var Refund = 0;
+    $(document).ready(function ()
+    {
         SetInputEvents();
 
-        Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, value) {
-            OnFolioSelected(id, value);
+        Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, label, value)
+        {
+            OnFolioSelected(id, label, value);
         });
 
         SumAmount();
@@ -247,31 +254,39 @@
 
         var amountToPay = parseFloat($("#AmountToPay").val());
 
-        console.log(amountToPay);
+        
         //si el monto a pagar es menor o igual con cero, no se recibe ningun pago
         if (amountToPay > 0)
             $("#divPayments").removeClass("hidden");
 
         if (amountToPay < 0)
+        {
+            Refund = amountToPay * -1;
+            LoadRefundControls();
             $("#divRefund").removeClass("hidden");
+        }
     });
 
 
-    function BindRegistButtons() {
-        $("#btnRegistNote").off('click').on('click', function () {
-            $("#btnRegistNote").off('click');
+    function BindRegistButtons()
+    {
+        $("#btnRegistNote").off('click').on('click', function ()
+        {
             RegisterPayment(2);
         });
 
-        $("#btnRegistTicket").off('click').on('click', function () {
-            $("#btnRegistTicket").off('click');
+        $("#btnRegistTicket").off('click').on('click', function ()
+        {
             RegisterPayment(1);
         });
     }
 
-    function SetInputEvents() {
-        $("#CashAmount").off('keyup').keyup(function () {
-            if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name) {
+    function SetInputEvents()
+    {
+        $("#CashAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name)
+            {
                 var val = $("#CashAmount").val();
                 var result = Calculate(val);
 
@@ -283,8 +298,10 @@
             SumAmount();
         });
 
-        $("#CardAmount").off('keyup').keyup(function () {
-            if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name) {
+        $("#CardAmount").off('keyup').keyup(function ()
+        {
+            if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name)
+            {
                 var val = $("#CardAmount").val();
                 var result = Calculate(val);
 
@@ -297,7 +314,8 @@
         });
 
         //cuando se limpia el campo de folio
-        $("#Folio").off('keyup').keyup(function (e) {
+        $("#Folio").off('keyup').keyup(function (e)
+        {
             if (e.keyCode == undefined || e.keyCode == 9 || e.keyCode == 13)
                 return;
 
@@ -311,6 +329,7 @@
             $("#Reference").val('');
             $("#CardAmount").val(0);
             $("#CreditNoteId").val(0);
+            $("#CreditNoteFolio").val('');
             $("#CreditNoteAmount").val(0);
 
             $("#Expiration").val('');
@@ -324,28 +343,29 @@
 
             SumAmount();
         });
-
-
     }
 
 
-    function OnFolioSelected(id, value) {
+    function OnFolioSelected(id, folio, value)
+    {
         $("#CreditNoteId").val(id);
+        $("#CreditNoteFolio").val(folio);
 
         $("#Folio").removeClass('alert-info');
 
-        ExecuteAjax('@Url.Action("GetFolioAmount")', { id: id }, function (response) {
-            console.log(response);
+        ExecuteAjax('@Url.Action("GetFolioAmount")', { id: id, folio:folio }, function (response)
+        {
             $("#CreditNoteAmount").val(response.Extra);
             $("#Expiration").val(response.Body);
             $("#Folio").val(response.Header);
+          
+            var tot = parseFloat($("#AmountToPay").val());
 
             $("#Folio").addClass('alert-info');
 
-            var tot = parseFloat($("#AmountToPay").val());
-
             //si el monto del vale excede o es igual a la cantidad  pagar, inhibo el ingreso de otra forma de pago
-            if (response.Extra > tot || response.Extra == tot) {
+            if (response.Extra > tot || response.Extra == tot)
+            {
                 $("#CashAmount").val(0);
                 $("#CashAmount").attr("disabled", true);
 
@@ -355,15 +375,16 @@
                 $("#Reference").val('');
                 $("#Reference").attr("disabled", true);
             }
-
-                //de otra forma si la venta es de contado, recalculo el monto a pagar
-            else if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name) {
+            //de otra forma si la venta es de contado, recalculo el monto a pagar
+            else if ('@Model.Details.First().Sale.TransactionType' == TranType.Cash.Name)
+            {
                 var cash = parseFloat($("#AmountToPay").val()) - response.Extra;
                 $("#CashAmount").val(cash);
                 $("#CardAmount").val(0);
                 $("#Reference").val('');
             }
-            else {
+            else
+            {
                 $("#CashAmount").val(0);
                 $("#CardAmount").val(0);
                 $("#Reference").val('');
@@ -389,11 +410,21 @@
         return result;
     }
 
-    function RegisterPayment(printType) {
-        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0) {
+    function RegisterPayment(printType)
+    {
+        if (parseFloat($("#CashAmount").val()) < 0 || parseFloat($("#CashAmount").val()) < 0)
+        {
             ShowNotify("Cantidad Incorrecta!", "warning",
                 "Los pagos no pueden incluir cantidades negativas, por favor ajuste las cantidades de manera correcta", 3000);
             return;
+        }
+
+        if (Refund > 0)
+        {
+            var form = $("#formRefund");
+
+            if (!form.valid())
+                return;
         }
 
         ShowModLoading();
@@ -404,16 +435,21 @@
             CardAmount: $("#CardAmount").val(),
             Reference: $("#Reference").val(),
             CreditNoteId: $("#CreditNoteId").val(),
+            CreditNoteFolio: $("#CreditNoteFolio").val(),
             CreditNoteAmount: $("#CreditNoteAmount").val(),
-            PrintType: printType
+            PrintType: printType,
+            Ident: $("#Ident").val(),
+            ReceivedBy: $("#ReceivedBy").val(),
+            RefundCredit: $("#RefundCredit").val(),
+            RefundCash: $("#RefundCash").val()
         };
 
-        console.log("Parametros de pago");
-        console.log(param);
-
-        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response) {
-            HideModLoading(function () {
-                HideModal(function () {
+        ExecuteAjax('@Url.Action("RegistPayment")', { payment: param }, function (response)
+        {
+            HideModLoading(function ()
+            {
+                HideModal(function ()
+                {
                     CheckPendingPayments();
                     $("#divPrinter").html(response);
 
@@ -424,4 +460,66 @@
     }
 
 
+    function LoadRefundControls()
+    {
+        var form = $("#formRefund");
+        form.validate();
+
+        $("#RefundCredit").val(Refund);
+
+        $("#RefundCash").off('blur').on("blur",function ()
+        {
+            var val = $("#RefundCash").val();
+            var result = CalculateRefund(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#RefundCredit").val(result);
+
+            if (result < 0)
+            {
+                $("#RefundCredit").val(0);
+                $("#RefundCash").val(Refund);
+            }
+
+            EvalCredit();
+        });
+
+        $("#RefundCredit").off('blur').on("blur",function ()
+        {
+            var val = $("#RefundCredit").val();
+            var result = CalculateRefund(val);
+
+            result = parseFloat(result).toFixed(2);
+
+            $("#RefundCash").val(result);
+
+            if (result < 0)
+            {
+                $("#RefundCash").val(0);
+                $("#RefundCredit").val(Refund);
+            }
+
+            EvalCredit();
+        });
+
+    }
+
+    function EvalCredit()
+    {
+        var Ammount = parseFloat($("#RefundCredit").val());
+
+        if (Ammount > 0)
+            $("#Ident").attr("disabled", false);
+        else
+            $("#Ident").attr("disabled", true);
+    }
+
+
+    function CalculateRefund(val)
+    {
+        var result = (Refund - parseFloat(val));
+
+        return result;
+    }
 </script>

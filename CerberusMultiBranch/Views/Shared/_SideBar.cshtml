@@ -16,7 +16,7 @@
         @User.Identity.GetUserName()
     </label>
     <div class="">
-        <ul class="list-unstyled components col-md-12 col-sm-12 col-xs-12" >
+        <ul class="list-unstyled components col-md-12 col-sm-12 col-xs-12">
             <li>
                 <a href="/Products/" onclick="ShowLoading()">
                     &nbsp;Productos<span class="fa fa-dropbox" style="float:left" />
@@ -55,6 +55,11 @@
                     <a href="#salesSm" data-toggle="collapse" aria-expanded="false">&nbsp;Ventas<span class="fa fa-shopping-bag" style="float:left" /></a>
                     <ul class="collapse list-unstyled" id="salesSm">
 
+                        @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
+                        {
+                            <li title="Crear, revisar o modificar ventas">
+                             <a href="/Selling/SaleOrder/" onclick="ShowLoading()">&nbsp;Orden de venta<span class="fa fa-shopping-bag" style="float:left" /></a></li>
+                        }
                         @if (User.IsInRole("Supervisor"))
                         {
                             <li><a href="/Sales/Report/" onclick="ShowLoading()">&nbsp;Reporte de ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
@@ -97,7 +102,7 @@
             <li>
                 <a href="#PurchasingSubMenu" data-toggle="collapse" aria-expanded="false">
                     &nbsp;Compras<span class="fa fa-shopping-cart" style="float:left" />
-                </a> 
+                </a>
 
                 <ul class="collapse list-unstyled" id="PurchasingSubMenu">
                     <li>
@@ -136,7 +141,7 @@
 
             <li><a href="http://mail.autobien.com.mx" onclick="ShowLoading()">&nbsp;Web Mail<span class="fa fa-envelope" style="float:left" /></a></li>
             <li><a href="/Home/About" onclick="ShowLoading()">&nbsp;Acerca de<span class="glyphicon glyphicon-question-sign" style="float:left" /></a></li>
-            
+
         </ul>
     </div>
 </nav>

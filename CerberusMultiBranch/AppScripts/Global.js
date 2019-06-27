@@ -104,23 +104,31 @@ function ShowNotify(title, type, message, delay) {
 /***************************************************
 ************AUTOCOMPLEATE USING JQUERY UI***********
 ***************************************************/
-function Compleate(textbox, list, url, onSelected, entityId) {
+function Compleate(textbox, list, url, onSelected, entityId)
+{
     $(textbox).off('autocomplete').autocomplete(
       {
-          source: function (request, response) {
-              if (entityId == null) {
-                  ExecuteAjax(url, { filter: request.term }, function (json) {
+          source: function (request, response)
+          {
+              if (entityId == null)
+              {
+                  ExecuteAjax(url, { filter: request.term }, function (json)
+                  {
                       $(list).empty();
-                      for (var i = 0; i < json.length; i++) {
+                      for (var i = 0; i < json.length; i++)
+                      {
                           $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
                       }
                   });
               }
-              else {
-                  ExecuteAjax(url, { filter: request.term, entityId: entityId }, function (json) {
+              else
+              {
+                  ExecuteAjax(url, { filter: request.term, entityId: entityId }, function (json)
+                  {
                       $(list).empty();
-                      for (var i = 0; i < json.length; i++) {
-                          $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
+                      for (var i = 0; i < json.length; i++)
+                      {
+                          $(list).append($('<option data-id=' + json[i].Id + 'data-label='+json[i].Label+'></option>').val(json[i].Label).html(json[i].Value));
                       }
                   });
               }
@@ -130,29 +138,32 @@ function Compleate(textbox, list, url, onSelected, entityId) {
       });
 
     //this is executed when an option from DataList is selected
-    $(textbox).off('input').bind('input', function () {
+    $(textbox).off('input').bind('input', function ()
+    {
         var val = this.value;
-        if ($(list).find('option').filter(function () {
-            return this.value.toUpperCase() === val.toUpperCase();
-        }).length) {
-            var option = $(list).find('option').filter(function () {
+        if ($(list).find('option').filter(function (){ return this.value.toUpperCase() === val.toUpperCase(); }).length)
+        {
+            var option = $(list).find('option').filter(function ()
+            {
                 return this.value.toUpperCase() === val.toUpperCase();
             });
 
-
             var value = option.text();
-            var id = option.data("id");
+            var id    = option.data("id");
+            var label = option.val();
 
-            if (onSelected != null) {
-                onSelected(id, value);
+            if (onSelected != null)
+            {
+                onSelected(id, label, value);
             }
         }
     });
 }
 
-function LoadPopOver(button, callback) {
-    $("#ConfirmPopYes").click(function () {
-        console.log("Yes Clicked");
+function LoadPopOver(button, callback)
+{
+    $("#ConfirmPopYes").click(function ()
+    {
         callback();
     });
 

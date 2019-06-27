@@ -2,7 +2,7 @@
 @using CerberusMultiBranch.Models.Entities.Operative
 @using CerberusMultiBranch.Support
 
-<table id="tbSales" class="table dt-responsive table-bordered small hidden" style="width:100%">
+<table id="tbSales" class="table table-hover  table-bordered small hidden" style="width:100%">
     <thead>
         <tr>
             <th >
@@ -30,14 +30,16 @@
             </th>
             <th>
                 @Html.DisplayName("Abonos")
-            </th>           
-            <th></th>
+            </th>   
+            <th>
+                @Html.DisplayName("Adeudo")
+            </th>              
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
+            <tr onclick="ShowLoading(); window.location = '@Url.Action("SaleOrder","Selling", new { id = item.SaleId })'" onmouseover="SetPointer(this)">
                 <td class="@item.Status.GetAlert()">
                     @item.TransactionType.GetName() <br />
                     @item.Status.GetName()
@@ -66,18 +68,14 @@
                 </td>
                 <td class="text-right">
                     @item.SalePayments.Sum(p => p.Amount).ToMoney() <br />
-
+                </td>
+                <td class="text-right">
                     @{ var debt = item.TotalTaxedAmount - item.SalePayments.Sum(p => p.Amount); }
-                     @debt.ToMoney()
+                    @debt.ToMoney()
                 </td>
-                <td>
-                    <button class="btn btn-warning btn-sm" title="Editar Venta"
-                            onclick="ShowLoading(); window.location = '@Url.Action("SaleOrder","Selling", new { id = item.SaleId })'">
-                        <span class="fa fa-edit"></span>Editar
-                    </button>
-                </td>
+                
             </tr>
-                        }
+         }
     </tbody>
     @{
         var totalCommision = Model.Where(sale => sale.Status == TranStatus.Compleated).Sum(sale => sale.ComAmount);

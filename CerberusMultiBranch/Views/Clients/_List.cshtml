@@ -134,13 +134,22 @@
 
     function BeginDelete(id, name)
     {
-        var text = "Estas a punto de eliminar al cliente <br/>" + name + "<br/> ¿Estas seguro que deseas continuar?";
+        var header = "Borrado de cliente";
 
-        ShowConfirm(text, '@Url.Action("Deactivate","Clients")', id, function ()
+        var body   = "<p> Estas a punto de eliminar al cliente <br/>" + name + "<br/> Esta acción es irreversible ¿Estas seguro que deseas continuar? </p>";
+
+        ShowConfirm(header, body,function()
         {
-            ExecuteAjax('@Url.Action("Search")', {}, function (view)
+            ShowLoading('static');
+
+            ExecuteAjax('@Url.Action("Deactivate","Clients")', { id: id }, function (json)
             {
-                $("#divClients").html(view);
+                ExecuteAjax('@Url.Action("Search")', {}, function (view)
+                {
+                    $("#divClients").html(view);
+
+                    HideLoading(null);
+                });
             });
         });
     }

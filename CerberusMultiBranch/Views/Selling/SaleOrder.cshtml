@@ -2,8 +2,8 @@
 @using CerberusMultiBranch.Support
 
 @{
-    ViewBag.Title = "Detalle de venta";
-    ViewBag.Class = "fa fa-dollar";
+    ViewBag.Title = "Orden de venta";
+    ViewBag.Class = "fa fa-shopping-bag";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -13,11 +13,16 @@
 
 <br />
 
-<div class="@Model.Status.GetAlert() col-md-3" style="padding-bottom:0px">
-    <h4>
-        <i class="fa fa-tag"></i>
-        @Model.Folio
-    </h4>
+<div  class="@Model.Status.GetAlert() col-md-3" style="padding-bottom:0px; padding-top:0px; padding-left:0px; padding-right:0px"
+      tooltip-title="Escribe un folio para buscar" id="divFolio">
+    <div class="input-group">
+        <div class="input-group-addon addOn-line-white">
+            <i class="fa fa-tag"></i>
+        </div>
+        @Html.EditorFor(model => model.Folio, new { htmlAttributes = 
+         new { @class = "form-control input-lg textbox-line-white text-uppercase", list="Folios", autocomplete = "off" }})
+         <datalist id="Folios"></datalist>
+    </div>
 </div>
 
 <div class="@Model.Status.GetAlert() col-md-3 col-md-offset-6" style="padding-bottom:0px">
@@ -34,20 +39,20 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-      @Html.Partial("SaleOrderHeader",Model)
+        @Html.Partial("SaleOrderHeader", Model)
     </div>
 </div>
 
 <ul class="nav nav-tabs">
     <li class="active">
-      <a data-toggle="tab" href="#tabProducts">
+        <a data-toggle="tab" href="#tabProducts">
             <i class="fa fa-cubes"></i> Articulos
-       </a>
+        </a>
     </li>
 
     <li>
         <a data-toggle="tab" href="#tabHistories">
-             <i id="TotalPayments" class="fa fa-history"></i> Historico
+            <i id="TotalPayments" class="fa fa-history"></i> Historico
         </a>
     </li>
     <li>
@@ -56,17 +61,28 @@
         </a>
     </li>
     <li class="pull-right">
-       <button id="btnSendOrder" type="button" class="btn btn-success btn-sm hidden" tooltip-title="Concluir Captura de Venta">
-           <i class="fa fa-check"></i>
-           Terminar
-       </button>
+        <button id="btnGoTo" type="button" class="btn btn-default btn-sm" tooltip-title="Ir al listado general">
+            <i class="fa fa-search"></i>
+            Ir a Lista
+        </button>
+
+        <button id="btnSendOrder" type="button" class="btn btn-primary btn-sm hidden" tooltip-title="Concluir Captura de Venta y enviar a caja">
+            <i class="fa fa-save"></i>
+            Guardar
+        </button>
 
         <button id="btnChange" type="button" class="btn btn-warning btn-sm hidden" tooltip-title="Solicitar modificación de Venta">
             <i class="fa fa-refresh"></i>
             Modificar
         </button>
 
-        <button id="btnPrint" type="button" class="btn btn-primary btn-sm hidden" tooltip-title="Imprimir Venta">
+        <button id="btnNew" type="button" class="btn btn-success btn-sm" tooltip-title="Capturar una nueva venta">
+            <i class="fa fa-file"></i>
+            Nuevo
+        </button>
+
+
+        <button id="btnPrint" type="button" class="btn btn-default btn-sm hidden" tooltip-title="Imprimir Venta">
             <i class="fa fa-print"></i>
         </button>
 
@@ -77,16 +93,16 @@
 </ul>
 
 
-<div class="tab-content panel panel-default">
-    <div id="tabProducts" class="tab-pane fade in active panel-body dtContainer table-responsive">
-            @Html.Partial("SaleOrderDetail", Model.SaleDetails)
+<div class="tab-content panel panel-default" >
+    <div id="tabProducts" class="tab-pane fade in active panel-body dtContainer table-responsive" style="padding-right:0px">
+        @Html.Partial("SaleOrderDetail", Model.SaleDetails)
     </div>
 
-    <div id="tabHistories" class="tab-pane dtContainer table-responsive">
+    <div id="tabHistories" class="tab-pane dtContainer table-responsive" style="padding-right:0px">
         @Html.Partial("SaleOrderHistories", Model.SaleHistories)
     </div>
 
-    <div id="tabPayments" class="tab-pane table-responsive dtContainer">
+    <div id="tabPayments" class="tab-pane  table-responsive dtContainer">
         @Html.Partial("SaleOrderPayments", Model.SalePayments)
     </div>
 </div>

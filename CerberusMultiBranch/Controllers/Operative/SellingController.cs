@@ -15,24 +15,34 @@ using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
-    [CustomAuthorize(Roles = "Vendedor, Supevisor")]
+    [CustomAuthorize]
     public class SellingController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
-        // GET: Selling/Details/5
+        [CustomAuthorize(Roles = "Vendedor, Supevisor")]
         public ActionResult SaleOrder(int? id)
         {
             Sale model = null;
 
             if (id != null)
             {
+                //solo ventas de mis sucursales 
                 var branchIds = User.Identity.GetBranches().Select(b => b.BranchId);
+
+                //si no se es supervisor o administrador, solo ventas del usuario
+                var userId = User.IsInRole("Supervisor") ? string.Empty : User.Identity.GetUserId();
+
 
                 model = db.Sales.Include(p => p.SaleHistories).
                 Include(p => p.SalePayments).Include(p => p.User).
                 Include(s => s.SaleDetails.Select(td => td.Product.Images)).
-                FirstOrDefault(p => p.SaleId == id && branchIds.Contains(p.BranchId));
+                FirstOrDefault(p => p.SaleId == id && 
+                                   branchIds.Contains(p.BranchId) && 
+                                   (string.IsNullOrEmpty(userId) || p.UserId == userId));
+
+                if (model == null)
+                    return RedirectToAction("SaleOrder",new {id = new Nullable<int>() });
             }
             else
             {
@@ -47,7 +57,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View("SaleOrder", model);
         }
 
-        [HttpGet]
+        
         public ActionResult GetProductsInfo(List<int> productIds)
         {
             var branchId = User.Identity.GetBranchId();
@@ -246,6 +256,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                             break;
                     }
 
+                    //sumo la nueva devolución a las existentes
+                    detail.Refund += detail.NewRefund;
+
                     //si la partida es nueva y el producto tiene comisión se asigna
                     if (dbDetail == null && pInfo.SaleCommission > Cons.Zero)
                         detail.Commission = (detail.TaxedAmount * (pInfo.SaleCommission / Cons.OneHundred)).RoundMoney();
@@ -254,7 +267,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         detail.Commission = dbDetail.Commission;
 
                     var dbQuantity = dbDetail != null ? dbDetail.Quantity - dbDetail.Refund : Cons.Zero;
-                    var quantity = detail.Quantity - detail.Refund;
+                    var quantity   =  detail.Quantity - detail.Refund;
 
                     //si la diferencia es negativa indica que se agregan partidas y se deben restar del stock
                     //si la diferencia es positiva indica devoluciones  (entradas de inventario)
@@ -352,9 +365,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                 else
                     sale.Comment = "Venta modificada Folio:" + sale.Folio;
 
+                //toda venta modificada se coloca en status reserved para que aparezca en la caja
+                //para su reimpresión y aplicación de pago o devolución
                 var lStatus     = dbSale != null ? dbSale.LastStatus : TranStatus.InProcess;
                 sale.LastStatus = sale.Status;
-                sale.Status     =lStatus == TranStatus.InProcess ? lStatus : TranStatus.Reserved;
+                sale.Status     = TranStatus.Reserved;
         
 
                 //agrego el número de folio a los movimientos
@@ -722,7 +737,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
             }
 
-            //los días de crédiro solo se validan para nuevas ventas
+            //los días de crédito solo se validan para nuevas ventas
             if (sale.Status == TranStatus.InProcess && client.CreditAvailable < credit)
             {
                 return new JResponse
@@ -757,49 +772,25 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
 
-        // GET: Selling/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-        // POST: Selling/Edit/5
         [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
+        public ActionResult AutoCompleateSale(string filter)
         {
-            try
-            {
-                // TODO: Add update logic here
+            //solo ventas las sucursales autorizadas
+            var branchsIds = User.Identity.GetBranches().Select(p => p.BranchId).ToList();
 
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
+            //si no se es supervisor, solo ventas del usuario
+            var userId = User.IsInRole("Supervisor")  ?  string.Empty : User.Identity.GetUserId();
+
+            var model = db.Sales.Where(p => 
+                            branchsIds.Contains(p.BranchId) && 
+                            (string.IsNullOrEmpty(userId) || p.UserId == userId) &&
+                            p.Folio.Contains(filter)).Take(20).
+                Select(p =>
+                    new { Id = p.SaleId, Label = p.Folio, Value = p.Folio, Response = Cons.Responses.Success, Code = Cons.Responses.Codes.Success });
+
+            return Json(model);
         }
 
-        // GET: Selling/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: Selling/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
         protected override void Dispose(bool disposing)
         {

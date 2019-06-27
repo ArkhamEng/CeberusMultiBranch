@@ -35,29 +35,8 @@
 
                         <td align="center">@Html.DisplayFor(m => item.UpdUser)</td>
 
-                        @*<td align="center">
-                            @{
-                                var alr = "alert-success";
-
-                                switch (item.TransactionType)
-                                {
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Credito:
-                                        alr = "alert-danger";
-                                        break;
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Preventa:
-                                        alr = "alert-info";
-                                        break;
-                                    case CerberusMultiBranch.Models.Entities.Operative.TransactionType.Apartado:
-                                        alr = "alert-warning";
-                                        break;
-                                }
-                            }
-                            <div class="form-control input-sm @alr">
-                                @item.TransactionType.ToString()
-                            </div>
-                        </td>*@
                         <td align="center">
-                            @Html.DisplayFor(m => item.TransactionType)
+                            @item.TransactionType.GetName()
                         </td>
                         <td align="center">
                             <button class="btn btn-danger btn-sm" title="Generar devoluciones" onclick="BeginRefund('@item.SaleId')">

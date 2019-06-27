@@ -10,9 +10,10 @@ namespace CerberusMultiBranch.Models.Entities.Operative
     [Table("SaleCreditNote", Schema = "Operative")]
     public class SaleCreditNote
     {
-        [Key, ForeignKey("Sale")]
+        [Key, Column(Order = 0), ForeignKey("Sale")]
         public int SaleCreditNoteId { get; set; }
 
+        [Key,Column(Order = 1)]
         [MaxLength(30)]
         [Index("IDX_Identifier_Active",Order =0)]
         public string Folio { get; set; }
@@ -30,7 +31,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Index("IDX_Sequential",1)]
         public int Sequential { get; set; }
 
-     
 
         [MaxLength(30)]
         public string User { get; set; }
@@ -44,7 +44,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public virtual Sale Sale { get; set; }
 
-        public ICollection<CreditNoteHistory> CreditNoteHistories { get; set; }
+        //public ICollection<CreditNoteHistory> CreditNoteHistories { get; set; }
     }
 
     [Table("CreditNoteHistory", Schema = "Operative")]
@@ -54,6 +54,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public int SaleCreditNoteId { get; set; }
 
+        public string Folio { get; set; }
+
         public double Amount { get; set; }
 
         [MaxLength(30)]
@@ -61,6 +63,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime ChangeDate { get; set; }
 
-        public virtual SaleCreditNote SaleCreditNote { get; set; }
+        //public virtual SaleCreditNote SaleCreditNote { get; set; }
     }
 }

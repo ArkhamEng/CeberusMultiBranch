@@ -78,7 +78,15 @@
 
     function DeleteCategory(id)
     {
-        ShowConfirm("¿Estas seguro de querer eliminar esta categoría?", '@Url.Action("DeleteCategory","Configuration")', id, function () { SearchCategory(); });
+        ShowConfirm("Eliminacion de categoría", "¿Estas seguro de querer eliminar esta categoría?", function ()
+        {
+            ShowLoading("static");
+
+            ExecuteAjax('@Url.Action("DeleteCategory", "Configuration")', { id: id }, function (json)
+            {
+                SearchCategory();
+            });
+        })
     }
 
 </script>

@@ -203,7 +203,13 @@
 
     function BeginDelete(id)
     {
-        ShowConfirm("¿Estas seguro de eliminar el producto?. Al eliminar tambien se borraran las imagenes y el registro no se podra recuperar", '@Url.Action("Delete", "Products")', id, LookFor);
+        ShowConfirm("Borrado de Producto", "¿Estas seguro de eliminar el producto?. Al eliminar tambien se borraran las imagenes y el registro no se podra recuperar",
+            function ()
+            {
+                ShowLoading('static');
+
+                ExecuteAjax('@Url.Action("Delete", "Products")',{id:id}, LookFor);
+            });
     }
 
     function BeginActivate(id)
@@ -211,7 +217,7 @@
         ShowConfirm("¿Estas seguro de la activación del producto?, Al activarlo, el producto estara disponible para venta y edición, ¿deseas continuar?", '@Url.Action("Activate", "Products")', id, LookFor);
     }
 
-  
+
     function BeginEdit(id)
     {
         ShowCatalogModal(SearchBy, null, 'Product', id);

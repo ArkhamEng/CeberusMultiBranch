@@ -21,7 +21,7 @@
 </div>
 
 
-<table id="tbSaleDetails" class="table table-striped small" style="width:100%; border-top:solid; border-top-width:thin">
+<table id="tbSaleDetails" class="table table-striped small" style="width:100%; border-top:solid; border-top-width:thin;">
     <thead>
         <tr>
             <td class="hidden"></td>
@@ -39,9 +39,12 @@
             <th align="center">
                 @Html.DisplayNameFor(model => model.Quantity)
             </th>
-
             <th align="center">
                 @Html.DisplayNameFor(model => model.Refund)
+            </th>
+
+            <th class="newRefund hidden" align="center">
+                @Html.DisplayNameFor(model => model.NewRefund)
             </th>
 
             <th align="right">
@@ -62,7 +65,7 @@
                     @Html.HiddenFor(modelItem => item.SaleId)
                 </td>
                 <td style="width:80px">
-                    <img src="@item.Image" class="img-responsive" />
+                    <img src="@item.Image" class="img-responsive img-rounded" />
                 </td>
                 <td>
                     @Html.DisplayUpperFor(modelItem => item.Product.Code)
@@ -87,6 +90,13 @@
                 </td>
                 <td style="width:80px; padding:0px 2px 0px 2px" align="center">
                     @Html.EditorFor(modelItem => item.Refund, new
+               {
+                   htmlAttributes =
+                        new { @class = "form-control input-sm", autocomplete = "off", @type = "number", disabled = "true" }
+               })
+                </td>
+                <td class="newRefund hidden" style="width:80px; padding:0px 2px 0px 2px" align="center">
+                    @Html.EditorFor(modelItem => item.NewRefund, new
                {
                    htmlAttributes =
                         new { @class = "form-control input-sm txtRefund", autocomplete = "off", @type = "number", disabled = "true" }
@@ -117,6 +127,7 @@
                     <strong>Por @Model.FirstOrDefault().Sale.UpdUser </strong>  @Model.FirstOrDefault().Sale.UpdDate
                 }
             </td>
+            <td class="newRefund hidden"></td>
             <td align="right">
                 <h3>
                     Total
@@ -136,7 +147,7 @@
             @Html.Hidden("item_ProductId")
             @Html.Hidden("item_SaleId")
         </td>
-        <td style="max-width:50px">
+        <td style="width:80px">
             <img id="imgProduct" src="" class="img-rounded img-responsive" />
         </td>
         <td id="tdCode"></td>
@@ -150,6 +161,10 @@
         </td>
         <td style="width:80px; padding:0px 2px 0px 2px">
             @Html.TextBox("item_Refund", "0", htmlAttributes:
+           new { @class = "form-control input-sm", autocomplete = "off", @type = "number", disabled = "true" })
+        </td>
+        <td class="newRefund hidden" style="width:80px; padding:0px 2px 0px 2px">
+            @Html.TextBox("item_NewRefund", "0", htmlAttributes:
            new { @class = "form-control input-sm", autocomplete = "off", @type = "number", disabled = "true" })
         </td>
         <td id="tdRowAmount" align="right" style="width:150px;"></td>

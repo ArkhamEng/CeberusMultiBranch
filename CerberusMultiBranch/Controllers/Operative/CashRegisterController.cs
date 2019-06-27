@@ -332,7 +332,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "Ocurrio un error al obtener el cierre de caja",
+                    Body = ex.Message,
                     Header = "Errro al obtener datos"
                 });
             }
@@ -539,18 +539,35 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.SaleCreditNotes.Add(nc);
                 }
 
+                var history = new SaleHistory
+                {
+                    SaleId = sale.SaleId,
+                    Comment = sale.Comment,
+                    InsDate = sale.UpdDate,
+                    User = sale.UpdUser,
+                    Status = sale.Status.GetName(),
+                    TotalDue = sale.FinalAmount
+                };
+
                 //solo cambio el status sin registrar, el usuario que lo cambia 
                 //para que quede registrado, el usuario que realiza la cancelación
                 sale.LastStatus = sale.Status;
-                sale.Status = TranStatus.Canceled;
+                sale.Status     = TranStatus.Canceled;
+                sale.UpdUser    = User.Identity.Name;
+                sale.UpdDate    = DateTime.Now.ToLocal();
 
+                db.SaleHistories.Add(history);
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
 
-                printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
-                FirstOrDefault(n => n.SaleCreditNoteId == sale.SaleId);
+                //obtengo la nota de crédito a imprimir
 
-
+                if (nc != null)
+                {
+                    printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
+                    FirstOrDefault(n => n.SaleCreditNoteId == nc.SaleCreditNoteId && n.Folio == nc.Folio);
+                }
+              
                 return PartialView("_PrintRefund", printRefund);
             }
             catch (Exception)
@@ -681,10 +698,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 var branchId = User.Identity.GetBranchId();
 
-                var sale = db.Sales.Include(s=> s.User).Include(sd => sd.SaleDetails.Select(d => d.Product.Images)).
-                    Include(s=> s.SalePayments).FirstOrDefault(s => s.SaleId == id && (s.Status == TranStatus.Reserved || s.Status == TranStatus.Revision));
+                var sale = db.Sales.Include(s => s.User).Include(sd => sd.SaleDetails.Select(d => d.Product.Images)).
+                    Include(s => s.SalePayments).FirstOrDefault(s => s.SaleId == id && (s.Status == TranStatus.Reserved || s.Status == TranStatus.Revision));
 
-              
+
                 //si no encuentro detalles de venta, envío un error
                 if (sale == null)
                 {
@@ -697,13 +714,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-               
-           
+
+
                 //construyo el modelo para recibir el pago
                 var model = new ChoosePaymentViewModel
                 {
                     Details = sale.SaleDetails,
-                    AmountToPay = Math.Round(sale.FinalAmount - sale.SalePayments.Sum(sp => sp.Amount),Cons.Two),
+                    AmountToPay = Math.Round(sale.FinalAmount - sale.SalePayments.Sum(sp => sp.Amount), Cons.Two),
                     PaymentMethod = PaymentMethod.Efectivo,
                     SaleId = id,
                     User = sale.User.UserName.ToUpper(),
@@ -738,9 +755,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
         [HttpPost]
         [CustomAuthorize(Roles = "Cajero")]
-        public ActionResult GetFolioAmount(int id)
+        public ActionResult GetFolioAmount(int id, string folio)
         {
-            var note = db.SaleCreditNotes.Find(id);
+            var note = db.SaleCreditNotes.Find(id,folio);
 
             if (note != null && note.IsActive)
                 return Json(new JResponse
@@ -749,7 +766,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Code = Cons.Responses.Codes.Success,
                     Extra = note.Amount.ToString(),
                     Body = note.ExplirationDate.ToString("dd/MM/yyyy"),
-                    Header = "Folio " + note.Folio + " IFE " + note.Ident
+                    Header = "Folio " + note.Folio + " IFE " + note.Ident,
+                    JProperty = note.Folio
                 });
             else
             {
@@ -773,14 +791,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //busco la venta a pagar
-                var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).
-                            Include(s => s.SaleDetails).Include(s => s.Client).Include(s => s.Client.Addresses).Include(s => s.User).
-                            Include(s => s.SaleDetails.Select(td => td.Product)).Include(s => s.SaleDetails.Select(td => td.Product.Images)).
+                var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).Include(s => s.SaleHistories).
+                            Include(s => s.SaleDetails).Include(s => s.Client.Addresses).Include(s => s.User).
+                            Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
                             Include(s => s.Branch).FirstOrDefault();
 
-                var cPayments = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
-
+                //creo el historico de la venta por si se modifica
                 var SaleHistory = new SaleHistory
                 {
                     Comment = sale.Comment,
@@ -791,260 +808,43 @@ namespace CerberusMultiBranch.Controllers.Operative
                     TotalDue = sale.FinalAmount
                 };
 
+                //valido si estoy haciendo devolución
+                var refund = payment.RefundCash + payment.RefundCredit;
+                var isRefund = refund > Cons.Zero;
 
-                //monto en dinero
-                var money = payment.CashAmount + payment.CardAmount;
-
-                //monto en dinero y vale
-                var wholePayment = payment.CreditNoteAmount + money;
-
-                //monto maximo a pagar
-                var toPay = sale.FinalAmount - cPayments;
-
-                var hasFolio = (payment.CreditNoteAmount > Cons.Zero);
-
-                //si la venta fue modificada
-                if (sale.LastStatus != TranStatus.OnChange)
-                {
-                    var valResponse = ValidatePayment(sale, payment, toPay, wholePayment);
-
-                    //si la respueste es diferente de null, algo falló
-                    if (valResponse != null)
-                        return valResponse;
-                }
-              
-            
-
-                #region Logica para el uso de folio
                 SaleCreditNote note = null;
-                var folioChanged = false;
 
-                //si se registro un vale, hago validaciones de este
-                if (payment.CreditNoteId > Cons.Zero)
+                if (isRefund)
                 {
-                    note = db.SaleCreditNotes.Include(s => s.Sale).Include(s => s.Sale.Client.Addresses).
-                        FirstOrDefault(n => n.SaleCreditNoteId == payment.CreditNoteId && n.IsActive);
+                    var response = ApplyRefund(sale, payment, ref note);
 
-                    if (note != null)
-                    {
-                        if (note.ExplirationDate < DateTime.Now.ToLocal())
-                        {
-                            return Json(new JResponse
-                            {
-                                Result = Cons.Responses.Warning,
-                                Code = Cons.Responses.Codes.InvalidData,
-                                Body = "El vale que intentas aplicar ya ha caducado y no se puede aplicar como pago",
-
-                                Header = "Vale cáduco!"
-                            });
-
-                        }
-
-                        if (note.Amount != payment.CreditNoteAmount)
-                        {
-                            return Json(new JResponse
-                            {
-                                Result = Cons.Responses.Warning,
-                                Code = Cons.Responses.Codes.InvalidData,
-                                Body = "El monto aplicado en el vale, no conicide con el monto " +
-                                "en base de datos, intente asignarlo nuevamente para reflejar los cambios",
-
-                                Header = "Discrepancia de datos!"
-                            });
-
-                        }
-
-                        if (payment.CreditNoteAmount >= toPay && money > Cons.Zero)
-                        {
-                            return Json(new JResponse
-                            {
-                                Result = Cons.Responses.Info,
-                                Code = Cons.Responses.Codes.InvalidData,
-                                Body = "El monto aplicado en el vale, ya cubre el total de la deuda " +
-                                "no es necesario la aplicación de otro tipo de pago",
-
-                                Header = "Pago inecesario"
-                            });
-                        }
-
-                        //agrego el historico
-                        var history = new CreditNoteHistory
-                        {
-                            SaleCreditNoteId = note.SaleCreditNoteId,
-                            Amount = note.Amount,
-                            ChangeDate = DateTime.Now.ToLocal(),
-                            User = note.User
-                        };
-
-                        db.CreditNoteHistories.Add(history);
-
-                        //si tengo monto excedente, resto el monto a pagar del folio
-                        if (note.Amount > toPay)
-                        {
-                            folioChanged = true;
-                            note.User = User.Identity.Name;
-                            note.Amount = (note.Amount - toPay);
-                        }
-                        else
-                        {
-                            note.IsActive = false;
-                            note.Amount = Cons.Zero;
-                        }
-
-                        db.Entry(note).State = EntityState.Modified;
-                    }
-                    else
-                    {
-                        return Json(new JResponse
-                        {
-                            Result = Cons.Responses.Warning,
-                            Code = Cons.Responses.Codes.InvalidData,
-                            Body = "El vale que intentas aplicar ya fue usado o ha caducado",
-                            Header = "Vale No admitido!"
-                        });
-                    }
+                    if (response.Code != Cons.Responses.Codes.Success)
+                        return Json(response);
                 }
 
+                // monto del pago en dinero (tarjeta o efectivo)
+                var money = payment.CashAmount + payment.CardAmount;
+                var wholePayment = payment.CreditNoteAmount + money;
+                var isPayment = wholePayment > Cons.Zero;
 
-                #endregion
+                if (!isRefund)
+                {
+                    var response = ApplyPayment(sale, payment, note);
 
-
+                    if (response.Code != Cons.Responses.Codes.Success)
+                        return Json(response);
+                }
                 //ordeno por el campo Sort Order
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
-                sale.UpdDate = DateTime.Now.ToLocal();
-                sale.UpdUser = User.Identity.Name;
-
                 sale.SalePayments = sale.SalePayments ?? new List<SalePayment>();
-
-                #region Registro de pagos
-
-                var totalPayments = 0.00;
-                //si viene un monto en efectivo, agrego el registro de pago
-                if (payment.CashAmount > Cons.Zero)
-                {
-                    totalPayments += payment.CashAmount;
-                    var p = new SalePayment
-                    {
-                        SaleId = sale.SaleId,
-                        Amount = payment.CashAmount,
-                        PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Efectivo,
-                        UpdDate = DateTime.Now.ToLocal(),
-                        UpdUser = User.Identity.Name,
-                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper()
-                    };
-
-                    sale.SalePayments.Add(p);
-                }
-                //si viene un monto de tarjeta, agrego el registro de pago
-                if (payment.CardAmount > Cons.Zero)
-                {
-                    totalPayments += payment.CardAmount;
-                    var p = new SalePayment
-                    {
-                        SaleId = sale.SaleId,
-                        Amount = payment.CardAmount,
-                        PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Tarjeta,
-                        UpdDate = DateTime.Now.ToLocal(),
-                        UpdUser = User.Identity.Name,
-                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper(),
-                        Reference = payment.Reference
-                    };
-
-                    sale.SalePayments.Add(p);
-                }
-
-                //si se esta aplicando un folio
-                if (payment.CreditNoteAmount > Cons.Zero)
-                {
-                    totalPayments += payment.CreditNoteAmount;
-
-                    var p = new SalePayment
-                    {
-                        SaleId = sale.SaleId,
-                        Amount = (folioChanged ? toPay : payment.CreditNoteAmount),
-                        PaymentDate = DateTime.Now.ToLocal(),
-                        PaymentMethod = PaymentMethod.Vale,
-                        UpdDate = DateTime.Now.ToLocal(),
-                        UpdUser = User.Identity.Name,
-                        Comment = "ABONO A VENTA " + sale.Folio.ToUpper(),
-                        Reference = note.Folio
-                    };
-
-                    sale.SalePayments.Add(p);
-                }
-
-                #endregion
-
-                var changeRequired = false;
-
-                if (folioChanged || toPay <= Cons.Zero || sale.FinalAmount == Math.Round(cPayments + wholePayment,Cons.Two))
-                {
-                    sale.LastStatus = sale.Status;
-                    sale.Status = TranStatus.Compleated;
-                    sale.Comment = "Venta cobrada totalmente";
-                    db.SaleHistories.Add(SaleHistory);
-
-                    changeRequired = toPay < Cons.Zero;
-                }
-                else if (sale.Status == TranStatus.Reserved)
-                {
-                    sale.LastStatus = sale.Status;
-                    sale.Status = TranStatus.Revision;
-                    sale.Comment = sale.TransactionType == TransactionType.Credit ? "Venta despachada" : "Venta reservada";
-                    db.SaleHistories.Add(SaleHistory);
-                }
-
-                if (sale.TransactionType == TransactionType.Credit)
-                    sale.Client.UsedAmount -= (cPayments + wholePayment);
-
-
-                db.Sales.Attach(sale);
-                db.Entry(sale).State = EntityState.Modified;
-
-
-                #region registro de Ingreso a caja
-                //obtengo el registro de caja activo
-                var cr = GetCashRegister();
-
-                if (cr == null)
-                {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "No hay una sesión de caja activa",
-                        Header = "Error al cobrar!"
-                    });
-                }
-                //por cada registro de pago agrego una registro de entrada a la caja
-                foreach (var pay in sale.SalePayments)
-                {
-                    if (pay.PaymentMethod != PaymentMethod.Vale)
-                    {
-                        var dt = new CashDetail();
-                        dt.CashRegisterId = cr.CashRegisterId;
-                        dt.Amount = pay.Amount;
-                        dt.InsDate = DateTime.Now.ToLocal();
-                        dt.User = User.Identity.Name;
-                        dt.Type = pay.PaymentMethod;
-                        dt.SaleFolio = sale.Folio;
-                        dt.DetailType = Cons.One;
-                        dt.Comment = "COBRO EN CAJA";
-
-                        db.CashDetails.Add(dt);
-                    }
-                }
-                #endregion
 
                 db.SaveChanges();
 
                 PrintableViewModel model = new PrintableViewModel();
 
-                if (folioChanged)
-                    model.SaleCreditNote = note;
+                //if (folioChanged)
+                //    model.SaleCreditNote = note;
 
                 //evito la impresion de detalles en cantidad 0
                 var noPrintDetails = sale.SaleDetails.Where(d => d.DueQuantity == Cons.Zero).ToList();
@@ -1054,6 +854,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.SaleDetails.Remove(d);
                 });
 
+
+                model.SaleCreditNote = note != null && note.IsActive ? note : null;
                 model.PrintType = payment.PrintType;
                 model.Sale = sale;
 
@@ -1071,119 +873,474 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        private JsonResult ValidatePayment(Sale sale, ChoosePaymentViewModel payment, double toPay, double wholePayment)
+        private JResponse ApplyPayment(Sale sale, ChoosePaymentViewModel payment, SaleCreditNote note)
+        {
+            try
+            {
+                var money = payment.CashAmount + payment.CardAmount;
+                var wholePayment = payment.CreditNoteAmount + money;
+                //pagos actuales
+                var cPayments = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
+
+                //monto del adeudo de la venta
+                var debtAmount = sale.FinalAmount - cPayments;
+
+                //determino si se usa nota de crédito en el pago
+                var usingCreditNote = (payment.CreditNoteAmount > Cons.Zero);
+
+                //si la venta estaba en estado InProcess (recien hecha o modificada antes de despacho)
+                if (sale.LastStatus == TranStatus.InProcess)
+                {
+                    var valResponse = ValidatePayment(sale, payment, debtAmount, wholePayment);
+
+                    //si la respueste es diferente de null, algo falló y salgo
+                    if (valResponse != null)
+                        return valResponse;
+                }
+
+                //creo el historico
+                var history = new SaleHistory
+                {
+                    Comment = sale.Comment,
+                    InsDate = sale.UpdDate,
+                    User = sale.UpdUser,
+                    SaleId = sale.SaleId,
+                    Status = sale.Status.GetName(),
+                    TotalDue = sale.FinalAmount
+                };
+
+                var cashRegister = GetCashRegister();
+
+                var totalPayments = 0.00;
+                var comment = sale.TransactionType == TransactionType.Cash ? "Pago de venta " : "Abono de venta ";
+
+                var payments = new List<SalePayment>();
+
+                //si viene un monto en efectivo, agrego el registro de pago a la venta
+                if (payment.CashAmount > Cons.Zero)
+                {
+                    totalPayments += payment.CashAmount;
+                    var p = new SalePayment
+                    {
+                        SaleId = sale.SaleId,
+                        Amount = payment.CashAmount,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Efectivo,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = comment + sale.Folio
+                    };
+
+                    payments.Add(p);
+                }
+                //si viene un monto de tarjeta, agrego el registro de pago
+                if (payment.CardAmount > Cons.Zero)
+                {
+                    totalPayments += payment.CardAmount;
+                    var p = new SalePayment
+                    {
+                        SaleId = sale.SaleId,
+                        Amount = payment.CardAmount,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Tarjeta,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = comment + sale.Folio,
+                        Reference = payment.Reference
+                    };
+
+                    payments.Add(p);
+                }
+
+                var folioChanged = false;
+                //si se esta aplicando un folio
+                if (payment.CreditNoteAmount > Cons.Zero)
+                {
+                    totalPayments += payment.CreditNoteAmount;
+
+                    note = db.SaleCreditNotes.Find(payment.CreditNoteId);
+
+                    if (Math.Round(payment.CreditNoteAmount, Cons.Two) > Math.Round(note.Amount, Cons.Two))
+                    {
+                        return new JResponse
+                        {
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.InvalidData,
+                            Body = "El monto en vale excede el disponible",
+                            Header = "Vale sin fondos"
+                        };
+                    }
+
+                    if (note.ExplirationDate < DateTime.Now.ToLocal().AddDays(Cons.One))
+                    {
+                        return new JResponse
+                        {
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.InvalidData,
+                            Body = "El vale cadudo en la fecha " + note.ExplirationDate.ToString("dd/MM/yyyy"),
+                            Header = "Vale sin caducado"
+                        };
+                    }
+
+                    var p = new SalePayment
+                    {
+                        SaleId = sale.SaleId,
+                        Amount = (folioChanged ? debtAmount : payment.CreditNoteAmount),
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Vale,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        Comment = "Abono a venta Folio: " + sale.Folio.ToUpper(),
+                        Reference = "vale:" + note.Folio
+                    };
+
+                    //creo el historico del vale
+                    CreditNoteHistory noteHistory = new CreditNoteHistory
+                    {
+                        Amount = note.Amount,
+                        ChangeDate = DateTime.Now.ToLocal(),
+                        User = User.Identity.Name,
+                        SaleCreditNoteId = note.SaleCreditNoteId,
+                        Folio = note.Folio,
+                    };
+
+                    //si el vale se queda con menos de un peso, ya no lo imprimo
+                    note.Amount -= payment.CreditNoteAmount;
+                    note.IsActive = (Math.Round(note.Amount, Cons.Two) >= Cons.One);
+
+                    db.CreditNoteHistories.Add(noteHistory);
+                    db.Entry(note).State = EntityState.Modified;
+                    payments.Add(p);
+                }
+
+                payments.ForEach(p =>
+                {
+                    var dt = new CashDetail
+                    {
+                        CashRegisterId = cashRegister.CashRegisterId,
+                        Amount = p.Amount,
+                        InsDate = DateTime.Now.ToLocal(),
+                        User = User.Identity.Name,
+                        Type = p.PaymentMethod,
+                        SaleFolio = sale.Folio,
+                        DetailType = Cons.One,
+                        Comment = p.Comment,
+                    };
+
+                    sale.SalePayments.Add(p);
+                    db.CashDetails.Add(dt);
+                });
+
+                if (folioChanged || sale.FinalAmount == Math.Round(cPayments + wholePayment, Cons.Two))
+                {
+                    sale.LastStatus = sale.Status;
+                    sale.Status = TranStatus.Compleated;
+                    sale.Comment = "Venta cobrada totalmente";
+                    db.SaleHistories.Add(history);
+                }
+
+                else if (sale.Status == TranStatus.Reserved)
+                {
+                    sale.LastStatus = sale.Status;
+                    sale.Status = TranStatus.Revision;
+                    sale.Comment = sale.TransactionType == TransactionType.Credit ? "Venta despachada" : "Venta reservada";
+                    db.SaleHistories.Add(history);
+                }
+
+                //si la venta es a crédito, se descuenta el monto abonado de la cuenta del cliente
+                if (sale.TransactionType == TransactionType.Credit && wholePayment > Cons.Zero)
+                    sale.Client.UsedAmount -= wholePayment;
+
+
+                sale.SaleHistories.Add(history);
+                db.Sales.Attach(sale);
+                db.Entry(sale).State = EntityState.Modified;
+
+                return new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Body = "El pago se ha registrado correctamente",
+                    Header = "Pago realizado"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = ex.Message,
+                    Header = "Error al validar!"
+                };
+            }
+        }
+
+        private JResponse ApplyRefund(Sale sale, ChoosePaymentViewModel payment, ref SaleCreditNote note)
+        {
+            try
+            {
+                var refundAmount = payment.RefundCash + payment.RefundCredit;
+                var refundPending = sale.SalePayments.Sum(sp => sp.Amount) - sale.FinalAmount;
+
+                if (refundAmount > refundPending)
+                {
+                    return new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "El monto que intentas devolver supera lo permitido: " + refundPending.ToMoney(),
+                        Header = "Monto incorrecto"
+                    };
+                }
+
+                //creo el historico
+                var history = new SaleHistory
+                {
+                    Comment = sale.Comment,
+                    InsDate = sale.UpdDate,
+                    User = sale.UpdUser,
+                    SaleId = sale.SaleId,
+                    Status = sale.Status.GetName(),
+                    TotalDue = sale.FinalAmount
+                };
+
+
+                var cashRegister = GetCashRegister();
+
+                //agrego pagos negativos a la venta (devoluciones)
+                if (payment.RefundCash > Cons.Zero)
+                {
+                    SalePayment p = new SalePayment
+                    {
+                        SaleId = sale.SaleId,
+                        Amount = payment.RefundCash * -1,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        Comment = "Devolución por modificacón, recibida por: " + payment.ReceivedBy,
+                        PaymentMethod = PaymentMethod.Efectivo,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name
+                    };
+
+                    var cashDetail = new CashDetail
+                    {
+                        Amount = payment.RefundCash,
+                        CashRegisterId = cashRegister.CashRegisterId,
+                        Comment = p.Comment,
+                        InsDate = DateTime.Now.ToLocal(),
+
+                        Type = PaymentMethod.Efectivo,
+                        User = User.Identity.Name,
+                        DetailType = Cons.Zero,
+                        SaleFolio = sale.Folio,
+                        WithdrawalCauseId = Cons.RefundId
+                    };
+
+                    db.CashDetails.Add(cashDetail);
+                    sale.SalePayments.Add(p);
+                }
+
+                if (payment.RefundCredit > Cons.Zero)
+                {
+                    SalePayment p = new SalePayment
+                    {
+                        SaleId = sale.SaleId,
+                        Amount = payment.RefundCredit * -1,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Vale,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name
+                    };
+
+                    //hay que crear nota de crédito
+                    var year = Convert.ToInt32(DateTime.Now.ToLocal().ToString("yy"));
+                    var last = db.SaleCreditNotes.Where(n => n.Year == year).OrderByDescending(n => n.Sequential).FirstOrDefault();
+
+                    var seq = last == null ? Cons.One : (last.Sequential + Cons.One);
+
+                    note = new SaleCreditNote
+                    {
+                        SaleCreditNoteId = sale.SaleId,
+                        Amount = payment.RefundCredit,
+                        ExplirationDate = DateTime.Now.ToLocal().AddDays(Cons.DaysToCancel),
+                        RegisterDate = DateTime.Now.ToLocal(),
+                        IsActive = true,
+                        User = User.Identity.Name,
+                        Year = year,
+                        Sequential = seq,
+                        Ident = payment.Ident,
+                        Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
+                    };
+
+                    var cashDetail = new CashDetail
+                    {
+                        Amount = payment.RefundCredit,
+                        CashRegisterId = cashRegister.CashRegisterId,
+                        Comment = string.Format("Devolución por modificación! vale {0}, recibo por {1}", note.Folio, payment.ReceivedBy),
+                        InsDate = DateTime.Now.ToLocal(),
+
+                        Type = PaymentMethod.Efectivo,
+                        User = User.Identity.Name,
+                        DetailType = Cons.Zero,
+                        SaleFolio = sale.Folio,
+                        WithdrawalCauseId = Cons.RefundId
+                    };
+
+                    p.Comment = cashDetail.Comment;
+
+                    db.SaleCreditNotes.Add(note);
+                    db.CashDetails.Add(cashDetail);
+                    sale.SalePayments.Add(p);
+                }
+
+                sale.Comment = "Devolución recibida por " + payment.ReceivedBy;
+                sale.Status = TranStatus.Compleated;
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.UpdUser = User.Identity.Name;
+
+
+                if (sale.TransactionType == TransactionType.Presale || sale.TransactionType == TransactionType.Reservation)
+                {
+                    var isCompleated = (sale.SaleHistories.Count(h => h.Status.Contains(TranStatus.Compleated.GetName())) > Cons.Zero);
+                    sale.Status = TranStatus.Revision;
+                }
+
+                sale.SaleHistories.Add(history);
+                db.Sales.Attach(sale);
+                db.Entry(sale).State = EntityState.Modified;
+
+                return new JResponse
+                {
+                    Result = Cons.Responses.Success,
+                    Code = Cons.Responses.Codes.Success,
+                    Body = "La devolución ha sido aplicada correctamente",
+                    Header = "Devolución realizada!"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new JResponse
+                {
+                    Result = Cons.Responses.Warning,
+                    Code = Cons.Responses.Codes.ServerError,
+                    Body = ex.Message,
+                    Header = "Error en la devolución!"
+                };
+            }
+        }
+
+        private JResponse ValidatePayment(Sale sale, ChoosePaymentViewModel payment, double toPay, double wholePayment)
         {
             try
             {
                 if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
-
                         Header = "Venta cancelada"
-                    });
+                    };
                 }
 
                 if (sale.Status == TranStatus.InProcess || sale.Status == TranStatus.OnChange)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "Esta venta esta siendo modificada, no puede recibir pagos hasta que la edición concluya",
 
                         Header = "Venta en modificación"
-                    });
+                    };
                 }
 
                 //si el monto a pagar es cero y la venta no fue modificada
                 if (toPay == Cons.Zero)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "Esta venta ya ha sido cobrada en su totalidad",
                         Header = "Cobro no requerido"
-                    });
+                    };
                 }
 
                 //si hay valores negativos
                 if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "No puede ingresar montos negativos, en el pago de una venta",
 
                         Header = "Datos incorrectos!"
-                    });
+                    };
                 }
 
                 //si se excede el monto de la deuda y se esa usando efectivo o tarjeta se envía un aviso (se puede exceder el monto si y solo si se usa vale)
                 if (wholePayment > toPay && (payment.CashAmount > Cons.Zero || payment.CardAmount > Cons.Zero))
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
                         Header = "Pago excedente!"
-                    });
+                    };
                 }
 
 
                 if (sale.TransactionType == TransactionType.Cash && wholePayment < toPay)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "El monto del pago es menor que el  monto de la deuda, las ventas de contado deben ser liquidades en su totalidad",
 
                         Header = "Pago Insuficiente!"
-                    });
+                    };
                 }
 
                 if (sale.TransactionType == TransactionType.Presale && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "La preventa requiere por lo menos un 20% de anticipo",
 
                         Header = "Anticipo requerido!"
-                    });
+                    };
                 }
 
                 if (sale.TransactionType == TransactionType.Reservation && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
                 {
-                    return Json(new JResponse
+                    return new JResponse
                     {
                         Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
                         Body = "Los apartados requieren un anticipo de 10% por lo menos",
 
                         Header = "Anticipo requerido!"
-                    });
+                    };
                 }
 
                 return null;
             }
             catch (Exception ex)
             {
-                return Json(new JResponse
+                return new JResponse
                 {
                     Result = Cons.Responses.Warning,
                     Code = Cons.Responses.Codes.ServerError,
                     Body = ex.Message,
                     Header = "Error al validar!"
-                });
+                };
             }
         }
 

@@ -516,3 +516,48 @@ input[type=date] {
     background-color:#428bca !important;
     color: #fff !important;
 }
+
+
+.textbox-line {
+    background-color: transparent;
+    outline: none;
+    outline-style: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: solid lightgray 1px;
+    padding: 3px 10px;
+}
+
+.textbox-line-white {
+    background-color: transparent;
+    color:whitesmoke;
+    outline: none;
+    outline-style: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: solid lightgray 1px;
+    padding: 3px 10px;
+}
+
+.addOn-line {
+    background-color: transparent;
+    outline: none;
+    outline-style: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: solid #eeeeee 1px;
+}
+
+.addOn-line-white {
+    background-color: transparent;
+    color:whitesmoke;
+    outline: none;
+    outline-style: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: solid #eeeeee 1px;
+}
