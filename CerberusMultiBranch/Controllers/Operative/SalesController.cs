@@ -34,7 +34,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             TransactionViewModel model = new TransactionViewModel();
             model.Branches = branches.ToSelectList();
-            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, null, Cons.InitialRows);
+            model.Sales = LookFor(null, null, null, null, null, null, TranStatus.Revision, Cons.InitialRows);
 
             return View(model);
         }
@@ -199,19 +199,17 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (endDate != null)
                 endDate = endDate.Value.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-
-            //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
-            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
-
-            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status, userId);
+            var model = LookFor(branchId, beginDate, endDate, folio, client, user, status);
 
             return PartialView("_SaleList", model);
         }
 
 
         private List<Sale> LookFor(int? branchId, DateTime? beginDate, DateTime? endDate, string folio, string client,
-            string user, TranStatus? status, string userId, int top = Cons.NoTopResults)
+            string user, TranStatus? status, int top = Cons.NoTopResults)
         {
+            //si el usuario no es un supervisor, solo se le permite ver el dato de sus ventas
+            var userId = !User.IsInRole("Supervisor") ? User.Identity.GetUserId() : null;
 
             var brancheIds = User.Identity.GetBranches().Select(b => b.BranchId);
 
@@ -220,10 +218,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                             (branchId == null && brancheIds.Contains(p.BranchId) || p.BranchId == branchId)
                          && (beginDate == null || p.TransactionDate >= beginDate)
                          && (endDate == null || p.TransactionDate <= endDate)
-                         && (folio == null || folio == string.Empty || p.Folio.Contains(folio))
-                         && (client == null || client == string.Empty || p.Client.Name.Contains(client))
-                         && (user == null || user == string.Empty || p.User.UserName.Contains(user))
-                         && (userId == null || userId == string.Empty || p.UserId == userId)
+                         && (string.IsNullOrEmpty(folio) || p.Folio.Contains(folio))
+                         && (string.IsNullOrEmpty(client) || p.Client.Name.Contains(client))
+                         && (string.IsNullOrEmpty(user) || p.User.UserName.Contains(user))
+                         && (string.IsNullOrEmpty(userId) || p.UserId == userId)
                          && (status == null || p.Status == status)
                          select p).Take(top).OrderByDescending(p => p.TransactionDate).ToList();
 

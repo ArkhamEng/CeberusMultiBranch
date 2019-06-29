@@ -37,12 +37,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 model = db.Sales.Include(p => p.SaleHistories).
                 Include(p => p.SalePayments).Include(p => p.User).
                 Include(s => s.SaleDetails.Select(td => td.Product.Images)).
-                FirstOrDefault(p => p.SaleId == id && 
-                                   branchIds.Contains(p.BranchId) && 
+                FirstOrDefault(p => p.SaleId == id &&
+                                   branchIds.Contains(p.BranchId) &&
                                    (string.IsNullOrEmpty(userId) || p.UserId == userId));
 
                 if (model == null)
-                    return RedirectToAction("SaleOrder",new {id = new Nullable<int>() });
+                    return RedirectToAction("SaleOrder", new { id = new Nullable<int>() });
             }
             else
             {
@@ -57,7 +57,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             return View("SaleOrder", model);
         }
 
-        
+
         public ActionResult GetProductsInfo(List<int> productIds)
         {
             var branchId = User.Identity.GetBranchId();
@@ -192,7 +192,21 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult SendSaleOrder(Sale sale)
         {
             try
-            {  //si es una modificación obtengo el registro original
+            {   //valido que la caja este abierta
+                var isCashOpen = User.IsCashRegisterOpen();
+
+                if(!isCashOpen)
+                {
+                    return Json(new JResponse
+                    {
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Result = Cons.Responses.Danger,
+                        Header = "Caja cerrada",
+                        Body = "No se puede hacer modificaciones a la venta si la caja esta cerrada"
+                    });
+                }
+
+                //si es una modificación obtengo el registro original
                 Sale dbSale = null;
 
                 if (sale.SaleId != Cons.Zero)
@@ -267,7 +281,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         detail.Commission = dbDetail.Commission;
 
                     var dbQuantity = dbDetail != null ? dbDetail.Quantity - dbDetail.Refund : Cons.Zero;
-                    var quantity   =  detail.Quantity - detail.Refund;
+                    var quantity = detail.Quantity - detail.Refund;
 
                     //si la diferencia es negativa indica que se agregan partidas y se deben restar del stock
                     //si la diferencia es positiva indica devoluciones  (entradas de inventario)
@@ -344,9 +358,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
 
                     sale.Sequential = (seq + Cons.One);
-                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
-
-                    sale.Comment = "Venta generada con Folio " + sale.Folio;
+                    sale.Folio      = User.Identity.GetFolio(sale.Sequential);
+                    sale.Status     = TranStatus.Reserved;
+                    sale.Comment    = "Venta generada con Folio " + sale.Folio;
                 }
                 //si es una modificación concateno el número de revisión al folio
                 else if (sale.Status == TranStatus.OnChange)
@@ -361,17 +375,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                         sale.Folio = arr[Cons.Zero] + c + (Convert.ToUInt32(arr[Cons.One]) + Cons.One).ToString();
 
                     sale.Comment = "Venta modificada con el folio " + sale.Folio;
+                    sale.Status  = TranStatus.Modified;
                 }
                 else
+                {
                     sale.Comment = "Venta modificada Folio:" + sale.Folio;
+                    sale.Status  = TranStatus.Reserved;
+                }
 
                 //toda venta modificada se coloca en status reserved para que aparezca en la caja
                 //para su reimpresión y aplicación de pago o devolución
-                var lStatus     = dbSale != null ? dbSale.LastStatus : TranStatus.InProcess;
-                sale.LastStatus = sale.Status;
-                sale.Status     = TranStatus.Reserved;
-        
-
+                var lStatus = dbSale != null ? dbSale.LastStatus : TranStatus.InProcess;
+  
                 //agrego el número de folio a los movimientos
                 movements.ForEach(m => { m.Comment += sale.Folio; });
 
@@ -507,7 +522,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Header = "Error al obtener datos",
-                    Body    = ex.Message,
+                    Body = ex.Message,
                     Code = Cons.Responses.Codes.ServerError
                 }, JsonRequestBehavior.AllowGet);
             }
@@ -519,34 +534,48 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
+
                 //busco la venta a la que se le cambiara el status
                 var sale = db.Sales.Include(s => s.SaleDetails).Include(s => s.SalePayments).Include(s => s.Client).
                     FirstOrDefault(s => s.SaleId == saleId);
 
-                //creo el historico
-                var saleHistory = new SaleHistory
+                //si se solicita una modificación sobre un estado modificado
+                //regreso un error
+                if (!isCancelation && sale.Status == TranStatus.Modified)
                 {
-                    SaleId    = sale.SaleId,
-                    Comment   = sale.Comment,
-                    InsDate   = sale.UpdDate,
-                    User      = sale.UpdUser,
-                    Status    = sale.Status.GetName(),
-                    TotalDue  = sale.FinalAmount
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Header = "Operación no permita",
+                        Body   = "No se puede solicitar modificación sobre una venta recien modificada",
+                        Code = Cons.Responses.Codes.Success
+                    });
+                }
+
+                    //creo el historico
+                    var saleHistory = new SaleHistory
+                {
+                    SaleId = sale.SaleId,
+                    Comment = sale.Comment,
+                    InsDate = sale.UpdDate,
+                    User = sale.UpdUser,
+                    Status = sale.Status.GetName(),
+                    TotalDue = sale.FinalAmount
                 };
 
                 db.SaleHistories.Add(saleHistory);
 
                 sale.LastStatus = sale.Status;
-                sale.UpdUser    = User.Identity.Name;
-                sale.UpdDate    = DateTime.Now.ToLocal();
-                sale.Comment    = comment;
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.Comment = comment;
 
                 //si es una cancelación 
                 if (isCancelation)
                     return Json(CancelSale(sale));
 
                 //si no es cancelación
-                sale.Status      = sale.Status == TranStatus.Reserved ? TranStatus.InProcess : TranStatus.OnChange; 
+                sale.Status = sale.Status == TranStatus.Reserved ? TranStatus.InProcess : TranStatus.OnChange;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
@@ -554,8 +583,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Success,
-                    Header = "Venta "+ sale.Status.GetName(),
-                    Body = "Se ha solicitado la modificación de la venta "+sale.Folio,
+                    Header = "Venta " + sale.Status.GetName(),
+                    Body = "Se ha solicitado la modificación de la venta " + sale.Folio,
                     Code = Cons.Responses.Codes.Success
                 });
             }
@@ -576,13 +605,13 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 //ids de producto
-                var ids = sale.SaleDetails.Select(d=> d.ProductId).ToList();
+                var ids = sale.SaleDetails.Select(d => d.ProductId).ToList();
 
                 //obtengo los productos hijos
                 var prodDetails = db.PackageDetails.Where(pd => ids.Contains(pd.PackageId)).ToList();
 
                 //agrego esos ids de producto al listado
-                ids.AddRange(prodDetails.Select(c=> c.DetailtId));
+                ids.AddRange(prodDetails.Select(c => c.DetailtId));
 
                 //obtengo el detalle de inventario para productos padre e hijos
                 var branchProducts = db.BranchProducts.
@@ -596,11 +625,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     //agrego movimiento al inventario
                     StockMovement parentMovement = new StockMovement
                     {
-                        BranchId  = parentStock.BranchId,
+                        BranchId = parentStock.BranchId,
                         ProductId = parentStock.ProductId,
                         User = User.Identity.Name,
                         MovementDate = DateTime.Now.ToLocal(),
-                        Comment      = "Cancelación de venta: " + sale.Folio,
+                        Comment = "Cancelación de venta: " + sale.Folio,
                         MovementType = MovementType.Entry
                     };
                     //agrego el movimiento de inventario
@@ -611,18 +640,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                     parentStock.Stock += (detail.Quantity - detail.Refund);
 
                     //reviso si el producto es un paquete (tiene productos hijos)
-                    foreach(var packDetail in prodDetails.Where(d=> d.PackageId == detail.ProductId))
+                    foreach (var packDetail in prodDetails.Where(d => d.PackageId == detail.ProductId))
                     {
                         var childStock = branchProducts.FirstOrDefault(b => b.ProductId == detail.ProductId);
 
                         //agrego movimiento al inventario
                         StockMovement childMovement = new StockMovement
                         {
-                            BranchId     = parentStock.BranchId,
-                            ProductId    = parentStock.ProductId,
-                            User         = User.Identity.Name,
+                            BranchId = parentStock.BranchId,
+                            ProductId = parentStock.ProductId,
+                            User = User.Identity.Name,
                             MovementDate = DateTime.Now.ToLocal(),
-                            Comment      = "Cancelación de venta: " + sale.Folio,
+                            Comment = "Cancelación de venta: " + sale.Folio,
                             MovementType = MovementType.Reservation
                         };
 
@@ -661,19 +690,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Code = Cons.Responses.Codes.Success,
                     Result = Cons.Responses.Success,
-                    Body   = message,
+                    Body = message,
                     Header = "Venta " + sale.Status.GetName()
                 };
 
             }
             catch (Exception ex)
             {
-               return new JResponse
+                return new JResponse
                 {
                     Code = Cons.Responses.Codes.ServerError,
                     Result = Cons.Responses.Danger,
                     Body = ex.Message,
-                    Header ="Error al Cancelar!"
+                    Header = "Error al Cancelar!"
                 };
             }
         }
@@ -779,10 +808,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branchsIds = User.Identity.GetBranches().Select(p => p.BranchId).ToList();
 
             //si no se es supervisor, solo ventas del usuario
-            var userId = User.IsInRole("Supervisor")  ?  string.Empty : User.Identity.GetUserId();
+            var userId = User.IsInRole("Supervisor") ? string.Empty : User.Identity.GetUserId();
 
-            var model = db.Sales.Where(p => 
-                            branchsIds.Contains(p.BranchId) && 
+            var model = db.Sales.Where(p =>
+                            branchsIds.Contains(p.BranchId) &&
                             (string.IsNullOrEmpty(userId) || p.UserId == userId) &&
                             p.Folio.Contains(filter)).Take(20).
                 Select(p =>
@@ -790,6 +819,70 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             return Json(model);
         }
+
+        [HttpPost]
+        [CustomAuthorize(Roles = "Vendedor")]
+        public ActionResult CreateBudget(Sale sale)
+        {
+            try
+            {
+                Budget budget = new Budget
+                {
+                    ClientId = sale.ClientId,
+                    DueDate = DateTime.Today.ToLocal().AddDays(Cons.DaysToCancel),
+                    BranchId = User.Identity.GetBranchId(),
+                    BudgetDate = DateTime.Now.ToLocal(),
+                    UserName = User.Identity.Name
+                };
+
+                var iva = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
+
+
+                sale.SaleDetails.ToList().ForEach(item =>
+                {
+                    item.TaxedAmount   = Math.Round(item.Price * item.Quantity, Cons.Two);
+                    item.TaxedPrice    = item.Price;
+                    item.TaxPercentage = iva; //porcentaje de IVA
+                    item.Price         = (item.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //precio sin IVA
+                    item.Amount        = (item.TaxedAmount / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //Monto partida sin Iva
+                    item.TaxAmount     = (item.TaxedAmount - item.Amount).RoundMoney(); //Monto total de IVA
+
+                    var detail = new BudgetDetail
+                    {
+                        Amount = item.Amount,
+                        InsDate = DateTime.Now.ToLocal(),
+                        Price = item.Price,
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        TaxAmount = item.TaxAmount,
+                        TaxedAmount = item.TaxedAmount,
+                        TaxedPrice = item.TaxedPrice,
+                        TaxPercentage = item.TaxPercentage
+                    };
+
+                    budget.BudgetDetails.Add(detail);
+                });
+
+                db.Budgets.Add(budget);
+                db.SaveChanges();
+                ViewBag.Message = "Hola mundo mundial";
+                var model = db.Budgets.Include(b => b.Branch).Include(b => b.Client.Addresses).
+                    Include(b => b.BudgetDetails.Select(d => d.Product)).Include(b => b.Client).FirstOrDefault(b => b.BudgetId == budget.BudgetId);
+
+                return PartialView("PrintBudget", model);
+            }
+            catch (Exception)
+            {
+                return Json(new JResponse
+                {
+                    Result = Cons.Responses.Danger,
+                    Body = "Ocurrio un error mientras se generaba el presupuesto",
+                    Header = "Error al Generar!",
+                    Code = Cons.Responses.Codes.ServerError
+                });
+            }
+        }
+
 
 
         protected override void Dispose(bool disposing)

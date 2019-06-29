@@ -1,0 +1,267 @@
+﻿@model CerberusMultiBranch.Models.Entities.Operative.Budget
+@using CerberusMultiBranch.Support
+@using CerberusMultiBranch.Models.Entities.Operative
+
+
+<script src="~/Scripts/printThis.js"></script>
+
+<div class="hidden">
+    <div id="divBudget" style="width:816px;">
+        <input type="hidden" id="Budget_Folio" value="@Model.BranchId.ToString("000000")" />
+        <table class="Note">
+            <tr>
+                <td width="300px">
+                    <table style="width:100%">
+                        @if (User.Identity.GetBranchId() != 2)
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/Content/Images/logo2.png" style="width:150px">
+                                </td>
+                            </tr>
+                            <tr><td colspan="2" style="height:10px"></td></tr>
+                            <tr>
+                                <td>
+                                    <label class="control-label">
+                                        Autopartes Bicentenario S.A. de C.V.
+                                    </label><br />
+                                    APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
+                                    LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    <img src="~/Content/Images/rebilogo2.png" style="width:180px; height:90px">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="control-label">
+                                        AUTOPARTES BICENTENARIO
+                                    </label><br />
+                                    HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
+                                    COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+                <td width="292px" align="center">
+                    @if (User.Identity.GetBranchId() != 2)
+                    {
+                        <div style="width:250px">
+                            <label>Expedida en sucursal</label><br />
+                            @Model.Branch.Address
+                        </div>
+                    }
+                </td>
+                <td width="244px">
+                    <table style="width:100%" class="table-bordered">
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>COTIZACIÓN DE MERCANCÍA</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                              COTIZACIÓN NO. <label>@Model.BudgetId.ToString(Cons.BudgetFormat)</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                <label>Emitida</label>
+                            </td>
+                            <td class="text-center">
+                                <label>Expira</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-center">
+                                @Model.BudgetDate.ToString("dd/MM/yyyy")
+                            </td>
+                            <td class="text-center">
+                                @Model.DueDate.ToString("dd/MM/yyyy")
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <label>Agente</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                @Model.UserName
+                            </td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="height:20px"></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table style="width:816px;border:1px solid gray;" class="table-bordered">
+                        <tr>
+                            <td colspan="3" class="text-center">
+                                <label>Datos del cliente</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:30%" class="text-center">
+                                <label>Nombre del cliente</label>
+                            </td>
+                            <td style="width:50%" class="text-center">
+                                <label>Dirección del cliente</label>
+                            </td>
+                            <td style="width:20%" class="text-center">
+                                <label>R.F.C.</label>
+                            </td>
+                        </tr>
+                        <tr style="height:60px">
+                            <td valign="top" class="text-uppercase">
+                                @Model.Client.Name.ToUpper()
+                            </td>
+                            <td valign="top" class="text-uppercase">
+                                @Model.Client.Addresses.FirstOrDefault().ToString().ToUpper()<br />
+                            </td>
+                            <td valign="top" class="text-center text-uppercase">
+                                @Model.Client.FTR.ToUpper()
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" style="height:20px"></td>
+            </tr>
+            <tr>
+                <td class="text-center" style="border:1px solid gray;" colspan="3">
+                    <label>Detalle de cotización</label>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table style="width:100%; height:600px; border:1px solid gray;">
+                        <tr style="border-bottom:1px solid gray; height:15px">
+                            <td style="border-right:1px solid gray; width:10%" align="center">
+                                <label>Codigo</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:10%" align="center">
+                                <label>Cve. Sat</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:40%" align="center">
+                                <label>Descripción</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:10%" align="center">
+                                <label>Precio</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:10%" align="center">
+                                <label>Cantidad</label>
+                            </td>
+                            <td style="width:10%">
+                                <label>Total</label>
+                            </td>
+                        </tr>
+                        @foreach (var item in Model.BudgetDetails)
+                        {  
+                            <tr style="height:20px">
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayUpperFor(mItem => item.Product.Code)
+                                </td>
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayUpperFor(mItem => item.Product.Category.SatCode)
+                                </td>
+                                <td style="border-right:1px solid gray; width:40%" valign="top">
+                                    @item.Product.Name.Substring(0, item.Product.Name.Length <= 30 ? item.Product.Name.Length : 30).ToUpper()
+                                </td>
+                                <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Price)
+                                </td>
+                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Quantity)
+                                </td>
+                                <td class="text-right" style="width:10%" valign="top">
+                                    @Html.DisplayFor(mItem => item.Amount)
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td style="border-right:1px solid gray;" />
+                            <td style="border-right:1px solid gray;" />
+                            <td style="border-right:1px solid gray;" />
+                            <td style="border-right:1px solid gray;" />
+                            <td style="border-right:1px solid gray;" />
+                            <td />
+                        </tr>
+
+                        <tr style="height:23px; border-top:1px solid gray;">
+                            <td colspan="4" rowspan="3">
+                                IMPORTE CON LETRA <br />
+                                @Model.BudgetDetails.Sum(s=> s.TaxedAmount).RoundMoney().ToText()
+                                
+                            </td>
+
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                <label class="control-label">
+                                    @Html.DisplayName("Sub-Total")
+                                </label>
+                            </td>
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                @Model.BudgetDetails.Sum(s=> s.Amount).ToMoney()
+                            </td>
+                        </tr>
+                        <tr style="height:23px">
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                <label>
+                                    @Html.DisplayName("IVA")
+                                </label>
+                            </td>
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                @Model.BudgetDetails.Sum(s=> s.TaxAmount).ToMoney()
+                            </td>
+                        </tr>
+                        <tr style="height:23px">
+
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                <label>
+                                    @Html.DisplayName("Total")
+                                </label>
+                            </td>
+                            <td class="text-right" style="border:1px solid gray; width:10%">
+                                <label class="control-label text-danger">
+                                    @Model.BudgetDetails.Sum(s=> s.TaxedAmount).ToMoney()
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                   La cotización solo sera válida hasta la fecha de expiración indicada**
+                    <br />
+                    Cotización sujeta a cambio de precios y marcas si previo aviso****
+                    <br />
+                    DATOS PARA DEPÓSITOS Y/O TRANSFERENCIAS<br />
+                    Cuenta Santander 65502949975<br />
+                    CLABE  Santander 014905655029499756 
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function ()
+    {
+        $("#divBudget").printThis();
+    });
+</script>

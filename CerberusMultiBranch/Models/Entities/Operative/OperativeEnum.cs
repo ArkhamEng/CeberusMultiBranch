@@ -36,7 +36,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name = "Completado")]
         [DisplayStyle(Alert = "alert alert-success", Icon = "fa fa-thumbs-up")]
         Compleated = 3, //Compra-Venta pagada en su totalidad
-        
+
+        [Display(Name = "Modificado")]
+        [DisplayStyle(Alert = "alert alert-info", Icon = "fa fa-exclamation")]
+        Modified = 4, //Compra-Venta pagada en su totalidad
+
     }
 
     public enum PaymentMethod

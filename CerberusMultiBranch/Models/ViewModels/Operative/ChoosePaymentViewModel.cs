@@ -34,7 +34,7 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public int CreditNoteId { get; set; }
 
-        public int CreditNoteFolio { get; set; }
+        public string CreditNoteFolio { get; set; }
 
         public string Folio { get; set; }
 

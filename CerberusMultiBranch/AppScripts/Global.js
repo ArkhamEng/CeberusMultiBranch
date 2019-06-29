@@ -13,7 +13,8 @@ const TranStatus = {
     InProcess: { Name: "InProcess", Value:  0,  Display: "En Proceso" },
     Reserved:  { Name: "Reserved",  Value:  1,  Display: "Reservada" },
     Revision:  { Name: "Revision",  Value:  2,  Display: "En Seguimiento" },
-    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completada" }
+    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completada" },
+    Modified: { Name: "Modified", Value: 4, Display: "Modificado" }
 }
 
 const TranType =

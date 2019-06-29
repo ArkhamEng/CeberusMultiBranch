@@ -14,6 +14,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Operative
 
         public int PrintType { get; set; }
 
+        public PrintRefundViewModel PrintRefund { get; set; }
+
         public Sale Sale { get; set; }
 
         public SaleCreditNote SaleCreditNote { get; set; }

@@ -60,7 +60,7 @@
                             <li title="Crear, revisar o modificar ventas">
                              <a href="/Selling/SaleOrder/" onclick="ShowLoading()">&nbsp;Orden de venta<span class="fa fa-shopping-bag" style="float:left" /></a></li>
                         }
-                        @if (User.IsInRole("Supervisor"))
+                        @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
                         {
                             <li><a href="/Sales/Report/" onclick="ShowLoading()">&nbsp;Reporte de ventas<span class="fa fa-file-text-o" style="float:left" /></a></li>
                         }

@@ -9,11 +9,16 @@
 @if (Model.PrintType == Cons.One)
 {
     @Html.Partial("_PrintTicket", Model.Sale)
-   
 }
 
 else
 {
    @Html.Partial("_PrintNote", Model.Sale)
   
+}
+
+
+@if (Model.PrintRefund != null)
+{
+    @Html.Partial("_PrintNote", Model.PrintRefund)
 }

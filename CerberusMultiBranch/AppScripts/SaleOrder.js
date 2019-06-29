@@ -90,11 +90,63 @@ $(document).ready(function ()
         window.location.replace("/Selling/SaleOrder");
     });
 
-    $("#btnGoTo").off('click').on('click', function (e) {
+    $("#btnGoTo").off('click').on('click', function (e)
+    {
         ShowLoading('static');
         window.location.replace("/Sales/Report");
     });
+
+    if (status == TranStatus.InProcess.Name)
+    {
+        $("#btnBudget").removeClass("hidden");
+        $("#btnBudget").off('click').on('click', CreateBudget);
+    }
+ 
 });
+
+function CreateBudget()
+{
+    var sale =
+        {
+            SaleId: $("#SaleId").val(),
+            ClientId: $("#ClientId").val(),
+            TransactionDate: $("#TransactionDate").val(),
+            Expiration: $("#Expiration").val(),
+            TransactionType: $("#TransactionType").val(),
+            SendingType: $("#SendingType").val(),
+            LastStatus: $("#LastStatus").val(),
+            Status: $("#Status").val(),
+            SaleDetails: Details,
+            TotalTaxedAmount: totalAmount
+        }
+
+    if (totalItems == 0)
+    {
+        ShowNotify("No hay articulos", "danger",
+            "No puedes generar una cotización sin articulos,", 4000);
+        return;
+    }
+
+    ShowConfirm("Crear cotización", "¿Deseas generar la cotización de estos articulos?", function ()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('/Selling/CreateBudget', { sale: sale }, function (response)
+        {
+            HideLoading(function ()
+            {
+                $("#divPrinter").html(response);
+                
+                ShowConfirm("Cotización generada","Se creo la cotización "+$("#Budget_Folio").val() +
+                    "¿Deseas realizar una nueva captura?", function ()
+                {
+                    ShowLoading('static');
+                    window.location.replace("/Selling/SaleOrder");
+                })
+            });
+        });
+    });
+}
 
 
 
@@ -190,8 +242,6 @@ function SetCustomer(customer)
 
 function SetPrices()
 {
-    ShowLoading('static');
-
     //obtengo los ids de productos en la venta
     var ids = [];
 
@@ -201,6 +251,11 @@ function SetPrices()
     {
         ids.push($(row).find("#item_ProductId").val());
     });
+
+    if (ids.length <= 0)
+        return;
+
+    ShowLoading('static');
 
    
     //obtengo los precios
@@ -621,9 +676,9 @@ function SetPopOver()
         title: $("#btnCancelSale").attr("tooltip-title")
     })
 
-    $("#btnPrint").tooltip({
+    $("#btnBudget").tooltip({
         placement: 'bottom',
-        title: $("#btnPrint").attr("tooltip-title")
+        title: $("#btnBudget").attr("tooltip-title")
     })
 
     $("#btnGoTo").tooltip({

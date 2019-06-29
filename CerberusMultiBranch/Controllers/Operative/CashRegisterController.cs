@@ -354,7 +354,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             {
                 var branchId = User.Identity.GetBranchId();
 
-                var model = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved)
+                var model = db.Sales.Where(s => s.BranchId == branchId &&
+                        (s.Status == TranStatus.Reserved) || (s.Status == TranStatus.Modified))
                     .Include(s => s.User).Include(s => s.Client).ToList();
 
                 return PartialView("_PendingPayment", model);
@@ -552,9 +553,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //solo cambio el status sin registrar, el usuario que lo cambia 
                 //para que quede registrado, el usuario que realiza la cancelación
                 sale.LastStatus = sale.Status;
-                sale.Status     = TranStatus.Canceled;
-                sale.UpdUser    = User.Identity.Name;
-                sale.UpdDate    = DateTime.Now.ToLocal();
+                sale.Status = TranStatus.Canceled;
+                sale.UpdUser = User.Identity.Name;
+                sale.UpdDate = DateTime.Now.ToLocal();
 
                 db.SaleHistories.Add(history);
                 db.Entry(sale).State = EntityState.Modified;
@@ -567,7 +568,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
                     FirstOrDefault(n => n.SaleCreditNoteId == nc.SaleCreditNoteId && n.Folio == nc.Folio);
                 }
-              
+
                 return PartialView("_PrintRefund", printRefund);
             }
             catch (Exception)
@@ -699,7 +700,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var branchId = User.Identity.GetBranchId();
 
                 var sale = db.Sales.Include(s => s.User).Include(sd => sd.SaleDetails.Select(d => d.Product.Images)).
-                    Include(s => s.SalePayments).FirstOrDefault(s => s.SaleId == id && (s.Status == TranStatus.Reserved || s.Status == TranStatus.Revision));
+                    Include(s => s.SalePayments).FirstOrDefault(s => s.SaleId == id &&
+                    (s.Status == TranStatus.Reserved || s.Status == TranStatus.Revision || s.Status == TranStatus.Modified));
 
 
                 //si no encuentro detalles de venta, envío un error
@@ -757,7 +759,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         [CustomAuthorize(Roles = "Cajero")]
         public ActionResult GetFolioAmount(int id, string folio)
         {
-            var note = db.SaleCreditNotes.Find(id,folio);
+            var note = db.SaleCreditNotes.Find(id, folio);
 
             if (note != null && note.IsActive)
                 return Json(new JResponse
@@ -789,13 +791,37 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult RegistPayment(ChoosePaymentViewModel payment)
         {
             try
-            {
-                //busco la venta a pagar
+            {   //busco la venta a pagar
                 var sale = db.Sales.Where(s => s.SaleId == payment.SaleId).Include(s => s.SalePayments).Include(s => s.SaleHistories).
                             Include(s => s.SaleDetails).Include(s => s.Client.Addresses).Include(s => s.User).
                             Include(s => s.SaleDetails.Select(td => td.Product.Images)).
                             Include(s => s.SaleDetails.Select(td => td.Product.BranchProducts)).
                             Include(s => s.Branch).FirstOrDefault();
+
+                //valido que la venta este en un status valido para recibir pago o hacer devolución
+                if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
+                        Header = "Venta cancelada"
+                    });
+                }
+
+                if (sale.Status == TranStatus.InProcess || sale.Status == TranStatus.OnChange)
+                {
+                    return Json(new JResponse
+                    {
+                        Result = Cons.Responses.Info,
+                        Code = Cons.Responses.Codes.InvalidData,
+                        Body = "Esta venta esta siendo modificada, no puede recibir pagos hasta que la edición concluya",
+
+                        Header = "Venta en modificación"
+                    });
+                }
+
 
                 //creo el historico de la venta por si se modifica
                 var SaleHistory = new SaleHistory
@@ -827,13 +853,31 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var wholePayment = payment.CreditNoteAmount + money;
                 var isPayment = wholePayment > Cons.Zero;
 
-                if (!isRefund)
+                //pagos actuales
+                var cPayments = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
+                //monto del adeudo de la venta
+                var debtAmount = Math.Round(sale.FinalAmount - cPayments, Cons.Two);
+
+                //hago validaciones con respecto a si se hace o no se hace pago
+                var valResponse = ValidatePayment(sale, payment, debtAmount, wholePayment);
+
+                //si la respueste es diferente de null, algo falló y salgo
+                if (valResponse != null)
+                    return Json(valResponse);
+
+                //si se esta aplicando un pago
+                if (isPayment)
                 {
-                    var response = ApplyPayment(sale, payment, note);
+                    var response = ApplyPayment(sale, payment, note, debtAmount, cPayments);
 
                     if (response.Code != Cons.Responses.Codes.Success)
                         return Json(response);
                 }
+
+                //si la venta no lleva pago ni abono solo se regresa a su estado anterior
+                if (!isPayment && !isRefund)
+                    sale.Status = sale.LastStatus;
+
                 //ordeno por el campo Sort Order
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
@@ -843,8 +887,6 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 PrintableViewModel model = new PrintableViewModel();
 
-                //if (folioChanged)
-                //    model.SaleCreditNote = note;
 
                 //evito la impresion de detalles en cantidad 0
                 var noPrintDetails = sale.SaleDetails.Where(d => d.DueQuantity == Cons.Zero).ToList();
@@ -854,8 +896,28 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.SaleDetails.Remove(d);
                 });
 
+                if (isRefund)
+                {
+                    var printRefund = new PrintRefundViewModel
+                    {
+                        Cash = payment.RefundCash.ToMoney(),
+                        Comment = "Devolucíon por modificación de venta " + sale.Folio,
+                        Client = payment.ReceivedBy,
+                        HasNote = (note != null),
+                        Date = DateTime.Now.ToLocal().ToString("dd/MM/yyyy hh:mm"),
+                        Folio = note.Folio,
+                        Note = note.Amount.ToMoney(),
+                        User = User.Identity.Name,
+                        Total = (payment.RefundCash + payment.RefundCredit).ToText(),
+                        Branch = sale.Branch,
+                        CreditNote = note ?? note,
+                    };
 
-                model.SaleCreditNote = note != null && note.IsActive ? note : null;
+                    model.PrintRefund = printRefund;
+                }
+                else
+                    model.SaleCreditNote = note != null && note.IsActive ? note : null;
+
                 model.PrintType = payment.PrintType;
                 model.Sale = sale;
 
@@ -873,31 +935,18 @@ namespace CerberusMultiBranch.Controllers.Operative
             }
         }
 
-        private JResponse ApplyPayment(Sale sale, ChoosePaymentViewModel payment, SaleCreditNote note)
+        private JResponse ApplyPayment(Sale sale, ChoosePaymentViewModel payment, SaleCreditNote note, 
+            double debtAmount,double cPayments)
         {
             try
             {
                 var money = payment.CashAmount + payment.CardAmount;
                 var wholePayment = payment.CreditNoteAmount + money;
-                //pagos actuales
-                var cPayments = sale.SalePayments != null ? sale.SalePayments.Sum(s => s.Amount) : Cons.Zero;
-
-                //monto del adeudo de la venta
-                var debtAmount = sale.FinalAmount - cPayments;
 
                 //determino si se usa nota de crédito en el pago
                 var usingCreditNote = (payment.CreditNoteAmount > Cons.Zero);
 
-                //si la venta estaba en estado InProcess (recien hecha o modificada antes de despacho)
-                if (sale.LastStatus == TranStatus.InProcess)
-                {
-                    var valResponse = ValidatePayment(sale, payment, debtAmount, wholePayment);
-
-                    //si la respueste es diferente de null, algo falló y salgo
-                    if (valResponse != null)
-                        return valResponse;
-                }
-
+              
                 //creo el historico
                 var history = new SaleHistory
                 {
@@ -958,7 +1007,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     totalPayments += payment.CreditNoteAmount;
 
-                    note = db.SaleCreditNotes.Find(payment.CreditNoteId);
+                    note = db.SaleCreditNotes.Find(payment.CreditNoteId, payment.CreditNoteFolio);
 
                     if (Math.Round(payment.CreditNoteAmount, Cons.Two) > Math.Round(note.Amount, Cons.Two))
                     {
@@ -1031,26 +1080,32 @@ namespace CerberusMultiBranch.Controllers.Operative
                     db.CashDetails.Add(dt);
                 });
 
-                if (folioChanged || sale.FinalAmount == Math.Round(cPayments + wholePayment, Cons.Two))
+                //si se paga completamente
+                if (Math.Round(sale.FinalAmount, Cons.Two) == Math.Round(cPayments + wholePayment, Cons.Two))
                 {
                     sale.LastStatus = sale.Status;
                     sale.Status = TranStatus.Compleated;
                     sale.Comment = "Venta cobrada totalmente";
                     db.SaleHistories.Add(history);
                 }
+                //si queda adeudo y es preventa
+                else 
+                {  //si la venta queda con adeudo la pongo en seguimiento 
+                  
+                    if(sale.Status == TranStatus.Revision)
+                        sale.Comment = "Abono recibido";
+                    else
+                    {  //agrego el historial solo en cambios de estado
+                        sale.Status  = TranStatus.Revision;
+                        sale.Comment = "Abono recibido";
 
-                else if (sale.Status == TranStatus.Reserved)
-                {
-                    sale.LastStatus = sale.Status;
-                    sale.Status = TranStatus.Revision;
-                    sale.Comment = sale.TransactionType == TransactionType.Credit ? "Venta despachada" : "Venta reservada";
-                    db.SaleHistories.Add(history);
+                        db.SaleHistories.Add(history);
+                    }
                 }
 
                 //si la venta es a crédito, se descuenta el monto abonado de la cuenta del cliente
                 if (sale.TransactionType == TransactionType.Credit && wholePayment > Cons.Zero)
                     sale.Client.UsedAmount -= wholePayment;
-
 
                 sale.SaleHistories.Add(history);
                 db.Sales.Attach(sale);
@@ -1083,6 +1138,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var refundAmount = payment.RefundCash + payment.RefundCredit;
                 var refundPending = sale.SalePayments.Sum(sp => sp.Amount) - sale.FinalAmount;
 
+                //solo se puede aplicar devolución en ventas Modificadas
+                if (sale.Status != TranStatus.Modified)
+                {
+                    return new JResponse
+                    {
+                        Result = Cons.Responses.Warning,
+                        Code = Cons.Responses.Codes.ConditionMissing,
+                        Body = "Solo se puede aplicar devoluciones en ventas con estado Modificado, " +
+                               "El estado actual es " + sale.Status.GetName(),
+                        Header = "Estado de venta incorrecto"
+                    };
+                }
+
                 if (refundAmount > refundPending)
                 {
                     return new JResponse
@@ -1104,8 +1172,6 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Status = sale.Status.GetName(),
                     TotalDue = sale.FinalAmount
                 };
-
-
                 var cashRegister = GetCashRegister();
 
                 //agrego pagos negativos a la venta (devoluciones)
@@ -1233,31 +1299,32 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
             try
             {
-                if (sale.Status == TranStatus.PreCancel || sale.Status == TranStatus.Canceled)
+                //verifico que no haya negativos
+                if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
                 {
                     return new JResponse
                     {
-                        Result = Cons.Responses.Info,
+                        Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Esta venta se encuentra cancelada o en cancelación y no requiere pago",
-                        Header = "Venta cancelada"
+                        Body = "No puede ingresar montos negativos, en el pago de una venta",
+                        Header = "Datos incorrectos!"
                     };
                 }
 
-                if (sale.Status == TranStatus.InProcess || sale.Status == TranStatus.OnChange)
+                //el cobro no puede exceder el monto de la deuda
+                if (wholePayment > toPay)
                 {
                     return new JResponse
                     {
-                        Result = Cons.Responses.Info,
+                        Result = Cons.Responses.Warning,
                         Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Esta venta esta siendo modificada, no puede recibir pagos hasta que la edición concluya",
-
-                        Header = "Venta en modificación"
+                        Body = string.Format("Estas excediendo el monto del adeudo de esta venta, Adeudo actual:{0}", toPay.ToMoney()),
+                        Header = "Pago excedente",
                     };
                 }
 
-                //si el monto a pagar es cero y la venta no fue modificada
-                if (toPay == Cons.Zero)
+                //si el monto a pagar es cero y la venta no fue modificada, error
+                if (toPay <= 0.0 && sale.Status != TranStatus.Modified)
                 {
                     return new JResponse
                     {
@@ -1268,66 +1335,38 @@ namespace CerberusMultiBranch.Controllers.Operative
                     };
                 }
 
-                //si hay valores negativos
-                if (payment.CardAmount < Cons.Zero || payment.CashAmount < Cons.Zero || payment.CreditNoteAmount < Cons.Zero)
-                {
-                    return new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "No puede ingresar montos negativos, en el pago de una venta",
-
-                        Header = "Datos incorrectos!"
-                    };
-                }
-
-                //si se excede el monto de la deuda y se esa usando efectivo o tarjeta se envía un aviso (se puede exceder el monto si y solo si se usa vale)
-                if (wholePayment > toPay && (payment.CashAmount > Cons.Zero || payment.CardAmount > Cons.Zero))
+                //si es venta de contado o si el estado de la venta ya había sido completado y aun hay adeudo
+                if ((sale.TransactionType == TransactionType.Cash || sale.LastStatus == TranStatus.Compleated) && wholePayment < toPay)
                 {
                     return new JResponse
                     {
                         Result = Cons.Responses.Info,
                         Code = Cons.Responses.Codes.InvalidData,
-                        Body = "El monto ingresado excede la deuda total, por favor verifica las cantidades",
-                        Header = "Pago excedente!"
+                        Body = string.Format("El monto ingresado {0} no cubre el total del adeudo {1}",
+                                            wholePayment.ToMoney(), toPay.ToMoney()),
+                        Header = "Se requiere cobro total"
                     };
                 }
 
-
-                if (sale.TransactionType == TransactionType.Cash && wholePayment < toPay)
+                //si es Preventa o apartado
+                if (sale.TransactionType == TransactionType.Presale || sale.TransactionType == TransactionType.Reservation)
                 {
-                    return new JResponse
+                    var percentage = sale.TransactionType == TransactionType.Presale ? 0.1 :
+                              sale.TransactionType == TransactionType.Reservation ? 0.2 : 0;
+
+                    var minAmount = Math.Round((sale.FinalAmount * percentage), Cons.Two);
+
+                    //si es el primer despacho y no se cubre el porcentaje mímimo
+                    if (sale.Status == TranStatus.Reserved && minAmount > wholePayment)
                     {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "El monto del pago es menor que el  monto de la deuda, las ventas de contado deben ser liquidades en su totalidad",
-
-                        Header = "Pago Insuficiente!"
-                    };
-                }
-
-                if (sale.TransactionType == TransactionType.Presale && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.2) > wholePayment)
-                {
-                    return new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "La preventa requiere por lo menos un 20% de anticipo",
-
-                        Header = "Anticipo requerido!"
-                    };
-                }
-
-                if (sale.TransactionType == TransactionType.Reservation && sale.Status == TranStatus.Reserved && (sale.TotalTaxedAmount * 0.1) > wholePayment)
-                {
-                    return new JResponse
-                    {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = "Los apartados requieren un anticipo de 10% por lo menos",
-
-                        Header = "Anticipo requerido!"
-                    };
+                        return new JResponse
+                        {
+                            Result = Cons.Responses.Warning,
+                            Code = Cons.Responses.Codes.InvalidData,
+                            Body = string.Format("Esta venta requiere un pago mínimo del {0} %", (percentage * 100)),
+                            Header = "Anticipo requerido!"
+                        };
+                    }
                 }
 
                 return null;
