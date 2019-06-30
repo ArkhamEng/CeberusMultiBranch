@@ -87,7 +87,7 @@
                         </tr>
                         <tr>
                             <td colspan="2" class="text-center">
-                                @Model.User
+                                @Model.User.ToUpper()
                             </td>
                         </tr>
 
@@ -118,10 +118,10 @@
                             <td class="text-center" style="border-right:1px solid gray; width:80%" valign="middle" >
                                 <h4>
                                     <LABEL>Devolución de mercancía</LABEL><br />
-                                    <label>Folio de venta</label>  @Model.Sale.Folio
+                                    <label>Folio de venta</label>  @Model.Sale.Folio.ToUpper()
                                     <br /><br />
                                     COMENTARIOS: <br />
-                                    @Model.Sale.Comment
+                                    @Model.Sale.Comment.ToUpper()
                                 </h4>
                             </td>
                             <td class="text-center"  style="width:20%" valign="middle">

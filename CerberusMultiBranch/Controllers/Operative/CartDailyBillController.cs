@@ -532,7 +532,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var dt = DateTime.Now.TodayLocal();
 
                     //verifico si el cliente tiene alguna venta a credito pendiente de pago
-                    var pendingSales = db.Sales.Where(s => s.Expiration < dt &&
+                    var pendingSales = db.Sales.Where(s => s.ClientId == client.ClientId && s.Expiration < dt &&
                                        s.TransactionType == TransactionType.Credit && s.Status == TranStatus.Reserved);
 
                     if (pendingSales != null && pendingSales.Count() > Cons.Zero)
@@ -742,8 +742,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 sale.FinalAmount = sale.SaleDetails.Sum(d => d.TaxedAmount).RoundMoney();
 
                 //obtengo la utima venta para generar unel folio siguiente
-                var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
-                                                      s.BranchId == sale.BranchId && s.Year == sale.Year).
+                var lastSale = db.Sales.Where(s =>   s.BranchId == sale.BranchId && s.Year == sale.Year).
                                                       OrderByDescending(s => s.Sequential).FirstOrDefault();
 
                 var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;

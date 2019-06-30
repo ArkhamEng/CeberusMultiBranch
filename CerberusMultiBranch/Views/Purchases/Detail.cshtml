@@ -239,11 +239,16 @@
 
         $("#btnCompleate").click(function ()
         {
-            ShowConfirm("Terminar e inventariar?, Estas seguro que quieres inventariar esta compra?",
-                '@Url.Action("Compleate","Purchases")', '@Model.PurchaseId', function ()
+            ShowConfirm("Terminar e inventariar", "¿Estas seguro que quieres inventariar esta compra?", function ()
+            {
+                ShowLoading('static');
+
+                ExecuteAjax('@Url.Action("Compleate","Purchases")', { id: '@Model.PurchaseId' }, function ()
                 {
-                    window.location = '@Url.Action("Detail",new { id= Model.PurchaseId})';
+                    window.location.replace('@Url.Action("Detail",new { id= Model.PurchaseId})');
                 });
+            });
+
         });
 
         if ('@Model.Status' == '@TranStatus.Reserved' || '@Model.Status' == '@TranStatus.Compleated')

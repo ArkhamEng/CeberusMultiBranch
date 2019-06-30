@@ -65,7 +65,7 @@ namespace CerberusMultiBranch.Support
 
         public struct Formats
         {
-            public const string PurchaseFolioMask = "{0}-{1}-{2}C";
+            public const string PurchaseFolioMask = "{0}{1}{2}C";
 
             public const string YearFolioFormat = "00";
 
@@ -104,7 +104,7 @@ namespace CerberusMultiBranch.Support
 
         public const string VariableIVA = "IVA";
 
-        public const string CodeMask = "{0}-{1}-{2}V";
+        public const string CodeMask = "{0}{1}{2}V";
 
         public const string BranchSession = "BranchSession";
 

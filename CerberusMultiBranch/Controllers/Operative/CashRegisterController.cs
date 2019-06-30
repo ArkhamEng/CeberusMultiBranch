@@ -342,7 +342,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         public ActionResult CheckPending()
         {
             var branchId = User.Identity.GetBranchId();
-            var count = db.Sales.Where(s => s.BranchId == branchId && s.Status == TranStatus.Reserved).ToList().Count();
+            var count = db.Sales.Where(s => s.BranchId == branchId && (s.Status == TranStatus.Reserved || s.Status == TranStatus.Modified)).ToList().Count();
             return Json(new { Result = "OK", Count = count });
         }
 
@@ -355,7 +355,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var branchId = User.Identity.GetBranchId();
 
                 var model = db.Sales.Where(s => s.BranchId == branchId &&
-                        (s.Status == TranStatus.Reserved) || (s.Status == TranStatus.Modified))
+                        (s.Status == TranStatus.Reserved || s.Status == TranStatus.Modified))
                     .Include(s => s.User).Include(s => s.Client).ToList();
 
                 return PartialView("_PendingPayment", model);
@@ -424,8 +424,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     RefundSaleId = sale.SaleId,
                     RefundClient = sale.Client.Name,
-                    RefundCash = sale.SalePayments.Where(p => p.PaymentMethod == PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
-                    RefundCredit = sale.SalePayments.Where(p => p.PaymentMethod != PaymentMethod.Efectivo).Sum(p => p.Amount).RoundMoney(),
+                    RefundCredit = sale.SalePayments.Sum(p => p.Amount).RoundMoney(),
                     RefundClientId = sale.ClientId
                 };
 
@@ -730,15 +729,25 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Client = sale.Client.Name.ToUpper()
                 };
 
-                //si la venta es a crédito establesco el moto en efectivo como el total de la venta
-                if (sale.TransactionType == TransactionType.Cash)
-                    model.CashAmount = sale.FinalAmount;
+                //si es reservada coloco los montos sugeridos de pago
+                if (sale.Status == TranStatus.Reserved)
+                {
+                    //si la venta es a crédito establesco el moto en efectivo como el total de la venta
+                    if (sale.TransactionType == TransactionType.Cash)
+                        model.CashAmount = sale.FinalAmount;
 
-                if (sale.TransactionType == TransactionType.Presale)
-                    model.CashAmount = (sale.FinalAmount / Cons.Two).RoundMoney();
+                    if (sale.TransactionType == TransactionType.Presale)
+                        model.CashAmount = (sale.FinalAmount / Cons.Two).RoundMoney();
 
-                if (sale.TransactionType == TransactionType.Reservation)
-                    model.CashAmount = (sale.FinalAmount * 0.1).RoundMoney();
+                    if (sale.TransactionType == TransactionType.Reservation)
+                        model.CashAmount = (sale.FinalAmount * 0.1).RoundMoney();
+                }
+                //si es modificado
+                else if (sale.Status == TranStatus.Modified)
+                {
+                    if((model.AmountToPay > 0.0) && sale.LastStatus == TranStatus.Compleated)
+                        model.CashAmount = model.AmountToPay;
+                }
 
                 return PartialView("_RegistPayment", model);
             }
@@ -858,12 +867,16 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //monto del adeudo de la venta
                 var debtAmount = Math.Round(sale.FinalAmount - cPayments, Cons.Two);
 
-                //hago validaciones con respecto a si se hace o no se hace pago
-                var valResponse = ValidatePayment(sale, payment, debtAmount, wholePayment);
+                //si es pago o reimpresión solamente, hago una serie de validaciones
+                if (!isRefund)
+                {
+                    //hago validaciones con respecto a si se hace o no se hace pago
+                    var valResponse = ValidatePayment(sale, payment, debtAmount, wholePayment);
 
-                //si la respueste es diferente de null, algo falló y salgo
-                if (valResponse != null)
-                    return Json(valResponse);
+                    //si la respueste es diferente de null, algo falló y salgo
+                    if (valResponse != null)
+                        return Json(valResponse);
+                }
 
                 //si se esta aplicando un pago
                 if (isPayment)
@@ -876,12 +889,21 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //si la venta no lleva pago ni abono solo se regresa a su estado anterior
                 if (!isPayment && !isRefund)
-                    sale.Status = sale.LastStatus;
+                    sale.Status = sale.LastStatus == TranStatus.InProcess ? TranStatus.Revision : sale.LastStatus ;
+
+                //preparo para guardar
+                sale.UpdDate = DateTime.Now.ToLocal();
+                sale.UpdUser = User.Identity.Name;
+
+                db.Sales.Attach(sale);
+                db.Entry(sale).State = EntityState.Modified;
+
 
                 //ordeno por el campo Sort Order
                 sale.SaleDetails = sale.SaleDetails.OrderBy(td => td.SortOrder).ToList();
 
                 sale.SalePayments = sale.SalePayments ?? new List<SalePayment>();
+
 
                 db.SaveChanges();
 
@@ -1107,10 +1129,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                 if (sale.TransactionType == TransactionType.Credit && wholePayment > Cons.Zero)
                     sale.Client.UsedAmount -= wholePayment;
 
+              
                 sale.SaleHistories.Add(history);
-                db.Sales.Attach(sale);
-                db.Entry(sale).State = EntityState.Modified;
 
+             
                 return new JResponse
                 {
                     Result = Cons.Responses.Success,
@@ -1261,10 +1283,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 sale.Comment = "Devolución recibida por " + payment.ReceivedBy;
                 sale.Status = TranStatus.Compleated;
-                sale.UpdDate = DateTime.Now.ToLocal();
-                sale.UpdUser = User.Identity.Name;
-
-
+             
                 if (sale.TransactionType == TransactionType.Presale || sale.TransactionType == TransactionType.Reservation)
                 {
                     var isCompleated = (sale.SaleHistories.Count(h => h.Status.Contains(TranStatus.Compleated.GetName())) > Cons.Zero);
@@ -1272,9 +1291,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
                 sale.SaleHistories.Add(history);
-                db.Sales.Attach(sale);
-                db.Entry(sale).State = EntityState.Modified;
-
+              
                 return new JResponse
                 {
                     Result = Cons.Responses.Success,

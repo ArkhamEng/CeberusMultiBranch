@@ -147,6 +147,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
+
             var model = (from bp in db.BranchProducts.Include(p => p.Product).Include(p => p.Product.Images)
                          where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
                                (bp.BranchId == branchId) && (bp.Product.IsActive)
@@ -165,7 +166,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                              MaxQuantity = bp.MaxQuantity,
                              OrderQty = (bp.MaxQuantity - (bp.Stock + bp.Reserved)),
                              SellQty = (bp.Stock < Cons.One && bp.Stock > Cons.Zero) ? bp.Stock : Cons.One,
-                             SaleCommission = bp.Product.System.Commission
+                             SaleCommission = bp.Product.System != null ? bp.Product.System.Commission : Cons.Zero,
 
                          }).OrderBy(p => p.Name).Take(Cons.QuickResults).ToList();
 
@@ -195,7 +196,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             {   //valido que la caja este abierta
                 var isCashOpen = User.IsCashRegisterOpen();
 
-                if(!isCashOpen)
+                if (!isCashOpen)
                 {
                     return Json(new JResponse
                     {
@@ -351,16 +352,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 //si es nueva venta se genera folio
                 if (dbSale == null)
                 {
-                    var lastSale = db.Sales.Where(s => s.Status != TranStatus.InProcess &&
-                                                        s.BranchId == sale.BranchId && s.Year == sale.Year).
+                    var lastSale = db.Sales.Where(s => s.BranchId == sale.BranchId && s.Year == sale.Year).
                                                         OrderByDescending(s => s.Sequential).FirstOrDefault();
 
                     var seq = lastSale != null ? lastSale.Sequential : Cons.Zero;
 
                     sale.Sequential = (seq + Cons.One);
-                    sale.Folio      = User.Identity.GetFolio(sale.Sequential);
-                    sale.Status     = TranStatus.Reserved;
-                    sale.Comment    = "Venta generada con Folio " + sale.Folio;
+                    sale.Folio = User.Identity.GetFolio(sale.Sequential);
+                    sale.Status = TranStatus.Reserved;
+                    sale.Comment = "Venta generada con Folio " + sale.Folio;
                 }
                 //si es una modificación concateno el número de revisión al folio
                 else if (sale.Status == TranStatus.OnChange)
@@ -375,18 +375,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                         sale.Folio = arr[Cons.Zero] + c + (Convert.ToUInt32(arr[Cons.One]) + Cons.One).ToString();
 
                     sale.Comment = "Venta modificada con el folio " + sale.Folio;
-                    sale.Status  = TranStatus.Modified;
+                    sale.Status = TranStatus.Modified;
                 }
                 else
                 {
                     sale.Comment = "Venta modificada Folio:" + sale.Folio;
-                    sale.Status  = TranStatus.Reserved;
+                    sale.Status = TranStatus.Reserved;
                 }
 
                 //toda venta modificada se coloca en status reserved para que aparezca en la caja
                 //para su reimpresión y aplicación de pago o devolución
                 var lStatus = dbSale != null ? dbSale.LastStatus : TranStatus.InProcess;
-  
+
                 //agrego el número de folio a los movimientos
                 movements.ForEach(m => { m.Comment += sale.Folio; });
 
@@ -547,13 +547,13 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         Result = Cons.Responses.Warning,
                         Header = "Operación no permita",
-                        Body   = "No se puede solicitar modificación sobre una venta recien modificada",
+                        Body = "No se puede solicitar modificación sobre una venta recien modificada",
                         Code = Cons.Responses.Codes.Success
                     });
                 }
 
-                    //creo el historico
-                    var saleHistory = new SaleHistory
+                //creo el historico
+                var saleHistory = new SaleHistory
                 {
                     SaleId = sale.SaleId,
                     Comment = sale.Comment,
@@ -751,7 +751,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var dt = DateTime.Now.TodayLocal();
 
                 //verifico si el cliente tiene alguna venta a credito pendiente de pago
-                var pendingSales = db.Sales.Where(s => s.Expiration < dt &&
+                var pendingSales = db.Sales.Where(s => s.ClientId == client.ClientId && s.Expiration < dt && 
                                    s.TransactionType == TransactionType.Credit && s.Status == TranStatus.Reserved);
 
                 if (pendingSales != null && pendingSales.Count() > Cons.Zero)
@@ -840,12 +840,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 sale.SaleDetails.ToList().ForEach(item =>
                 {
-                    item.TaxedAmount   = Math.Round(item.Price * item.Quantity, Cons.Two);
-                    item.TaxedPrice    = item.Price;
+                    item.TaxedAmount = Math.Round(item.Price * item.Quantity, Cons.Two);
+                    item.TaxedPrice = item.Price;
                     item.TaxPercentage = iva; //porcentaje de IVA
-                    item.Price         = (item.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //precio sin IVA
-                    item.Amount        = (item.TaxedAmount / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //Monto partida sin Iva
-                    item.TaxAmount     = (item.TaxedAmount - item.Amount).RoundMoney(); //Monto total de IVA
+                    item.Price = (item.TaxedPrice / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //precio sin IVA
+                    item.Amount = (item.TaxedAmount / (Cons.One + (iva / Cons.OneHundred))).RoundMoney(); //Monto partida sin Iva
+                    item.TaxAmount = (item.TaxedAmount - item.Amount).RoundMoney(); //Monto total de IVA
 
                     var detail = new BudgetDetail
                     {

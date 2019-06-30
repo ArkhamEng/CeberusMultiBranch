@@ -10,8 +10,7 @@
                     <th class="col-md-1 text-center">@Html.DisplayName("Folio")</th>
                     <th class="col-md-5 text-center">@Html.DisplayName("Cliente")</th>
 
-                    <th class="col-md-2 text-center">@Html.DisplayName("En efectivo")</th>
-                    <th class="col-md-2 text-center">@Html.DisplayName("En vale")</th>
+                    <th class="col-md-2 text-center">@Html.DisplayName("Devolución")</th>
                     <th class="col-md-2 text-center">@Html.DisplayName("Cancelo")</th>
                     <th class="col-md-1 text-center">@Html.DisplayName("Tipo")</th>
                     <th class="col-md-1 text-center" />
@@ -26,13 +25,10 @@
                         <td  class="text-uppercase">@Html.DisplayUpperFor(m => item.Client.Name)</td>
 
                         <td align="center">
-                        @item.SalePayments.Where(s=> s.PaymentMethod == PaymentMethod.Efectivo).Sum(s=> s.Amount).ToMoney()
+                            @item.SalePayments.Sum(s => s.Amount).ToMoney()
                         </td>
 
-                        <td align="center">
-                        @item.SalePayments.Where(s => s.PaymentMethod != PaymentMethod.Efectivo).Sum(s => s.Amount).ToMoney()
-                        </td>
-
+                     
                         <td align="center">@Html.DisplayFor(m => item.UpdUser)</td>
 
                         <td align="center">

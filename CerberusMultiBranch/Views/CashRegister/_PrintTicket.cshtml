@@ -33,7 +33,7 @@
                     <label>Folio</label><br />
                 </td>
                 <td  class="text-right">
-                    @Model.Folio
+                    @Model.Folio.ToUpper()
                 </td>
             </tr>
             <tr>
@@ -43,7 +43,7 @@
                     </label>
                 </td>
                 <td  class="text-right">
-                    @Model.User.UserName
+                    @Model.User.UserName.ToUpper()
                 </td>
             </tr>
             <tr>
@@ -123,22 +123,26 @@
                         @foreach (var tI in Model.SaleDetails)
                         {
                             var i = tI.Product.Code.Length - 4;
-                            var sCode = tI.Product.Code.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
+                            var sCode = tI.Product.Code; //.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
                             var sName = tI.Product.Name.Length <= 12 ? tI.Product.Name : tI.Product.Name.Substring(0, 12);
                             <tr style="border-bottom:solid 1px gray; ">
                                 <td class="text-left">
                                     @if (tI.ParentId == null)
                                     {
-                                        @sCode
+                                        @sCode<br />
                                     }
-
-                                </td>
-                                <td class="text-left">
-                                    @if (tI.ParentId != null)
+                                    else
                                     {
                                         sName = (sCode + " " + sName).ToString();
                                     }
                                     @sName
+                                </td>
+                                <td class="text-left">
+                                    @*@if (tI.ParentId != null)
+                                    {
+                                        sName = (sCode + " " + sName).ToString();
+                                    }
+                                    @sName*@
                                 </td>
                                 <td class="text-center">
                                     @tI.Quantity
@@ -184,7 +188,7 @@
                                 o retrabajo<br />
                                 2. Mercancía   con
                                 empaque original<br />
-                                3. Máximo treinta días a
+                                3. Máximo sesenta días a
                                 la fecha de la nota<br />
                                 4.Autorización de su ejecutivo de venta
                             </td>

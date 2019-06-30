@@ -172,7 +172,7 @@
 
         $("#btnCompleate").click(function ()
         {
-            ShowConfirm("Terminar y Reservar?", "Deseas concluir la venta y retirar los productos del inventario?", 'static', SubmitCompleate);
+            ShowConfirm("Terminar y Reservar?", "Deseas concluir la venta y retirar los productos del inventario?", SubmitCompleate);
         });
 
         if ('@Model.Status' != '@TranStatus.InProcess' && '@Model.Status' != '@TranStatus.OnChange')
@@ -183,10 +183,12 @@
     });
 
 
-    function SubmitCompleate() {
+    function SubmitCompleate()
+    {
         ShowLoading('static');
 
-        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response) {
+        ExecuteAjax('@Url.Action("CompleateManual")', { saleId: $("#SaleId").val() }, function (response)
+        {
             HideLoading(function () {
                 window.location = '@Url.Action("Detail",new { id= Model.SaleId})';
             });

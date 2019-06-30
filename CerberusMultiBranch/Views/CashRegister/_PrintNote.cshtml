@@ -87,7 +87,7 @@
                         </tr>
                         <tr>
                             <td colspan="2" class="text-center">
-                                @Model.User.UserName
+                                @Model.User.UserName.ToUpper()
                             </td>
                         </tr>
                         <tr>
@@ -176,7 +176,7 @@
                     <table style="width:100%; min-height:600px; border:1px solid gray;">
                         <tr style="border-bottom:1px solid gray; height:15px">
                             <td style="border-right:1px solid gray; width:10%" align="center">
-                                <label>Codigo</label>
+                                <label>Código</label>
                             </td>
                             <td style="border-right:1px solid gray; width:10%" align="center">
                                 <label>Cve. Sat</label>
@@ -204,13 +204,13 @@
 
                             <tr style="@st">
                                 <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                    @Html.DisplayFor(mItem => item.Product.Code)
+                                    @Html.DisplayUpperFor(mItem => item.Product.Code)
                                 </td>
                                 <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                    @Html.DisplayFor(mItem => item.Product.Category.SatCode)
+                                    @Html.DisplayUpperFor(mItem => item.Product.Category.SatCode)
                                 </td>
                                 <td style="border-right:1px solid gray; width:40%" valign="top">
-                                    @item.Product.Name.Substring(0, item.Product.Name.Length <= 50 ? item.Product.Name.Length : 50)
+                                    @item.Product.Name.ToUpper().Substring(0, item.Product.Name.Length <= 50 ? item.Product.Name.Length : 50)
                                 </td>
                                 <td class="text-right" style="border-right:1px solid gray; width:10%" valign="top">
                                     @Html.DisplayFor(mItem => item.Price)
