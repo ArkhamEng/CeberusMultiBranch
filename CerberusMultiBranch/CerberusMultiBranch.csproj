@@ -1125,6 +1125,7 @@
     <Content Include="Views\Selling\SaleOrderChange.cshtml" />
     <Content Include="Views\Selling\SaleOrderPayments.cshtml" />
     <Content Include="Views\Selling\PrintBudget.cshtml" />
+    <Content Include="Views\CashRegister\_Incomes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -478,15 +478,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                 }
 
 
-                printRefund.Branch = sale.Branch;
-                printRefund.Client = refund.ReceivedBy;
-                printRefund.Cash = refund.RefundCash.ToMoney();
-                printRefund.Note = refund.RefundCredit.ToMoney();
-                printRefund.Total = (refund.RefundCash + refund.RefundCredit).toText();
-                printRefund.Folio = sale.Folio;
+                printRefund.Branch  = sale.Branch;
+                printRefund.Client  = refund.ReceivedBy;
+                printRefund.Cash    = refund.RefundCash.ToMoney();
+                printRefund.Note    = refund.RefundCredit.ToMoney();
+                printRefund.Total   = (refund.RefundCash + refund.RefundCredit).toText();
+                printRefund.Folio   = sale.Folio;
                 printRefund.Comment = sale.Comment;
-                printRefund.Date = DateTime.Now.ToLocal().ToString("dd/MM/yyyy hh:mm");
-
+                printRefund.User    = User.Identity.Name;
+                printRefund.Date    = DateTime.Now.ToLocal().ToString("dd/MM/yyyy hh:mm");
 
                 var cr = GetCashRegister();
 
@@ -541,17 +541,15 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var history = new SaleHistory
                 {
-                    SaleId = sale.SaleId,
-                    Comment = sale.Comment,
-                    InsDate = sale.UpdDate,
-                    User = sale.UpdUser,
-                    Status = sale.Status.GetName(),
+                    SaleId   = sale.SaleId,
+                    Comment  = sale.Comment,
+                    InsDate  = sale.UpdDate,
+                    User     = sale.UpdUser,
+                    Status   = sale.Status.GetName(),
                     TotalDue = sale.FinalAmount
                 };
 
-                //solo cambio el status sin registrar, el usuario que lo cambia 
-                //para que quede registrado, el usuario que realiza la cancelación
-                sale.LastStatus = sale.Status;
+                
                 sale.Status = TranStatus.Canceled;
                 sale.UpdUser = User.Identity.Name;
                 sale.UpdDate = DateTime.Now.ToLocal();
@@ -564,6 +562,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (nc != null)
                 {
+                    
                     printRefund.CreditNote = db.SaleCreditNotes.Include(n => n.Sale).Include(n => n.Sale.Branch).
                     FirstOrDefault(n => n.SaleCreditNoteId == nc.SaleCreditNoteId && n.Folio == nc.Folio);
                 }
@@ -1110,29 +1109,22 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.Comment = "Venta cobrada totalmente";
                     db.SaleHistories.Add(history);
                 }
-                //si queda adeudo y es preventa
+                //si queda adeudo
                 else 
                 {  //si la venta queda con adeudo la pongo en seguimiento 
-                  
-                    if(sale.Status == TranStatus.Revision)
-                        sale.Comment = "Abono recibido";
-                    else
-                    {  //agrego el historial solo en cambios de estado
-                        sale.Status  = TranStatus.Revision;
-                        sale.Comment = "Abono recibido";
 
+                    sale.Status = TranStatus.Revision;
+                    sale.Comment = "Abono recibido";
+
+                    //solo si es la primera vuelta creo el historial de pago
+                    if (sale.Status == TranStatus.Revision)
                         db.SaleHistories.Add(history);
-                    }
                 }
 
                 //si la venta es a crédito, se descuenta el monto abonado de la cuenta del cliente
                 if (sale.TransactionType == TransactionType.Credit && wholePayment > Cons.Zero)
                     sale.Client.UsedAmount -= wholePayment;
-
-              
-                sale.SaleHistories.Add(history);
-
-             
+            
                 return new JResponse
                 {
                     Result = Cons.Responses.Success,
@@ -1290,6 +1282,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                     sale.Status = TranStatus.Revision;
                 }
 
+
+                //si la venta es a crédito, se descuenta el monto abonado de la cuenta del cliente
+                if (sale.TransactionType == TransactionType.Credit && refundAmount > Cons.Zero)
+                    sale.Client.UsedAmount -= refundAmount;
+
                 sale.SaleHistories.Add(history);
               
                 return new JResponse
@@ -1436,6 +1433,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     Header = "Error obtener datos"
                 });
             }
+        }
+
+        public ActionResult GetIncomes()
+        {
+            var cr = GetCashRegister();
+
+            var model = db.CashDetails.Where(d => d.CashRegisterId == cr.CashRegisterId && d.DetailType == 1).ToList();
+
+            return PartialView("_Incomes", model);
         }
     }
 }

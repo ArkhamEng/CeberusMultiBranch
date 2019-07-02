@@ -88,7 +88,7 @@
                             <td>@item.InsDate.ToString("HH:mm:ss")</td>
 
                             <td>
-                                @if (item.DetailType == 0)
+                                @switch (item.DetailType == 0)
                                 {
                                     <a>Retiro</a>
                                 }

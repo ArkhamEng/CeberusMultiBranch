@@ -1,0 +1,78 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.CashDetail>
+@using CerberusMultiBranch.Support;
+
+<div class="panel panel-success">
+    <div class="modal-header panel-heading">
+        <h4 class="modal-title">
+            <button type="button" class="close" onclick="HideModal(null,true)">
+                <span class="fa fa-times"></span>
+            </button>
+            <span class="fa fa-money"></span>
+            Cobros realizados  @Model.Sum(m=> m.Amount).ToMoney()
+        </h4>
+    </div>
+    <div class="panel-body" style="max-height:400px; overflow-y:auto;overflow-x:hidden">
+        <table class="table table-striped small" style="width:100%;">
+            <thead>
+                <tr >
+                    <th>
+                        @Html.DisplayName("Folio")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Tipo")
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Comment)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Amount)
+                    </th>
+                   
+                  
+                    <th>
+                        @Html.DisplayNameFor(model => model.InsDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.User)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody >
+                @foreach (var item in Model)
+            {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.SaleFolio)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                       
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Amount)
+                        </td>
+                      
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Comment)
+                        </td>
+                      
+                        <td>
+                            @Html.DisplayFor(modelItem => item.InsDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.User)
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer clearfix">
+        <button class="btn btn-danger btn-sm pull-right" type="button" onclick="HideModal(null,true)">
+            <span class="fa fa-times"></span> Cerrar
+        </button>
+    </div>
+</div>
+
+

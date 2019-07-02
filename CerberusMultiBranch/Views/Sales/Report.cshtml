@@ -1,5 +1,6 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Operative.TransactionViewModel
 @using CerberusMultiBranch.Models.Entities.Operative;
+@using CerberusMultiBranch.Support;
 
 @{
     ViewBag.Title = "Ventas";
@@ -25,13 +26,19 @@
 
                 <select id="Status" class="form-control" style="width:20% !important">
                     <option value="">Status</option>
-                    <option value="@TranStatus.Reserved">Reservado</option>
-                    <option value="@TranStatus.Compleated">Pagado</option>
-                    <option value="@TranStatus.Revision">Pago pendiente</option>
-                    <option value="@TranStatus.PreCancel">En devolución</option>
-                    <option value="@TranStatus.Canceled">Cancelado</option>
-                    <option value="@TranStatus.OnChange">En Modificación</option>
+                    <option value="@TranStatus.InProcess">@TranStatus.InProcess.GetName()</option>
+                    <option value="@TranStatus.Reserved">@TranStatus.Reserved.GetName()</option>
+                    <option value="@TranStatus.Reserved">@TranStatus.Reserved.GetName()</option>
+                    <option value="@TranStatus.Revision">@TranStatus.Revision.GetName()</option>
+
+                    <option value="@TranStatus.Compleated">@TranStatus.Compleated.GetName()</option>
+
+                    <option value="@TranStatus.PreCancel">@TranStatus.InProcess.GetName()</option>
+                    <option value="@TranStatus.Canceled">@TranStatus.PreCancel.GetName()</option>
+                    <option value="@TranStatus.OnChange">@TranStatus.OnChange.GetName()</option>
                 </select>
+
+               
 
                 <span class="input-group-btn">
                     <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar ventas a clientes">

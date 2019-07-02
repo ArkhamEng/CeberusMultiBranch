@@ -76,6 +76,24 @@ else
                             y comprobantes
                         </h3>
                     </div>
+                    @if (User.IsInRole("Cajero"))
+                    {
+                        <div class="text-center col-md-12 alert btn-success" onclick="OpenIncomes()"
+                             onmouseover="SetPointer(this)" title="Ver cobros realizados">
+                            <h3>
+                                Cobros Realizados
+                            </h3>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center col-md-12 alert btn-success disabled">
+                            <h3>
+                                Cobros Realizados
+                            </h3>
+                        </div>
+                    }
+
 
                     @if (User.IsInRole("Cajero"))
                     {
@@ -193,6 +211,20 @@ else
             HideLoading(function ()
             {
                 ShowModal(response, 'static','lg');
+            });
+        });
+    }
+
+
+    //Abre la ventana de retiros
+    function OpenIncomes()
+    {
+        ShowLoading('static');
+
+        ExecuteAjax('@Url.Action("GetIncomes", "CashRegister")', {}, function (response)
+        {
+            HideLoading(function () {
+                ShowModal(response, 'static', 'lg');
             });
         });
     }

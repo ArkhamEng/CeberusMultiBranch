@@ -93,7 +93,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                              MaxQuantity = bp.MaxQuantity,
                              OrderQty = (bp.MaxQuantity - (bp.Stock + bp.Reserved)),
                              SellQty = (bp.Stock < Cons.One && bp.Stock > Cons.Zero) ? bp.Stock : Cons.One,
-                             SaleCommission = bp.Product.System.Commission
+                             SaleCommission = bp.Product.System != null ? bp.Product.System.Commission : Cons.Zero
 
                          }).ToList();
 
@@ -541,7 +541,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //si se solicita una modificación sobre un estado modificado
                 //regreso un error
-                if (!isCancelation && sale.Status == TranStatus.Modified)
+               /* if (!isCancelation && sale.Status == TranStatus.Modified)
                 {
                     return Json(new JResponse
                     {
@@ -550,7 +550,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Body = "No se puede solicitar modificación sobre una venta recien modificada",
                         Code = Cons.Responses.Codes.Success
                     });
-                }
+                }*/
 
                 //creo el historico
                 var saleHistory = new SaleHistory
@@ -575,7 +575,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     return Json(CancelSale(sale));
 
                 //si no es cancelación
-                sale.Status = sale.Status == TranStatus.Reserved ? TranStatus.InProcess : TranStatus.OnChange;
+                sale.Status = sale.Status == TranStatus.Reserved ?  TranStatus.InProcess : TranStatus.OnChange;
 
                 db.Entry(sale).State = EntityState.Modified;
                 db.SaveChanges();
