@@ -163,9 +163,8 @@ function BeginRequestChange(isCancelation)
                 ShowModal(response, 'static', "", null);
                 OnChangeCompleate = function (response)
                 {
-                    ShowConfirm(response.Header, response.Body + " ¿Deseas Capturar otra venta?",
-                        function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder'); },
-                        function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder/' + $("#SaleId").val()); });
+                    ShowLoading('static');
+                    window.location.replace('/Selling/SaleOrder/' + $("#SaleId").val());
                 }
             }
             else
@@ -743,11 +742,6 @@ function CompleateSendOrder(sale)
 
     ExecuteAjax('/Selling/SendSaleOrder', { sale: sale }, function (response)
     {
-        HideLoading(function ()
-        {
-            ShowConfirm(response.Header, "<p>" + response.Body + "<br/> ¿Deseas agregar otra venta? <p/>",
-                function () { ShowLoading('static'); window.location.replace('/Selling/SaleOrder'); },
-                function () { ShowLoading('static'); window.location.replace("/Selling/SaleOrder/" + response.Id) });
-        });
+        window.location.replace("/Selling/SaleOrder/" + response.Id);
     });
 }

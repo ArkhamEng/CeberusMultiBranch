@@ -265,12 +265,24 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (dbDetail == null)
                     {
+                        //usuario y fecha de registro
+                        detail.InsDate = DateTime.Now.ToLocal();
+                        detail.InsUser = User.Identity.Name;
+
                         response = ValidateNewDetail(sale, detail, pInfo);
 
                         if (response != null)
                             break;
                     }
+                    else
+                    {
+                        detail.InsDate = dbDetail.InsDate;
+                        detail.InsUser = dbDetail.InsUser;
+                        detail.UpdDate = dbDetail.UpdDate;
+                        detail.UpdUser = dbDetail.UpdUser;
+                    }
 
+                   
                     //sumo la nueva devolución a las existentes
                     detail.Refund += detail.NewRefund;
 
@@ -282,7 +294,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         detail.Commission = dbDetail.Commission;
 
                     var dbQuantity = dbDetail != null ? dbDetail.Quantity - dbDetail.Refund : Cons.Zero;
-                    var quantity = detail.Quantity - detail.Refund;
+                    var quantity   = detail.Quantity - detail.Refund;
 
                     //si la diferencia es negativa indica que se agregan partidas y se deben restar del stock
                     //si la diferencia es positiva indica devoluciones  (entradas de inventario)
@@ -290,6 +302,9 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     if (difQuantity != Cons.Zero)
                     {
+                        detail.UpdDate = DateTime.Now.ToLocal();
+                        detail.UpdUser = User.Identity.Name;
+
                         var bp = branchProducts.First(b => b.ProductId == detail.ProductId);
 
                         bp.LastStock = bp.Stock;
@@ -637,7 +652,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                     //modifico las existencias
                     parentStock.LastStock = parentStock.Stock;
-                    parentStock.Stock += (detail.Quantity - detail.Refund);
+                    parentStock.Stock     += (detail.Quantity - detail.Refund);
 
                     //reviso si el producto es un paquete (tiene productos hijos)
                     foreach (var packDetail in prodDetails.Where(d => d.PackageId == detail.ProductId))
@@ -647,11 +662,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                         //agrego movimiento al inventario
                         StockMovement childMovement = new StockMovement
                         {
-                            BranchId = parentStock.BranchId,
-                            ProductId = parentStock.ProductId,
-                            User = User.Identity.Name,
+                            BranchId     = parentStock.BranchId,
+                            ProductId    = parentStock.ProductId,
+                            User         = User.Identity.Name,
                             MovementDate = DateTime.Now.ToLocal(),
-                            Comment = "Cancelación de venta: " + sale.Folio,
+                            Comment      = "Cancelación de venta: " + sale.Folio,
                             MovementType = MovementType.Reservation
                         };
 
@@ -712,7 +727,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
 
             JResponse response = null;
-
+           
             //se valida que los productos tengan existencias suficiente, salvo para preventa
             if (sale.TransactionType != TransactionType.Presale && detail.Quantity > pInfo.Stock)
             {

@@ -641,7 +641,11 @@ namespace CerberusMultiBranch.Controllers.Operative
                         TaxAmount = item.TaxAmount,
                         TaxedAmount = item.TaxedAmount,
                         TaxedPrice = item.TaxedPrice,
-                        TaxPercentage = item.TaxPercentage
+                        TaxPercentage = item.TaxPercentage,
+                        InsDate = DateTime.Now.ToLocal(),
+                        InsUser = User.Identity.Name,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name
                     };
 
                     detail.SortOrder = sortOrder;
@@ -683,6 +687,10 @@ namespace CerberusMultiBranch.Controllers.Operative
                                 ProductId = pckDet.DetailtId,
                                 SortOrder = sortOrder,
                                 ParentId = pckDet.PackageId,
+                                InsDate = DateTime.Now.ToLocal(),
+                                InsUser = User.Identity.Name,
+                                UpdDate = DateTime.Now.ToLocal(),
+                                UpdUser = User.Identity.Name
                             };
 
 
@@ -873,13 +881,14 @@ namespace CerberusMultiBranch.Controllers.Operative
         {
 
             var SoldItems = (from sd in db.SaleDetails.Include(sd => sd.Product.Category)
-                             where (sd.Sale.TransactionDate >= model.Date) &&
-                                   (sd.Sale.TransactionDate < model.EndDate) &&
+                             where (sd.Sale.InsDate >= model.Date) &&
+                                   (sd.Sale.InsDate < model.EndDate) &&
                                    (sd.Sale.TransactionType == model.TransType) &&
                                    (sd.Sale.Status == TranStatus.Compleated) && //solo las ventas pagadas en su totalidad
                                    (sd.Sale.BranchId == model.BranchId) &&
-                                   (string.IsNullOrEmpty(model.Client) || sd.Sale.Client.Name == model.Client) &&
-                                   (string.IsNullOrEmpty(model.Folio) || sd.Sale.Folio == model.Folio)
+                                   (string.IsNullOrEmpty(model.Client) || sd.Sale.Client.Name.Contains(model.Client)) &&
+                                   (string.IsNullOrEmpty(model.Folio) || sd.Sale.Folio.Contains(model.Folio))
+
                              select sd).ToList();
 
 

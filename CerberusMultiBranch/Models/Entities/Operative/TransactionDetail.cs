@@ -43,6 +43,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [DataType(DataType.Currency)]
         public double TaxedAmount { get; set; }
 
+
+
         public virtual Product Product { get; set; }
 
         #region Not Mapped

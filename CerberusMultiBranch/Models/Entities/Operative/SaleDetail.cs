@@ -1,4 +1,5 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Support;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -21,6 +22,19 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name ="Devuelto")]
         public double Refund { get; set; }
 
+        [Display(Name = "Creado")]
+        [Index("IDX_InsDate", IsClustered = false, IsUnique =false)]
+        public DateTime InsDate { get; set; }
+
+        [Display(Name = "Creador por")]
+        public string InsUser { get; set; }
+
+        [Display(Name = "Editado")]
+        public DateTime UpdDate { get; set; }
+
+        [Display(Name = "Editado por")]
+        public string UpdUser { get; set; }
+
         public virtual Sale Sale { get; set; }
 
         [NotMapped]
@@ -30,5 +44,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [NotMapped]
         [Display(Name = "Devolver")]
         public double NewRefund { get; set; }
+
+      
     }
 }

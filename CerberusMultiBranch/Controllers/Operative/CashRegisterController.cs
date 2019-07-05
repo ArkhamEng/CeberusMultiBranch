@@ -500,7 +500,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                         CashRegisterId = cr.CashRegisterId,
                         Amount = refund.RefundCash,
                         Type = PaymentMethod.Efectivo,
-                        Comment = string.Format("DEVOLUCIÓN POR CANCELACIÓN {0}! RECIBIDA POR {1}", sale.Folio, refund.ReceivedBy.ToUpper()),
+                        Comment = string.Format("DEVOLUCIÓN DE VENTA {0}! RECIBIO {1}", sale.Folio, refund.ReceivedBy.ToUpper()),
                         InsDate = DateTime.Now.ToLocal(),
                         User = User.Identity.Name,
                         DetailType = Cons.Zero,
@@ -508,6 +508,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                         WithdrawalCauseId = Cons.RefundId
                     };
 
+                    var payment = new SalePayment
+                    {
+                        Amount = (refund.RefundCash * -Cons.One),
+                        Comment = cd.Comment,
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        PaymentMethod = PaymentMethod.Efectivo,
+                        SaleId = sale.SaleId,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name
+                    };
+
+                    db.SalePayments.Add(payment);
                     db.CashDetails.Add(cd);
                 }
                 SaleCreditNote nc = null;
@@ -533,10 +545,37 @@ namespace CerberusMultiBranch.Controllers.Operative
                         Folio = DateTime.Now.ToLocal().ToString("yy") + "-" + seq.ToString(Cons.CodeSeqFormat)
                     };
 
+                    var cd = new CashDetail
+                    {
+                        CashRegisterId = cr.CashRegisterId,
+                        Amount = refund.RefundCredit,
+                        Type = PaymentMethod.Vale,
+                        Comment = string.Format("DEVOLUCIÓN DE VENTA {0}! RECIBIO {1}, VALE {2}", sale.Folio, refund.ReceivedBy.ToUpper(), nc.Folio),
+                        InsDate = DateTime.Now.ToLocal(),
+                        User = User.Identity.Name,
+                        DetailType = Cons.Zero,
+                        SaleFolio = sale.Folio,
+                        WithdrawalCauseId = Cons.RefundId
+                    };
+
+                    var payment = new SalePayment
+                    {
+                        Amount  = (refund.RefundCredit * -Cons.One),
+                        PaymentDate = DateTime.Now.ToLocal(),
+                        Comment = cd.Comment,
+                        PaymentMethod = PaymentMethod.Vale,
+                        Reference = nc.Folio,
+                        SaleId = sale.SaleId,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name
+                    };
+
                     message += " Monto en Vale " + refund.RefundCredit.ToMoney() + " Folio del vale " + nc.Folio;
                     printRefund.HasNote = true;
 
+                    sale.SalePayments.Add(payment);
                     db.SaleCreditNotes.Add(nc);
+                    db.CashDetails.Add(cd);
                 }
 
                 var history = new SaleHistory
@@ -569,14 +608,14 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 return PartialView("_PrintRefund", printRefund);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return Json(new JResponse
                 {
                     Result = Cons.Responses.Danger,
                     Code = Cons.Responses.Codes.ServerError,
-                    Body = "Ocurrio un error al obtener aplicar el rembolso",
-                    Header = "Errro al interno"
+                    Body = ex.Message,
+                    Header = "Eerror al  aplicar el rembolso"
                 });
             }
         }
