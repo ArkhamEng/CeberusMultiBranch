@@ -22,6 +22,8 @@ namespace CerberusMultiBranch.Support
         {
             public const string SmtpHost = "SmtpHost";
 
+            public const string NoReplyCredentials = "NoReplyCredentials";
+
             public const string PurchasingCredentials = "PurchasingCredentials";
 
             public const string BillingCredentials = "BillingCredentials";
@@ -33,6 +35,8 @@ namespace CerberusMultiBranch.Support
             public const string PurchasingSubject = "PurchasingSubject";
 
             public const string PurchasingCC = "PurchasingCC";
+
+            public const string MailToWebSite = "MailToWebSite";
         }
     }
 
@@ -116,6 +120,10 @@ namespace CerberusMultiBranch.Support
 
         public const string ProductImagesPath = "/Files/ProductImages";
 
+        public const string BranchImagePath = "/Files/BranchImages";
+
+        public const string OfferImagesPath = "/Files/OfferImages";
+
 
         public const string DefaultPassword = "ADn9JXAPolz3R1QmEjw7chz42neVTLn426+eRtgaG2TvE2mR03Ri7TtoKH8iWJyuVw==";
 
@@ -130,6 +138,8 @@ namespace CerberusMultiBranch.Support
         public const string NoImagePath = "/Content/Images/sinimagen.jpg";
 
         public const char SplitChar = ',';
+
+        public const string NullString = "null";
     }
 
     public struct FileStruct

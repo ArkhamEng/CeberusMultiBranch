@@ -927,7 +927,8 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //si la venta no lleva pago ni abono solo se regresa a su estado anterior
                 if (!isPayment && !isRefund)
-                    sale.Status = sale.LastStatus == TranStatus.InProcess ? TranStatus.Revision : sale.LastStatus ;
+                    sale.Status = sale.LastStatus == TranStatus.InProcess ? TranStatus.Revision : 
+                                  sale.LastStatus == TranStatus.Reserved ? TranStatus.Revision : sale.LastStatus;
 
                 //preparo para guardar
                 sale.UpdDate = DateTime.Now.ToLocal();
@@ -1001,7 +1002,10 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
                 var money = payment.CashAmount + payment.CardAmount;
-                var wholePayment = payment.CreditNoteAmount + money;
+                
+                //extraigo el monto a pagar con el vale si la cantidad es mayor a la deuda solo tomo lo necesario
+                var creditNoteAmount = payment.CreditNoteAmount > debtAmount ? debtAmount : payment.CreditNoteAmount;
+                var wholePayment     = creditNoteAmount + money;
 
                 //determino si se usa nota de crédito en el pago
                 var usingCreditNote = (payment.CreditNoteAmount > Cons.Zero);
@@ -1061,9 +1065,9 @@ namespace CerberusMultiBranch.Controllers.Operative
                     payments.Add(p);
                 }
 
-                var folioChanged = false;
+                
                 //si se esta aplicando un folio
-                if (payment.CreditNoteAmount > Cons.Zero)
+                if (creditNoteAmount > Cons.Zero)
                 {
                     totalPayments += payment.CreditNoteAmount;
 
@@ -1094,7 +1098,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var p = new SalePayment
                     {
                         SaleId = sale.SaleId,
-                        Amount = (folioChanged ? debtAmount : payment.CreditNoteAmount),
+                        Amount = creditNoteAmount,
                         PaymentDate = DateTime.Now.ToLocal(),
                         PaymentMethod = PaymentMethod.Vale,
                         UpdDate = DateTime.Now.ToLocal(),
@@ -1114,7 +1118,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     };
 
                     //si el vale se queda con menos de un peso, ya no lo imprimo
-                    note.Amount -= payment.CreditNoteAmount;
+                    note.Amount -= creditNoteAmount;
                     note.IsActive = (Math.Round(note.Amount, Cons.Two) >= Cons.One);
 
                     db.CreditNoteHistories.Add(noteHistory);
@@ -1364,15 +1368,15 @@ namespace CerberusMultiBranch.Controllers.Operative
                     };
                 }
 
-                //el cobro no puede exceder el monto de la deuda
-                if (wholePayment > toPay)
+                //el cobro no puede exceder el monto de la deuda a menos que solo sea pago con vale
+                if ( (wholePayment > toPay) && (payment.CreditNoteAmount <= Cons.Zero))
                 {
                     return new JResponse
                     {
-                        Result = Cons.Responses.Warning,
-                        Code = Cons.Responses.Codes.InvalidData,
-                        Body = string.Format("Estas excediendo el monto del adeudo de esta venta, Adeudo actual:{0}", toPay.ToMoney()),
-                        Header = "Pago excedente",
+                        Result  = Cons.Responses.Warning,
+                        Code    = Cons.Responses.Codes.InvalidData,
+                        Body    = string.Format("Estas excediendo el monto del adeudo de esta venta, Adeudo actual:{0}", toPay.ToMoney()),
+                        Header  = "Pago excedente",
                     };
                 }
 

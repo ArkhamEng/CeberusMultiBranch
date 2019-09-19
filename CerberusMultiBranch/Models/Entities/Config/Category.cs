@@ -48,8 +48,8 @@ namespace CerberusMultiBranch.Models.Entities.Config
         public Category()
         {
             this.UpdDate = DateTime.Now.ToLocal();
-            this.UpdUser = HttpContext.Current.User.Identity.Name;
             this.IsActive = true;
+            this.UpdUser = HttpContext.Current != null ? HttpContext.Current.User.Identity.Name : null;
         }
     }
 }

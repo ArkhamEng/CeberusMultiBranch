@@ -43,7 +43,12 @@
                         <div class='@txtC'>
                             <h4  onclick="Detail('@prod.ProductId','@prod.IsActive.ToString()')" onmouseover="SetPointer(this)" >
                                 <strong>
-                                    <u>@prod.Code</u>    
+                                    <u>@prod.Code</u>   
+                                     @if(prod.IsOnlineSold)
+                                     {
+                                         <i class="glyphicon glyphicon-cloud text-info" title="Se vende por internet"/>
+                                     }
+
                                 </strong>
                             </h4>
 

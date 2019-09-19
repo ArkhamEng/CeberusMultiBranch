@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace CerberusMultiBranch
 {
@@ -9,6 +10,17 @@ namespace CerberusMultiBranch
     {
         public static void Register(HttpConfiguration config)
         {
+            config.EnableCors();
+
+            var enableCorsAttribute = new EnableCorsAttribute("*",
+                                           "Origin, Content-Type, Accept",
+                                           "GET, PUT, POST, DELETE, OPTIONS");
+
+            config.EnableCors(enableCorsAttribute);
+
+            // Web API configuration and services
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            // Web API routes
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

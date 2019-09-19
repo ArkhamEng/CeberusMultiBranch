@@ -1,5 +1,16 @@
 ﻿@model CerberusMultiBranch.Models.ViewModels.Catalog.ProductViewModel
 
+    <div class="col-md-8 form-group">
+        @Html.Label("Nombre corto", htmlAttributes: new { @class = "control-label" })
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-tag"></i></span>
+            @Html.EditorFor(model => model.ShortName, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm" } })
+        </div>
+        @Html.ValidationMessageFor(model => model.Code, "", new { @class = "text-danger" })
+    </div>
+
+
+
 <div class="col-md-5 form-group">
     @Html.Label("Codigo", htmlAttributes: new { @class = "control-label" })
     <div class="input-group">
@@ -41,6 +52,17 @@
         @Html.TextAreaFor(model => model.Name, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
     </div>
     @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+</div>
+
+
+
+<div class="col-md-12 form-group">
+    @Html.LabelFor(model => model.Comment, htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+        @Html.TextAreaFor(model => model.Comment, 3, 1, htmlAttributes: new { @class = "form-control text-uppercase input-sm" })
+    </div>
+    @Html.ValidationMessageFor(model => model.Comment, "", new { @class = "text-danger" })
 </div>
 
 <div class="col-md-6 form-group">
@@ -158,6 +180,25 @@
         </label>
     </div>
 </div>
+<div class="col-md-2">
+    <div class="checkbox form-control">
+        <label>
+            @Html.EditorFor(m => m.IsOnlineSold)
+            Online
+        </label>
+    </div>
+</div>
+<div class="col-md-4 form-group">
+    @Html.Label("Precio Online", htmlAttributes: new { @class = "control-label" })
+    <div class="input-group">
+        <span class="input-group-addon"><i class="fa fa-percent"></i></span>
+        @Html.EditorFor(model => model.OnlinePercentage, new { htmlAttributes = new { @class = "form-control input-sm" } })
+        <span class="input-group-addon"><i class="fa fa-dollar"></i></span>
+        @Html.EditorFor(model => model.OnlinePrice, new { htmlAttributes = new { @class = "form-control input-sm" } })
+    </div>
+    @Html.ValidationMessageFor(model => model.OnlinePercentage, "", new { @class = "text-danger" })
+    @Html.ValidationMessageFor(model => model.OnlinePrice, "", new { @class = "text-danger" })
+</div>
 
 
 
@@ -178,6 +219,10 @@
 
         $("#StockRequired").change(function (a)
         {
+            ValidateStock();
+        });
+
+        $("#IsOnlineSold").change(function (a) {
             ValidateStock();
         });
 
@@ -205,14 +250,25 @@
 
         var checked = $("#StockRequired").is(':checked');
 
+        var isOnline = $("#IsOnlineSold").is(':checked');
+
         $("#Quantity").attr("readonly", isLocked);
         $("#BuyPrice").attr("readonly", isLocked);
         $("#Code").attr("readonly", isLocked);
+        $("#ShortName").attr("readonly", isLocked);
+        $("#IsOnlineSold").attr("readonly", isLocked);
 
+        $("#OnlinePercentage").attr("readonly", !isOnline);
+        $("#OnlinePrice").attr("readonly", !isOnline);
 
+        if (!isOnline)
+        {
+            $("#OnlinePercentage").val(0);
+            $("#OnlinePrice").val(0);
+        }
+        
         if (!isLocked)
             $("#Quantity").attr("readonly", !checked);
-
 
         $("#Ledge").attr("readonly", !checked);
         $("#Row").attr("readonly", !checked);

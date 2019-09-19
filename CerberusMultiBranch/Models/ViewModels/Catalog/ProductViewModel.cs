@@ -78,6 +78,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
         {
             this.ProductId = product.ProductId;
             this.Name = product.Name;
+            this.ShortName = product.ShortName;
+            this.Comment = product.Comment;
             this.CategoryId = product.CategoryId;
             this.BarCode = product.BarCode;
             this.BuyPrice = product.BuyPrice;
@@ -111,6 +113,9 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
             this.Quantity = product.Quantity;
             this.IsActive = product.IsActive;
             this.StockLocked = product.StockLocked;
+            this.IsOnlineSold = product.IsOnlineSold;
+            this.OnlinePercentage = product.OnlinePercentage;
+            this.OnlinePrice = product.OnlinePrice;
             this.FillTypes();
         }
 

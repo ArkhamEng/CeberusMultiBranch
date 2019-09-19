@@ -29,10 +29,25 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public string Code { get; set; }
 
         [Display(Name = "Descripción")]
-        [MaxLength(200)]
+        [MaxLength(300)]
         [Index("IDX_Ident_TradeMark", Order = 1)]
         [Required(ErrorMessage ="Se requiere una descripción del producto")]
         public string Name { get; set; }
+
+
+        [Display(Name = "Fabricante")]
+        [MaxLength(50)]
+        [Index("IDX_Ident_TradeMark", Order = 2)]
+        public string TradeMark { get; set; }
+
+
+        [Display(Name = "Nombre Corto")]
+        [MaxLength(50)]
+        public string ShortName { get; set; }
+
+        [Display(Name = "Observaciones")]
+        [MaxLength(300)]
+        public string Comment { get; set; }
 
 
         [Display(Name = "Cantidad Minima")]
@@ -53,17 +68,20 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         public ProductType ProductType { get; set; }
 
 
-        [Display(Name = "Fabricante")]
-        [MaxLength(50)]
-        [Index("IDX_Ident_TradeMark", Order = 2)]
-        public string TradeMark { get; set; }
-
         [Display(Name = "Unidad")]
         [MaxLength(20)]
         public string Unit { get; set; }
 
 
         public bool IsActive { get; set; }
+
+        public bool IsOnlineSold { get; set; }
+
+        
+        public int OnlinePercentage { get; set; }
+
+        [DataType(DataType.Currency)]
+        public double OnlinePrice { get; set; }
 
 
         public bool StockRequired { get; set; }
@@ -233,8 +251,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         {
             this.NewCompatibilities = new List<string>();
             this.UpdDate = DateTime.Now.ToLocal();
-            this.UpdUser = HttpContext.Current.User.Identity.Name; 
-
+            this.UpdUser = HttpContext.Current != null ? HttpContext.Current.User.Identity.Name : null;
         }
         #endregion
     }

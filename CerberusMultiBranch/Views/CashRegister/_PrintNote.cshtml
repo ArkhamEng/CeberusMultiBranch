@@ -106,7 +106,7 @@
                                     <label>Tipo de pago:</label>
                                     <a>@PaymentMethod.Mixto.ToString()</a><br />
                                 }
-                                else
+                                else if(Model.SalePayments.Count == Cons.One)
                                 {
                                     <label>Tipo de pago:</label>
                                     <a>@Model.SalePayments.First().PaymentMethod.ToString()</a><br />
@@ -216,7 +216,7 @@
                                     @Html.DisplayFor(mItem => item.Price)
                                 </td>
                                 <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
-                                    @Html.DisplayFor(mItem => item.Quantity)
+                                    @Html.DisplayFor(mItem => item.DueQuantity)
                                 </td>
                                 <td class="text-right" style="width:10%" valign="top">
                                     @Html.DisplayFor(mItem => item.Amount)

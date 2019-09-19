@@ -17,6 +17,8 @@ namespace CerberusMultiBranch.Support
 
         public string Password { get; private set; }
 
+        public  string OutsideFrom { get; set; }
+
         private string host;
 
         private int port;
@@ -28,6 +30,7 @@ namespace CerberusMultiBranch.Support
             Password = password;
             this.host = host;
             this.port = port;
+            this.CC = new List<string>();
         }
 
        
@@ -48,7 +51,7 @@ namespace CerberusMultiBranch.Support
                 }
             }
 
-            message.From = new MailAddress(FromAddress, FromTitle);
+            message.From = new MailAddress(string.IsNullOrEmpty(this.OutsideFrom) ? FromAddress : this.OutsideFrom, FromTitle);
 
             foreach (var t in to)
                 message.To.Add(new MailAddress(t));

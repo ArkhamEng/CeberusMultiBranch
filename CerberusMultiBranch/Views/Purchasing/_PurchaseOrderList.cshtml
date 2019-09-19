@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<PurchaseOrder>
 @using CerberusMultiBranch.Models.Entities.Purchasing
+@using CerberusMultiBranch.Support
 
 
 <table id="tbPurchaseOrders" class="table small table-bordered" style="width:100%" >
@@ -79,7 +80,7 @@
             <tr>
                 <td style="min-width:100px"  class="@item.StatusStyle">
                     @Html.DisplayFor(modelItem => item.PurchaseStatus.Name) <br />
-                    @Html.DisplayFor(modelItem => item.Folio)
+                    @Html.DisplayUpperFor(modelItem => item.Folio)
                 </td>
 
                 <td style="min-width:100px">
@@ -91,7 +92,7 @@
                    new { title = "Ir a al detalle", data_toggle = "tooltip", onclick = "ShowLoading('static')" })
                 </td>
                 <td  style="white-space:nowrap">
-                    @Html.DisplayFor(modelItem => item.Bill)
+                    @Html.DisplayUpperFor(modelItem => item.Bill)
                 </td>
 
                 <td>

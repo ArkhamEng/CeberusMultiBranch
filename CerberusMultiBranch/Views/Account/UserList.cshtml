@@ -34,7 +34,7 @@
 
 <div class="panel panel-default">
     <div class="panel-body dtContainer">
-        <table id="tbUsers"  class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
+        <table id="tbUsers" class="table dt-responsive nowrap table-bordered small hidden" style="width:100%">
             <thead>
                 <tr>
                     <th />
@@ -105,9 +105,9 @@
                             </button>
 
                             @*<button class="btn btn-danger btn-sm" title="Restaurar contraseña">
-                                <span class="fa fa-trash-o"></span>
-                                Eliminar
-                            </button>*@
+                                    <span class="fa fa-trash-o"></span>
+                                    Eliminar
+                                </button>*@
 
                             <button class="btn btn-info btn-sm" title="Restaurar contraseña" onclick="BeginReset('@item.Id')">
                                 <span class="fa fa-refresh"></span>
@@ -117,7 +117,7 @@
 
                         </td>
                     </tr>
-                   }
+                                }
             </tbody>
         </table>
     </div>
@@ -127,18 +127,23 @@
 <input hidden id="userId" />
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#tbUsers").removeClass("hidden");
         Paginate("#tbUsers", 10, true, "#txtName", false, "#dtUserButtons");
     });
 
-    function BeginReset(id)
-    {
-        
-        ShowConfirm("Esta acción restaurara la contraseña a su valor por defecto, ¿deseas continuar?",
-            '@Url.Action("ResetPassword", "Account")', id, null);
-    
+    function BeginReset(id) {
+
+        ShowConfirm("Restaurar contraseña", "Esta acción restaurara la contraseña a su valor por defecto, ¿deseas continuar?", function ()
+        {
+            ShowLoading('static');
+            ExecuteAjax('@Url.Action("ResetPassword", "Account")', { id: id }, function (response) {
+                HideLoading(function () {
+                    ShowNotify(response.Header, response.Result, response.Body, 3000);
+                });
+            });
+        });
+
     }
 
 </script>

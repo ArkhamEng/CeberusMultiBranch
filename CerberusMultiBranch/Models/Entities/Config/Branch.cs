@@ -30,6 +30,14 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [MaxLength(500)]
         public string NoteLocalHtml { get; set; }
 
+        public double Latitude { get; set; }
+
+        public double Longitude { get; set; }
+
+        public string Image { get; set; }
+
+        public string Phone { get; set; }
+
 
         [MaxLength(50)]
         public string LogoPath { get; set; }

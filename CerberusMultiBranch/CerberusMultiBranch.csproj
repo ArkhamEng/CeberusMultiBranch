@@ -9,23 +9,22 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{455898DA-7248-4524-A3B0-E9588A8B8D44}</ProjectGuid>
+    <ProjectGuid>{4725770E-7CB6-4B85-8DAE-C88C36B06EE1}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CerberusMultiBranch</RootNamespace>
     <AssemblyName>CerberusMultiBranch</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort>44384</IISExpressSSLPort>
-    <IISExpressAnonymousAuthentication />
-    <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressSSLPort>44383</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
+    <IISExpressWindowsAuthentication>disabled</IISExpressWindowsAuthentication>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,55 +44,39 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.AspNet.SignalR.Core, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.Core.2.4.0\lib\net45\Microsoft.AspNet.SignalR.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.AspNet.SignalR.SystemWeb, Version=2.4.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.4.0\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.Owin.Security.Facebook, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.3.1.0\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Security" />
+    <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Cors.5.2.7\lib\net45\System.Web.Cors.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.7\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    <Reference Include="System.Web.Http.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Cors.5.2.7\lib\net45\System.Web.Http.Cors.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
@@ -135,7 +118,6 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebGrease">
       <Private>True</Private>
       <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
@@ -148,6 +130,9 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
@@ -167,8 +152,17 @@
     <Reference Include="Owin">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Owin">
+      <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Owin.Host.SystemWeb">
       <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.0.1\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.0.1\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Facebook">
+      <HintPath>..\packages\Microsoft.Owin.Security.Facebook.3.0.1\lib\net45\Microsoft.Owin.Security.Facebook.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Owin.Security.Cookies">
       <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.0.1\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
@@ -197,20 +191,22 @@
     <Compile Include="Controllers\Catalog\ClientsController.cs" />
     <Compile Include="Controllers\Catalog\EmployeesController.cs" />
     <Compile Include="Controllers\Catalog\ProductComplementController.cs" />
+    <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\Catalog\ProvidersController.cs" />
+    <Compile Include="Controllers\Common\BusinessController.cs" />
+    <Compile Include="Controllers\Common\CatalogController.cs" />
     <Compile Include="Controllers\Common\JsonController.cs" />
     <Compile Include="Controllers\Config\CarModelsController.cs" />
     <Compile Include="Controllers\Config\ConfigurationController.cs" />
-    <Compile Include="Controllers\Config\MakesAndModelsController.cs" />
     <Compile Include="Controllers\Config\DataTablesPostObject.cs" />
+    <Compile Include="Controllers\Config\MakesAndModelsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\Catalog\ProductsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
     <Compile Include="Controllers\Operative\PurchaseEstimationController.cs" />
-    <Compile Include="Controllers\Operative\PurchasingController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
-    <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
+    <Compile Include="Controllers\Operative\PurchasingController.cs" />
     <Compile Include="Controllers\Operative\SalesController.cs" />
     <Compile Include="Controllers\Operative\SellingController.cs" />
     <Compile Include="Global.asax.cs">
@@ -220,8 +216,23 @@
     <Compile Include="Migrations\201907040223342_Initial.Designer.cs">
       <DependentUpon>201907040223342_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201908241446117_BranchAndProductOnlineConfig.cs" />
+    <Compile Include="Migrations\201908241446117_BranchAndProductOnlineConfig.Designer.cs">
+      <DependentUpon>201908241446117_BranchAndProductOnlineConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201909020035352_ProductShortName.cs" />
+    <Compile Include="Migrations\201909020035352_ProductShortName.Designer.cs">
+      <DependentUpon>201909020035352_ProductShortName.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ApiModel\BranchModel.cs" />
+    <Compile Include="Models\ApiModel\CategoryModel.cs" />
+    <Compile Include="Models\ApiModel\ContactMessageModel.cs" />
+    <Compile Include="Models\ApiModel\OfferModel.cs" />
+    <Compile Include="Models\ApiModel\ProductModel.cs" />
+    <Compile Include="Models\ApiModel\SearchFilter.cs" />
+    <Compile Include="Models\ApiModel\TradeMark.cs" />
     <Compile Include="Models\ApplicationDbContext.cs" />
     <Compile Include="Models\Entities\Catalog\Address.cs" />
     <Compile Include="Models\Entities\Catalog\Client.cs" />
@@ -230,39 +241,39 @@
     <Compile Include="Models\Entities\Catalog\Equivalence.cs" />
     <Compile Include="Models\Entities\Catalog\ExternalProduct.cs" />
     <Compile Include="Models\Entities\Catalog\PackageDetail.cs" />
+    <Compile Include="Models\Entities\Catalog\Product.cs" />
+    <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Catalog\Provider.cs" />
     <Compile Include="Models\Entities\Catalog\ShipMethod.cs" />
     <Compile Include="Models\Entities\Catalog\TempExternalProduct.cs" />
+    <Compile Include="Models\Entities\Config\Branch.cs" />
+    <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
+    <Compile Include="Models\Entities\Config\Category.cs" />
     <Compile Include="Models\Entities\Config\City.cs" />
+    <Compile Include="Models\Entities\Config\Company.cs" />
     <Compile Include="Models\Entities\Config\ISelectable.cs" />
     <Compile Include="Models\Entities\Config\IUserAssignment.cs" />
+    <Compile Include="Models\Entities\Config\JobPosition.cs" />
     <Compile Include="Models\Entities\Config\State.cs" />
-    <Compile Include="Models\Entities\Config\Branch.cs" />
-    <Compile Include="Models\Entities\Config\Company.cs" />
-    <Compile Include="Models\Entities\Config\Category.cs" />
-    <Compile Include="Models\Entities\Catalog\Product.cs" />
-    <Compile Include="Models\Entities\Config\CarMakeModelYear.cs" />
-    <Compile Include="Models\Entities\Catalog\ProductImage.cs" />
     <Compile Include="Models\Entities\Config\System.cs" />
     <Compile Include="Models\Entities\Config\SystemCategory.cs" />
     <Compile Include="Models\Entities\Config\UserBranch.cs" />
     <Compile Include="Models\Entities\Config\Variable.cs" />
     <Compile Include="Models\Entities\Finances\Account.cs" />
     <Compile Include="Models\Entities\Finances\FinancialOperation.cs" />
+    <Compile Include="Models\Entities\Finances\PurchaseDiscount.cs" />
     <Compile Include="Models\Entities\Finances\PurchasePayment.cs" />
     <Compile Include="Models\Entities\Finances\Receivable.cs" />
-    <Compile Include="Models\Entities\Config\JobPosition.cs" />
+    <Compile Include="Models\Entities\Finances\SalePayment.cs" />
+    <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Budget.cs" />
     <Compile Include="Models\Entities\Operative\BudgetDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashDetail.cs" />
     <Compile Include="Models\Entities\Operative\CashRegister.cs" />
     <Compile Include="Models\Entities\Operative\ItemLocation.cs" />
     <Compile Include="Models\Entities\Operative\OperativeEnum.cs" />
-    <Compile Include="Models\Entities\Finances\SalePayment.cs" />
-    <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Purchase.cs" />
     <Compile Include="Models\Entities\Operative\PurchaseDetail.cs" />
-    <Compile Include="Models\Entities\Finances\PurchaseDiscount.cs" />
     <Compile Include="Models\Entities\Operative\Sale.cs" />
     <Compile Include="Models\Entities\Operative\SaleCreditNote.cs" />
     <Compile Include="Models\Entities\Operative\SaleDetail.cs" />
@@ -282,10 +293,10 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
+    <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ProviderViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchPersonViewModel.cs" />
-    <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductResultViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\SearchProductViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\TransferViewModel.cs" />
@@ -296,6 +307,7 @@
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
@@ -304,11 +316,10 @@
     <Compile Include="Models\ViewModels\Operative\ProductReceptionViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PurchaseCartViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\RefundViewModel.cs" />
-    <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SaleCancelViewModel.cs" />
+    <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\SetProviderCodeViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\TransactionViewModel.cs" />
-    <Compile Include="Models\ViewModels\Operative\SaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\WithdrawalViewModel.cs" />
     <Compile Include="Models\ViewModels\Purchasing\BillingViewModel.cs" />
     <Compile Include="Models\ViewModels\Purchasing\RequiredProductGroupViewModel.cs" />
@@ -319,7 +330,7 @@
     <Compile Include="Support\CustomAuthorize.cs" />
     <Compile Include="Support\DBHelper.cs" />
     <Compile Include="Support\Extension.cs" />
-    <Compile Include="Support\FileManager.cs" />
+    <Compile Include="Support\FIleManager.cs" />
     <Compile Include="Support\GzipWrapper.cs" />
     <Compile Include="Support\JResponse.cs" />
     <Compile Include="Support\MailSender.cs" />
@@ -330,14 +341,15 @@
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Controls\SaleOrderChange.js" />
+    <Content Include="AppScripts\Controls\SearchCustomer.js" />
     <Content Include="AppScripts\Controls\SearchProduct.js" />
-    <Content Include="AppScripts\Searches.js" />
     <Content Include="AppScripts\Global.js" />
     <Content Include="AppScripts\Operative.js" />
     <Content Include="AppScripts\PurchaseEstimation.js" />
     <Content Include="AppScripts\PurchaseOrder.js" />
     <Content Include="AppScripts\SaleOrder.js" />
-    <Content Include="AppScripts\Controls\SearchCustomer.js" />
+    <Content Include="AppScripts\Searches.js" />
+    <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -515,7 +527,6 @@
     <Content Include="Content\Images\sinimagen.jpg" />
     <Content Include="Content\Images\success.png" />
     <Content Include="Content\Images\warning.png" />
-    <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="Content\pnotify\pnotify.buttons.css" />
     <Content Include="Content\pnotify\pnotify.css" />
     <Content Include="Content\pnotify\pnotify.nonblock.css" />
@@ -566,30 +577,19 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.min.css.map" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="fonts\FontAwesome.otf" />
-    <Content Include="fonts\fontawesome-webfont.woff2" />
-    <Content Include="fonts\fontawesome-webfont.woff" />
-    <Content Include="fonts\fontawesome-webfont.ttf" />
-    <Content Include="fonts\fontawesome-webfont.eot" />
-    <Content Include="LoadFormat.xml" />
+    <Content Include="Content\bootstrap-theme.min.css.map" />
+    <Content Include="Content\bootstrap.css.map" />
+    <Content Include="Content\bootstrap.min.css.map" />
     <Content Include="Content\DataTables\css\common.scss" />
     <Content Include="Content\DataTables\css\mixins.scss" />
     <Content Include="Content\DataTables\css\semanticui.scss" />
-    <Content Include="Models\Entities\Operative\SalePayment.cd" />
-    <Content Include="Models\Entities\Operative\Purchase.cd" />
-    <Content Include="Models\Entities\Purchasing\PurchaseOrder.cd" />
-    <None Include="Properties\PublishProfiles\Default Settings.pubxml" />
-    <None Include="Properties\PublishProfiles\SimsTrial.pubxml" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="fonts\FontAwesome.otf" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="Scripts\bootstrap-slider.min.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -670,32 +670,34 @@
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
-    <Content Include="Scripts\jquery.maskedinput.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.4.0.js" />
-    <Content Include="Scripts\jquery.signalR-2.4.0.min.js" />
-    <Content Include="Scripts\jszip\jszip.min.js" />
-    <Content Include="Scripts\pnotify\pnotify.buttons.js" />
-    <Content Include="Scripts\pnotify\pnotify.js" />
-    <Content Include="Scripts\pnotify\pnotify.nonblock.js" />
-    <Content Include="Scripts\Table2Excel.js" />
+    <None Include="Properties\PublishProfiles\Sims1.5.pubxml" />
+    <None Include="Properties\PublishProfiles\SimsTrial.pubxml" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
     <Content Include="Scripts\jquery-3.1.1.min.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.js" />
     <Content Include="Scripts\jquery-3.1.1.slim.min.js" />
-    <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
-    <Content Include="Scripts\jquery-3.1.1.min.map" />
+    <Content Include="Scripts\jquery.maskedinput.min.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.0.js" />
+    <Content Include="Scripts\jquery.signalR-2.4.0.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\_jquery-ui-1.12.1.js" />
-    <Content Include="Scripts\_jquery-ui-1.12.1.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="Scripts\jszip\jszip.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
+    <Content Include="Scripts\pnotify\pnotify.buttons.js" />
+    <Content Include="Scripts\pnotify\pnotify.js" />
+    <Content Include="Scripts\pnotify\pnotify.nonblock.js" />
     <Content Include="Scripts\printThis.js" />
     <Content Include="Scripts\respond.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Scripts\_references.js" />
+    <Content Include="Scripts\Table2Excel.js" />
+    <Content Include="Scripts\_jquery-ui-1.12.1.js" />
+    <Content Include="Scripts\_jquery-ui-1.12.1.min.js" />
+    <None Include="Scripts\_references.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -705,13 +707,9 @@
     <Content Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
-    <Content Include="Views\Web.config" />
+    <Content Include="Scripts\jquery-3.1.1.min.map" />
+    <Content Include="Scripts\jquery-3.1.1.slim.min.map" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Account\_ExternalLoginsListPartial.cshtml" />
     <Content Include="Views\Account\ConfirmEmail.cshtml" />
     <Content Include="Views\Account\ExternalLoginConfirmation.cshtml" />
@@ -723,185 +721,191 @@
     <Content Include="Views\Account\ResetPassword.cshtml" />
     <Content Include="Views\Account\ResetPasswordConfirmation.cshtml" />
     <Content Include="Views\Account\SendCode.cshtml" />
+    <Content Include="Views\Account\UserConfig.cshtml" />
+    <Content Include="Views\Account\UserList.cshtml" />
     <Content Include="Views\Account\VerifyCode.cshtml" />
+    <Content Include="Views\CashRegister\_CashRegisterList.cshtml" />
+    <Content Include="Views\CashRegister\_CloseCash.cshtml" />
+    <Content Include="Views\CashRegister\_Incomes.cshtml" />
+    <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
+    <Content Include="Views\CashRegister\_PendingRefundment.cshtml" />
+    <Content Include="Views\CashRegister\_PrintCreditNote.cshtml" />
+    <Content Include="Views\CashRegister\_PrintElements.cshtml" />
+    <Content Include="Views\CashRegister\_PrintNote.cshtml" />
+    <Content Include="Views\CashRegister\_PrintRefund.cshtml" />
+    <Content Include="Views\CashRegister\_PrintTicket.cshtml" />
+    <Content Include="Views\CashRegister\_Refundment.cshtml" />
+    <Content Include="Views\CashRegister\_RegistPayment.cshtml" />
+    <Content Include="Views\CashRegister\_SalesToPayList.cshtml" />
+    <Content Include="Views\CashRegister\_TicketsAndNotes.cshtml" />
+    <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
+    <Content Include="Views\CashRegister\Detail.cshtml" />
+    <Content Include="Views\CashRegister\History.cshtml" />
+    <Content Include="Views\CashRegister\Index.cshtml" />
+    <Content Include="Views\Clients\_ClientEdition.cshtml" />
+    <Content Include="Views\Clients\_ClientQuickSearch.cshtml" />
+    <Content Include="Views\Clients\_ClientQuickSearchList.cshtml" />
+    <Content Include="Views\Clients\_List.cshtml" />
+    <Content Include="Views\Clients\Index.cshtml" />
+    <Content Include="Views\Configuration\_Branches.cshtml" />
+    <Content Include="Views\Configuration\_BranchList.cshtml" />
+    <Content Include="Views\Configuration\_Categories.cshtml" />
+    <Content Include="Views\Configuration\_CategoryEdition.cshtml" />
+    <Content Include="Views\Configuration\_CategoryList.cshtml" />
+    <Content Include="Views\Configuration\_SystemCategory.cshtml" />
+    <Content Include="Views\Configuration\_SystemEdition.cshtml" />
+    <Content Include="Views\Configuration\_SystemList.cshtml" />
+    <Content Include="Views\Configuration\_Systems.cshtml" />
+    <Content Include="Views\Configuration\_VariableList.cshtml" />
+    <Content Include="Views\Configuration\_Variables.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCause.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCauseEdition.cshtml" />
+    <Content Include="Views\Configuration\_WithdrawalCauseList.cshtml" />
+    <Content Include="Views\Configuration\Clasifications.cshtml" />
+    <Content Include="Views\Employees\_EmployeeEdition.cshtml" />
+    <Content Include="Views\Employees\_List.cshtml" />
+    <Content Include="Views\Employees\Index.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakeEdition.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakeList.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarMakes.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModelEdition.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModelList.cshtml" />
+    <Content Include="Views\MakesAndModels\_CarModels.cshtml" />
+    <Content Include="Views\MakesAndModels\_YearList.cshtml" />
+    <Content Include="Views\MakesAndModels\Create.cshtml" />
+    <Content Include="Views\MakesAndModels\Index.cshtml" />
     <Content Include="Views\Manage\AddPhoneNumber.cshtml" />
+    <Content Include="Views\Manage\AddProfilePicture.cshtml" />
     <Content Include="Views\Manage\ChangePassword.cshtml" />
     <Content Include="Views\Manage\Index.cshtml" />
     <Content Include="Views\Manage\ManageLogins.cshtml" />
     <Content Include="Views\Manage\SetPassword.cshtml" />
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
-    <Content Include="Views\Shared\Lockout.cshtml" />
-    <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\Products\Index.cshtml" />
-    <Content Include="Views\Products\_List.cshtml" />
-    <Content Include="Views\Products\_ImagesLoaded.cshtml" />
-    <Content Include="Views\Clients\_ClientEdition.cshtml" />
-    <Content Include="Views\Clients\Index.cshtml" />
-    <Content Include="Views\Employees\_EmployeeEdition.cshtml" />
-    <Content Include="Views\Employees\Index.cshtml" />
-    <Content Include="Views\Clients\_List.cshtml" />
-    <Content Include="Views\MakesAndModels\Index.cshtml" />
-    <Content Include="Views\MakesAndModels\Create.cshtml" />
-    <Content Include="Views\MakesAndModels\_YearList.cshtml" />
-    <Content Include="Views\Providers\_ProviderEdition.cshtml" />
-    <Content Include="Views\Providers\Index.cshtml" />
-    <Content Include="Views\Providers\_List.cshtml" />
-    <Content Include="Views\Employees\_List.cshtml" />
     <Content Include="Views\Products\_CarModelSelector.cshtml" />
-    <Content Include="Views\Clients\_ClientQuickSearch.cshtml" />
-    <Content Include="Views\Shared\_QuickProvider.cshtml" />
-    <Content Include="Views\Configuration\_Categories.cshtml" />
-    <Content Include="Views\Configuration\_CategoryList.cshtml" />
-    <Content Include="Views\Configuration\_BranchList.cshtml" />
-    <Content Include="Views\Configuration\_Branches.cshtml" />
-    <Content Include="Views\Shared\_BranchSelector.cshtml" />
-    <Content Include="Views\Purchases\Detail.cshtml" />
-    <Content Include="Views\Purchases\Report.cshtml" />
-    <Content Include="Views\Purchases\_Details.cshtml" />
-    <Content Include="Views\Products\_ProductList.cshtml" />
-    <Content Include="Views\Products\_StockInBranches.cshtml" />
-    <Content Include="Views\Purchases\_PurchaseList.cshtml" />
-    <Content Include="Views\Products\_ProductDetail.cshtml" />
-    <Content Include="Views\Shared\_Progress.cshtml" />
-    <Content Include="Views\Shared\_SideBar.cshtml" />
-    <Content Include="Views\Sales\_Cart.cshtml" />
-    <Content Include="Views\Sales\_CartDetails.cshtml" />
-    <Content Include="Views\Clients\_ClientQuickSearchList.cshtml" />
-    <Content Include="Views\Sales\Report.cshtml" />
-    <Content Include="Views\Sales\_SaleList.cshtml" />
-    <Content Include="Views\Configuration\_VariableList.cshtml" />
-    <Content Include="Views\Configuration\_Variables.cshtml" />
-    <Content Include="Views\CashRegister\Index.cshtml" />
-    <Content Include="Views\Providers\_QuickProviderList.cshtml" />
-    <Content Include="Views\CashRegister\_Withdrawals.cshtml" />
-    <Content Include="Views\CashRegister\_CloseCash.cshtml" />
-    <Content Include="Views\Sales\_AddProduct.cshtml" />
-    <Content Include="Views\Products\_ListForSaleNotUsed.cshtml" />
-    <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
-    <Content Include="Views\CashRegister\_PrintNote.cshtml" />
-    <Content Include="Views\Account\UserConfig.cshtml" />
-    <Content Include="Views\Account\UserList.cshtml" />
-    <Content Include="Views\Configuration\_WithdrawalCause.cshtml" />
-    <Content Include="Views\Configuration\_WithdrawalCauseList.cshtml" />
-    <Content Include="Views\CashRegister\_CashRegisterList.cshtml" />
-    <Content Include="Views\CashRegister\History.cshtml" />
-    <Content Include="Views\CashRegister\Detail.cshtml" />
-    <Content Include="Views\Sales\_PriceSelector.cshtml" />
-    <Content Include="Views\Manage\AddProfilePicture.cshtml" />
-    <Content Include="Views\Sales\Payments.cshtml" />
-    <Content Include="Views\CashRegister\_SalesToPayList.cshtml" />
-    <Content Include="Views\CashRegister\_TicketsAndNotes.cshtml" />
-    <Content Include="Views\Purchases\_SearchExternalProduct.cshtml" />
-    <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
-    <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
-    <Content Include="Views\Purchases\_InternalProductList.cshtml" />
-    <Content Include="Views\Providers\_ProviderCatalogEdition.cshtml" />
-    <Content Include="Views\Shared\MainLayout.cshtml" />
-    <Content Include="Views\Shared\PageLayout.cshtml" />
-    <Content Include="Views\Shared\_CartOption.cshtml" />
-    <Content Include="Views\Products\_Transference.cshtml" />
-    <Content Include="Views\Sales\_CancelSale.cshtml" />
-    <Content Include="Views\Products\_Movement.cshtml" />
-    <Content Include="Views\Products\_SearchInternalProduct.cshtml" />
-    <Content Include="Views\Products\_ListForPackage.cshtml" />
-    <Content Include="Views\Products\_PackageDetails.cshtml" />
     <Content Include="Views\Products\_Compatibilities.cshtml" />
-    <Content Include="Views\Shared\_BranchOption.cshtml" />
-    <Content Include="Views\Products\_ProviderProducts.cshtml" />
-    <Content Include="Views\Shared\_Confirm.cshtml" />
-    <Content Include="Views\CashRegister\_PendingPayment.cshtml" />
-    <Content Include="Views\Shared\_PaymentOption.cshtml" />
-    <Content Include="Views\Configuration\_CategoryEdition.cshtml" />
-    <Content Include="Views\Configuration\_Systems.cshtml" />
-    <Content Include="Views\Configuration\_SystemList.cshtml" />
-    <Content Include="Views\Configuration\_SystemEdition.cshtml" />
-    <Content Include="Views\Configuration\Clasifications.cshtml" />
-    <Content Include="Views\Configuration\_SystemCategory.cshtml" />
     <Content Include="Views\Products\_GeneralData.cshtml" />
-    <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
-    <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
-    <Content Include="Views\CashRegister\_PrintTicket.cshtml" />
-    <Content Include="Views\Sales\Detail.cshtml" />
-    <Content Include="Views\Sales\_Details.cshtml" />
-    <Content Include="Views\Sales\_SalePayments.cshtml" />
-    <Content Include="Views\Sales\_ProductResult.cshtml" />
-    <Content Include="Views\Sales\_SearchProduct.cshtml" />
-    <Content Include="Views\Sales\DailyBill.cshtml" />
-    <Content Include="Views\Sales\_SoldItemsDetails.cshtml" />
-    <Content Include="Views\Purchases\_SearchProduct.cshtml" />
-    <Content Include="Views\Purchases\_ProductResult.cshtml" />
-    <Content Include="Views\Purchases\_AddProduct.cshtml" />
-    <Content Include="Views\CashRegister\_RegistPayment.cshtml" />
-    <Content Include="Views\CashRegister\_PendingRefundment.cshtml" />
-    <Content Include="Views\CashRegister\_Refundment.cshtml" />
-    <Content Include="Views\CashRegister\_PrintCreditNote.cshtml" />
-    <Content Include="Views\CashRegister\_PrintElements.cshtml" />
-    <Content Include="Views\Products\StockMovement.cshtml" />
+    <Content Include="Views\Products\_ImagesLoaded.cshtml" />
+    <Content Include="Views\Products\_List.cshtml" />
+    <Content Include="Views\Products\_ListForPackage.cshtml" />
+    <Content Include="Views\Products\_ListForSaleNotUsed.cshtml" />
+    <Content Include="Views\Products\_Movement.cshtml" />
     <Content Include="Views\Products\_MovementList.cshtml" />
-    <Content Include="Views\Sales\_PrintBudget.cshtml" />
-    <Content Include="Views\CashRegister\_PrintRefund.cshtml" />
-    <Content Include="Views\Sales\Budget.cshtml" />
-    <Content Include="Views\Sales\_BudgetDetail.cshtml" />
-    <Content Include="Views\Sales\_BudgetList.cshtml" />
-    <Content Include="Views\Sales\_ChangeQuantity.cshtml" />
-    <Content Include="Views\Shared\_ChildModal.cshtml" />
-    <Content Include="Views\Shared\_Loading.cshtml" />
-    <Content Include="Views\Shared\_Message.cshtml" />
-    <Content Include="Views\Shared\_Modal.cshtml" />
-    <Content Include="Views\Shared\_QuickProduct.cshtml" />
-    <Content Include="Views\Configuration\_WithdrawalCauseEdition.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarModels.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarModelList.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarMakes.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarMakeList.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarMakeEdition.cshtml" />
-    <Content Include="Views\MakesAndModels\_CarModelEdition.cshtml" />
-    <Content Include="Views\Products\_ProductImages.cshtml" />
-    <Content Include="Views\Products\_ProductMovement.cshtml" />
-    <Content Include="Views\Purchases\_CancelPurchase.cshtml" />
+    <Content Include="Views\Products\_PackageDetails.cshtml" />
+    <Content Include="Views\Products\_Pagination.cshtml" />
+    <Content Include="Views\Products\_ProductDetail.cshtml" />
     <Content Include="Views\Products\_ProductEdition.cshtml" />
     <Content Include="Views\Products\_ProductEditionGeneral.cshtml" />
     <Content Include="Views\Products\_ProductEditionImages.cshtml" />
-    <Content Include="Views\Shared\_ChildLoading.cshtml" />
-    <Content Include="Views\PurchaseEstimation\PurchaseEstimation.cshtml" />
-    <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
-    <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
+    <Content Include="Views\Products\_ProductImages.cshtml" />
+    <Content Include="Views\Products\_ProductList.cshtml" />
+    <Content Include="Views\Products\_ProductMovement.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearch.cshtml" />
     <Content Include="Views\Products\_ProductQuickSearchList.cshtml" />
+    <Content Include="Views\Products\_ProviderProducts.cshtml" />
+    <Content Include="Views\Products\_SearchInternalProduct.cshtml" />
+    <Content Include="Views\Products\_SearchPagin.cshtml" />
+    <Content Include="Views\Products\_StockInBranches.cshtml" />
+    <Content Include="Views\Products\_Transference.cshtml" />
+    <Content Include="Views\Products\Index.cshtml" />
+    <Content Include="Views\Products\SearchPagin.cshtml" />
+    <Content Include="Views\Products\StockMovement.cshtml" />
+    <Content Include="Views\Providers\_List.cshtml" />
+    <Content Include="Views\Providers\_ProviderCatalogEdition.cshtml" />
+    <Content Include="Views\Providers\_ProviderEdition.cshtml" />
+    <Content Include="Views\Providers\_ProviderQuickSearch.cshtml" />
+    <Content Include="Views\Providers\_ProviderQuickSearchList.cshtml" />
+    <Content Include="Views\Providers\_QuickProviderList.cshtml" />
+    <Content Include="Views\Providers\Index.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_AvailableCarts.cshtml" />
+    <Content Include="Views\PurchaseEstimation\_EditEstimationDetail.cshtml" />
     <Content Include="Views\PurchaseEstimation\_PurchaseEstimationDetails.cshtml" />
     <Content Include="Views\PurchaseEstimation\_SetProviderCode.cshtml" />
-    <Content Include="Views\Purchasing\PurchaseOrder.cshtml" />
+    <Content Include="Views\PurchaseEstimation\PurchaseEstimation.cshtml" />
+    <Content Include="Views\Purchases\_AddProduct.cshtml" />
+    <Content Include="Views\Purchases\_BeginPurchase.cshtml" />
+    <Content Include="Views\Purchases\_CancelPurchase.cshtml" />
+    <Content Include="Views\Purchases\_Details.cshtml" />
+    <Content Include="Views\Purchases\_ExternalProductList.cshtml" />
+    <Content Include="Views\Purchases\_InternalProductList.cshtml" />
+    <Content Include="Views\Purchases\_ProductResult.cshtml" />
+    <Content Include="Views\Purchases\_PurchaseList.cshtml" />
+    <Content Include="Views\Purchases\_PurchasePayments.cshtml" />
+    <Content Include="Views\Purchases\_SearchExternalProduct.cshtml" />
+    <Content Include="Views\Purchases\_SearchInternalProduct.cshtml" />
+    <Content Include="Views\Purchases\_SearchProduct.cshtml" />
+    <Content Include="Views\Purchases\Detail.cshtml" />
+    <Content Include="Views\Purchases\Report.cshtml" />
+    <Content Include="Views\Purchasing\_CreateBill.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrder.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderDetails.cshtml" />
-    <Content Include="Views\Purchasing\_ReceivePurchaseItem.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderFilter.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderHistories.cshtml" />
+    <Content Include="Views\Purchasing\_PurchaseOrderList.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderRequest.cshtml" />
     <Content Include="Views\Purchasing\_PurchaseOrderRevision.cshtml" />
-    <Content Include="Views\Purchasing\_PurchaseOrder.cshtml" />
-    <Content Include="Views\Purchasing\_PurchaseOrderHistories.cshtml" />
-    <Content Include="Views\PurchaseEstimation\_EditEstimationDetail.cshtml" />
-    <Content Include="Views\Purchasing\PurchaseOrders.cshtml" />
-    <Content Include="Views\Purchasing\_PurchaseOrderList.cshtml" />
+    <Content Include="Views\Purchasing\_ReceivePurchaseItem.cshtml" />
     <Content Include="Views\Purchasing\_ReceptionDetail.cshtml" />
-    <Content Include="Views\Purchasing\_CreateBill.cshtml" />
-    <Content Include="Views\Purchasing\_PurchaseOrderFilter.cshtml" />
-    <Content Include="Views\Shared\_SearchProductForOrder.cshtml" />
-    <Content Include="Views\Shared\_SearchProductForOrderList.cshtml" />
-    <Content Include="Views\Products\SearchPagin.cshtml" />
-    <Content Include="Views\Products\_SearchPagin.cshtml" />
-    <Content Include="Views\Products\_Pagination.cshtml" />
-    <Content Include="Views\PurchaseEstimation\_AvailableCarts.cshtml" />
+    <Content Include="Views\Purchasing\PurchaseOrder.cshtml" />
+    <Content Include="Views\Purchasing\PurchaseOrders.cshtml" />
+    <Content Include="Views\Sales\_AddProduct.cshtml" />
+    <Content Include="Views\Sales\_BudgetDetail.cshtml" />
+    <Content Include="Views\Sales\_BudgetList.cshtml" />
+    <Content Include="Views\Sales\_CancelSale.cshtml" />
+    <Content Include="Views\Sales\_Cart.cshtml" />
+    <Content Include="Views\Sales\_CartDetails.cshtml" />
+    <Content Include="Views\Sales\_ChangeQuantity.cshtml" />
+    <Content Include="Views\Sales\_Details.cshtml" />
+    <Content Include="Views\Sales\_PriceSelector.cshtml" />
+    <Content Include="Views\Sales\_PrintBudget.cshtml" />
+    <Content Include="Views\Sales\_ProductResult.cshtml" />
+    <Content Include="Views\Sales\_SaleList.cshtml" />
+    <Content Include="Views\Sales\_SalePayments.cshtml" />
+    <Content Include="Views\Sales\_SearchProduct.cshtml" />
+    <Content Include="Views\Sales\_SoldItemsDetails.cshtml" />
+    <Content Include="Views\Sales\Budget.cshtml" />
+    <Content Include="Views\Sales\DailyBill.cshtml" />
+    <Content Include="Views\Sales\Detail.cshtml" />
+    <Content Include="Views\Sales\Payments.cshtml" />
+    <Content Include="Views\Sales\Report.cshtml" />
+    <Content Include="Views\Selling\CustomerInfo.cshtml" />
+    <Content Include="Views\Selling\PrintBudget.cshtml" />
     <Content Include="Views\Selling\SaleOrder.cshtml" />
+    <Content Include="Views\Selling\SaleOrderChange.cshtml" />
     <Content Include="Views\Selling\SaleOrderDetail.cshtml" />
     <Content Include="Views\Selling\SaleOrderHeader.cshtml" />
+    <Content Include="Views\Selling\SaleOrderHistories.cshtml" />
+    <Content Include="Views\Selling\SaleOrderPayments.cshtml" />
     <Content Include="Views\Selling\SearchCustomer.cshtml" />
     <Content Include="Views\Selling\SearchCustomerResults.cshtml" />
-    <Content Include="Views\Selling\CustomerInfo.cshtml" />
     <Content Include="Views\Selling\SearchProduct.cshtml" />
     <Content Include="Views\Selling\SearchProductResults.cshtml" />
-    <Content Include="Views\Selling\SaleOrderHistories.cshtml" />
-    <Content Include="Views\Selling\SaleOrderChange.cshtml" />
-    <Content Include="Views\Selling\SaleOrderPayments.cshtml" />
-    <Content Include="Views\Selling\PrintBudget.cshtml" />
-    <Content Include="Views\CashRegister\_Incomes.cshtml" />
+    <Content Include="Views\Shared\_BranchOption.cshtml" />
+    <Content Include="Views\Shared\_BranchSelector.cshtml" />
+    <Content Include="Views\Shared\_CartOption.cshtml" />
+    <Content Include="Views\Shared\_ChildLoading.cshtml" />
+    <Content Include="Views\Shared\_ChildModal.cshtml" />
+    <Content Include="Views\Shared\_Confirm.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\Shared\_Loading.cshtml" />
+    <Content Include="Views\Shared\_LoginPartial.cshtml" />
+    <Content Include="Views\Shared\_Message.cshtml" />
+    <Content Include="Views\Shared\_Modal.cshtml" />
+    <Content Include="Views\Shared\_PaymentOption.cshtml" />
+    <Content Include="Views\Shared\_ProductSearchFilters.cshtml" />
+    <Content Include="Views\Shared\_Progress.cshtml" />
+    <Content Include="Views\Shared\_QuickProduct.cshtml" />
+    <Content Include="Views\Shared\_QuickProvider.cshtml" />
+    <Content Include="Views\Shared\_SearchProductForOrder.cshtml" />
+    <Content Include="Views\Shared\_SearchProductForOrderList.cshtml" />
+    <Content Include="Views\Shared\_SideBar.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\Lockout.cshtml" />
+    <Content Include="Views\Shared\MainLayout.cshtml" />
+    <Content Include="Views\Shared\PageLayout.cshtml" />
+    <Content Include="Views\Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -909,15 +913,24 @@
     <Folder Include="Views\ProductComplement\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
+    <Content Include="Models\Entities\Operative\Purchase.cd" />
+    <Content Include="Models\Entities\Operative\SalePayment.cd" />
+    <Content Include="Models\Entities\Purchasing\PurchaseOrder.cd" />
     <None Include="Project_Readme.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201907040223342_Initial.resx">
       <DependentUpon>201907040223342_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201908241446117_BranchAndProductOnlineConfig.resx">
+      <DependentUpon>201908241446117_BranchAndProductOnlineConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201909020035352_ProductShortName.resx">
+      <DependentUpon>201909020035352_ProductShortName.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -936,9 +949,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>18798</DevelopmentServerPort>
+          <DevelopmentServerPort>14927</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44384/</IISUrl>
+          <IISUrl>http://localhost:18798/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

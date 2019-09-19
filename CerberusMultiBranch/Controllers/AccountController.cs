@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -9,13 +7,11 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using CerberusMultiBranch.Models;
-using CerberusMultiBranch.Models.Entities;
 using CerberusMultiBranch.Support;
 using System.Data.Entity;
 using CerberusMultiBranch.Models.ViewModels.Config;
 using Microsoft.AspNet.Identity.EntityFramework;
 using CerberusMultiBranch.Models.Entities.Config;
-using System.Web.Security;
 
 namespace CerberusMultiBranch.Controllers
 {

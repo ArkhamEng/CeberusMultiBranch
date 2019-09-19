@@ -59,7 +59,10 @@ namespace CerberusMultiBranch.Models.ViewModels.Catalog
         {
             get
             {
-                return (LockEndDate != null && LockUser != HttpContext.Current.User.Identity.Name);
+                //si el campo lock enDate es diferente de null y mayor que la fecha actual, indica bloqueo
+                return (LockEndDate != null && 
+                        LockEndDate.Value > DateTime.Now.ToLocal() && 
+                        LockUser != HttpContext.Current.User.Identity.Name);
             }
         }
      

@@ -103,6 +103,9 @@
         $("#DealerPercentage").keyup(SetPrice);
         $("#DealerPercentage").click(SetPrice);
 
+        $("#OnlinePercentage").keyup(SetPrice);
+        $("#OnlinePercentage").click(SetPrice);
+
         $("#BuyPrice").keyup(SetPrice);
         $("#BuyPrice").click(SetPrice);
     });
@@ -112,9 +115,16 @@
         var sp = (1 + $("#StorePercentage").val() / 100);
         var wp = (1 + $("#WholesalerPercentage").val() / 100);
         var dp = (1 + $("#DealerPercentage").val() / 100);
+      
 
         $("#StorePrice").val(($("#BuyPrice").val() * sp).toFixed(0));
         $("#WholesalerPrice").val(($("#BuyPrice").val() * wp).toFixed(0));
         $("#DealerPrice").val(($("#BuyPrice").val() * dp).toFixed(0));
+
+        var isOnline = $("#IsOnlineSold").is(':checked');
+        if (isOnline) {
+            var op = (1 + $("#OnlinePercentage").val() / 100);
+            $("#OnlinePrice").val(($("#BuyPrice").val() * op).toFixed(0));
+        }
     }
 </script>

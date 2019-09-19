@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.SaleHistory>
-
+@using CerberusMultiBranch.Support;
 
 <table class="table table-striped small" style="width:100%">
     <thead>
@@ -27,19 +27,19 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Status)
+                    @Html.DisplayUpperFor(modelItem => item.Status)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.TotalDue)
+                    @Html.DisplayUpperFor(modelItem => item.TotalDue)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Comment)
+                    @Html.DisplayUpperFor(modelItem => item.Comment)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.User)
+                    @Html.DisplayUpperFor(modelItem => item.User)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.InsDate)
+                    @Html.DisplayUpperFor(modelItem => item.InsDate)
                 </td>
             </tr>
         }
