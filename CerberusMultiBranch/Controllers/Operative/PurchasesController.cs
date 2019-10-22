@@ -32,8 +32,8 @@ namespace CerberusMultiBranch.Controllers.Operative
             var branches = User.Identity.GetBranches();
 
             TransactionViewModel model = new TransactionViewModel();
-            model.BeginDate    = DateTime.Now.TodayLocal();
-            model.EndDate   = DateTime.Now.TodayLocal();
+            model.BeginDate = DateTime.Now.TodayLocal();
+            model.EndDate = DateTime.Now.TodayLocal();
             model.Branches = branches.ToSelectList();
             model.Purchases = LookFor(null, null, null, null, null, null, null, TranStatus.Reserved, Cons.InitialRows);
 
@@ -119,7 +119,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
-                if (purchase.Status == TranStatus.Reserved || purchase.Status == TranStatus.Compleated) 
+                if (purchase.Status == TranStatus.Reserved || purchase.Status == TranStatus.Compleated)
                 {
                     return Json(new JResponse
                     {
@@ -147,7 +147,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     }
 
                     bp.LastStock = bp.Stock;
-                    bp.Stock     -= detail.Quantity;
+                    bp.Stock -= detail.Quantity;
                     db.Entry(bp).State = EntityState.Modified;
 
                     //creo un movimiento de stock
@@ -167,10 +167,10 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 //desactivo la venta y registo usuario, comentario y fecha de cancelación
                 purchase.LastStatus = purchase.Status;
-                purchase.Status     = TranStatus.Canceled;
-                purchase.UpdUser    = User.Identity.Name;
-                purchase.UpdDate    = DateTime.Now.ToLocal();
-                purchase.Comment    = comment;
+                purchase.Status = TranStatus.Canceled;
+                purchase.UpdUser = User.Identity.Name;
+                purchase.UpdDate = DateTime.Now.ToLocal();
+                purchase.Comment = comment;
 
                 db.Entry(purchase).State = EntityState.Modified;
 
@@ -262,7 +262,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     DiscountPercentage = model.Discount
                 };
 
-                if(model.Discount > Cons.Zero)
+                if (model.Discount > Cons.Zero)
                 {
                     purchase.PurchaseDiscount = new List<PurchaseDiscount>();
                     purchase.PurchaseDiscount.Add(new PurchaseDiscount
@@ -274,7 +274,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                     });
                 }
 
-                
+
                 db.Purchases.Add(purchase);
                 db.SaveChanges();
 
@@ -318,13 +318,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
             List<Product> products = new List<Product>();
 
-       
-                products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
-                            where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
-                            && (ep.ProductType == ProductType.Single)
-                            && (ep.IsActive)
-                            select ep).Take((int)Cons.OneHundred).ToList();
-     
+
+            products = (from ep in db.Products.Include(p => p.Images).Include(p => p.BranchProducts).Include(p => p.Equivalences)
+                        where (filter == null || filter == string.Empty || arr.All(s => (ep.Code + " " + ep.Name + " " + ep.TradeMark).Contains(s)))
+                        && (ep.ProductType == ProductType.Single)
+                        && (ep.IsActive)
+                        select ep).Take((int)Cons.OneHundred).ToList();
+
             //obtengo el código del proveedor si es que tiene
             products.ForEach(p =>
             {
@@ -404,14 +404,14 @@ namespace CerberusMultiBranch.Controllers.Operative
             try
             {
 
-                var detail = db.PurchaseDetails.Include(d=> d.Purchase).
+                var detail = db.PurchaseDetails.Include(d => d.Purchase).
                     FirstOrDefault(d => d.ProductId == productId && d.PurchaseId == purchaseId);
 
                 //obtengo el IVA configurado en base de datos
                 var taxPercentage = Convert.ToDouble(db.Variables.FirstOrDefault(v => v.Name == Cons.VariableIVA).Value);
 
                 //Calculo el precio con IVA
-                var taxAmount  = (price * (taxPercentage / Cons.OneHundred)).RoundMoney();
+                var taxAmount = (price * (taxPercentage / Cons.OneHundred)).RoundMoney();
                 var taxedPrice = (price + taxAmount).RoundMoney();
 
                 //compruebo si existe el código entre los productos del proveedor
@@ -460,13 +460,13 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 if (detail != null)
                 {
-                    detail.Quantity     += quantity;
-                    detail.Price        = price;
-                    detail.Amount       = price * detail.Quantity;
-                    detail.TaxedPrice   = taxedPrice;
-                    detail.TaxedAmount  = detail.Quantity * detail.TaxedPrice;
+                    detail.Quantity += quantity;
+                    detail.Price = price;
+                    detail.Amount = price * detail.Quantity;
+                    detail.TaxedPrice = taxedPrice;
+                    detail.TaxedAmount = detail.Quantity * detail.TaxedPrice;
 
-                    detail.TaxAmount     = taxAmount * detail.Quantity;
+                    detail.TaxAmount = taxAmount * detail.Quantity;
                     detail.TaxPercentage = taxPercentage;
 
                     db.Entry(detail).State = EntityState.Modified;
@@ -493,11 +493,11 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 var purchase = db.Purchases.Include(s => s.PurchaseDetails).FirstOrDefault(s => s.PurchaseId == purchaseId);
 
-                purchase.TotalAmount      = purchase.PurchaseDetails.Sum(d => d.Amount).RoundMoney();
+                purchase.TotalAmount = purchase.PurchaseDetails.Sum(d => d.Amount).RoundMoney();
                 purchase.TotalTaxedAmount = purchase.PurchaseDetails.Sum(d => d.TaxedAmount).RoundMoney();
-                purchase.TotalTaxAmount   = purchase.PurchaseDetails.Sum(d => d.TaxAmount).RoundMoney();
-                purchase.UpdDate          = DateTime.Now.ToLocal();
-                purchase.UpdUser          = User.Identity.Name;
+                purchase.TotalTaxAmount = purchase.PurchaseDetails.Sum(d => d.TaxAmount).RoundMoney();
+                purchase.UpdDate = DateTime.Now.ToLocal();
+                purchase.UpdUser = User.Identity.Name;
 
                 //si hay un descuento, lo aplico
                 if (purchase.DiscountPercentage > Cons.Zero)
@@ -585,12 +585,12 @@ namespace CerberusMultiBranch.Controllers.Operative
                 var branchId = User.Identity.GetBranchId();
 
                 var model = db.Purchases.Include(p => p.PurchaseDetails).
-                    Include(p => p.PurchaseDetails.Select(pd => pd.Product.BranchProducts)).Include(p=> p.PurchaseDiscount).
+                    Include(p => p.PurchaseDetails.Select(pd => pd.Product.BranchProducts)).Include(p => p.PurchaseDiscount).
                     FirstOrDefault(p => p.PurchaseId == id);
 
                 model.UpdDate = DateTime.Now.ToLocal();
                 model.UpdUser = User.Identity.Name;
-                model.Status  = TranStatus.Reserved;
+                model.Status = TranStatus.Reserved;
 
                 var discount = model.PurchaseDiscount.Sum(d => d.DiscountPercentage);
 
@@ -602,8 +602,8 @@ namespace CerberusMultiBranch.Controllers.Operative
                     var variables = db.Variables;
 
                     //calculo el precio con descuento (si es que aplica)
-                    var realPrice = discount > Cons.Zero ? 
-                        (detail.TaxedPrice - (detail.TaxedPrice *  (discount / Cons.OneHundred))).RoundMoney() : detail.TaxedPrice;
+                    var realPrice = discount > Cons.Zero ?
+                        (detail.TaxedPrice - (detail.TaxedPrice * (discount / Cons.OneHundred))).RoundMoney() : detail.TaxedPrice;
 
                     if (brp != null)
                     {
@@ -614,16 +614,19 @@ namespace CerberusMultiBranch.Controllers.Operative
                         if (brp.BuyPrice > realPrice && brp.Stock > Cons.Zero)
                         {
                             var oldAmount = (brp.Stock + brp.Reserved) * brp.BuyPrice;
-                            brp.BuyPrice = (oldAmount + detail.Amount) / (brp.Stock + brp.Reserved + detail.Quantity);
+                            brp.BuyPrice = Math.Round((oldAmount + detail.Amount) / (brp.Stock + brp.Reserved + detail.Quantity), Cons.Two);
                         }
                         //si el nuevo precio de compra es mayor o igual se actualiza y recalculan los precios (para eliminar errores previos en la captura del precio)
                         else
-                            brp.BuyPrice = realPrice;
+                            brp.BuyPrice = Math.Round(realPrice, Cons.Two);
 
                         //se recalculan los precios
-                        brp.DealerPrice     = Math.Round(brp.BuyPrice * (Cons.One + (brp.DealerPercentage / Cons.OneHundred)), Cons.Zero);
-                        brp.StorePrice      = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.DealerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
                         brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+
+                        if (brp.Branch.IsWebStore)
+                            brp.OnlinePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.OnlinePercentage / Cons.OneHundred)), Cons.Zero);
 
                         //si el producto esta configurado para generar stock, actualizo las cantidades
                         if (detail.Product.StockRequired)
@@ -641,17 +644,18 @@ namespace CerberusMultiBranch.Controllers.Operative
                     {
                         //si no existe una relacion de producto sucursal
 
-                        brp             = new BranchProduct();
-                        brp.BranchId    = branchId;
-                        brp.ProductId   = detail.ProductId;
-                        brp.BuyPrice    = detail.Price;
-                        brp.DealerPercentage     = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
-                        brp.StorePercentage      = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
+                        brp = new BranchProduct();
+                        brp.BranchId = branchId;
+                        brp.ProductId = detail.ProductId;
+                        brp.BuyPrice = detail.Price;
+                        brp.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
+                        brp.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
                         brp.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
 
                         brp.DealerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.DealerPercentage / Cons.OneHundred)), Cons.Zero);
                         brp.StorePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.StorePercentage / Cons.OneHundred)), Cons.Zero);
                         brp.WholesalerPrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
+                        brp.OnlinePrice = Math.Round(brp.BuyPrice * (Cons.One + (brp.OnlinePercentage / Cons.OneHundred)), Cons.Zero);
 
                         //si se requiere inventario, agrego la cantidad al stock
                         if (detail.Product.StockRequired)
@@ -689,7 +693,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Success,
                     Header = "Compra generada",
-                    Body = "Se genero la compra con factura "+ model .Bill+ ", los productos se agregaron al invetario",
+                    Body = "Se genero la compra con factura " + model.Bill + ", los productos se agregaron al invetario",
                     Code = Cons.Responses.Codes.Success
                 });
             }
@@ -719,7 +723,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 FirstOrDefault();
 
             model.FinalAmount = Math.Round(model.FinalAmount, Cons.Two);
-            
+
 
             model.PurchaseDetails.ToList().ForEach(p =>
             {
@@ -745,12 +749,12 @@ namespace CerberusMultiBranch.Controllers.Operative
 
                 total += payment.Amount;
 
-                if (Math.Round(purchase.FinalAmount,2) >= total)
+                if (Math.Round(purchase.FinalAmount, 2) >= total)
                 {
-                   
-                    if (total == Math.Round(purchase.FinalAmount,2))
+
+                    if (total == Math.Round(purchase.FinalAmount, 2))
                     {
-                        purchase.Status  = TranStatus.Compleated;
+                        purchase.Status = TranStatus.Compleated;
                         purchase.UpdDate = DateTime.Now.ToLocal();
                         purchase.UpdUser = User.Identity.Name;
                     }
@@ -781,7 +785,7 @@ namespace CerberusMultiBranch.Controllers.Operative
                 {
                     Result = Cons.Responses.Danger,
                     Header = "Error al registrar el pago!!",
-                    Body = "Mensaje "+ex.Message,
+                    Body = "Mensaje " + ex.Message,
                     Code = Cons.Responses.Codes.ServerError
                 });
             }

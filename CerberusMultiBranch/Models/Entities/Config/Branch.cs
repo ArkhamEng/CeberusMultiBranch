@@ -42,6 +42,10 @@ namespace CerberusMultiBranch.Models.Entities.Config
         [MaxLength(50)]
         public string LogoPath { get; set; }
 
+        public bool ShowInMap { get; set; }
+
+        public bool IsWebStore { get; set; }
+
         public ICollection<Sale> Sales { get; set; }
 
         public ICollection<PurchaseOrder> PurchaseOrder { get; set; }

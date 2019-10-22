@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -223,6 +224,10 @@
     <Compile Include="Migrations\201909020035352_ProductShortName.cs" />
     <Compile Include="Migrations\201909020035352_ProductShortName.Designer.cs">
       <DependentUpon>201909020035352_ProductShortName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201910212211369_OnlineStore.cs" />
+    <Compile Include="Migrations\201910212211369_OnlineStore.Designer.cs">
+      <DependentUpon>201910212211369_OnlineStore.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -931,6 +936,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201909020035352_ProductShortName.resx">
       <DependentUpon>201909020035352_ProductShortName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910212211369_OnlineStore.resx">
+      <DependentUpon>201910212211369_OnlineStore.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

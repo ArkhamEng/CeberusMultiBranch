@@ -116,7 +116,7 @@ namespace CerberusMultiBranch.Controllers.Common
         {
             var url = Request.RequestUri.GetLeftPart(UriPartial.Authority);
 
-            var branches = await db.Branches.Select(b => new BranchModel
+            var branches = await db.Branches.Where(b=> b.ShowInMap).Select(b => new BranchModel
             {
                 Id        = b.BranchId,
                 Address   = b.Address.Trim().ToUpper(),
@@ -152,12 +152,12 @@ namespace CerberusMultiBranch.Controllers.Common
 
                 model.Results = paged.Results.Select(p => new ProductModel
                 {
-                    Id = p.ProductId,
-                    Code = p.Code.ToUpper(),
+                    Id        = p.ProductId,
+                    Code      = p.Code.ToUpper(),
                     TradeMark = p.TradeMark.Trim().ToUpper(),
-                    Price = p.OnlinePrice,
-                    Unit = p.Unit.ToUpper(),
-                    Name = string.IsNullOrEmpty(p.ShortName) ? "" :p.ShortName.ToUpper(),
+                    Price     = p.OnlinePrice,
+                    Unit      = p.Unit.ToUpper(),
+                    Name      = string.IsNullOrEmpty(p.ShortName) ? "" :p.ShortName.ToUpper(),
                     Description = p.Name.ToUpper(),
                     Images = p.Images.Count > 0 ? p.Images.Select(i => url + i.Path).ToList() :
                     new List<string> { url + Cons.NoImagePath },
@@ -181,12 +181,14 @@ namespace CerberusMultiBranch.Controllers.Common
                    Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
                    Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
 
-                         where (string.IsNullOrEmpty(filter.Description) || arr.All(s => (p.Code + " "+p.ShortName+" " + p.Name + " " + p.TradeMark).Contains(s))) &&
+                         where (p.BranchProducts.Where(bp => bp.Branch.IsWebStore).Count() > Cons.Zero) &&
+                               (p.IsActive && p.IsOnlineSold) &&
+                               (string.IsNullOrEmpty(filter.Description) || arr.All(s => (p.Code + " "+p.ShortName+" " + p.Name + " " + p.TradeMark).Contains(s))) &&
                                (filter.Category == Cons.Zero || p.System.PartSystemId == filter.Category) &&
                                (filter.TradeMarks.Count == Cons.Zero || filter.TradeMarks.Contains(p.TradeMark)) &&
                                (filter.MaxPrice == Cons.Zero ||
-                                    p.BranchProducts.Where(bp => bp.StorePrice >= filter.MinPrice && bp.StorePrice <= filter.MinPrice).Count() > Cons.Zero) &&
-                               (p.IsActive && p.IsOnlineSold)
+                                    p.BranchProducts.Where(bp => bp.StorePrice >= filter.MinPrice && bp.StorePrice <= filter.MinPrice).Count() > Cons.Zero) 
+                              
 
                          select p);
 

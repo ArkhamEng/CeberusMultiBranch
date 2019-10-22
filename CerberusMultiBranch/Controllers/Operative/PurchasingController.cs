@@ -253,7 +253,7 @@ namespace CerberusMultiBranch.Controllers.Operative
             var model = new ProductReceptionViewModel
             {
                 Description = detail.Product.Name,
-                DetailId = detail.PurchaseOrderDetailId,
+                DetailId    = detail.PurchaseOrderDetailId,
                 MeasureUnit = detail.Product.Unit,
                 ReceivedQty = detail.ReceivedQty,
                 RequestedQty = detail.OrderQty,
@@ -551,20 +551,33 @@ namespace CerberusMultiBranch.Controllers.Operative
                         //calculo los precios en base a la utilidad configurada, si no hay margenes de utilidad solo coloco el precio de compra
                         inventory.DealerPrice = inventory.DealerPercentage != Cons.Zero ?
                                                 inventory.BuyPrice * (Cons.One + inventory.DealerPercentage / Cons.OneHundred) : inventory.BuyPrice;
+
                         inventory.WholesalerPrice = inventory.WholesalerPercentage != Cons.Zero ?
                                                     inventory.BuyPrice * (Cons.One + inventory.WholesalerPercentage / Cons.OneHundred) : inventory.BuyPrice;
+
                         inventory.StorePrice = inventory.StorePercentage != Cons.Zero ?
                                                inventory.BuyPrice * (Cons.One + inventory.StorePercentage / Cons.OneHundred) : inventory.BuyPrice;
+                        //si es sucursal web
+                        if (inventory.Branch.IsWebStore)
+                        {
+                            inventory.OnlinePrice = inventory.OnlinePercentage != Cons.Zero ?
+                                                   inventory.BuyPrice * (Cons.One + inventory.OnlinePercentage / Cons.OneHundred) : inventory.BuyPrice;
+
+                            inventory.OnlinePrice = Math.Round(inventory.OnlinePrice, Cons.Zero);
+                        }
+
 
                         //el cliente quiere precio cerrados sin centavos
 
                         inventory.DealerPrice = Math.Round(inventory.DealerPrice, Cons.Zero);
                         inventory.WholesalerPrice = Math.Round(inventory.WholesalerPrice, Cons.Zero);
                         inventory.StorePrice = Math.Round(inventory.StorePrice, Cons.Zero);
+                        
 
                         db.Entry(inventory).Property(i => i.DealerPrice).IsModified = true;
                         db.Entry(inventory).Property(i => i.WholesalerPrice).IsModified = true;
                         db.Entry(inventory).Property(i => i.StorePrice).IsModified = true;
+                        db.Entry(inventory).Property(i => i.OnlinePrice).IsModified = true;
                         db.Entry(inventory).Property(i => i.BuyPrice).IsModified = true;
 
                         isModified = true;

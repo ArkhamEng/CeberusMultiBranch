@@ -230,12 +230,19 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 product.UpdDate = DateTime.Now.ToLocal();
                 product.UpdUser = User.Identity.GetUserName();
 
+                var branchId = User.Identity.GetBranchId();
+
+                var branch = db.Branches.Find(branchId);
+
                 if (product.WholesalerPercentage < 10)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mayorista no puede ser menor al 10%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
                 if (product.DealerPercentage < 15)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de distribuidor no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
                 if (product.StorePercentage < 20)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mostrador no puede ser menor al 20%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
+
+                if(branch.IsWebStore && product.OnlinePercentage < 10)
+                    return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de Online no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
 
 
                 //si el producto es nuevo

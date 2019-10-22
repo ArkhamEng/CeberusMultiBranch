@@ -56,6 +56,11 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Required]
         public double DealerPrice { get; set; }
 
+        public int OnlinePercentage { get; set; }
+
+        [DataType(DataType.Currency)]
+        public double OnlinePrice { get; set; }
+
         [Display(Name = "Fila")]
         [MaxLength(30)]
         public string Row { get; set; }

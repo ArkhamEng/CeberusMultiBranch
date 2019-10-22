@@ -10,6 +10,7 @@ namespace CerberusMultiBranch.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            CommandTimeout = 10000;
         }
 
         protected override void Seed(CerberusMultiBranch.Models.ApplicationDbContext context)

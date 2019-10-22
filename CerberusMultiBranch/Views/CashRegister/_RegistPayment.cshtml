@@ -9,26 +9,26 @@
         <button type="button" class="close" style="float:right" onclick="HideModal(null,true)">
             <span class="fa fa-times"></span>
         </button>
-        
-            <div class="col-md-5">
-                <strong> @Model.Details.First().Sale.Folio</strong><br />
-                <a class="text-capitalize">
-                    @Model.Client.ToLower()
-                </a>
-            </div>
-            <div class="col-md-2 text-center">
-                <strong>Total </strong> @Model.Details.First().Sale.TotalTaxedAmount.ToMoney()<br />
-                <a class="text-capitalize">
-                    @Model.Delivery.ToLower()
-                </a>
-            </div>
-            <div class="col-md-3 text-right pull-right">
-                <strong>Por Cobrar </strong>@Model.AmountToPay.ToMoney()<br />
-                <a class="text-capitalize">
-                    @Model.User.ToLower()
-                </a>
-            </div>
-        
+
+        <div class="col-md-5">
+            <strong> @Model.Details.First().Sale.Folio</strong><br />
+            <a class="text-capitalize">
+                @Model.Client.ToLower()
+            </a>
+        </div>
+        <div class="col-md-2 text-center">
+            <strong>Total </strong> @Model.Details.First().Sale.TotalTaxedAmount.ToMoney()<br />
+            <a class="text-capitalize">
+                @Model.Delivery.ToLower()
+            </a>
+        </div>
+        <div class="col-md-3 text-right pull-right">
+            <strong>Por Cobrar </strong>@Model.AmountToPay.ToMoney()<br />
+            <a class="text-capitalize">
+                @Model.User.ToLower()
+            </a>
+        </div>
+
     </div>
     <div class="panel-body">
 
@@ -96,13 +96,13 @@
         <div id="divPayments" class="panel panel-default hidden">
             <div class="panel-heading clearfix">
                 @if (Model.Details.First().Sale.TransactionType == TransactionType.Cash)
-                    {
+                {
                     <label>Registre el pago exacto de la venta de contado</label>
-                    }
-                    else
-                    {
+                }
+                else
+                {
                     <label>Registre el monto del anticipo (opcional) </label>
-                    }
+                }
                 <div class="pull-right">
                     <label class="text-danger"> Total Ingresado $ <a id="total"></a></label>
                 </div>
@@ -234,7 +234,7 @@
     </div>
     @Html.HiddenFor(m => m.CreditNoteId)
     @Html.HiddenFor(m => m.CreditNoteFolio)
-    
+
 </div>
 
 
@@ -243,6 +243,18 @@
     $(document).ready(function ()
     {
         SetInputEvents();
+
+        $('#SiteModal').off('shown.bs.modal').on('shown.bs.modal', function (e)
+        {
+            $("#btnRegistTicket").focus();
+         });
+
+       
+
+        $("#RegistPaymentContent").off("keyup").on("keyup", function (e)
+        {
+            $("#btnRegistTicket").click();
+        });
 
         Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, label, value)
         {
@@ -255,7 +267,7 @@
 
         var amountToPay = parseFloat($("#AmountToPay").val());
 
-        
+
         //si el monto a pagar es menor o igual con cero, no se recibe ningun pago
         if (amountToPay > 0)
             $("#divPayments").removeClass("hidden");
@@ -359,7 +371,7 @@
             $("#CreditNoteAmount").val(response.Extra);
             $("#Expiration").val(response.Body);
             $("#Folio").val(response.Header);
-          
+
             var tot = parseFloat($("#AmountToPay").val());
 
             $("#Folio").addClass('alert-info');

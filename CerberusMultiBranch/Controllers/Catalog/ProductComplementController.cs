@@ -352,27 +352,49 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 }
                 else
                 {
+                    var newStock = destBp.Stock + quantity;
+
                     destBp.LastStock = destBp.Stock;
-                    destBp.Stock += quantity;
+                    destBp.Stock     = newStock;
+
+                    //si el precio de la sucursal destino es mayor que la de origen, se promedia de lo contrario se actualiza
+                    if (destBp.BuyPrice > orBP.BuyPrice)
+                        destBp.BuyPrice = Math.Round(((destBp.BuyPrice + orBP.BuyPrice) / newStock), Cons.Two);
+                    else
+                        destBp.BuyPrice = orBP.BuyPrice;
+
+                    destBp.StorePrice = Math.Round(  (destBp.StorePercentage != Cons.Zero ?
+                                               destBp.BuyPrice * (Cons.One + destBp.StorePercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+
+                    destBp.DealerPrice = Math.Round((destBp.DealerPercentage != Cons.Zero ?
+                                               destBp.BuyPrice * (Cons.One + destBp.DealerPercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+
+                    destBp.WholesalerPrice = Math.Round((destBp.WholesalerPercentage != Cons.Zero ?
+                                              destBp.BuyPrice * (Cons.One + destBp.WholesalerPercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+
+                    //si es sucursal web
+                    if (destBp.Branch.IsWebStore)
+                    {
+                        destBp.OnlinePrice = Math.Round((destBp.OnlinePercentage != Cons.Zero ?
+                                               destBp.BuyPrice * (Cons.One + destBp.OnlinePercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+                    }
+
                     destBp.UpdDate = DateTime.Now;
                     destBp.UpdUser = User.Identity.Name;
                 }
 
-                db.Entry(destBp).Property(p => p.LastStock).IsModified = true;
-                db.Entry(destBp).Property(p => p.Stock).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-                db.Entry(destBp).Property(p => p.UpdDate).IsModified = true;
-
+                db.Entry(destBp).State = EntityState.Modified;
+              
                 //agrego los movimientos de Stock en la sucursal destino
                 StockMovement smD = new StockMovement
                 {
-                    BranchId = destBp.BranchId,
-                    ProductId = destBp.ProductId,
-                    Comment = "Transferencia de sucursal " + orBP.Branch.Name,
+                    BranchId     = destBp.BranchId,
+                    ProductId    = destBp.ProductId,
+                    Comment      = "Transferencia de sucursal " + orBP.Branch.Name,
                     MovementType = MovementType.Entry,
                     MovementDate = DateTime.Now,
-                    User = User.Identity.Name,
-                    Quantity = quantity
+                    User         = User.Identity.Name,
+                    Quantity     = quantity
                 };
 
                 db.StockMovements.Add(smD);
@@ -380,9 +402,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 //agrego los movimientos de Stock en la sucursal origen
                 StockMovement smO = new StockMovement
                 {
-                    BranchId = orBP.BranchId,
-                    ProductId = orBP.ProductId,
-                    Comment = "Transferencia a sucursal " + destBp.Branch.Name,
+                    BranchId     = orBP.BranchId,
+                    ProductId    = orBP.ProductId,
+                    Comment      = "Transferencia a sucursal " + destBp.Branch.Name,
                     MovementType = MovementType.Exit,
                     MovementDate = DateTime.Now,
                     User = User.Identity.Name,
@@ -393,9 +415,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 //actualizo stock en sucursal de origen
                 orBP.LastStock = orBP.Stock;
-                orBP.Stock -= quantity;
-                orBP.UpdUser = User.Identity.Name;
-                orBP.UpdDate = DateTime.Now.ToLocal();
+                orBP.Stock     -= quantity;
+                orBP.UpdUser   = User.Identity.Name;
+                orBP.UpdDate   = DateTime.Now.ToLocal();
 
                 db.Entry(orBP).Property(p => p.LastStock).IsModified = true;
                 db.Entry(orBP).Property(p => p.Stock).IsModified = true;
