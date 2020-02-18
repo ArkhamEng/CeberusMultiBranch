@@ -1,0 +1,75 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Offer>
+@using CerberusMultiBranch.Support
+
+    <div class="dtContainer">
+        <table id="tbOffers" class="table dt-responsive nowrap table-bordered small table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    <th />
+                    <th>
+                        Clave
+                    </th>
+                    <th>
+                        Tipo
+                    </th>
+
+                    <th>
+                        Descripción
+                    </th>
+
+                    <th>
+                        Descuento
+                    </th>
+                  
+                    <th>
+                        Inicio
+                    </th>
+                    <th>
+                        Fin
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="col-md-1">
+                            <img src="@item.ImagePath" class="img-responsive" />
+                        </td>
+                        <td>
+                            @Html.HiddenFor(model => item.OfferId)
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @item.Type.GetName()
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Discount)
+                        </td>
+                      
+                        <td>
+                            @Html.DisplayFor(modelItem => item.BeginDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EndDate)
+                        </td>
+                        <td>
+                            <button class="btn btn-warning btn-sm edit" title="Editar Oferta" onclick="Edit('@item.OfferId')" >
+                                <span class="fa fa-edit"></span> Editar
+                            </button>
+
+                            <button class="btn btn-danger btn-sm" title="Eliminar Oferta" id="btnDelete" onclick="Delete('@item.OfferId')">
+                                <span class="fa fa-trash"></span> Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>

@@ -21,8 +21,6 @@ namespace CerberusMultiBranch.Support
 
         public int CurrentMax { get; set; }
 
-
-
         public int FirstRowOnPage
         {
 

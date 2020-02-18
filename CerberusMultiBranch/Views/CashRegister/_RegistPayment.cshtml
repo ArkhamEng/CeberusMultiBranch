@@ -253,7 +253,9 @@
 
         $("#RegistPaymentContent").off("keyup").on("keyup", function (e)
         {
-            $("#btnRegistTicket").click();
+            if (e.keyCode == 13) {
+                $("#btnRegistTicket").click();
+            }
         });
 
         Compleate("#Folio", "#Folios", '@Url.Action("AutoCompleate","CashRegister")', function (id, label, value)

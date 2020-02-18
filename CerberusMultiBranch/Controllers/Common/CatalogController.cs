@@ -1,21 +1,17 @@
-﻿using System;
+﻿using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.ApiModel;
+using CerberusMultiBranch.Models.Entities.Catalog;
+using CerberusMultiBranch.Support;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
-using CerberusMultiBranch.Models;
-using CerberusMultiBranch.Models.Entities.Catalog;
-using CerberusMultiBranch.Support;
-using CerberusMultiBranch.Models.ApiModel;
-using System.Text.RegularExpressions;
 using System.Web.Http.Cors;
-using System.Web.Http.Controllers;
+using System.Web.Http.Description;
 
 namespace CerberusMultiBranch.Controllers.Common
 {
@@ -70,6 +66,36 @@ namespace CerberusMultiBranch.Controllers.Common
             });
 
             return Ok(categories);
+        }
+
+        [HttpGet]
+        [Route("api/Offers/Active")]
+        [ResponseType(typeof(List<OfferModel>))]
+        public async Task<IHttpActionResult> GetActiveOffers()
+        {
+            var offers = new List<OfferModel>();
+            var url = Request.RequestUri.GetLeftPart(UriPartial.Authority);
+
+            await Task.Factory.StartNew(() =>
+            {
+                var date = DateTime.Now.ToLocal();
+
+               offers = db.Offers.Where(o => o.IsActive && o.EndDate >= date).Select(o => new OfferModel 
+                {
+                    Image = url + o.ImagePath,
+                    Id = o.OfferId,
+                    Description = o.Description,
+                    Discount = o.Discount,
+                    Name = o.Name,
+                    TextShadow = o.ShadowColor,
+                    TextColor = o.TextColor
+                
+                }).ToList();
+
+                offers.ForEach(o => { o.TextShadow = string.Format("-1px 0 {0}, 0 1px {0}, 1px 0 {0}, 0 -1px {0}", o.TextShadow); });
+            });
+
+            return Ok(offers);
         }
 
         [HttpGet]

@@ -8,10 +8,17 @@ namespace CerberusMultiBranch
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+          
             bundles.Add(new ScriptBundle("~/bundles/jquery").Include(
                 "~/Scripts/_jquery-ui-1.12.1.min.js",
                         "~/Scripts/jquery-3.1.1.js",
                         "~/Scripts/jquery.maskedinput.min.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/imageEditor").Include(
+              "~/Scripts/cropper/cropper.min.js",
+                      "~/Scripts/cropper/jquery-cropper.min.js",
+                      "~/AppScripts/Controls/ImageEditor.js"));
+
 
             bundles.Add(new ScriptBundle("~/bundles/pnotify").Include(
                 "~/Scripts/pnotify/pnotify.js",

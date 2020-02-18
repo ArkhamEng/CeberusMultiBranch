@@ -1,0 +1,85 @@
+﻿
+
+<link href="~/Scripts/cropper/cropper.css" rel="stylesheet" />
+<script src="~/Scripts/cropper/cropper.min.js"></script>
+<script src="~/Scripts/cropper/jquery-cropper.min.js"></script>
+<script src="~/AppScripts/Controls/ImageEditor.js"></script>
+
+
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div class="close" onclick="HideModal(null,true)"><span class="fa fa-times"></span> </div>
+        <div class="panel-title">
+            Editor de Image <span class="fa fa-image"></span>
+        </div>
+    </div>
+    <div class="panel-body panel-group">
+        <div class="col-md-8 top-left">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Original <span class="fa fa-picture-o"></span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12 row" id="imgContainer" style="overflow:auto;">
+                        <img id="imgSource" class="img-responsive" src="~/Content/Images/sinimagen.jpg" style="min-width:500px !important">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 top-right">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="panel-title"> 
+                        Recorte <span class="fa fa-cut"></span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="col-md-12 row" >
+                        <img id="largeImg" class="img-responsive imgSample" src="~/Content/Images/sinimagen.jpg" style="border:solid; border-color:gray" />
+                    </div>
+                    <div class="col-md-12 row">
+                        <div class="col-md-6 form-group">
+                            <label class="control-label">
+                                Ancho
+                            </label>
+                            <input type="text" id="txtWidth" class="form-control" /> px
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label class="control-label">
+                                Alto
+                            </label>
+                            <input type="text" id="txtHeight" class="form-control" /> px
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary btn-sm" onclick="AceptImage()">
+                <span class="fa fa-check"></span>
+                Aceptar
+            </button>
+
+            <label class="btn btn-warning btn-sm" for="inputImg" title="Upload image file">
+                <input type="file" class="sr-only" id="inputImg" name="file" accept=".jpg,.jpeg,.png,.gif,.bmp,.tiff">
+
+                <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Import image with Blob URLs">
+                    <span class="fa fa-upload"></span> Cargar
+                </span>
+            </label>
+
+            <button type="button" class="btn btn-danger btn-sm" onclick="HideModal(true)">
+                <span class="fa fa-times"></span>
+                Cancelar
+            </button>
+        </div>
+
+    </div>
+</div>

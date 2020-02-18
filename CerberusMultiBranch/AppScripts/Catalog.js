@@ -121,13 +121,15 @@ function ShowCatalogModal(OnCompleate, CloseCallBack, Entity, id, disableCallBac
 
 
 
-function SubmitPerson(SuccessCallBack, form, idField) {
-    $(form).off('submit').on('submit', function (e) {
+function SubmitPerson(SuccessCallBack, form, idField)
+{
+    $(form).off('submit').on('submit', function (e)
+    {
         e.preventDefault();
 
         var $form = $(e.target),
-        formData = new FormData(),
-        params = $form.serializeArray(),
+        formData  = new FormData(),
+        params    = $form.serializeArray(),
         files = [],
         addresses = [];
 

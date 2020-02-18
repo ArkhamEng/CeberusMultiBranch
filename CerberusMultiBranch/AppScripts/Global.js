@@ -1,28 +1,26 @@
-﻿$(document).ready(function ()
-{
-    $('#sidebarCollapse').on('click', function ()
-    {
+﻿$(document).ready(function () {
+    $('#sidebarCollapse').on('click', function () {
         $('#sidebar').toggleClass('active');
     });
 });
 
 const TranStatus = {
-    OnChange:  { Name: "OnChange",  Value: -3, Display:  "En Modificación" },
-    PreCancel: { Name: "PreCancel", Value: -2, Display:  "En Cancelación" },
-    Canceled:  { Name: "Canceled",  Value: -1, Display:  "Cancelada" },
-    InProcess: { Name: "InProcess", Value:  0,  Display: "En Proceso" },
-    Reserved:  { Name: "Reserved",  Value:  1,  Display: "Reservada" },
-    Revision:  { Name: "Revision",  Value:  2,  Display: "En Seguimiento" },
-    Compleated:{ Name: "Compleated", Value: 3,  Display: "Completada" },
+    OnChange: { Name: "OnChange", Value: -3, Display: "En Modificación" },
+    PreCancel: { Name: "PreCancel", Value: -2, Display: "En Cancelación" },
+    Canceled: { Name: "Canceled", Value: -1, Display: "Cancelada" },
+    InProcess: { Name: "InProcess", Value: 0, Display: "En Proceso" },
+    Reserved: { Name: "Reserved", Value: 1, Display: "Reservada" },
+    Revision: { Name: "Revision", Value: 2, Display: "En Seguimiento" },
+    Compleated: { Name: "Compleated", Value: 3, Display: "Completada" },
     Modified: { Name: "Modified", Value: 4, Display: "Modificado" }
 }
 
 const TranType =
- {
-     Cash: { Name: "Cash", Value: 0, Display: "Efectivo" },
-     Credit: { Name: "Credit", Value: 1, Display: "Crédito" },
-     Presale: { Name: "Presale", Value: 2, Display: "Preventa" },
-     Reservation: { Name: "Reservation", Value: 3, Display: "Apartado" }
+{
+    Cash: { Name: "Cash", Value: 0, Display: "Efectivo" },
+    Credit: { Name: "Credit", Value: 1, Display: "Crédito" },
+    Presale: { Name: "Presale", Value: 2, Display: "Preventa" },
+    Reservation: { Name: "Reservation", Value: 3, Display: "Apartado" }
 }
 
 const ClientType =
@@ -33,9 +31,9 @@ const ClientType =
 }
 
 const PopOverTemplatePrimary = '<div class="popover panel panel-primary fade" role="tooltip">' +
-           '<div class="arrow"></div>' +
-           '<div class="popover-title"></div>' +
-           '<div class="panel-body popover-content"></div></div>'
+    '<div class="arrow"></div>' +
+    '<div class="popover-title"></div>' +
+    '<div class="panel-body popover-content"></div></div>'
 
 
 /**
@@ -105,66 +103,52 @@ function ShowNotify(title, type, message, delay) {
 /***************************************************
 ************AUTOCOMPLEATE USING JQUERY UI***********
 ***************************************************/
-function Compleate(textbox, list, url, onSelected, entityId)
-{
+function Compleate(textbox, list, url, onSelected, entityId) {
     $(textbox).off('autocomplete').autocomplete(
-      {
-          source: function (request, response)
-          {
-              if (entityId == null)
-              {
-                  ExecuteAjax(url, { filter: request.term }, function (json)
-                  {
-                      $(list).empty();
-                      for (var i = 0; i < json.length; i++)
-                      {
-                          $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
-                      }
-                  });
-              }
-              else
-              {
-                  ExecuteAjax(url, { filter: request.term, entityId: entityId }, function (json)
-                  {
-                      $(list).empty();
-                      for (var i = 0; i < json.length; i++)
-                      {
-                          $(list).append($('<option data-id=' + json[i].Id + 'data-label='+json[i].Label+'></option>').val(json[i].Label).html(json[i].Value));
-                      }
-                  });
-              }
+        {
+            source: function (request, response) {
+                if (entityId == null) {
+                    ExecuteAjax(url, { filter: request.term }, function (json) {
+                        $(list).empty();
+                        for (var i = 0; i < json.length; i++) {
+                            $(list).append($('<option data-id=' + json[i].Id + '></option>').val(json[i].Label).html(json[i].Value));
+                        }
+                    });
+                }
+                else {
+                    ExecuteAjax(url, { filter: request.term, entityId: entityId }, function (json) {
+                        $(list).empty();
+                        for (var i = 0; i < json.length; i++) {
+                            $(list).append($('<option data-id=' + json[i].Id + 'data-label=' + json[i].Label + '></option>').val(json[i].Label).html(json[i].Value));
+                        }
+                    });
+                }
 
-          },
-          minLength: 3
-      });
+            },
+            minLength: 3
+        });
 
     //this is executed when an option from DataList is selected
-    $(textbox).off('input').bind('input', function ()
-    {
+    $(textbox).off('input').bind('input', function () {
         var val = this.value;
-        if ($(list).find('option').filter(function (){ return this.value.toUpperCase() === val.toUpperCase(); }).length)
-        {
-            var option = $(list).find('option').filter(function ()
-            {
+        if ($(list).find('option').filter(function () { return this.value.toUpperCase() === val.toUpperCase(); }).length) {
+            var option = $(list).find('option').filter(function () {
                 return this.value.toUpperCase() === val.toUpperCase();
             });
 
             var value = option.text();
-            var id    = option.data("id");
+            var id = option.data("id");
             var label = option.val();
 
-            if (onSelected != null)
-            {
+            if (onSelected != null) {
                 onSelected(id, label, value);
             }
         }
     });
 }
 
-function LoadPopOver(button, callback)
-{
-    $("#ConfirmPopYes").click(function ()
-    {
+function LoadPopOver(button, callback) {
+    $("#ConfirmPopYes").click(function () {
         callback();
     });
 
@@ -324,32 +308,32 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
         searching = true;
 
     var oTable = $(table).DataTable(
-       {
-           //destroy: true,
-           //keys: true,
-           //scrollX: scrollX,
-           //scrollCollapse: true,
-           fixedHeader: true,
-           responsive: responsive,
-           "aaSorting": [],
-           "lengthChange": false,
-           "searching": searching,
-           "order": [],
-           "lengthMenu": [[5, 10, 20, 50, 100, -1], [5, 10, 20, 50, 100, "All"]],
-           "pageLength": iniRecords,
-           "language": {
-               "search": "filtrar resultados",
-               "lengthMenu": "mostrar  _MENU_ ",
-               "zeroRecords": "no hay datos disponibles",
-               "info": "página _PAGE_ de _PAGES_",
-               "infoEmpty": "",
-               "infoFiltered": "(filtrado de _MAX_ total registros)",
-               "paginate": {
-                   "previous": "Anterior",
-                   "next": "Siguiente"
-               }
-           },
-       });
+        {
+            //destroy: true,
+            //keys: true,
+            //scrollX: scrollX,
+            //scrollCollapse: true,
+            fixedHeader: true,
+            responsive: responsive,
+            "aaSorting": [],
+            "lengthChange": false,
+            "searching": searching,
+            "order": [],
+            "lengthMenu": [[5, 10, 20, 50, 100, -1], [5, 10, 20, 50, 100, "All"]],
+            "pageLength": iniRecords,
+            "language": {
+                "search": "filtrar resultados",
+                "lengthMenu": "mostrar  _MENU_ ",
+                "zeroRecords": "no hay datos disponibles",
+                "info": "página _PAGE_ de _PAGES_",
+                "infoEmpty": "",
+                "infoFiltered": "(filtrado de _MAX_ total registros)",
+                "paginate": {
+                    "previous": "Anterior",
+                    "next": "Siguiente"
+                }
+            },
+        });
     if (typeof (filter) != 'undefined') {
         $(filter).keyup(function () {
             oTable.data().search(this.value).draw();
@@ -393,18 +377,17 @@ function Paginate(table, iniRecords, responsive, filter, scrollX, buttonContaine
 
         if (printButton != '') {
             new $.fn.dataTable.Buttons(oTable,
-         { buttons: [copyButton, printButton, excelButton] }).container().appendTo($(buttonContainer));
+                { buttons: [copyButton, printButton, excelButton] }).container().appendTo($(buttonContainer));
         }
         else {
             new $.fn.dataTable.Buttons(oTable,
-            { buttons: [copyButton, excelButton] }).container().appendTo($(buttonContainer));
+                { buttons: [copyButton, excelButton] }).container().appendTo($(buttonContainer));
         }
     }
 }
 
 //SHOWS MODAL WITH CUSTON FUNCTIONS AND CONTENT
-function ShowModal(html, backdrop, size, closeCallback)
-{
+function ShowModal(html, backdrop, size, closeCallback) {
     $("#ModalDialog").removeClass('modal-sm');
     $("#ModalDialog").removeClass('modal-lg');
     $("#ModalDialog").removeClass('modal-ul');
@@ -425,8 +408,7 @@ function ShowModal(html, backdrop, size, closeCallback)
     $("#SiteModal").modal({ backdrop: backdrop });
 
     //si la modal se sin invocar el método hide
-    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e)
-    {
+    $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
         if (closeCallback != null)
             closeCallback();
 
@@ -435,8 +417,7 @@ function ShowModal(html, backdrop, size, closeCallback)
 }
 
 //Hide Main Modal
-function HideModal(callback, removeContent)
-{
+function HideModal(callback, removeContent) {
     $('#SiteModal').off('hidden.bs.modal').on('hidden.bs.modal', function (e) {
         if (callback != null)
             callback();
@@ -454,8 +435,7 @@ function ShowChildModal(content, openCallBack, size) {
     $("#ChildModalDialog").removeClass('modal-sm');
     $("#ChildModalDialog").removeClass('modal-lg');
 
-    $("#ChildModal").off("shown.bs.modal").on('shown.bs.modal', function ()
-    {
+    $("#ChildModal").off("shown.bs.modal").on('shown.bs.modal', function () {
         $('#SiteModal').css('opacity', .7);
         $('#SiteModal').unbind();
 
@@ -534,8 +514,7 @@ function HideModLoading(callback) {
 
 
 //CONFIRM CONTROL FUNCTIONS
-function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack, backdrop)
-{
+function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack, backdrop) {
     //header and body text
     $("#MessageHeader").text(textHeader);
     $("#MessageBody").text(textBody);
@@ -544,20 +523,17 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
     $("#MessageOk").show();
 
     //setting Image and header color
-    if (type == 'success')
-    {
+    if (type == 'success') {
         $("#MessageContent").attr("class", 'modal-content panel panel-success');
         $("#MessageImage").attr("src", '/Images/success.png');
         $("#MessageOk").attr('class', 'btn btn-success');
     }
-    else if (type == 'warning')
-    {
+    else if (type == 'warning') {
         $("#MessageContent").attr("class", 'modal-content panel panel-warning');
         $("#MessageImage").attr("src", '/Images/warning.png');
         $("#MessageOk").attr('class', 'btn btn-warning');
     }
-    else if (type == 'confirm')
-    {
+    else if (type == 'confirm') {
         $("#MessageContent").attr("class", 'modal-content panel panel-info');
         $("#MessageImage").attr("src", '/Images/question.png');
         $("#MessageGroup").children().show();
@@ -566,10 +542,8 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
 
 
     //binding button acctions
-    $("#MessageConfirm").off('click').on("click", function (e)
-    {
-        HideMessage(true, function ()
-        {
+    $("#MessageConfirm").off('click').on("click", function (e) {
+        HideMessage(true, function () {
             ShowLoading('static');
 
             if (confirmCallBack != null)
@@ -577,8 +551,7 @@ function ShowMessage(textHeader, textBody, type, confirmCallBack, cancelCallBack
         });
     });
 
-    $("#MessageCancel").unbind('click').click(function (e)
-    {
+    $("#MessageCancel").unbind('click').click(function (e) {
         HideMessage(true, cancelCallBack);
     });
 
@@ -602,53 +575,53 @@ function GroupRow(table, iniRecords, filter, index, colspan) {
         searching = true;
 
     var oTable = $(table).DataTable(
-       {
-           destroy: true,
-           fixedHeader: true,
-           responsive: false,
-           "aaSorting": [],
-           "lengthChange": false,
-           "searching": searching,
-           "order": [],
-           "lengthMenu": [[5, 10, 20, 50, 100, -1], [5, 10, 20, 50, 100, "All"]],
-           "pageLength": iniRecords,
-           "language": {
-               "search": "filtrar resultados",
-               "lengthMenu": "mostrar  _MENU_ ",
-               "zeroRecords": "no hay datos disponibles",
-               "info": "página _PAGE_ de _PAGES_",
-               "infoEmpty": "",
-               "infoFiltered": "(filtrado de _MAX_ total registros)",
-               "paginate": {
-                   "previous": "Anterior",
-                   "next": "Siguiente"
-               }
-           },
-           "columnDefs": [
-               { "visible": false, "targets": index }
-           ],
+        {
+            destroy: true,
+            fixedHeader: true,
+            responsive: false,
+            "aaSorting": [],
+            "lengthChange": false,
+            "searching": searching,
+            "order": [],
+            "lengthMenu": [[5, 10, 20, 50, 100, -1], [5, 10, 20, 50, 100, "All"]],
+            "pageLength": iniRecords,
+            "language": {
+                "search": "filtrar resultados",
+                "lengthMenu": "mostrar  _MENU_ ",
+                "zeroRecords": "no hay datos disponibles",
+                "info": "página _PAGE_ de _PAGES_",
+                "infoEmpty": "",
+                "infoFiltered": "(filtrado de _MAX_ total registros)",
+                "paginate": {
+                    "previous": "Anterior",
+                    "next": "Siguiente"
+                }
+            },
+            "columnDefs": [
+                { "visible": false, "targets": index }
+            ],
 
-           "displayLength": 25,
-           "drawCallback": function (settings) {
-               var api = this.api();
-               var rows = api.rows({ page: 'current' }).nodes();
-               var last = null;
+            "displayLength": 25,
+            "drawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
 
-               apCd = api.column(index, { page: 'current' }).data();
+                apCd = api.column(index, { page: 'current' }).data();
 
-               if (apCd != 'undefined') {
-                   apCd.each(function (group, i) {
-                       if (last !== group) {
-                           $(rows).eq(i).before(
-                               '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
-                           );
+                if (apCd != 'undefined') {
+                    apCd.each(function (group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<tr class="group bgDataTable-dark"><td colspan="' + colspan + '">' + group + '</td></tr>'
+                            );
 
-                           last = group;
-                       }
-                   });
-               }
-           }
-       });
+                            last = group;
+                        }
+                    });
+                }
+            }
+        });
     if (typeof (filter) != 'undefined') {
         $(filter).keyup(function () {
             oTable.data().search(this.value).draw();
@@ -657,4 +630,23 @@ function GroupRow(table, iniRecords, filter, index, colspan) {
         $(table + "_filter").addClass("hidden");
     }
 
+}
+
+var imageEditorType = "default";
+
+var OnImageSelected;
+
+var currentImage;
+
+function ShowImageEditor(type,image, imageSelected)
+{
+    imageEditorType = type;
+    OnImageSelected = imageSelected;
+    currentImage = image;
+    ShowLoading('static');
+
+    GetAjax('/Offers/ImageEditor/")', null, function (response) {
+
+        HideLoading(function () { ShowModal(response, 'static', 'lg', null); });
+    }, null);
 }

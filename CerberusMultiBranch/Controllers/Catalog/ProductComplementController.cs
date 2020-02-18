@@ -363,20 +363,24 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     else
                         destBp.BuyPrice = orBP.BuyPrice;
 
-                    destBp.StorePrice = Math.Round(  (destBp.StorePercentage != Cons.Zero ?
-                                               destBp.BuyPrice * (Cons.One + destBp.StorePercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+                    destBp.StorePrice = Math.Round(  (destBp.StorePercentage > Cons.Zero ?
+                                               destBp.BuyPrice * (Cons.One + (destBp.StorePercentage / Cons.OneHundred)) : 
+                                               destBp.BuyPrice), Cons.Zero);
 
-                    destBp.DealerPrice = Math.Round((destBp.DealerPercentage != Cons.Zero ?
-                                               destBp.BuyPrice * (Cons.One + destBp.DealerPercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+                    destBp.DealerPrice = Math.Round( (destBp.DealerPercentage > Cons.Zero ?
+                                               destBp.BuyPrice * (Cons.One + (destBp.DealerPercentage / Cons.OneHundred)) : 
+                                               destBp.BuyPrice), Cons.Zero);
 
-                    destBp.WholesalerPrice = Math.Round((destBp.WholesalerPercentage != Cons.Zero ?
-                                              destBp.BuyPrice * (Cons.One + destBp.WholesalerPercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+                    destBp.WholesalerPrice = Math.Round( (destBp.WholesalerPercentage > Cons.Zero ?
+                                              destBp.BuyPrice * (Cons.One + (destBp.WholesalerPercentage / Cons.OneHundred)) : 
+                                              destBp.BuyPrice), Cons.Zero);
 
                     //si es sucursal web
                     if (destBp.Branch.IsWebStore)
                     {
                         destBp.OnlinePrice = Math.Round((destBp.OnlinePercentage != Cons.Zero ?
-                                               destBp.BuyPrice * (Cons.One + destBp.OnlinePercentage / Cons.OneHundred) : destBp.BuyPrice), Cons.Zero);
+                                               destBp.BuyPrice * (Cons.One + (destBp.OnlinePercentage / Cons.OneHundred)) : 
+                                               destBp.BuyPrice), Cons.Zero);
                     }
 
                     destBp.UpdDate = DateTime.Now;

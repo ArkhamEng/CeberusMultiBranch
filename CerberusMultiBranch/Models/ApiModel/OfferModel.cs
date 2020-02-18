@@ -11,6 +11,10 @@ namespace CerberusMultiBranch.Models.ApiModel
 
         public string Name { get; set; }
 
+        public string TextShadow { get; set; }
+
+        public string TextColor { get; set; }
+
         public string Description { get; set; }
 
         public double Price { get; set; }

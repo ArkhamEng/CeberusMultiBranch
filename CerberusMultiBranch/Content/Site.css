@@ -492,17 +492,36 @@ ul.notifications {
 }
 
 input[type=date] {
-    
-   max-width: 100% !important;
-   box-sizing:border-box !important;
-   box-sizing:padding-box !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    box-sizing: padding-box !important;
 }
 
-.dropdown-menu {
-    width: 100% !important;
-    padding:5px !important;
-    
+.DateStyle{
+    -webkit-appearance:none;
 }
+    .DateStyle::-webkit-inner-spin-button,
+    .DateStyle::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        display: none;
+    }
+
+
+    .DateStyle::-webkit-calendar-picker-indicator {
+        -webkit-appearance: none;
+        margin-left: -20px;
+        position:relative;
+        float:left;
+    }
+    /*.DateStyle::-webkit-inner-spin-button,
+    .DateStyle::-webkit-calendar-picker-indicator {
+        display:none;
+        -webkit-appearance:none;
+    }*/
+    .dropdown-menu {
+        width: 100% !important;
+        padding: 5px !important;
+    }
 
 
 
@@ -560,4 +579,16 @@ input[type=date] {
     border-left: none;
     border-right: none;
     border-bottom: solid #eeeeee 1px;
+}
+
+.ImageText {
+    position: absolute;
+    margin-top: 100px;
+    margin-left:0px;
+    text-align:center;
+    width:90%;
+    color: darkred;
+    font-weight: 300;
+    
+    text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
 }

@@ -4,11 +4,7 @@ using CerberusMultiBranch.Models.Entities.Finances;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Models.Entities.Purchasing;
 using Microsoft.AspNet.Identity.EntityFramework;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
-using System.Web;
 
 namespace CerberusMultiBranch.Models
 {
@@ -70,6 +66,8 @@ namespace CerberusMultiBranch.Models
         #endregion
 
         #region Operative
+
+        public DbSet<Offer> Offers { get; set; }
         public DbSet<StockMovement> StockMovements { get; set; }
 
         public DbSet<SaleCreditNote> SaleCreditNotes { get; set; }

@@ -1,0 +1,46 @@
+﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Operative.Offer>
+@using CerberusMultiBranch.Support
+
+<script src="~/AppScripts/Offers.js"></script>
+
+
+@{
+    ViewBag.Title = "Ofertas especiales";
+    ViewBag.Class = "fa fa-shopping-bag";
+}
+
+<hr />
+
+<div class="panel-group">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div id="tbButtons" class="col-md-6"></div>
+
+                <div class="col-md-6">
+                    <div class="input-group">
+                        @Html.TextBox("txtName", "", htmlAttributes: new { @class = "form-control", placeholder = "Descripción de la oferta" })
+
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" id="btnSearch" title="Buscar oferta">
+                                <span class="glyphicon glyphicon-search"></span>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnCreate" title="Agregar nueva oferta">
+                                <span class="glyphicon  glyphicon-file"></span>
+                                Agregar
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div id="divOffers" class="panel-body dtContainer table-responsive">
+            @Html.Partial("_OfferList", Model)
+        </div>
+    </div>
+</div>
+

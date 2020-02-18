@@ -58,7 +58,8 @@
                         @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
                         {
                             <li title="Crear, revisar o modificar ventas">
-                             <a href="/Selling/SaleOrder/" onclick="ShowLoading()">&nbsp;Orden de venta<span class="fa fa-shopping-bag" style="float:left" /></a></li>
+                                <a href="/Selling/SaleOrder/" onclick="ShowLoading()">&nbsp;Orden de venta<span class="fa fa-shopping-bag" style="float:left" /></a>
+                            </li>
                         }
                         @if (User.IsInRole("Vendedor") || User.IsInRole("Supervisor"))
                         {
@@ -137,6 +138,11 @@
                         <li><a href="/Account/UserList" onclick="ShowLoading()">&nbsp;Cuentas de usuario<span class="fa fa-users" style="float:left" /></a></li>
                     </ul>
                 </li>
+            }
+
+            @if (User.IsInRole("Supervisor") || User.IsInRole("Administrador"))
+            {
+        <li><a href="/Offers/" onclick="ShowLoading()">&nbsp;Ofertas<span class="fa fa-shopping-bag" style="float:left" /></a></li>
             }
 
             <li><a href="http://mail.autobien.com.mx" onclick="ShowLoading()">&nbsp;Web Mail<span class="fa fa-envelope" style="float:left" /></a></li>

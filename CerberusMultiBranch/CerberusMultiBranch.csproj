@@ -205,6 +205,7 @@
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
+    <Compile Include="Controllers\Operative\OffersController.cs" />
     <Compile Include="Controllers\Operative\PurchaseEstimationController.cs" />
     <Compile Include="Controllers\Operative\PurchasesController.cs" />
     <Compile Include="Controllers\Operative\PurchasingController.cs" />
@@ -228,6 +229,10 @@
     <Compile Include="Migrations\201910212211369_OnlineStore.cs" />
     <Compile Include="Migrations\201910212211369_OnlineStore.Designer.cs">
       <DependentUpon>201910212211369_OnlineStore.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202002171856035_OfferConfig.cs" />
+    <Compile Include="Migrations\202002171856035_OfferConfig.Designer.cs">
+      <DependentUpon>202002171856035_OfferConfig.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -284,6 +289,7 @@
     <Compile Include="Models\Entities\Operative\SaleDetail.cs" />
     <Compile Include="Models\Entities\Operative\SaleHistory.cs" />
     <Compile Include="Models\Entities\Operative\ShoppingCart.cs" />
+    <Compile Include="Models\Entities\Operative\Offer.cs" />
     <Compile Include="Models\Entities\Operative\StockMovement.cs" />
     <Compile Include="Models\Entities\Operative\TrackingItem.cs" />
     <Compile Include="Models\Entities\Operative\Transaction.cs" />
@@ -315,6 +321,8 @@
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\ChoosePaymentViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\DailyBill.cs" />
+    <Compile Include="Models\ViewModels\Operative\OfferType.cs" />
+    <Compile Include="Models\ViewModels\Operative\OfferViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PriceSelectorViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintableViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\PrintRefundViewModel.cs" />
@@ -345,10 +353,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
+    <Content Include="AppScripts\Controls\ImageEditor.js" />
+    <Content Include="AppScripts\Offers.js" />
     <Content Include="AppScripts\Controls\SaleOrderChange.js" />
     <Content Include="AppScripts\Controls\SearchCustomer.js" />
     <Content Include="AppScripts\Controls\SearchProduct.js" />
     <Content Include="AppScripts\Global.js" />
+    <Content Include="AppScripts\OfferEditor.js" />
     <Content Include="AppScripts\Operative.js" />
     <Content Include="AppScripts\PurchaseEstimation.js" />
     <Content Include="AppScripts\PurchaseOrder.js" />
@@ -599,6 +610,11 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\Common.js" />
+    <Content Include="Scripts\cropper\cropper.css" />
+    <Content Include="Scripts\cropper\cropper.min.js" />
+    <Content Include="Scripts\cropper\jquery-cropper.common.js" />
+    <Content Include="Scripts\cropper\jquery-cropper.esm.js" />
+    <Content Include="Scripts\cropper\jquery-cropper.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap4.js" />
@@ -676,7 +692,7 @@
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
     <None Include="Properties\PublishProfiles\Sims1.5.pubxml" />
-    <None Include="Properties\PublishProfiles\SimsTrial.pubxml" />
+    <None Include="Properties\PublishProfiles\SimsPublish.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <None Include="Scripts\jquery-3.1.1-vsdoc.js" />
     <Content Include="Scripts\jquery-3.1.1.js" />
@@ -911,6 +927,10 @@
     <Content Include="Views\Shared\MainLayout.cshtml" />
     <Content Include="Views\Shared\PageLayout.cshtml" />
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Offers\Index.cshtml" />
+    <Content Include="Views\Offers\Editor.cshtml" />
+    <Content Include="Views\Shared\_ImageEditor.cshtml" />
+    <Content Include="Views\Offers\_OfferList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -939,6 +959,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201910212211369_OnlineStore.resx">
       <DependentUpon>201910212211369_OnlineStore.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202002171856035_OfferConfig.resx">
+      <DependentUpon>202002171856035_OfferConfig.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
