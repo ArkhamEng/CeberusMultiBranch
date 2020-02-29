@@ -25,19 +25,22 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
         [Required]
         [MaxLength(30)]
         [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "El código solo admite letras y numeros (sin espacios en blanco)")]
-        [Index("IDX_Ident_TradeMark", Order =0)]
+        //[Index("IDX_Ident_TradeMark", Order =0)]
+        [Index("IDX_Code")]
         public string Code { get; set; }
 
         [Display(Name = "Descripción")]
         [MaxLength(300)]
-        [Index("IDX_Ident_TradeMark", Order = 1)]
+        //[Index("IDX_Ident_TradeMark", Order = 1)]
+        [Index("IDX_Name")]
         [Required(ErrorMessage ="Se requiere una descripción del producto")]
         public string Name { get; set; }
 
 
         [Display(Name = "Fabricante")]
         [MaxLength(50)]
-        [Index("IDX_Ident_TradeMark", Order = 2)]
+        //[Index("IDX_Ident_TradeMark", Order = 2)]
+        [Index("IDX_TradeMark")]
         public string TradeMark { get; set; }
 
 
@@ -107,7 +110,7 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
 
         public virtual PartSystem System { get; set; }
 
-        public ICollection<ProductImage> Images { get; set; }
+        public  ICollection<ProductImage> Images { get; set; }
 
         public ICollection<Compatibility> Compatibilities { get; set; }
 
@@ -252,6 +255,67 @@ namespace CerberusMultiBranch.Models.Entities.Catalog
             this.NewCompatibilities = new List<string>();
             this.UpdDate = DateTime.Now.ToLocal();
             this.UpdUser = HttpContext.Current != null ? HttpContext.Current.User.Identity.Name : null;
+        }
+
+        public Product(Product product)
+        {
+            this.BarCode = product.BarCode;
+            this.Branches = product.Branches;
+            this.BranchProducts = product.BranchProducts;
+            this.BuyPrice = product.BuyPrice;
+            this.CanSell = product.CanSell;
+            this.Category = product.Category;
+            this.CategoryId = product.CategoryId;
+            this.Code = product.Code;
+            this.Comment = product.Comment;
+            this.Compatibilities = product.Compatibilities;
+            this.DealerPercentage = product.DealerPercentage;
+            this.DealerPrice = product.DealerPrice;
+            this.Discount = product.Discount;
+            this.Equivalences = product.Equivalences;
+            this.Files = product.Files;
+            this.FromProviderId = product.FromProviderId;
+            this.Images = product.Images;
+            this.IsActive = product.IsActive;
+            this.IsIncart = product.IsIncart;
+            
+            this.IsOnlineSold = product.IsOnlineSold;
+            this.IsTrackable = product.IsTrackable;
+            this.Ledge = product.Ledge;
+            this.LockDate = product.LockDate;
+            this.MaxQuantity = product.MaxQuantity;
+            this.MinQuantity = product.MinQuantity;
+            this.ModelCompatibilities = product.ModelCompatibilities;
+            this.Name = product.Name;
+            this.NewCompatibilities = product.NewCompatibilities;
+            this.OnlinePercentage = product.OnlinePercentage;
+            this.OnlinePrice = product.OnlinePrice;
+            this.PackageDetails = product.PackageDetails;
+            this.PartSystemId = product.PartSystemId;
+            this.ProductId = product.ProductId;
+            this.ProductType = product.ProductType;
+            this.ProviderCode = product.ProviderCode;
+            this.PurchaseDetails = product.PurchaseDetails;
+            this.PurchaseItems = product.PurchaseItems;
+            this.PurchaseOrderDetails = product.PurchaseOrderDetails;
+            this.Quantity = product.Quantity;
+            this.Row = product.Row;
+            this.SaleDetails = product.SaleDetails;
+            this.ShortName = product.ShortName;
+            this.StockLocked = product.StockLocked;
+            this.StockRequired = product.StockRequired;
+            this.StorePercentage = product.StorePercentage;
+            this.StorePrice = product.StorePrice;
+            this.System = product.System;
+            this.TrackingItems = product.TrackingItems;
+            this.TradeMark = product.TradeMark;
+            this.TransactionId = product.TransactionId;
+            this.Unit = product.Unit;
+            this.UpdDate = product.UpdDate;
+            this.UpdUser = product.UpdUser;
+            this.UserLock = product.UserLock;
+            this.WholesalerPercentage = product.WholesalerPercentage;
+            this.WholesalerPrice = product.WholesalerPrice;
         }
         #endregion
     }

@@ -87,12 +87,10 @@ namespace CerberusMultiBranch.Controllers.Common
                     Description = o.Description,
                     Discount = o.Discount,
                     Name = o.Name,
-                    TextShadow = o.ShadowColor,
+                    TextShadow = "-1px 0 " + o.ShadowColor + ", 0 1px " + o.ShadowColor + ", 1px 0 " + o.ShadowColor + ", 0 -1px "+ o.ShadowColor,
                     TextColor = o.TextColor
                 
                 }).ToList();
-
-                offers.ForEach(o => { o.TextShadow = string.Format("-1px 0 {0}, 0 1px {0}, 1px 0 {0}, 0 -1px {0}", o.TextShadow); });
             });
 
             return Ok(offers);

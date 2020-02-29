@@ -12,6 +12,7 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace CerberusMultiBranch.Controllers.Catalog
@@ -34,70 +35,116 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
         [HttpPost]
-        public ActionResult Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid, int? id)
+        public async Task<ActionResult> Search(int? categoryId, int? partSystemId, int? carYear, int? carModelId, int? carMakeId, string name, string code, bool isGrid, int? id)
         {
-            var model = LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid, id);
+            var model = await LookFor(categoryId, partSystemId, carYear, carModelId, carMakeId, name, code, isGrid, id);
             return PartialView("_List", model);
         }
 
-     
 
-        private List<List<Product>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int? id, int top = Cons.MaxProductResult)
+
+        private  async Task<List<List<Product>>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int? id, int top = Cons.MaxProductResult)
         {
             var branchId = User.Identity.GetBranchId();
 
             string[] arr = new List<string>().ToArray();
+
+            var key = string.Empty;
 
             if (name != null && name != string.Empty)
             {
                 arr = name.Trim().Split(' ');
 
                 if (arr.Length == Cons.One)
+                {
                     arr[Cons.Zero] = Regex.Replace(arr[Cons.Zero], "[^a-zA-Z0-9]+", "");
+                    key = arr[Cons.Zero];
+                }
             }
+            var userId = User.Identity.GetUserId();
+            var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId == userId).Select(s => s.ProductId).ToArray();
 
             List<Product> products = new List<Product>();
+            /*
+            products = (from p in db.Products.Include(p => p.Images)
+                        //.Include(p => p.Compatibilities)
+                        //.Include(p => p.BranchProducts)
+                            //.Include(p => p.Compatibilities.Select(c => c.CarYear))
+                            //.Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
 
-            products = (from p in db.Products.Include(p => p.Images).Include(p => p.Compatibilities).
-                        Include(p => p.BranchProducts).Include(p => p.Compatibilities.Select(c => c.CarYear)).
-                        Include(p => p.Compatibilities.Select(c => c.CarYear.CarModel))
-                        
                         where (p.IsActive) &&
                         (id == null || p.ProductId == id)
                         && (categoryId == null || p.CategoryId == categoryId)
                         && (partSystemId == null || p.PartSystemId == partSystemId)
-                        && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s)))
+                        && (name == null || name == string.Empty || arr.All(s => (p.Code + " " + p.Name ).Contains(s)))
 
-                        && (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
-                        && (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
-                        && (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
-                        select p).OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
-                        s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(top).ToList();
-            var userId = User.Identity.GetUserId();
-            var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId == userId).Select(s => s.ProductId).ToArray();
+                        //&& (carYear == null || p.Compatibilities.Where(c => c.CarYearId == carYear).ToList().Count > Cons.Zero)
+                        //&& (carModel == null || p.Compatibilities.Where(c => c.CarYear.CarModelId == carModel).ToList().Count > Cons.Zero)
+                        //&& (carMake == null || p.Compatibilities.Where(c => c.CarYear.CarModel.CarMakeId == carMake).ToList().Count > Cons.Zero)
+                        select p).Take(top).ToList();
+                        //.OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
+                        //s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(top).ToList();*/
 
-            foreach (var prod in products)
+            var tmProducts = db.Products.Where(p => p.IsActive);
+
+
+            for (int i = 0; i < arr.Length; i++)
             {
-                var bp = prod.BranchProducts.FirstOrDefault(b => b.BranchId == branchId);
+                var word = arr[i];
 
-                prod.Quantity           = bp != null ? bp.Stock : Cons.Zero;
-                prod.StorePercentage    = bp != null ? bp.StorePercentage : Cons.Zero;
-                prod.DealerPercentage   = bp != null ? bp.DealerPercentage : Cons.Zero;
-                prod.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
-                prod.StorePrice         = bp != null ? bp.StorePrice : Cons.Zero;
-                prod.DealerPrice        = bp != null ? bp.DealerPrice : Cons.Zero;
-                prod.WholesalerPrice    = bp != null ? bp.WholesalerPrice : Cons.Zero;
-                prod.Row                = bp != null ? bp.Row : string.Empty;
-                prod.Ledge              = bp != null ? bp.Ledge : string.Empty;
-
-                prod.MaxQuantity = bp != null ? bp.MaxQuantity : Cons.Zero;
-                prod.MinQuantity = bp != null ? bp.MinQuantity : Cons.Zero;
-
-                prod.StockLocked = bp != null ? bp.StockLocked : false;
-                prod.IsIncart = ids.Contains(prod.ProductId);
+                tmProducts = (from p in tmProducts
+                              where (p.Code+" "+p.Name+" "+p.TradeMark).Contains(word)
+                              select p);
             }
 
-            products.OrderCarModels();
+            var anonProd =   (from prod in tmProducts
+
+                            join b in db.BranchProducts on prod.ProductId equals b.ProductId into bt
+                            from bp in bt.DefaultIfEmpty()
+
+                            join i in db.ProductImages on prod.ProductId equals i.ProductId into it
+                            from img in it.DefaultIfEmpty()
+
+                            where
+                            (id == null || prod.ProductId == id)
+
+                            && (categoryId == null || prod.CategoryId == categoryId)
+                            && (partSystemId == null || prod.PartSystemId == partSystemId)
+
+                            select new
+                            {
+                                Stock = bp != null ? bp.Stock : Cons.Zero,
+                                prod,
+                                img,
+                                bp
+                            }).OrderByDescending(s => s.Stock).GroupBy(a => a.prod).Take(top);
+
+
+            await anonProd.ForEachAsync(group =>
+                     {
+                         var bp = group.Select(v => v.bp).FirstOrDefault(b => b != null && b.BranchId == branchId);
+
+                         group.Key.Quantity = bp != null ? bp.Stock : Cons.Zero;
+                         group.Key.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
+                         group.Key.DealerPercentage = bp != null ? bp.DealerPercentage : Cons.Zero;
+                         group.Key.WholesalerPercentage = bp != null ? bp.WholesalerPercentage : Cons.Zero;
+                         group.Key.StorePrice = bp != null ? bp.StorePrice : Cons.Zero;
+                         group.Key.DealerPrice = bp != null ? bp.DealerPrice : Cons.Zero;
+                         group.Key.WholesalerPrice = bp != null ? bp.WholesalerPrice : Cons.Zero;
+                         group.Key.Row = bp != null ? bp.Row : string.Empty;
+                         group.Key.Ledge = bp != null ? bp.Ledge : string.Empty;
+
+                         group.Key.MaxQuantity = bp != null ? bp.MaxQuantity : Cons.Zero;
+                         group.Key.MinQuantity = bp != null ? bp.MinQuantity : Cons.Zero;
+
+                         group.Key.StockLocked = bp != null ? bp.StockLocked : false;
+                         group.Key.IsIncart = ids.Contains(group.Key.ProductId);
+                         group.Key.Images = group.Where(v => v.img != null).Select(v => v.img).ToList();
+                     });
+
+            products =await anonProd.Select(a => a.Key).ToListAsync();
+
+            // products.OrderCarModels();
 
             if (isGrid)
                 return OrderAsGrid(products);
@@ -106,15 +153,16 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 List<List<Product>> ord = new List<List<Product>>();
 
                 products.ForEach(p =>
-                {
-                    List<Product> pl = new List<Product>();
-                    pl.Add(p);
-                    ord.Add(pl);
-                });
+                                        {
+                                            List<Product> pl = new List<Product>();
+                                            pl.Add(p);
+                                            ord.Add(pl);
+                                        });
 
                 return ord;
             }
         }
+
 
 
         [HttpPost]
@@ -241,7 +289,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 if (product.StorePercentage < 20)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de mostrador no puede ser menor al 20%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
 
-                if(branch.IsWebStore && product.OnlinePercentage < 10)
+                if (branch.IsWebStore && product.OnlinePercentage < 10)
                     return Json(new JResponse { Header = "Error en porcentaje", Body = "El porcentaje de Online no puede ser menor al 15%", Code = Cons.Responses.Codes.ConditionMissing, Result = Cons.Responses.Warning });
 
 
@@ -407,18 +455,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             var ep = db.ExternalProducts.Find(providerId, code);
 
             ProductViewModel vm = new ProductViewModel();
-            
-            vm.IsActive   = true;
+
+            vm.IsActive = true;
             vm.Categories = new List<Category>().ToSelectList();//cats.ToSelectList();
-            vm.Systems    = db.Systems.OrderBy(s => s.Name).ToSelectList();
-            vm.Name       = ep.Description.ToUpper();
-            vm.TradeMark  = ep.TradeMark.ToUpper();
-            vm.Unit       = ep.Unit.ToUpper();
-            vm.BuyPrice    = Math.Round(ep.Price,Cons.Two);
+            vm.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+            vm.Name = ep.Description.ToUpper();
+            vm.TradeMark = ep.TradeMark.ToUpper();
+            vm.Unit = ep.Unit.ToUpper();
+            vm.BuyPrice = Math.Round(ep.Price, Cons.Two);
             vm.MinQuantity = Cons.One;
-            vm.Code             = Regex.Replace(ep.Code, @"[^0-9a-zA-Z]+", "").ToUpper();
-            vm.ProviderCode     = ep.Code;
-            vm.FromProviderId   = ep.ProviderId;
+            vm.Code = Regex.Replace(ep.Code, @"[^0-9a-zA-Z]+", "").ToUpper();
+            vm.ProviderCode = ep.Code;
+            vm.FromProviderId = ep.ProviderId;
             vm.DealerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.DealerPercentage)).Value);
             vm.StorePercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.StorePercentage)).Value);
             vm.WholesalerPercentage = Convert.ToInt16(variables.FirstOrDefault(v => v.Name == nameof(Product.WholesalerPercentage)).Value);
@@ -505,18 +553,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 var bProd = product.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId);
 
                 //si no existe relacion con sucursal, los precios y existencias seran 0
-                product.Quantity            = bProd != null ? bProd.Stock : Cons.Zero;
-                product.StorePercentage     = bProd != null ? bProd.StorePercentage : Cons.Zero;
-                product.DealerPercentage    = bProd != null ? bProd.DealerPercentage : Cons.Zero;
+                product.Quantity = bProd != null ? bProd.Stock : Cons.Zero;
+                product.StorePercentage = bProd != null ? bProd.StorePercentage : Cons.Zero;
+                product.DealerPercentage = bProd != null ? bProd.DealerPercentage : Cons.Zero;
                 product.WholesalerPercentage = bProd != null ? bProd.WholesalerPercentage : Cons.Zero;
-                product.StorePrice          = bProd != null ? bProd.StorePrice : Cons.Zero;
-                product.DealerPrice         = bProd != null ? bProd.DealerPrice : Cons.Zero;
-                product.WholesalerPrice     = bProd != null ? bProd.WholesalerPrice : Cons.Zero;
-                product.MaxQuantity         = bProd != null ? bProd.MaxQuantity : Cons.Zero;
-                product.MinQuantity         = bProd != null ? bProd.MinQuantity : Cons.Zero;
+                product.StorePrice = bProd != null ? bProd.StorePrice : Cons.Zero;
+                product.DealerPrice = bProd != null ? bProd.DealerPrice : Cons.Zero;
+                product.WholesalerPrice = bProd != null ? bProd.WholesalerPrice : Cons.Zero;
+                product.MaxQuantity = bProd != null ? bProd.MaxQuantity : Cons.Zero;
+                product.MinQuantity = bProd != null ? bProd.MinQuantity : Cons.Zero;
 
-                product.Ledge               = bProd != null ? bProd.Ledge : string.Empty;
-                product.Row                 = bProd != null ? bProd.Row : string.Empty;
+                product.Ledge = bProd != null ? bProd.Ledge : string.Empty;
+                product.Row = bProd != null ? bProd.Row : string.Empty;
 
                 product.OrderCarModels();
 
@@ -558,12 +606,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             //si es producto nuevo lo guardo de inmediato para generar un ID
             if (product.ProductId == Cons.Zero)
             {
-                if(!string.IsNullOrEmpty(product.ProviderCode))
+                if (!string.IsNullOrEmpty(product.ProviderCode))
                 {
                     Equivalence eq = new Equivalence
-                    { ProviderId = product.FromProviderId, Code = product.ProviderCode, BuyPrice = product.BuyPrice,
-                        UpdDate = DateTime.Now.ToLocal(), UpdUser = User.Identity.Name, InsDate = DateTime.Now.ToLocal(),
-                        InsUser = User.Identity.Name, IsDefault = true
+                    {
+                        ProviderId = product.FromProviderId,
+                        Code = product.ProviderCode,
+                        BuyPrice = product.BuyPrice,
+                        UpdDate = DateTime.Now.ToLocal(),
+                        UpdUser = User.Identity.Name,
+                        InsDate = DateTime.Now.ToLocal(),
+                        InsUser = User.Identity.Name,
+                        IsDefault = true
                     };
 
                     product.Equivalences = new List<Equivalence>();
@@ -592,23 +646,23 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 branchP = new BranchProduct
                 {
                     ProductId = product.ProductId,
-                    BranchId  = User.Identity.GetBranchId(),
-                    Stock     = product.StockRequired ? product.Quantity : Cons.Zero,
+                    BranchId = User.Identity.GetBranchId(),
+                    Stock = product.StockRequired ? product.Quantity : Cons.Zero,
                     LastStock = Cons.Zero,
-                    UpdDate   = product.UpdDate,
-                    BuyPrice  = product.BuyPrice,
+                    UpdDate = product.UpdDate,
+                    BuyPrice = product.BuyPrice,
                     DealerPercentage = product.DealerPercentage,
-                    StorePercentage  = product.StorePercentage,
+                    StorePercentage = product.StorePercentage,
                     WholesalerPercentage = product.WholesalerPercentage,
-                    StorePrice       = product.StorePrice,
-                    DealerPrice      = product.DealerPrice,
-                    WholesalerPrice  = product.WholesalerPrice,
-                    UpdUser          = product.UpdUser,
-                    Row              = product.Row ?? string.Empty,
-                    Ledge            = product.Ledge ?? string.Empty,
-                    StockLocked      = product.StockLocked,
-                    MaxQuantity      = product.MaxQuantity,
-                    MinQuantity      = product.MinQuantity
+                    StorePrice = product.StorePrice,
+                    DealerPrice = product.DealerPrice,
+                    WholesalerPrice = product.WholesalerPrice,
+                    UpdUser = product.UpdUser,
+                    Row = product.Row ?? string.Empty,
+                    Ledge = product.Ledge ?? string.Empty,
+                    StockLocked = product.StockLocked,
+                    MaxQuantity = product.MaxQuantity,
+                    MinQuantity = product.MinQuantity
                 };
 
                 db.BranchProducts.Add(branchP);
@@ -638,13 +692,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 //coloco porcentajes de venta
                 branchP.DealerPercentage = product.DealerPercentage;
-                branchP.StorePercentage  = product.StorePercentage;
+                branchP.StorePercentage = product.StorePercentage;
                 branchP.WholesalerPercentage = product.WholesalerPercentage;
 
                 branchP.MaxQuantity = product.MaxQuantity;
                 branchP.MinQuantity = product.MinQuantity;
-                branchP.Ledge   = product.Ledge ?? string.Empty;
-                branchP.Row     = product.Row ?? string.Empty;
+                branchP.Ledge = product.Ledge ?? string.Empty;
+                branchP.Row = product.Row ?? string.Empty;
                 branchP.UpdDate = product.UpdDate;
                 branchP.UpdUser = product.UpdUser;
                 branchP.LockDate = null;
@@ -653,8 +707,8 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                 //calculo precios tomando como base el precio de compra que saque de la base de datos
                 //ya que puede haber actualizaciones por medio de compras
-                branchP.DealerPrice     = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.DealerPercentage / Cons.OneHundred)), Cons.Zero);
-                branchP.StorePrice      = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.StorePercentage / Cons.OneHundred)), Cons.Zero);
+                branchP.DealerPrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+                branchP.StorePrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.StorePercentage / Cons.OneHundred)), Cons.Zero);
                 branchP.WholesalerPrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
 
                 //si la cantidad indicada es diferente a la cantidad en stock agrego el movimiento requerido 
@@ -665,11 +719,11 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                     var sm = new StockMovement
                     {
-                        BranchId  = branchId,
+                        BranchId = branchId,
                         ProductId = product.ProductId,
-                        User      = product.UpdUser,
+                        User = product.UpdUser,
                         MovementDate = DateTime.Now.ToLocal(),
-                        Comment   = "Movimiento manual",
+                        Comment = "Movimiento manual",
                     };
 
                     if (product.Quantity > branchP.Stock)
@@ -744,18 +798,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
             branchP.DealerPercentage = package.DealerPercentage;
             branchP.StorePercentage = package.StorePercentage;
 
-            branchP.Ledge       = package.Ledge ?? string.Empty;
-            branchP.Row         = package.Row ?? string.Empty;
+            branchP.Ledge = package.Ledge ?? string.Empty;
+            branchP.Row = package.Row ?? string.Empty;
             branchP.MaxQuantity = package.MaxQuantity;
             branchP.MinQuantity = package.MinQuantity;
-            branchP.UpdDate     = package.UpdDate;
-            branchP.UpdUser     = package.UpdUser;
+            branchP.UpdDate = package.UpdDate;
+            branchP.UpdUser = package.UpdUser;
             branchP.StockLocked = package.StockLocked;
 
             //calculo precios tomando como base el precio de compra que saque de la base de datos
             //ya que puede haber actualizaciones por medio de compras
-            branchP.DealerPrice     = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.DealerPercentage / Cons.OneHundred)), Cons.Zero);
-            branchP.StorePrice      = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.StorePercentage / Cons.OneHundred)), Cons.Zero);
+            branchP.DealerPrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.DealerPercentage / Cons.OneHundred)), Cons.Zero);
+            branchP.StorePrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.StorePercentage / Cons.OneHundred)), Cons.Zero);
             branchP.WholesalerPrice = Math.Round(branchP.BuyPrice * (Cons.One + (branchP.WholesalerPercentage / Cons.OneHundred)), Cons.Zero);
 
             //si es un paquete  nuevo agrego la relacion a la sucursal en turno
