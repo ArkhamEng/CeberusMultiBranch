@@ -105,5 +105,30 @@ namespace CerberusMultiBranch.Support
             //put a breakpoint here and check datatable
             return dataTable;
         }
+
+        public static bool SearchProduct(int branchId, string[] words)
+        {
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
+            using (SqlConnection conn = new SqlConnection(cs))
+            {
+                conn.Open();
+                SqlCommand com = conn.CreateCommand();
+                com.CommandText = "[Catalog].[SearchProductsByWords]";
+                com.CommandType = CommandType.StoredProcedure;
+
+                DateTime? dateLock = DateTime.Now.ToLocal();
+
+
+                //com.Parameters.Add(new SqlParameter { Value = productId, ParameterName = "@ProductId" });
+                //com.Parameters.Add(new SqlParameter { Value = branchId, ParameterName = "@BranchId" });
+                //com.Parameters.Add(new SqlParameter { Value = dateLock, ParameterName = "@DateLock" });
+                //com.Parameters.Add(new SqlParameter { Value = user, ParameterName = "@UserLock" });
+                //com.Parameters.Add(new SqlParameter { Value = isLocked, ParameterName = "@IsLocked" });
+
+                var done = com.ExecuteNonQuery() > 0 ? true : false;
+
+                return done;
+            }
+        }
     }
 }

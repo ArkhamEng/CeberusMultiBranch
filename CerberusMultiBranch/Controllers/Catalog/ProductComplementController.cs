@@ -354,12 +354,18 @@ namespace CerberusMultiBranch.Controllers.Catalog
                 {
                     var newStock = destBp.Stock + quantity;
 
+                    var currentAmount = (destBp.Stock * destBp.BuyPrice);
+
+
                     destBp.LastStock = destBp.Stock;
                     destBp.Stock     = newStock;
 
                     //si el precio de la sucursal destino es mayor que la de origen, se promedia de lo contrario se actualiza
-                    if (destBp.BuyPrice > orBP.BuyPrice)
-                        destBp.BuyPrice = Math.Round(((destBp.BuyPrice + orBP.BuyPrice) / newStock), Cons.Two);
+                    if (destBp.BuyPrice > orBP.BuyPrice && destBp.Stock > Cons.Zero)
+                    {
+                        var newAmount = (quantity * orBP.BuyPrice);
+                        destBp.BuyPrice = Math.Round(((currentAmount + newAmount) / destBp.Stock), Cons.Two);
+                    }
                     else
                         destBp.BuyPrice = orBP.BuyPrice;
 

@@ -1084,13 +1084,17 @@ namespace CerberusMultiBranch.Controllers.Operative
                         };
                     }
 
-                    if (note.ExplirationDate < DateTime.Now.ToLocal().AddDays(Cons.One))
+                    var expiration = new DateTime(note.ExplirationDate.Year, note.ExplirationDate.Month, note.ExplirationDate.Day);
+
+                    var validationDate = DateTime.Today.ToLocal();
+
+                    if (expiration < validationDate)
                     {
                         return new JResponse
                         {
                             Result = Cons.Responses.Warning,
                             Code = Cons.Responses.Codes.InvalidData,
-                            Body = "El vale cadudo en la fecha " + note.ExplirationDate.ToString("dd/MM/yyyy"),
+                            Body = "El vale caduco en la fecha " + note.ExplirationDate.ToString("dd/MM/yyyy"),
                             Header = "Vale sin caducado"
                         };
                     }

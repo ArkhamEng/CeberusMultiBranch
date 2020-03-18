@@ -43,7 +43,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
 
 
-        private  async Task<List<List<Product>>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int? id, int top = Cons.MaxProductResult)
+        private async Task<List<List<Product>>> LookFor(int? categoryId, int? partSystemId, int? carYear, int? carModel, int? carMake, string name, string code, bool isGrid, int? id, int top = Cons.MaxProductResult)
         {
             var branchId = User.Identity.GetBranchId();
 
@@ -61,6 +61,9 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     key = arr[Cons.Zero];
                 }
             }
+
+            arr = arr.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
             var userId = User.Identity.GetUserId();
             var ids = db.ShoppingCarts.Where(s => s.BranchId == branchId && s.UserId == userId).Select(s => s.ProductId).ToArray();
 
@@ -85,44 +88,42 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         //.OrderByDescending(s => s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId) != null ?
                         //s.BranchProducts.FirstOrDefault(bp => bp.BranchId == branchId).Stock : Cons.Zero).Take(top).ToList();*/
 
-            var tmProducts = db.Products.Where(p => p.IsActive);
+
+            //for (int i = 0; i < arr.Length; i++)
+            //{
+            //    var word = arr[i];
+
+            //    tmProducts = (from p in tmProducts
+            //                  where (p.Code + " " + p.Name + " " + p.TradeMark).Contains(word)
+            //                  select p);
+            //}
+
+            var anonProd = await (from prod in db.Products.Where(p =>
+                                  string.IsNullOrEmpty(name) || arr.All(s => (p.Code + " " + p.Name + " " + p.TradeMark).Contains(s.Trim())))
+
+                                  join b in db.BranchProducts on new { prod.ProductId, BranchId = branchId } equals new { b.ProductId, b.BranchId } into bt
+                                  from bp in bt.DefaultIfEmpty()
+
+                                  join i in db.ProductImages on prod.ProductId equals i.ProductId into it
+                                  from img in it.DefaultIfEmpty()
+
+                                  where prod.IsActive && (id == null || prod.ProductId == id)
+                                  && (categoryId == null || prod.CategoryId == categoryId)
+                                  && (partSystemId == null || prod.PartSystemId == partSystemId)
 
 
-            for (int i = 0; i < arr.Length; i++)
-            {
-                var word = arr[i];
-
-                tmProducts = (from p in tmProducts
-                              where (p.Code+" "+p.Name+" "+p.TradeMark).Contains(word)
-                              select p);
-            }
-
-            var anonProd =   (from prod in tmProducts
-
-                            join b in db.BranchProducts on prod.ProductId equals b.ProductId into bt
-                            from bp in bt.DefaultIfEmpty()
-
-                            join i in db.ProductImages on prod.ProductId equals i.ProductId into it
-                            from img in it.DefaultIfEmpty()
-
-                            where
-                            (id == null || prod.ProductId == id)
-
-                            && (categoryId == null || prod.CategoryId == categoryId)
-                            && (partSystemId == null || prod.PartSystemId == partSystemId)
-
-                            select new
-                            {
-                                Stock = bp != null ? bp.Stock : Cons.Zero,
-                                prod,
-                                img,
-                                bp
-                            }).OrderByDescending(s => s.Stock).GroupBy(a => a.prod).Take(top);
+                                  select new
+                                  {
+                                      Stock = bp != null ? bp.Stock : Cons.Zero,
+                                      prod,
+                                      img,
+                                      bp
+                                  }).GroupBy(a => a.prod).Take(top).ToListAsync();//.GroupBy(a => a.prod).OrderByDescending(a => a.Sum(b => b.Stock)).Take(top).ToListAsync();
 
 
-            await anonProd.ForEachAsync(group =>
+            anonProd.ForEach(group =>
                      {
-                         var bp = group.Select(v => v.bp).FirstOrDefault(b => b != null && b.BranchId == branchId);
+                         var bp = group.Select(v => v.bp).FirstOrDefault();// (b => b != null && b.BranchId == branchId);
 
                          group.Key.Quantity = bp != null ? bp.Stock : Cons.Zero;
                          group.Key.StorePercentage = bp != null ? bp.StorePercentage : Cons.Zero;
@@ -139,10 +140,10 @@ namespace CerberusMultiBranch.Controllers.Catalog
 
                          group.Key.StockLocked = bp != null ? bp.StockLocked : false;
                          group.Key.IsIncart = ids.Contains(group.Key.ProductId);
-                         group.Key.Images = group.Where(v => v.img != null).Select(v => v.img).ToList();
+                         //group.Key.Images = group.Where(v => v.img != null).Select(v => v.img).ToList();
                      });
 
-            products =await anonProd.Select(a => a.Key).ToListAsync();
+            products = anonProd.Select(a => a.Key).ToList();
 
             // products.OrderCarModels();
 
