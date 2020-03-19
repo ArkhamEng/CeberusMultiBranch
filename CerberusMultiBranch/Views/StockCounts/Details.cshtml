@@ -1,0 +1,107 @@
+﻿@model CerberusMultiBranch.Models.Entities.Inventory.StockCount
+
+@{
+    ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/PageLayout.cshtml";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>StockCount</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Branch.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Branch.Name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.SystemId)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SystemId)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Compleation)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Compleation)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LinesCounted)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LinesCounted)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CorrectLines)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CorrectLines)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LinesAccurancy)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LinesAccurancy)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalCost)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalCost)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalCostVariance)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalCostVariance)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.User)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.User)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.StockCountId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

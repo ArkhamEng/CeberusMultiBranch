@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Web;
 
 namespace CerberusMultiBranch.Models.Entities.Operative
 {
@@ -18,6 +16,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Column(Order = 1), Key, ForeignKey("Product")]
         public int ProductId { get; set; }
 
+        [Index("IDX_Stock")]
         public double Stock { get; set; }
 
         public double LastStock { get; set; }

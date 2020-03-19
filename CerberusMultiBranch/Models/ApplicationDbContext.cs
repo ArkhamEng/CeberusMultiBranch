@@ -1,6 +1,7 @@
 ﻿using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Config;
 using CerberusMultiBranch.Models.Entities.Finances;
+using CerberusMultiBranch.Models.Entities.Inventory;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Models.Entities.Purchasing;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -125,6 +126,14 @@ namespace CerberusMultiBranch.Models
         public DbSet<PurchaseType> PurchaseTypes { get; set; }
 
         public DbSet<PurchaseStatus> PurchaseStatuses { get; set; }
+
+        #endregion
+
+        #region Inventory
+
+        public DbSet<StockCount> StockCounts { get; set; }
+
+        public DbSet<StockCountDetail> StockCountDetails { get; set; }
 
         #endregion
 

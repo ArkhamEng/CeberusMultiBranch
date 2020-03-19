@@ -62,6 +62,9 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [NotMapped]
         public string Base64 { get; set; }
 
+        [NotMapped]
+        public string IsTerminated { get; set; }
+
         public Offer()
         {
             IsActive = true;

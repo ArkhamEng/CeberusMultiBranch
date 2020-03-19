@@ -29,7 +29,7 @@
                         @{ string imgC = string.Format("col-md-{0} col-xs-4 col-sm-4", 2); }
 
                         <div class='@imgC' style="align-items:center">
-                            @if (prod.Images.Count > 0)
+                            @if (prod.Images != null && prod.Images.Count > 0)
                             {
                                     <img src="@prod.Images.First().Path" class="img-responsive img-rounded" onmouseover="SetPointer(this)" style="max-height:150px"
                                          title="Haz click sobre la image para ver la galería" onclick="ShowImages('@prod.ProductId')" />

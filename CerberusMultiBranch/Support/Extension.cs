@@ -283,10 +283,14 @@ namespace CerberusMultiBranch.Support
             foreach (var p in products)
             {
                 p.ModelCompatibilities = new List<CarModel>();
-                foreach (var m in p.Compatibilities)
+
+                if (p.Compatibilities != null)
                 {
-                    if (!p.ModelCompatibilities.Contains(m.CarYear.CarModel))
-                        p.ModelCompatibilities.Add(m.CarYear.CarModel);
+                    foreach (var m in p.Compatibilities)
+                    {
+                        if (!p.ModelCompatibilities.Contains(m.CarYear.CarModel))
+                            p.ModelCompatibilities.Add(m.CarYear.CarModel);
+                    }
                 }
             }
         }
@@ -294,10 +298,14 @@ namespace CerberusMultiBranch.Support
         public static void OrderCarModels(this Product product)
         {
             product.ModelCompatibilities = new List<CarModel>();
-            foreach (var m in product.Compatibilities)
+
+            if (product.Compatibilities != null)
             {
-                if (!product.ModelCompatibilities.Contains(m.CarYear.CarModel))
-                    product.ModelCompatibilities.Add(m.CarYear.CarModel);
+                foreach (var m in product.Compatibilities)
+                {
+                    if (!product.ModelCompatibilities.Contains(m.CarYear.CarModel))
+                        product.ModelCompatibilities.Add(m.CarYear.CarModel);
+                }
             }
         }
 

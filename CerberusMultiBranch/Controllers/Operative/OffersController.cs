@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Web.UI;
 
 namespace CerberusMultiBranch.Controllers.Operative
 {
@@ -21,6 +22,7 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpGet]
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public ActionResult Index()
         {
             var date = DateTime.Today.ToLocal();
@@ -29,14 +31,15 @@ namespace CerberusMultiBranch.Controllers.Operative
         }
 
         [HttpGet]
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public ActionResult Search(string description)
         {
 
             var arr = description.Split(' ');
 
             var date = DateTime.Today.ToLocal();
-            var offers = db.Offers.Where(o => o.IsActive && o.EndDate >= date
-            && ( string.IsNullOrEmpty(description) || arr.All(a=> o.Description.Contains(a)))
+            var offers = db.Offers.Where(o => o.IsActive 
+            && ( string.IsNullOrEmpty(description) || arr.All(a=> (o.Name +" "+ o.Description).Contains(a)))
             ).ToList();
 
             return PartialView("_OfferList",offers);
@@ -44,6 +47,7 @@ namespace CerberusMultiBranch.Controllers.Operative
 
 
         [HttpGet]
+        [OutputCache(Location = OutputCacheLocation.None, NoStore = true)]
         public ActionResult Editor(int? id)
         {
             var model = new Offer();
