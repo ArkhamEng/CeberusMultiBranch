@@ -10,10 +10,6 @@ namespace CerberusMultiBranch.Models.Entities.Inventory
 
         public int ProductId { get; set; }
 
-        public string Row { get; set; }
-
-        public string Ledge { get; set; }
-
         public double UnitCost { get; set; }
 
         public double CurrentQty { get; set; }

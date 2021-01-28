@@ -7,21 +7,22 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Scripts.Render("~/bundles/Searches")
-@Scripts.Render("~/bundles/SaleOrder")
-@Scripts.Render("~/bundles/jqueryval")
+
 
 <br />
 
-<div  class="@Model.Status.GetAlert() col-md-3" style="padding-bottom:0px; padding-top:0px; padding-left:0px; padding-right:0px"
-      tooltip-title="Escribe un folio para buscar" id="divFolio">
+<div class="@Model.Status.GetAlert() col-md-3" style="padding-bottom:0px; padding-top:0px; padding-left:0px; padding-right:0px"
+     tooltip-title="Escribe un folio para buscar" id="divFolio">
     <div class="input-group">
         <div class="input-group-addon addOn-line-white">
             <i class="fa fa-tag"></i>
         </div>
-        @Html.EditorFor(model => model.Folio, new { htmlAttributes = 
-         new { @class = "form-control input-lg textbox-line-white text-uppercase", list="Folios", autocomplete = "off" }})
-         <datalist id="Folios"></datalist>
+        @Html.EditorFor(model => model.Folio, new
+        {
+            htmlAttributes =
+         new { @class = "form-control input-lg textbox-line-white text-uppercase", list = "Folios", autocomplete = "off" }
+        })
+        <datalist id="Folios"></datalist>
     </div>
 </div>
 
@@ -52,7 +53,7 @@
 
     <li>
         <a data-toggle="tab" href="#tabHistories">
-            <i id="TotalPayments" class="fa fa-history"></i> Historico
+            <i class="fa fa-history"></i> Historico
         </a>
     </li>
     <li>
@@ -94,7 +95,7 @@
 </ul>
 
 
-<div class="tab-content panel panel-default" >
+<div class="tab-content panel panel-default">
     <div id="tabProducts" class="tab-pane fade in active panel-body dtContainer table-responsive" style="padding-right:0px">
         @Html.Partial("SaleOrderDetail", Model.SaleDetails)
     </div>
@@ -109,3 +110,6 @@
 </div>
 
 
+@Scripts.Render("~/bundles/Searches")
+@Scripts.Render("~/bundles/SaleOrder")
+@Scripts.Render("~/bundles/jqueryval")

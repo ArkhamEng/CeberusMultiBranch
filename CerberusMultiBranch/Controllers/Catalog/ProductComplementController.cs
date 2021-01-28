@@ -325,7 +325,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
             if (orBP.Stock < quantity)
             {
                 return Json(new JResponse
-                {
+                {  
                     Result = Cons.Responses.Warning,
                     Code = Cons.Responses.Codes.InvalidData,
                     Header = "Imposible realizar la transferencia",
@@ -389,7 +389,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                                                destBp.BuyPrice), Cons.Zero);
                     }
 
-                    destBp.UpdDate = DateTime.Now;
+                    destBp.UpdDate = DateTime.Now.ToLocal();
                     destBp.UpdUser = User.Identity.Name;
                 }
 
@@ -402,7 +402,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     ProductId    = destBp.ProductId,
                     Comment      = "Transferencia de sucursal " + orBP.Branch.Name,
                     MovementType = MovementType.Entry,
-                    MovementDate = DateTime.Now,
+                    MovementDate = DateTime.Now.ToLocal(),
                     User         = User.Identity.Name,
                     Quantity     = quantity
                 };
@@ -416,7 +416,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
                     ProductId    = orBP.ProductId,
                     Comment      = "Transferencia a sucursal " + destBp.Branch.Name,
                     MovementType = MovementType.Exit,
-                    MovementDate = DateTime.Now,
+                    MovementDate = DateTime.Now.ToLocal(),
                     User = User.Identity.Name,
                     Quantity = quantity
                 };

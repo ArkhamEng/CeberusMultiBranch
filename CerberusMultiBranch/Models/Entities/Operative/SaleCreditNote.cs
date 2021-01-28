@@ -63,6 +63,6 @@ namespace CerberusMultiBranch.Models.Entities.Operative
 
         public DateTime ChangeDate { get; set; }
 
-        //public virtual SaleCreditNote SaleCreditNote { get; set; }
+        public virtual SaleCreditNote SaleCreditNote { get; set; }
     }
 }

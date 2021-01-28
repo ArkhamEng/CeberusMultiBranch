@@ -137,7 +137,7 @@ namespace CerberusMultiBranch.Models
 
         #endregion
 
-        public ApplicationDbContext() : base("DefaultConnection", throwIfV1Schema: false)
+        public ApplicationDbContext() : base("LocalConnection", throwIfV1Schema: false)
         { }
 
         public static ApplicationDbContext Create()

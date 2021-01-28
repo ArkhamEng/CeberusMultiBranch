@@ -1,9 +1,9 @@
-﻿var Details = [];
+﻿const Details = [];
 
-var totalAmount = 0;
-var totalItems = 0;
+let totalAmount = 0;
+let totalItems = 0;
 
-var popOverTitle = '<button id="btnClosePop" type="button"  class="close"><i class="fa fa-times"></i> </button>' +
+let popOverTitle = '<button id="btnClosePop" type="button"  class="close"><i class="fa fa-times"></i> </button>' +
                    '<i class="fa fa-user"></i> Detalle del cliente'
 
 const PresaleDays = 30;
@@ -55,7 +55,7 @@ $(document).ready(function ()
     //siempre se tiene un cliente por lo que es necesario removerlo con el proceso de asignación
     $("#Client_Name").attr("readonly", true);
 
-    var status = $("#Status").val();
+    let status = $("#Status").val();
 
     if (status == TranStatus.OnChange.Name || status == TranStatus.Compleated.Name ||
         (status == TranStatus.InProcess.Name && $("#SaleId").val() > 0) || status == TranStatus.Revision.Name)
@@ -106,7 +106,7 @@ $(document).ready(function ()
 
 function CreateBudget()
 {
-    var sale =
+    let sale =
         {
             SaleId: $("#SaleId").val(),
             ClientId: $("#ClientId").val(),
@@ -176,9 +176,9 @@ function BeginRequestChange(isCancelation)
 //Cambia la fecha de expiración en función del tipo de venta y tipo de cliente
 function SetExpirationDate(e)
 {
-    var creditDays = parseInt($("#Client_CreditDays").val());
+    let creditDays = parseInt($("#Client_CreditDays").val());
 
-    var exp = new Date($("#TransactionDate").val());
+    let exp = new Date($("#TransactionDate").val());
 
     //si la venta es a crédito
     if ($("#TransactionType").val() == TranType.Credit.Value)
@@ -198,7 +198,7 @@ function SetExpirationDate(e)
 
 //comienza búsqueda de cliente
 function BegingSearchCustomer(e) {
-    var clientId = parseInt($("#ClientId").val());
+    let clientId = parseInt($("#ClientId").val());
 
     if (isNaN(clientId))
         SearchCustomer("#Client_Name", SetCustomer);
@@ -242,9 +242,9 @@ function SetCustomer(customer)
 function SetPrices()
 {
     //obtengo los ids de productos en la venta
-    var ids = [];
+    let ids = [];
 
-    var param = '';
+    let param = '';
 
     $("#tbSaleDetails tbody tr").each(function (index, row)
     {
@@ -265,15 +265,15 @@ function SetPrices()
             //ajusto los precios en base al cliente
             $("#tbSaleDetails tbody tr").each(function (index, row)
             {
-                var rowProductId = $(row).find("#item_ProductId").val();
+                let rowProductId = $(row).find("#item_ProductId").val();
 
                 if(rowProductId == product.ProductId)
                 {
-                    var price = parseFloat( $("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
+                    let price = parseFloat( $("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
                                 $("#Client_ClientType").val() == ClientType.Dealer.Display ? product.DealerPrice : product.WholesalerPrice);
 
                    
-                    var input = $(row).find("#item_TaxedPrice");
+                    let input = $(row).find("#item_TaxedPrice");
                     input.val(price);
 
                     SetPrice(input);
@@ -304,7 +304,7 @@ function BeginSearchProduct(e) {
 function SetProduct(product)
 {
     //este código se ejecuta al agregar un producto
-    for (var i = 0; i < Details.length; i++)
+    for (let i = 0; i < Details.length; i++)
     {
         if (Details[i].ProductId == parseInt(product.ProductId))
         {
@@ -313,7 +313,7 @@ function SetProduct(product)
         }
     }
 
-    var row = $("#rowTemplate").clone();
+    let row = $("#rowTemplate").clone();
 
     row.removeAttr("id");
 
@@ -330,8 +330,8 @@ function SetProduct(product)
 
     try {
         
-        var saleId = 0;
-        var price = parseFloat($("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
+        let saleId = 0;
+        let price = parseFloat($("#Client_ClientType").val() == ClientType.Store.Display ? product.StorePrice :
                     $("#Client_ClientType").val() == ClientType.Dealer.Display ? product.DealerPrice : product.WholesalerPrice);
 
         row.find("#item_ProductId").val(product.ProductId);
@@ -345,7 +345,7 @@ function SetProduct(product)
 
         row.find("#item_TaxedPrice").val(price);
 
-        var amount = GetCurrency(price * parseFloat(product.SellQty));
+        let amount = GetCurrency(price * parseFloat(product.SellQty));
 
         row.find("#tdRowAmount").text(amount);
 
@@ -366,15 +366,15 @@ function SumAmount(isFirstLoad) {
     totalItems = 0;
 
     $("#tbSaleDetails tbody tr").each(function (index, row) {
-        var quantityTxt = $(row).find("#item_Quantity");
-        var priceTxt = $(row).find("#item_TaxedPrice");
-        var refundTxt = $(row).find("#item_Refund");
-        var productIdTxt = $(row).find("#item_ProductId");
-        var saleIdTxt = $(row).find("#item_SaleId");
-        var amountCell = $(row).find("#tdRowAmount");
-        var newRefundTxt = $(row).find("#item_NewRefund");
+        let quantityTxt = $(row).find("#item_Quantity");
+        let priceTxt = $(row).find("#item_TaxedPrice");
+        let refundTxt = $(row).find("#item_Refund");
+        let productIdTxt = $(row).find("#item_ProductId");
+        let saleIdTxt = $(row).find("#item_SaleId");
+        let amountCell = $(row).find("#tdRowAmount");
+        let newRefundTxt = $(row).find("#item_NewRefund");
 
-        var deleteDetailBtn = $(row).find("#btnDeleteDetail");
+        let deleteDetailBtn = $(row).find("#btnDeleteDetail");
 
 
         $(quantityTxt).off("blur").on("blur", function (e) { SetQuantity(this); });
@@ -385,7 +385,7 @@ function SumAmount(isFirstLoad) {
 
         $(newRefundTxt).off("blur").on("blur", function (e) { SetRefund(this); });
 
-        var detail = {
+        let detail = {
             ProductId: parseInt(productIdTxt.val()),
             Amount: CurrencyToNumber(amountCell.text()),
             Price: CurrencyToNumber(priceTxt.val()),
@@ -396,7 +396,7 @@ function SumAmount(isFirstLoad) {
             IsModified: false
         }
 
-        var exist = false;
+        let exist = false;
 
         $(Details).each(function (index, product)
         {
@@ -412,7 +412,7 @@ function SumAmount(isFirstLoad) {
             $(newRefundTxt).attr("disabled", false);
 
         totalAmount += detail.Amount;
-        totalItems += (detail.Quantity - detail.Refund) - detail.NewRefund;
+        totalItems += ((detail.Quantity - detail.Refund) - detail.NewRefund);
     });
 
     $("#tdAmount").text(GetCurrency(totalAmount));
@@ -420,9 +420,9 @@ function SumAmount(isFirstLoad) {
 
 function SetQuantity(input)
 {
-    row = $(input).parent().parent();
+    let row = $(input).parent().parent();
 
-    var quantity = parseFloat($(input).val());
+    let quantity = parseFloat($(input).val());
 
     if (isNaN(quantity) || quantity <= 0)
     {
@@ -442,7 +442,7 @@ function SetQuantity(input)
     {
         HideLoading(function ()
         {
-            var idx = $("#tbSaleDetails tbody tr").index(row);
+            let idx = $("#tbSaleDetails tbody tr").index(row);
 
             if (quantity > parseFloat(response.JProperty[0].Stock))
             {
@@ -457,10 +457,10 @@ function SetQuantity(input)
                 row.attr("style", "background-color:transparent");
             }
 
-            var textPrice = $(row).find("#item_TaxedPrice").val();
-            var amountCell = $(row).find("#tdRowAmount");
+            let textPrice = $(row).find("#item_TaxedPrice").val();
+            let amountCell = $(row).find("#tdRowAmount");
 
-            var newAmount = parseFloat(textPrice) * quantity;
+            let newAmount = parseFloat(textPrice) * quantity;
 
             $(amountCell).html(GetCurrency(newAmount));
 
@@ -478,9 +478,9 @@ function SetPrice(input)
 {
     row = $(input).parent().parent();
 
-    var idx = $("#tbSaleDetails tbody tr").index(row);
+    let idx = $("#tbSaleDetails tbody tr").index(row);
 
-    var price = parseFloat($(input).val());
+    let price = parseFloat($(input).val());
 
    
     if (isNaN(price) || price <= 0)
@@ -530,10 +530,10 @@ function SetPrice(input)
                 return;
             }
 
-            var textQuantity = $(row).find("#item_Quantity").val();
-            var amountCell = $(row).find("#tdRowAmount");
+            let textQuantity = $(row).find("#item_Quantity").val();
+            let amountCell = $(row).find("#tdRowAmount");
 
-            var newAmount = parseFloat(textQuantity) * price;
+            let newAmount = parseFloat(textQuantity) * price;
 
             $(amountCell).html(GetCurrency(newAmount));
 
@@ -551,9 +551,9 @@ function SetRefund(input)
 {
     row = $(input).parent().parent();
 
-    var idx = $("#tbSaleDetails tbody tr").index(row);
+    let idx = $("#tbSaleDetails tbody tr").index(row);
 
-    var newRefund = parseFloat($(input).val());
+    let newRefund = parseFloat($(input).val());
 
     if (isNaN(newRefund) || newRefund < 0)
     {
@@ -568,12 +568,12 @@ function SetRefund(input)
         return;
     }
 
-    pId = row.find("#item_ProductId").val();
+    let pId = row.find("#item_ProductId").val();
 
-    var price      = parseFloat($(row).find("#item_TaxedPrice").val());
-    var quantity   = parseFloat( $(row).find("#item_Quantity").val()) - parseFloat( $(row).find("#item_Refund").val());
+    let price      = parseFloat($(row).find("#item_TaxedPrice").val());
+    let quantity   = parseFloat( $(row).find("#item_Quantity").val()) - parseFloat( $(row).find("#item_Refund").val());
     
-    var amountCell = $(row).find("#tdRowAmount");
+    let amountCell = $(row).find("#tdRowAmount");
 
     if (newRefund > quantity)
     {
@@ -588,7 +588,7 @@ function SetRefund(input)
         return;
     }
 
-    var newAmount = parseFloat(price) * (quantity - newRefund);
+    let newAmount = parseFloat(price) * (quantity - newRefund);
 
     $(amountCell).html(GetCurrency(newAmount));
 
@@ -600,9 +600,9 @@ function SetRefund(input)
 }
 
 function DeleteRow(button) {
-    var row = $(button).parent().parent();
+    let row = $(button).parent().parent();
 
-    var inx = $("#tbSaleDetails tbody tr").index(row);
+    let inx = $("#tbSaleDetails tbody tr").index(row);
 
     $(row).remove();
 
@@ -625,8 +625,8 @@ function SetPopOver()
     {
         $("#btnClosePop").off("click").on("click", function () { $("#spanPopOver").click() });
 
-        var cLimit = parseFloat($("#Client_CreditLimit").val());
-        var cAvailable = parseFloat($("#Client_CreditAvailable").val());
+        let cLimit = parseFloat($("#Client_CreditLimit").val());
+        let cAvailable = parseFloat($("#Client_CreditAvailable").val());
 
         $("#divCreditLimit").text(GetCurrency(cLimit));
         $("#divCreditAvailable").text(GetCurrency(cAvailable));
@@ -697,7 +697,7 @@ function SetPopOver()
 
 function SendOrder()
 {
-    var sale =
+    let sale =
         {
             SaleId: $("#SaleId").val(),
             ClientId: $("#ClientId").val(),

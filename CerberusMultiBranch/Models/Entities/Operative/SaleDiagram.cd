@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.Sale" Collapsed="true">
+    <Position X="7" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAIIRAgAAAAAgAABACAAAEQAAIAAYgAAACgAECw=</HashCode>
+      <FileName>Models\Entities\Operative\Sale.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.SaleDetail">
+    <Position X="7" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAJIAAAAAIAAAAAAAAAAIAIAAAQAABAggAAAAAEAA=</HashCode>
+      <FileName>Models\Entities\Operative\SaleDetail.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Sale" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.Transaction" Collapsed="true">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIgBIAEEAAAQAAAAAAEBAAoAIAAAAAkABAgAUAACAAQ=</HashCode>
+      <FileName>Models\Entities\Operative\Transaction.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.TransactionDetail">
+    <Position X="9" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAACAAAAAQAEAAABAAAAAQCAAAAAABAAAAAAgAAAAQA=</HashCode>
+      <FileName>Models\Entities\Operative\TransactionDetail.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Product" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Catalog.Product" Collapsed="true">
+    <Position X="12.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>FIIAGAAUCYhQg4BBMCGgQYQAMgAAEtFEAgwAoIQAKoA=</HashCode>
+      <FileName>Models\Entities\Catalog\Product.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.SaleCreditNote" Collapsed="true">
+    <Position X="3" Y="1.75" Width="1.5" />
+    <AssociationLine Name="Sale" Type="CerberusMultiBranch.Models.Entities.Operative.Sale">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="1.558" Y="0.123" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAABAIAABCAAAAAAEAAAAACAAAAgAIAEAAgAAAAAACA=</HashCode>
+      <FileName>Models\Entities\Operative\SaleCreditNote.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Sale" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="CerberusMultiBranch.Models.Entities.Operative.CreditNoteHistory" Collapsed="true">
+    <Position X="2.75" Y="4.5" Width="1.75" />
+    <AssociationLine Name="SaleCreditNote" Type="CerberusMultiBranch.Models.Entities.Operative.SaleCreditNote">
+      <MemberNameLabel ManuallyPlaced="true">
+        <Position X="0.235" Y="1.55" />
+      </MemberNameLabel>
+    </AssociationLine>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAAAAAABAACAAEABAAAEAAAAAAAAACA=</HashCode>
+      <FileName>Models\Entities\Operative\SaleCreditNote.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="SaleCreditNote" />
+    </ShowAsAssociation>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

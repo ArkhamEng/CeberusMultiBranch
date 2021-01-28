@@ -240,6 +240,10 @@
     <Compile Include="Migrations\202002282303254_ProductIndexes.Designer.cs">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202011161742501_stockCount.cs" />
+    <Compile Include="Migrations\202011161742501_stockCount.Designer.cs">
+      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\ApiModel\BranchModel.cs" />
@@ -345,6 +349,7 @@
     <Compile Include="Models\ViewModels\Purchasing\BillingViewModel.cs" />
     <Compile Include="Models\ViewModels\Purchasing\RequiredProductGroupViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Inventory\ProductService.cs" />
     <Compile Include="Startup.cs" />
     <Compile Include="Support\Constants.cs" />
     <Compile Include="Support\CustomAttributes.cs" />
@@ -699,6 +704,8 @@
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.js" />
     <Content Include="Scripts\DataTables\responsive.semanticui.min.js" />
+    <Content Include="Models\Entities\Catalog\ProductDiagram.cd" />
+    <Content Include="Models\Entities\Operative\SaleDiagram.cd" />
     <None Include="Properties\PublishProfiles\Sims1.5.pubxml" />
     <None Include="Properties\PublishProfiles\SimsPublish.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
@@ -947,6 +954,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Services\Operative\" />
+    <Folder Include="Services\Purchasing\" />
+    <Folder Include="Services\Sales\" />
     <Folder Include="Views\Inventory\" />
     <Folder Include="Views\ProductComplement\" />
   </ItemGroup>
@@ -955,9 +965,8 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
-    <Content Include="Models\Entities\Operative\Purchase.cd" />
     <Content Include="Models\Entities\Operative\SalePayment.cd" />
-    <Content Include="Models\Entities\Purchasing\PurchaseOrder.cd" />
+    <Content Include="Models\Entities\Inventory\Inventory.cd" />
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
@@ -978,6 +987,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202002282303254_ProductIndexes.resx">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202011161742501_stockCount.resx">
+      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

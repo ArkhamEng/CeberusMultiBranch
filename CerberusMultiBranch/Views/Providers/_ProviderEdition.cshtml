@@ -219,12 +219,12 @@
 
                     <div class="row">
                         <div class="form-group col-md-2">
-                            @Html.LabelFor(model => model.CreditLimit, htmlAttributes: new { @class = "control-label" })
+                            @Html.LabelFor(model => model.DaysToPay, htmlAttributes: new { @class = "control-label" })
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="fa fa-calendar-plus-o"></i></span>
-                                @Html.EditorFor(model => model.CreditLimit, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
+                                @Html.EditorFor(model => model.DaysToPay, new { htmlAttributes = new { @class = "form-control input-sm", autocomplete = "off" } })
                             </div>
-                            @Html.ValidationMessageFor(model => model.CreditLimit, "", new { @class = "text-danger" })
+                            @Html.ValidationMessageFor(model => model.DaysToPay, "", new { @class = "text-danger" })
                         </div>
 
                         <div class="form-group col-md-3">
