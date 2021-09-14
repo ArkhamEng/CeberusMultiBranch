@@ -9,7 +9,7 @@ namespace CerberusMultiBranch.Migrations
     {
         public Configuration()
         {
-            AutomaticMigrationsEnabled = false;
+            AutomaticMigrationsEnabled = true;
             CommandTimeout = 10000;
         }
 
