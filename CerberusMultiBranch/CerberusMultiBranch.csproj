@@ -326,6 +326,7 @@
     <Compile Include="Models\ViewModels\Config\MakesAndModelsViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />

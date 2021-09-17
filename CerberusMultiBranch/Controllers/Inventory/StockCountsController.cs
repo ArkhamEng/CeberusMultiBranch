@@ -7,10 +7,14 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using CerberusMultiBranch.Models;
+using CerberusMultiBranch.Models.Entities.Catalog;
 using CerberusMultiBranch.Models.Entities.Inventory;
+using CerberusMultiBranch.Models.ViewModels.Inventory;
+using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Inventory
 {
+    [CustomAuthorize]
     public class StockCountsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -18,8 +22,14 @@ namespace CerberusMultiBranch.Controllers.Inventory
         // GET: StockCounts
         public ActionResult Index()
         {
-            var stockCounts = db.StockCounts.Include(s => s.Branch);
-            return View(stockCounts.ToList());
+            var model = new StockCountsViewModel(); 
+                
+            var stock =  db.StockCounts.Include(s => s.Branch);
+            model.Products = new List<List<Product>>();
+            model.Systems = db.Systems.OrderBy(s => s.Name).ToSelectList();
+            model.Categories = db.Categories.OrderBy(c => c.Name).ToSelectList();
+            model.Makes = db.CarMakes.OrderBy(m => m.Name).ToSelectList();
+            return View(model);
         }
 
         // GET: StockCounts/Details/5
