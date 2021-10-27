@@ -126,7 +126,26 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 int branchId = User.Identity.GetBranchId();
 
-                var model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m => m.MovementDate).ToList();
+                List<StockMovement> model = null;
+
+                var date = (from m in db.StockMovements
+                            join s in db.StockCounts on m.StockCountId equals s.StockCountId
+                            join sd in db.StockCountDetails on s.StockCountId equals sd.StockCountId
+                            where (m.BranchId == branchId && m.ProductId == id)
+                            orderby m.MovementDate descending
+                            select m).FirstOrDefault();
+
+                if (date != null)
+                {
+                    model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId && sm.MovementDate >= date.MovementDate).OrderByDescending(m => m.MovementDate).ToList();
+                }
+                else
+                {
+                   model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m => m.MovementDate).ToList();
+                }
+
+
+                var first = model.LastOrDefault();
 
                 if (model.Count == Cons.Zero)
                 {
@@ -136,10 +155,13 @@ namespace CerberusMultiBranch.Controllers.Catalog
                         Code = Cons.Responses.Codes.RecordNotFound,
                         Header = "Producto sin movimientos",
                         Body = "El producto, aun no tiene movimientos registrados en esta sucursal"
+          
+
                     });
+
                 }
 
-
+                ViewBag.Date = first.MovementDate.ToString();
                 return PartialView("_ProductMovement", model);
             }
             catch (Exception)

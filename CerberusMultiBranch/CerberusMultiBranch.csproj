@@ -238,9 +238,9 @@
     <Compile Include="Migrations\202002282303254_ProductIndexes.Designer.cs">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011161742501_stockCount.cs" />
-    <Compile Include="Migrations\202011161742501_stockCount.Designer.cs">
-      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
+    <Compile Include="Migrations\202110261717004_stockCount.cs" />
+    <Compile Include="Migrations\202110261717004_stockCount.Designer.cs">
+      <DependentUpon>202110261717004_stockCount.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -285,6 +285,7 @@
     <Compile Include="Models\Entities\Finances\SalePayment.cs" />
     <Compile Include="Models\Entities\Inventory\StockCount.cs" />
     <Compile Include="Models\Entities\Inventory\StockCountDetail.cs" />
+    <Compile Include="Models\Entities\Inventory\StockCountsFilter.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Budget.cs" />
     <Compile Include="Models\Entities\Operative\BudgetDetail.cs" />
@@ -311,6 +312,7 @@
     <Compile Include="Models\Entities\Purchasing\PurchaseStatus.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\InventoryFilter.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
@@ -377,6 +379,7 @@
     <Content Include="AppScripts\PurchaseOrder.js" />
     <Content Include="AppScripts\SaleOrder.js" />
     <Content Include="AppScripts\Searches.js" />
+    <Content Include="AppScripts\StockCounts.js" />
     <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -987,8 +990,8 @@
     <EmbeddedResource Include="Migrations\202002282303254_ProductIndexes.resx">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011161742501_stockCount.resx">
-      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202110261717004_stockCount.resx">
+      <DependentUpon>202110261717004_stockCount.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

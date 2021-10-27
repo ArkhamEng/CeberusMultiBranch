@@ -1,4 +1,5 @@
-﻿using CerberusMultiBranch.Models.Entities.Purchasing;
+﻿using CerberusMultiBranch.Models.Entities.Inventory;
+using CerberusMultiBranch.Models.Entities.Purchasing;
 using CerberusMultiBranch.Support;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,7 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         [Display(Name="Flujo")]
         public MovementType MovementType { get; set; }
 
+        public int? StockCountId { get; set; }
 
         [Display(Name = "Comentarios")]
         public string Comment { get; set; }
@@ -47,6 +49,8 @@ namespace CerberusMultiBranch.Models.Entities.Operative
         public virtual TrackingItem TrackingItem { get; set; }
 
         public virtual PurchaseOrderDetail PurchaseOrderDetail { get; set; }
+
+        public virtual StockCount StockCount { get; set; }
 
         [Display(Name = "Tipo")]
         public string OperationType

@@ -13,7 +13,7 @@ namespace CerberusMultiBranch.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202011161742501_stockCount"; }
+            get { return "202110261717004_stockCount"; }
         }
         
         string IMigrationMetadata.Source

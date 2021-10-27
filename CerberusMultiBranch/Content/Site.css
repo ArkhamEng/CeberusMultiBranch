@@ -28,6 +28,14 @@ input,
 select,
 textarea {
     max-width: 100%;
+  
+}
+
+.textwrapper {
+    border: 1px solid #999999;
+    width: 100%;
+
+    padding: 1%;
 }
 
 .btn-file {
@@ -591,4 +599,33 @@ input[type=date] {
     font-weight: 300;
     
     text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1200px;
+    }
+}
+
+.tableg {
+    width: 100%;
+    display: block;
+}
+
+.thead {
+    display: inline-block;
+    width: 100%;
+    height: 20px;
+}
+
+.tbody {
+    height: 500px;
+    display: inline-block;
+    width: 100%;
+    overflow: auto;
+}
+.tfood {
+    display: inline-block;
+    width: 100%;
+    height: 20px;
 }

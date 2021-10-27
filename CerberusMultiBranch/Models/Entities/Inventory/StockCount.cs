@@ -1,5 +1,6 @@
 ﻿using CerberusMultiBranch.Models.Entities.Config;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CerberusMultiBranch.Models.Entities.Inventory
@@ -10,7 +11,7 @@ namespace CerberusMultiBranch.Models.Entities.Inventory
         public int StockCountId { get; set; }
 
         [Index("IDX_Branch_System_Date",Order =0)]
-        public int SystemId { get; set; }
+        public int PartSystemId { get; set; }
 
         [Index("IDX_Branch_System_Date", Order = 1)]
         public int BranchId { get; set; }
@@ -37,6 +38,14 @@ namespace CerberusMultiBranch.Models.Entities.Inventory
          public virtual PartSystem System { get; set; }
 
         public virtual Branch Branch { get; set; }
+
+        public virtual ICollection<StockCountDetail> StockCountDetails { get; set; }
+
+
+        public StockCount()
+        {
+            StockCountDetails = new List<StockCountDetail>();
+        }
 
     }
 }
