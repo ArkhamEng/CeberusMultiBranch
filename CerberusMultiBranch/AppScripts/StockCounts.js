@@ -6,6 +6,9 @@ let products = [];
 let SystemsIndex = 0;
 let BranchIndex = 0;
 let beginDate = null;
+let linesCounted = 0;
+let correctLines = 0;
+let linesAccurancy = 0.00;
 
 $(document).ready(function () {
 
@@ -99,18 +102,22 @@ function GetSession() {
 function Accept() {
            
     if ($("#Name").val().length >= 5 && $("#Observations").val().length >= 20) {
-
-        let linesCounted = 0;
-        let correctLines = 0;
-        let linesAccurancy = 0;
+        
 
         linesCounted = rows.length;
+        correctLines = 0;
         rows.forEach(function (r) {
             if (r.VarianceQty === 0) {
                 correctLines++;
             }
         });
-        linesAccurancy = (correctLines * 100) / linesCounted;
+        if (correctLines !== 0) {
+            linesAccurancy = (correctLines * 100) / linesCounted;
+        }
+        else {
+            linesAccurancy = 0;
+        }
+       
         
         var filter = {
             "IdBranch": $("#Branches option:selected").val(),
@@ -123,7 +130,7 @@ function Accept() {
             "TotalCostVariance": $('#TCosVar').text(),
             "LinesCounted": linesCounted,
             "CorrectLines": correctLines,
-            "LinesAccurancy": linesAccurancy,
+            "LinesAccurancy": linesAccurancy.toFixed(2),
             "BeginDate": beginDate
         }
 
@@ -245,6 +252,27 @@ function UpdateTable() {
     document.getElementById("TCosVar").innerHTML = "Total: $" + tCoVar.toFixed(2);
     document.getElementById("TCosVar").style.color = colors.backGroundColor;
     //document.getElementById("TCosVar").style.background = colors.backGroundColor;
+
+    linesCounted = rows.length;
+    correctLines = 0;
+    rows.forEach(function (r) {
+        if (r.VarianceQty === 0) {
+            correctLines++;
+        }
+    });
+    if (correctLines !== 0)
+    {
+        linesAccurancy = (correctLines * 100) / linesCounted;
+    }
+    else
+    {
+        linesAccurancy = 0;
+    }
+
+
+    document.getElementById("lineCounted").innerHTML = "Líneas contadas: " + linesCounted;
+    document.getElementById("correctLines").innerHTML = "Líneas correctas: " + correctLines;
+    document.getElementById("linesAccurancy").innerHTML = "% de líneas: " + linesAccurancy.toFixed(2);
 
 }
 

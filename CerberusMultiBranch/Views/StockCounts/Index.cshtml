@@ -10,7 +10,7 @@
 @*@Scripts.Render("~/bundles/SearchProduct")*@
 
 
-<div class="container">
+<div class="container" style="padding:20px">
     <div id="pnlFilters" class="panel panel-danger">
         <div class="panel-body">
             <div class="row">
@@ -74,11 +74,11 @@
                 <div class="col-lg-9"></div>
                 <div class="col-lg-3" style="margin-top:5px">
                     <button type="button" class="btn btn-danger" id="btnCancel" value="Submit">
-                        <span class="glyphicon  glyphicon-file"></span>
+                        <span class="glyphicon glyphicon-remove-circle"></span>
                         Cancelar
                     </button>
                     <button type="button" class="btn btn-success" id="btnAccept" title="Registro Producto">
-                        <span class="glyphicon  glyphicon-file"></span>
+                        <span class="glyphicon glyphicon-ok-circle"></span>
                         Aceptar
                     </button>
                 </div>
@@ -101,9 +101,9 @@
                     <tbody class="tbody" id="contenido"></tbody>
                     <tfoot class="tfood">
                         <tr>
-                            <th style="width:200px;text-align:center"></th>
-                            <th style="width:500px;text-align:center"></th>
-                            <th style="width:200px;text-align:center"></th>
+                            <th style="width:200px;text-align:center"><label class="control-label" id="lineCounted" style="width:auto; text-align:center"></label></th>
+                            <th style="width:500px;text-align:center"><label class="control-label" id="correctLines" style="width:auto; text-align:center"></label></th>
+                            <th style="width:200px;text-align:center"><label class="control-label" id="linesAccurancy" style="width:auto; text-align:center"></label></th>
                             <th style="width:200px;text-align:center"></th>
                             <th style="width:200px;text-align:center"></th>
                             <th style="width:200px;text-align:center"> <label class="control-label" id="TVar" style="width:auto; text-align:center"></label></th>

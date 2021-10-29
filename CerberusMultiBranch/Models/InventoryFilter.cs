@@ -30,7 +30,7 @@ namespace CerberusMultiBranch.Models
 
         public int LinesCounted { get; set; }
 
-        public int LinesAccurancy { get; set; }
+        public double LinesAccurancy { get; set; }
 
         public double TotalCost { get; set; }
 
