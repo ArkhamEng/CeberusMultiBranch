@@ -202,6 +202,7 @@
     <Compile Include="Controllers\Config\MakesAndModelsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Inventory\StockCountsController.cs" />
+    <Compile Include="Controllers\Inventory\StockCountsHistoryController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
@@ -314,6 +315,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\InventoryFilter.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SelectedOption.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
@@ -328,6 +330,11 @@
     <Compile Include="Models\ViewModels\Config\MakesAndModelsViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
+    <Compile Include="Models\ViewModels\Inventory\FilterHistory.cs" />
+    <Compile Include="Models\ViewModels\Inventory\Mark.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistoryDetail.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistory.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Inventory\StockCountsViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
@@ -368,6 +375,7 @@
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Controls\ImageEditor.js" />
+    <Content Include="AppScripts\dayjs.min.js" />
     <Content Include="AppScripts\Offers.js" />
     <Content Include="AppScripts\Controls\SaleOrderChange.js" />
     <Content Include="AppScripts\Controls\SearchCustomer.js" />
@@ -379,6 +387,7 @@
     <Content Include="AppScripts\PurchaseOrder.js" />
     <Content Include="AppScripts\SaleOrder.js" />
     <Content Include="AppScripts\Searches.js" />
+    <Content Include="AppScripts\StockCountsHistory.js" />
     <Content Include="AppScripts\StockCounts.js" />
     <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
@@ -953,6 +962,8 @@
     <Content Include="Views\StockCounts\Details.cshtml" />
     <Content Include="Views\StockCounts\Edit.cshtml" />
     <Content Include="Views\StockCounts\Index.cshtml" />
+    <Content Include="Views\StockCountsHistory\Index.cshtml" />
+    <Content Include="Views\StockCountsHistory\_StockCountsHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

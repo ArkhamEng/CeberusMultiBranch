@@ -612,6 +612,11 @@ input[type=date] {
     display: block;
 }
 
+.tablegg {
+    width: 100%;
+   
+}
+
 .thead {
     display: inline-block;
     width: 100%;

@@ -9,6 +9,7 @@ let beginDate = null;
 let linesCounted = 0;
 let correctLines = 0;
 let linesAccurancy = 0.00;
+let marks = [];
 
 $(document).ready(function () {
 
@@ -41,9 +42,15 @@ $(document).ready(function () {
         Accept();
     });
 
-    TotalRows();
+    $("#btnImp").click(function () {
+        PrintDiv();
+    });
 
-    
+    $("#Systems").change(function () {
+        ChangeSystem();
+    });
+
+    TotalRows();
 
     beginDate = $("#BeginDate").text();
 
@@ -57,6 +64,7 @@ function TotalRows() {
     if (rowCount > 0) {
         $("#Branches").prop('disabled', true);
         $("#btnAccept").prop('disabled', false);
+        $("#btnImp").prop('disabled', false);
         $("#Systems").prop('disabled', true);
         sessionStorage.setItem("BranchSelected", $("#Branches").prop('selectedIndex'));
         sessionStorage.setItem("SystemsSelected", $("#Systems").prop('selectedIndex'));
@@ -66,6 +74,7 @@ function TotalRows() {
     else {
         $("#Branches").prop('disabled', false);
         $("#btnAccept").prop('disabled', true);
+        $("#btnImp").prop('disabled', true);
         $("#Systems").prop('disabled', false);
         sessionStorage.setItem("BranchSelected", $("#Branches").prop('selectedIndex'));
         sessionStorage.setItem("SystemsSelected", $("#Systems").prop('selectedIndex'));
@@ -85,6 +94,8 @@ function GetSession() {
     let dSystemsSelected = sessionStorage.getItem("SystemsSelected");
     if (dSystemsSelected !== null) {
         $("#Systems").prop('selectedIndex', dSystemsSelected);
+        ChangeSystem();
+
     }
 
     let dproducts = sessionStorage.getItem('products');
@@ -195,11 +206,25 @@ function FillTable(result) {
     rows.push(result);
     
     sessionStorage.setItem('rows', JSON.stringify(rows));
+    Calculate(result.ProductId, 0);
+    let colorQuantity = Colors(result.VarianceQty);
+    let colorVarCost = Colors(result.VarianceCost);
+    let tVar = 0;
+    let tCoVar = 0;
+    let ctotal = 0;
+    //result.VarianceCost = rows.find(r.ProductId === result.ProductId).VarianceCost;
+    //result.VarianceQty = rows.find(r.ProductId === result.ProductId).VarianceQty;
     //Calculate(result.ProductId, 0);
     $("#contenido").append("<tr class='QtyValid'><td style='display: none;'>"+ result.ProductId + "</td><td class='QtyValidValue'  style='width:200px;text-align:center;font-weight:bold;'>" + result.Product.Code + "</td><td  style='width:500px;text-align:left'>" + result.Product.Name + "</td><td style='width:200px;text-align:center'>" + result.UnitCost +  "</td><td style='width:200px;text-align:center'>" + result.CurrentQty
-        + "</td> <td  style='width:200px;text-align:center'> <input type='number' onmouseup = 'Calculate(" + result.ProductId + ",value)' onkeyup = 'Calculate(" + result.ProductId + ",value)' class='Qty' placeholder='0' value =" + result.CountQty + "></td><td  style='width:200px;text-align:center;font-weight:bold'><font color='#DCDADA'>"
-        + result.VarianceQty + "</font><td style='width:200px;text-align:center;font-weight:bold;'><font color='#DCDADA'>" + result.VarianceCost.toFixed(2) + "</font></td><td  style='width:50px;text-align:center'><button id='btnDeleteDetail' class='delete btn btn-sm btn-danger pull-right' type='button' title='Eliminar partida'><i class='fa fa-trash'></i ></button ></td></tr>");
+        + "</td> <td  style='width:200px;text-align:center'> <input type='number' onmouseup = 'Calculate(" + result.ProductId + ",value)' onkeyup = 'Calculate(" + result.ProductId + ",value)' class='Qty' placeholder='0' value =" + result.CountQty + "></td><td  style='width:200px;text-align:center;font-weight:bold' bgcolor='" + colorQuantity.backGroundColor + "'><font color='" + colorQuantity.fontColor + "' >"
+        + result.VarianceQty + "</font><td style='width:200px;text-align:center;font-weight:bold;' bgcolor='" + colorVarCost.backGroundColor + "'><font color='" + colorVarCost.fontColor +"'>" + result.VarianceCost + "</font></td><td  style='width:50px;text-align:center'><button id='btnDeleteDetail' class='delete btn btn-sm btn-danger pull-right' type='button' title='Eliminar partida'><i class='fa fa-trash'></i ></button ></td></tr>");
 
+  
+    tVar = tVar + result.VarianceQty;
+    tCoVar = parseFloat(tCoVar) + parseFloat(result.VarianceCost);
+    ctotal = ctotal + result.CurrentQty;
+
+  
     $('.delete').off().click(function (e) {
         $(this).parent('td').parent('tr').remove();
         DeleteRow(e);
@@ -209,24 +234,63 @@ function FillTable(result) {
         UpdateTable();
     });
 
+
+    let colors = Colors(tVar)
+
+    document.getElementById("TVar").innerHTML = "Total: " + tVar;
+    document.getElementById("TVar").style.color = colors.backGroundColor;
+    //document.getElementById("TVar").style.background = colors.backGroundColor;
+
+    colors = Colors(tCoVar);
+
+    document.getElementById("TCosVar").innerHTML = "Total: $" + tCoVar.toFixed(2);
+    document.getElementById("TCosVar").style.color = colors.backGroundColor;
+    //document.getElementById("TCosVar").style.background = colors.backGroundColor;
+
+    linesCounted = rows.length;
+    correctLines = 0;
+
+    rows.forEach(function (r) {
+        if (r.VarianceQty === 0) {
+            correctLines++;
+        }
+    });
+    
+    if (correctLines !== 0) {
+        linesAccurancy = (correctLines * 100) / linesCounted;
+    }
+    else {
+        linesAccurancy = 0;
+    }
+
+    document.getElementById("lineCounted").innerHTML = "Líneas contadas: " + linesCounted;
+    document.getElementById("correctLines").innerHTML = "Líneas correctas: " + correctLines;
+    document.getElementById("linesAccurancy").innerHTML = "% de líneas: " + linesAccurancy.toFixed(2);
+    document.getElementById("currentTotal").innerHTML = "Total Existencias: " + ctotal;
+
     TotalRows();
 }
 
-
 function UpdateTable() {
+
+    sessionStorage.setItem('rows', JSON.stringify(rows));
+
+
     $("#contenido").html('');
     let tVar = 0;
     let tCoVar = 0;
+    let ctotal = 0;
     rows.forEach(function (r) {
 
         let colorQuantity = Colors(r.VarianceQty);
         let colorVarCost = Colors(r.VarianceCost);
-
+        
         $("#contenido").append("<tr class='QtyValid'><td style='display: none;'>" + r.ProductId + "</td><td class='QtyValidValue'  style='width:200px;text-align:center;font-weight:bold;'>" + r.Product.Code + "</td><td  style='width:500px;text-align:left'>" + r.Product.Name + "</td> <td style='width:200px;text-align:center'>" + r.UnitCost + "</td><td style='width:200px;text-align:center'>" + r.CurrentQty
             + "</td> <td  style='width:200px;text-align:center'> <input type='number' onmouseup = 'Calculate(" + r.ProductId + ",value)' onkeyup = 'Calculate(" + r.ProductId + ",value)' class='Qty' placeholder='0' value =" + r.CountQty + "></td><td  style='width:200px;text-align:center;font-weight:bold;' bgcolor='" + colorQuantity.backGroundColor + "'><font color='" + colorQuantity.fontColor + "' >"
             + r.VarianceQty + "</font></td><td style='width:200px;text-align:center;font-weight:bold;' bgcolor='" + colorVarCost.backGroundColor + "'><font color='" + colorVarCost.fontColor +"' > $" + r.VarianceCost + "</font></td><td  style='width:50px;text-align:center'><button id='btnDeleteDetail' class='delete btn btn-sm btn-danger pull-right' type='button' title='Eliminar partida'><i class='fa fa-trash'></i ></button ></td></tr>");
         tVar = tVar + r.VarianceQty;
         tCoVar = parseFloat(tCoVar) + parseFloat(r.VarianceCost);
+        ctotal = ctotal + r.CurrentQty;
     });
 
     $('.delete').off().click(function (e) {
@@ -238,7 +302,7 @@ function UpdateTable() {
         UpdateTable();
     });
 
-    sessionStorage.setItem('rows', JSON.stringify(rows));
+
 
 
     let colors = Colors(tVar)
@@ -269,13 +333,12 @@ function UpdateTable() {
         linesAccurancy = 0;
     }
 
-
     document.getElementById("lineCounted").innerHTML = "Líneas contadas: " + linesCounted;
     document.getElementById("correctLines").innerHTML = "Líneas correctas: " + correctLines;
     document.getElementById("linesAccurancy").innerHTML = "% de líneas: " + linesAccurancy.toFixed(2);
+    document.getElementById("currentTotal").innerHTML = "Total Existencias: " + ctotal;
 
 }
-
 
 function CancelButton()
 {
@@ -312,19 +375,19 @@ function Colors(value)
     let backGroundColor;
 
     if (value > 0) {
-        backGroundColor = "#1BBD1B"; //Verde
+        backGroundColor = "#d60000"; //Rojo
         fontColor = "#ffffff";
     }
     else if (value === 0) {
-        backGroundColor = "";
-        fontColor = "#000000";
+        backGroundColor = "1BBD1B";//Verde
+        fontColor = "#ffffff";
     }
     else if (value < 0) {
         backGroundColor = "#d60000";  //Rojo
         fontColor = "#ffffff";    }
     else {
-        backGroundColor = "";
-        fontColor = "#000000";
+        backGroundColor = "1BBD1B";//Verde
+        fontColor = "#ffffff";
     }
 
     return {
@@ -333,13 +396,13 @@ function Colors(value)
     }
 }
 
-
 function Calculate(ProductId, value) {
 
     if (value !== '') {
 
         let valueInt = parseInt(value);
         rows.forEach(function (r) {
+
             if (r.ProductId === ProductId) {
                 r.CountQty = valueInt;
                 //Reglas de negocio
@@ -398,6 +461,47 @@ function DeleteRow(button) {
 
 }
 
+function ChangeSystem() {
+
+    let idOption = 0;
+
+    $("#Systems option:selected").each(function () {
+        idOption =  $(this).attr('value');
+     });
+
+
+    var SelectedOption = {
+        "Id": idOption,
+    };
+
+
+    $.ajax({
+        url: "/StockCounts/GetListMarks",
+        type: "POST",
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        data: JSON.stringify(SelectedOption),
+        success: function (result) {
+            $("#Marks option").remove();
+            result.forEach(function (r) {
+                $("#Marks").append('<option value=' + r.Id + '>' + r.Name + '</option>');
+            });
+        },
+        error: function (result) {
+            alert("Error --> " + result );
+        }
+    });
+
+
+}
+
+function PrintDiv() {
+
+    $("#scContainer").printThis();
+
+    //window.print();
+}
+
 
 //BEGIN Control para busquedas de producto
 
@@ -409,7 +513,7 @@ function SearchProduct(input, productSelected, productsShown) {
 
     ShowLoading('static');
 
-    GetAjax('/StockCounts/SearchProduct', { filter: $(input).val(), idBranch: $("#Branches option:selected").val(), idPartSystem: $("#Systems option:selected").val()  }, function (response) {
+    GetAjax('/StockCounts/SearchProduct', { filter: $(input).val(), idBranch: $("#Branches option:selected").val(), idPartSystem: $("#Systems option:selected").val(), TradeMark: $("#Marks option:selected").text() }, function (response) {
         HideLoading(function () {
             //si encontre solo una coincidencia, la pongo de inmediato
             if ($.isPlainObject(response))

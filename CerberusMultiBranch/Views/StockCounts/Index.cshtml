@@ -8,51 +8,62 @@
 @Scripts.Render("~/bundles/StockCounts")
 @*@Scripts.Render("~/bundles/Searches")*@
 @*@Scripts.Render("~/bundles/SearchProduct")*@
+<script src="~/Scripts/printThis.js"></script>
 
-
-<div class="container" style="padding:20px">
-    <div id="pnlFilters" class="panel panel-danger">
+<div class="container" id="scContainer" style="padding-top:10px">
+    <div class="panel panel-danger" style="padding-bottom:0px">
         <div class="panel-body">
             <div class="row">
-                <div class="col-lg-3">
-                    <label class="control-label" for="Name">Sucursal</label>
-                    <div class="input-group">
-                        @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Branches, "Id","Name", Model.Branches.First().Id),
-                            new { id="Branches" ,@class = "form-control text-uppercase input-sm" })
 
-                    </div>
-                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Sucursal</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Branches, "Id","Name", Model.Branches.First().Id),
+                                        new { id="Branches" ,@class = "form-control text-uppercase input-sm", @style = "width:150px" })
 
-                <div class="col-lg-3">
-                    <label class="control-label" for="Name">Categoría</label>
-                    <div class="input-group">
-                        @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Systems, "Id","Name", Model.Branches.First().Id),
-                            new { id= "Systems", @class = "form-control text-uppercase input-sm" })
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Categoría</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Systems, "Id","Name", Model.Branches.First().Id),
+                                        new { id= "Systems", @class = "form-control text-uppercase input-sm", @style = "width:150px" })
 
-                    </div>
-                </div>
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Marcas</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Marks, "Id","Name", Model.Branches.First().Id),
+                                        new { id= "Marks", @class = "form-control text-uppercase input-sm", @style = "width:150px" })
 
+                                </div>
+                            </td>
 
-                <div class="col-lg-3">
-                    <label class="control-label" for="Name">Nombre</label>
-                    <div class="input-group">
-                        <input class="form-control valid" data-val="true" data-val-required="Es necesario agregar un nombre" id="Name" name="Name" type="text" value="">
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <label class="control-label" for="Name">Fecha de Inicio</label>
-                    <div class="input-group">
-                        @Html.Label(@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), new { id="BeginDate"})
-
-                        @*<label class="control-label" id="BeginDate"  @DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss") </label>*@
-                    </div>
-                </div>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Nombre</label>
+                                <div class="input-group">
+                                    <input class="form-control text-uppercase input-sm valid" data-val="true" data-val-required="Es necesario agregar un nombre" style="width:150px" id="Name" name="Name" type="text" value="">
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Fecha de Inicio</label>
+                                <div class="input-group">
+                                    @Html.Label(@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), new { id = "BeginDate", @style = "width:150px;font-size:small;" })
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="row">
                 <div class="col-lg-12">
                     <label class="control-label" for="Name">Observación</label>
                     <div class="input-group" style="width:100%">
-                        @Html.TextArea("Observaciones", "", new { id = "Observations", rows = "3", @class = "textwrapper" })
+                        @Html.TextArea("Observaciones", "", new { id = "Observations", rows = "3", @class = "form-control text-uppercase input-sm textwrapper" })
 
                     </div>
                 </div>
@@ -71,50 +82,68 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-9"></div>
-                <div class="col-lg-3" style="margin-top:5px">
-                    <button type="button" class="btn btn-danger" id="btnCancel" value="Submit">
-                        <span class="glyphicon glyphicon-remove-circle"></span>
-                        Cancelar
-                    </button>
-                    <button type="button" class="btn btn-success" id="btnAccept" title="Registro Producto">
-                        <span class="glyphicon glyphicon-ok-circle"></span>
-                        Aceptar
-                    </button>
-                </div>
-
-            </div>
-            <div class="row">
-                <table class="table table-striped tableg" id="DivGrid">
-                    <thead class="thead">
-                        <tr>
-                            <th style="width:200px;text-align:center">Código</th>
-                            <th style="width:500px;text-align:center">Descripción</th>
-                            <th style="width:200px;text-align:center">Costo Unitario</th>
-                            <th style="width:200px;text-align:center">Existencias</th>
-                            <th style="width:200px;text-align:center">Existencia real</th>
-                            <th style="width:200px;text-align:center">Varianza</th>
-                            <th style="width:200px;text-align:center">Costo Varianza</th>
-                            <th style="width:50px;text-align:center"></th>
-                        </tr>
-                    </thead>
-                    <tbody class="tbody" id="contenido"></tbody>
-                    <tfoot class="tfood">
-                        <tr>
-                            <th style="width:200px;text-align:center"><label class="control-label" id="lineCounted" style="width:auto; text-align:center"></label></th>
-                            <th style="width:500px;text-align:center"><label class="control-label" id="correctLines" style="width:auto; text-align:center"></label></th>
-                            <th style="width:200px;text-align:center"><label class="control-label" id="linesAccurancy" style="width:auto; text-align:center"></label></th>
-                            <th style="width:200px;text-align:center"></th>
-                            <th style="width:200px;text-align:center"></th>
-                            <th style="width:200px;text-align:center"> <label class="control-label" id="TVar" style="width:auto; text-align:center"></label></th>
-                            <th style="width:200px;text-align:center"> <label class="control-label" id="TCosVar" style="width:auto; text-align:center"></label></th>
-                            <th style="width:50px;text-align:center"></th>
-                        </tr>
-                    </tfoot>
+                <br>
+                <table class="tfood" id="footer">
+                    <tr>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="lineCounted"></label></th>
+                        <th style="width:500px;text-align:center"><label class="control-label" id="correctLines"></label></th>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="linesAccurancy"></label></th>
+                        <th style="width:200px;text-align:center"></th>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="currentTotal"></label></th>
+                        <th style="width:200px;text-align:center"></th>
+                        <th style="width:200px;text-align:center"> <label class="control-label" id="TVar"></label></th>
+                        <th style="width:200px;text-align:center"> <label class="control-label" id="TCosVar"></label></th>
+                        <th style="width:50px;text-align:center"></th>
+                    </tr>
+                    
                 </table>
-            </div>
 
+            </div>
+           
+        </div>
+    
+        <br />
+            
+        <div class="panel-footer clearfix" id="panel-footer">
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <button type="button" class="btn btn-default" id="btnImp" title="Registro Producto" style="width:100px">
+                    <span class="fa fa-print"></span>
+                    Imprimir
+                </button>
+                <button type="button" class="btn btn-danger" id="btnCancel" value="Submit" style="width:100px">
+                    <span class="fa fa-close"></span>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btnAccept" title="Registro Producto" style="width:100px">
+                    <span class="fa fa-check"></span>
+                    Aceptar
+                </button>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="container">
+            <table class="table dt-responsive nowrap table-bordered small" id="DivGrid">
+                <thead>
+                    <tr>
+                        <th style="width:200px;text-align:center">Código</th>
+                        <th style="width:500px;text-align:center">Descripción</th>
+                        <th style="width:200px;text-align:center">Costo Unitario</th>
+                        <th style="width:200px;text-align:center">Existencias</th>
+                        <th style="width:200px;text-align:center">Existencia real</th>
+                        <th style="width:200px;text-align:center">Varianza</th>
+                        <th style="width:200px;text-align:center">Costo Varianza</th>
+                        <th style="width:50px;text-align:center"></th>
+                    </tr>
+                </thead>
+                <tbody id="contenido"></tbody>
+
+            </table>
+        </div>
+    </div>
+
+
 </div>
 

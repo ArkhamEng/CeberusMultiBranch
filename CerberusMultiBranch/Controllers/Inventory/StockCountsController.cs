@@ -131,10 +131,26 @@ namespace CerberusMultiBranch.Controllers.Inventory
             return Json(result);
         }
 
+        [HttpPost]
+        public JsonResult GetListMarks(SelectedOption options)
+        {
+
+            List<Mark> marks = new List<Mark>();
+            var m = db.Products.Where(w => w.PartSystemId == (int?)options.Id).Select(s => s.TradeMark).Distinct().ToList();
+            marks.Add(new Mark() { Id = 0, Name = "Todas" });
+            int i = 1;
+            foreach (var mark in m)
+            {
+                marks.Add(new Mark() { Id =  i, Name = mark  });
+                i++;
+            }
+            return Json(marks);
+        }
+
 
 
         [HttpGet]
-        public ActionResult SearchProduct(string filter, string idBranch, string idPartSystem, bool fromModal = false)
+        public ActionResult SearchProduct(string filter, string idBranch, string idPartSystem, string TradeMark ,bool fromModal = false)
         {
             int branchId = Convert.ToInt32(idBranch);
 
@@ -146,36 +162,34 @@ namespace CerberusMultiBranch.Controllers.Inventory
             if (filter != null && filter != string.Empty)
                 arr = filter.Trim().Split(' ');
 
-
-
-
-
+            if(TradeMark == "Todas" || TradeMark == "")
+            {
+                TradeMark = string.Empty;
+            }
 
             var model = (from bp in db.BranchProducts.Include(p => p.Product).Include(p => p.Product.Images)
                          where (string.IsNullOrEmpty(filter) || arr.All(s => (bp.Product.Code + " " + bp.Product.Name).Contains(s))) &&
-                               (bp.BranchId == branchId) && (bp.Product.IsActive) && (PartSystemId == null || bp.Product.PartSystemId == PartSystemId)
-                         select new SearchProductResultViewModel
-                         {
-                             ProductId = bp.Product.ProductId,
-                             Name = bp.Product.Name.ToUpper(),
-                             Code = bp.Product.Code.ToUpper(),
-                             TradeMark = bp.Product.TradeMark.ToUpper(),
-                             Image = bp.Product.Images.Count > Cons.Zero ? bp.Product.Images.FirstOrDefault().Path : Cons.NoImagePath,
-                             Stock = bp.Stock,
-                             StorePrice = Math.Round(bp.StorePrice, Cons.Zero),
-                             DealerPrice = Math.Round(bp.DealerPrice, Cons.Zero),
-                             WholesalerPrice = Math.Round(bp.WholesalerPrice, Cons.Zero),
-                             MinQuantity = bp.MinQuantity,
-                             MaxQuantity = bp.MaxQuantity,
-                             OrderQty = (bp.MaxQuantity - (bp.Stock + bp.Reserved)),
-                             SellQty = (bp.Stock < Cons.One && bp.Stock > Cons.Zero) ? bp.Stock : Cons.One,
-                             SaleCommission = bp.Product.System != null ? bp.Product.System.Commission : Cons.Zero,
+                               (bp.BranchId == branchId) && (bp.Product.IsActive) && ( string.IsNullOrEmpty(TradeMark) || bp.Product.TradeMark == TradeMark) && (PartSystemId == null || bp.Product.PartSystemId == PartSystemId)
+                    select new SearchProductResultViewModel
+                    {
+                        ProductId = bp.Product.ProductId,
+                        Name = bp.Product.Name.ToUpper(),
+                        Code = bp.Product.Code.ToUpper(),
+                        TradeMark = bp.Product.TradeMark.ToUpper(),
+                        Image = bp.Product.Images.Count > Cons.Zero ? bp.Product.Images.FirstOrDefault().Path : Cons.NoImagePath,
+                        Stock = bp.Stock,
+                        StorePrice = Math.Round(bp.StorePrice, Cons.Zero),
+                        DealerPrice = Math.Round(bp.DealerPrice, Cons.Zero),
+                        WholesalerPrice = Math.Round(bp.WholesalerPrice, Cons.Zero),
+                        MinQuantity = bp.MinQuantity,
+                        MaxQuantity = bp.MaxQuantity,
+                        OrderQty = (bp.MaxQuantity - (bp.Stock + bp.Reserved)),
+                        SellQty = (bp.Stock < Cons.One && bp.Stock > Cons.Zero) ? bp.Stock : Cons.One,
+                        SaleCommission = bp.Product.System != null ? bp.Product.System.Commission : Cons.Zero,
 
-                         }).OrderBy(p => p.Name).Take(Cons.QuickResults).ToList();
+                    }).OrderBy(p => p.Name).Take(Cons.QuickResults).ToList();
 
-             
-
-
+            
             if (model.Count == Cons.One)
             {
                 var product = model.First();

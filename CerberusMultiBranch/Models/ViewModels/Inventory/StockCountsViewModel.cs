@@ -19,6 +19,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Inventory
 
         public List<PartSystem> Systems { get; set; }
 
+        public List<Mark> Marks { get; set; }
+
         public List<StockCountDetail> StockCountsDetails { get; set; }
 
         public StockCount StockCount { get; set; }
@@ -32,6 +34,8 @@ namespace CerberusMultiBranch.Models.ViewModels.Inventory
             Branches = new List<Branch>();
 
             Systems = new List<PartSystem>();
+
+            Marks = new List<Mark>();
 
         }
     }

@@ -77,6 +77,12 @@ namespace CerberusMultiBranch
             bundles.Add(new ScriptBundle("~/bundles/StockCounts").Include(
             "~/AppScripts/StockCounts.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/StockCountsHistory").Include(
+           "~/AppScripts/StockCountsHistory.js"));
+
+            bundles.Add(new ScriptBundle("~/bundles/dayjs").Include(
+            "~/AppScripts/dayjs.min.js"));
+
             #endregion
         }
     }
