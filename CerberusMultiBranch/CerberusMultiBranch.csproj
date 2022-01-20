@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.Net.Compilers.Toolset.3.5.0\build\Microsoft.Net.Compilers.Toolset.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.5.0\build\Microsoft.Net.Compilers.Toolset.props')" />
-  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -52,9 +51,8 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=3.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
@@ -204,6 +202,7 @@
     <Compile Include="Controllers\Config\MakesAndModelsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Inventory\StockCountsController.cs" />
+    <Compile Include="Controllers\Inventory\StockCountsHistoryController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\Operative\CartDailyBillController.cs" />
     <Compile Include="Controllers\Operative\CashRegisterController.cs" />
@@ -240,9 +239,9 @@
     <Compile Include="Migrations\202002282303254_ProductIndexes.Designer.cs">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202011161742501_stockCount.cs" />
-    <Compile Include="Migrations\202011161742501_stockCount.Designer.cs">
-      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
+    <Compile Include="Migrations\202110261717004_stockCount.cs" />
+    <Compile Include="Migrations\202110261717004_stockCount.Designer.cs">
+      <DependentUpon>202110261717004_stockCount.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -287,6 +286,7 @@
     <Compile Include="Models\Entities\Finances\SalePayment.cs" />
     <Compile Include="Models\Entities\Inventory\StockCount.cs" />
     <Compile Include="Models\Entities\Inventory\StockCountDetail.cs" />
+    <Compile Include="Models\Entities\Inventory\StockCountsFilter.cs" />
     <Compile Include="Models\Entities\Operative\BranchProduct.cs" />
     <Compile Include="Models\Entities\Operative\Budget.cs" />
     <Compile Include="Models\Entities\Operative\BudgetDetail.cs" />
@@ -313,7 +313,9 @@
     <Compile Include="Models\Entities\Purchasing\PurchaseStatus.cs" />
     <Compile Include="Models\Entities\Purchasing\PurchaseType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\InventoryFilter.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SelectedOption.cs" />
     <Compile Include="Models\ViewModels\Catalog\BranchAssigmentViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\ClientViewModel.cs" />
     <Compile Include="Models\ViewModels\Catalog\EmployeeViewModel.cs" />
@@ -328,6 +330,12 @@
     <Compile Include="Models\ViewModels\Config\MakesAndModelsViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\SystemCategoryViewModel.cs" />
     <Compile Include="Models\ViewModels\Config\UserInRole.cs" />
+    <Compile Include="Models\ViewModels\Inventory\FilterHistory.cs" />
+    <Compile Include="Models\ViewModels\Inventory\Mark.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistoryDetail.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistory.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsHistoryViewModel.cs" />
+    <Compile Include="Models\ViewModels\Inventory\StockCountsViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginPurchaseViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BeginSaleViewModel.cs" />
     <Compile Include="Models\ViewModels\Operative\BudgetViewModel.cs" />
@@ -367,6 +375,7 @@
   <ItemGroup>
     <Content Include="AppScripts\Catalog.js" />
     <Content Include="AppScripts\Controls\ImageEditor.js" />
+    <Content Include="AppScripts\dayjs.min.js" />
     <Content Include="AppScripts\Offers.js" />
     <Content Include="AppScripts\Controls\SaleOrderChange.js" />
     <Content Include="AppScripts\Controls\SearchCustomer.js" />
@@ -378,6 +387,8 @@
     <Content Include="AppScripts\PurchaseOrder.js" />
     <Content Include="AppScripts\SaleOrder.js" />
     <Content Include="AppScripts\Searches.js" />
+    <Content Include="AppScripts\StockCountsHistory.js" />
+    <Content Include="AppScripts\StockCounts.js" />
     <Content Include="Content\bootstrap-slider.min.css" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
@@ -951,6 +962,8 @@
     <Content Include="Views\StockCounts\Details.cshtml" />
     <Content Include="Views\StockCounts\Edit.cshtml" />
     <Content Include="Views\StockCounts\Index.cshtml" />
+    <Content Include="Views\StockCountsHistory\Index.cshtml" />
+    <Content Include="Views\StockCountsHistory\_StockCountsHistory.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -988,8 +1001,8 @@
     <EmbeddedResource Include="Migrations\202002282303254_ProductIndexes.resx">
       <DependentUpon>202002282303254_ProductIndexes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202011161742501_stockCount.resx">
-      <DependentUpon>202011161742501_stockCount.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202110261717004_stockCount.resx">
+      <DependentUpon>202110261717004_stockCount.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -1025,9 +1038,10 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.0.0\build\Microsoft.Net.Compilers.props'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.Toolset.3.5.0\build\Microsoft.Net.Compilers.Toolset.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.Toolset.3.5.0\build\Microsoft.Net.Compilers.Toolset.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets'))" />
   </Target>
+  <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.3.6.0\build\net46\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

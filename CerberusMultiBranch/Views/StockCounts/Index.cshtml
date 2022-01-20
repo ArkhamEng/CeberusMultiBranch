@@ -1,94 +1,149 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Inventory.StockCount>
+﻿@model CerberusMultiBranch.Models.ViewModels.Inventory.StockCountsViewModel
 
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/PageLayout.cshtml";
+    ViewBag.Title = "Recuentos de existencias ";
+    ViewBag.Class = "fa fa-dropbox";
+
 }
+@Scripts.Render("~/bundles/StockCounts")
+@*@Scripts.Render("~/bundles/Searches")*@
+@*@Scripts.Render("~/bundles/SearchProduct")*@
+<script src="~/Scripts/printThis.js"></script>
 
-<h2>Index</h2>
+<div class="container" id="scContainer" style="padding-top:10px">
+    <div class="panel panel-danger" style="padding-bottom:0px">
+        <div class="panel-body">
+            <div class="row">
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Branch.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.SystemId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Comment)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Compleation)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LinesCounted)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CorrectLines)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LinesAccurancy)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalCost)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalCostVariance)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.User)
-        </th>
-        <th></th>
-    </tr>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Sucursal</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Branches, "Id","Name", Model.Branches.First().Id),
+                                        new { id="Branches" ,@class = "form-control text-uppercase input-sm", @style = "width:150px" })
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Branch.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.SystemId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Comment)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Compleation)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LinesCounted)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CorrectLines)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LinesAccurancy)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalCost)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalCostVariance)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.StockCountId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.StockCountId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.StockCountId })
-        </td>
-    </tr>
-}
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Categoría</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Systems, "Id","Name", Model.Branches.First().Id),
+                                        new { id= "Systems", @class = "form-control text-uppercase input-sm", @style = "width:150px" })
 
-</table>
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Marcas</label>
+                                <div class="input-group">
+                                    @Html.DropDownListFor(m => m.Branches, new SelectList(Model.Marks, "Id","Name", Model.Branches.First().Id),
+                                        new { id= "Marks", @class = "form-control text-uppercase input-sm", @style = "width:150px" })
+
+                                </div>
+                            </td>
+
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Nombre</label>
+                                <div class="input-group">
+                                    <input class="form-control text-uppercase input-sm valid" data-val="true" data-val-required="Es necesario agregar un nombre" style="width:150px" id="Name" name="Name" type="text" value="">
+                                </div>
+                            </td>
+                            <td style="padding-left:15px">
+                                <label class="control-label" for="Name">Fecha de Inicio</label>
+                                <div class="input-group">
+                                    @Html.Label(@DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), new { id = "BeginDate", @style = "width:150px;font-size:small;" })
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <label class="control-label" for="Name">Observación</label>
+                    <div class="input-group" style="width:100%">
+                        @Html.TextArea("Observaciones", "", new { id = "Observations", rows = "3", @class = "form-control text-uppercase input-sm textwrapper" })
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <label class="control-label" for="Name">Producto</label>
+                    <div class="input-group">
+                        <input class="form-control input-sm text-uppercase" placeholder="Clave o nombre de producto" style="width:100% !important" id="ProductFilter" name="ProductFilter" type="text">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-primary btn-sm" id="btnBegingSearchProduct" tooltip-title="Agregar Productos">
+                                <i id="iSearchProduct" class="fa fa-plus"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <br>
+                <table class="tfood" id="footer">
+                    <tr>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="lineCounted"></label></th>
+                        <th style="width:500px;text-align:center"><label class="control-label" id="correctLines"></label></th>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="linesAccurancy"></label></th>
+                        <th style="width:200px;text-align:center"></th>
+                        <th style="width:200px;text-align:center"><label class="control-label" id="currentTotal"></label></th>
+                        <th style="width:200px;text-align:center"></th>
+                        <th style="width:200px;text-align:center"> <label class="control-label" id="TVar"></label></th>
+                        <th style="width:200px;text-align:center"> <label class="control-label" id="TCosVar"></label></th>
+                        <th style="width:50px;text-align:center"></th>
+                    </tr>
+                    
+                </table>
+
+            </div>
+           
+        </div>
+    
+        <br />
+            
+        <div class="panel-footer clearfix" id="panel-footer">
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <button type="button" class="btn btn-default" id="btnImp" title="Registro Producto" style="width:100px">
+                    <span class="fa fa-print"></span>
+                    Imprimir
+                </button>
+                <button type="button" class="btn btn-danger" id="btnCancel" value="Submit" style="width:100px">
+                    <span class="fa fa-close"></span>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-success" id="btnAccept" title="Registro Producto" style="width:100px">
+                    <span class="fa fa-check"></span>
+                    Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="container">
+            <table class="table dt-responsive nowrap table-bordered small" id="DivGrid">
+                <thead>
+                    <tr>
+                        <th style="width:200px;text-align:center">Código</th>
+                        <th style="width:500px;text-align:center">Descripción</th>
+                        <th style="width:200px;text-align:center">Costo Unitario</th>
+                        <th style="width:200px;text-align:center">Existencias</th>
+                        <th style="width:200px;text-align:center">Existencia real</th>
+                        <th style="width:200px;text-align:center">Varianza</th>
+                        <th style="width:200px;text-align:center">Costo Varianza</th>
+                        <th style="width:50px;text-align:center"></th>
+                    </tr>
+                </thead>
+                <tbody id="contenido"></tbody>
+
+            </table>
+        </div>
+    </div>
+
+
+</div>
+

@@ -3,8 +3,6 @@
 function SearchProviderProduct(filter, fromModal)
 {
     var filtr = $(filter).val();
-
- 
     if (filtr.length < 4)
     {
         ShowNotify("Datos insuficientes!", "info", "Para realizar una busqueda en el catálogo de proveedores"
