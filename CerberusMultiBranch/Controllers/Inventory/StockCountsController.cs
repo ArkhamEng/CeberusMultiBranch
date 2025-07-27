@@ -16,7 +16,7 @@ using CerberusMultiBranch.Support;
 
 namespace CerberusMultiBranch.Controllers.Inventory
 {
-    [CustomAuthorize]
+    [CustomAuthorize(Roles ="Supervisor")]
     public class StockCountsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
@@ -62,7 +62,6 @@ namespace CerberusMultiBranch.Controllers.Inventory
         [HttpPost]
         public JsonResult CreateRegister(InventoryFilter filter)
         {
-
             db = new ApplicationDbContext();
             bool result = false;
             try

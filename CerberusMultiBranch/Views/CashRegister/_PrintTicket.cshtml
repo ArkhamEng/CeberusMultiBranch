@@ -4,39 +4,40 @@
 
 <script src="~/Scripts/printThis.js"></script>
 
+
 <div hidden>
     <div id="divTicket" style="width:270px;">
         <table class="Ticket" style="width:100%;">
             <tr>
-                <td align="center" colspan="2">
+                <td align="center" colspan="2" style="padding-top: 10px">
                     <div style="width:200px">
                         <img src="~/Content/Images/logo2.png" class="img-responsive" />
                     </div>
                 </td>
             </tr>
 
-            <tr>
+            <tr style="padding-top: 10px">
                 <td align="center" colspan="2">
                     Sucursal @Model.Branch.Name
                 </td>
             </tr>
-            <tr>
+            <tr style="padding-top: 10px">
                 <td align="center" colspan="2">
                     @Model.Branch.Address
                 </td>
             </tr>
             <tr>
-                <td style="height:20px" colspan="2"></td>
+                <td style="height:30px" colspan="2"></td>
             </tr>
-            <tr>
-                <td class="text-left">
+            <tr style="padding-top: 10px">
+                <td class="text-left" >
                     <label>Folio</label><br />
                 </td>
                 <td  class="text-right">
                     @Model.Folio.ToUpper()
                 </td>
             </tr>
-            <tr>
+            <tr style="padding-top: 10px">
                 <td class="text-left">
                     <label>
                         Agente
@@ -46,7 +47,7 @@
                     @Model.User.UserName.ToUpper()
                 </td>
             </tr>
-            <tr>
+            <tr style="padding-top: 10px">
                 <td class="text-left">
                     <label>Fecha</label><br />
                 </td>
@@ -54,7 +55,7 @@
                     @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")
                 </td>
             </tr>
-            <tr>
+            <tr style="padding-top: 10px">
                 <td class="text-left">
                     <label>Tipo de venta</label><br />
                 </td>
@@ -65,7 +66,7 @@
            
             @if (Model.Status == TranStatus.Revision)
             {
-                <tr>
+                <tr style="padding-top: 10px">
                     <td class="text-left">
                         <label>Expira</label><br />
                     </td>
@@ -74,7 +75,7 @@
                     </td>
                 </tr>
                 var debt = (Model.TotalTaxedAmount - Model.SalePayments.Sum(s => s.Amount));
-                <tr>
+                <tr style="padding-top: 10px">
                     <td class="text-left">
                         <label> Total Pagos</label>
                     </td>
@@ -82,7 +83,7 @@
                         @Model.SalePayments.Sum(s => s.Amount).ToMoney()
                     </td>
                 </tr>
-                <tr>
+                <tr style="padding-top: 10px">
                     <td class="text-left">
                         <label> Restante</label>
                     </td>
@@ -94,7 +95,7 @@
 
             else if (Model.SalePayments.Count > Cons.One)
             {
-                <tr>
+                <tr style="padding-top: 10px">
                     <td  class="text-left">
                         <label>Tipo de pago</label>
                     </td>
@@ -105,7 +106,7 @@
             }
             else
             {
-                <tr>
+                <tr style="padding-top: 10px">
                     <td  class="text-left">
                         <label>Tipo de pago</label>
                     </td>
@@ -115,9 +116,9 @@
                 </tr>
             }
             <tr>
-                <td style="height:20px" colspan="2"></td>
+                <td style="height:30px" colspan="2"></td>
             </tr>
-            <tr>
+            <tr style="padding-top: 10px"> 
                 <td align="center" colspan="2">
                     <table style="width:100%; border-top:dotted 1px gray">
                         @foreach (var tI in Model.SaleDetails)
@@ -125,7 +126,7 @@
                             var i = tI.Product.Code.Length - 4;
                             var sCode = tI.Product.Code; //.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
                             var sName = tI.Product.Name.Length <= 12 ? tI.Product.Name : tI.Product.Name.Substring(0, 12);
-                            <tr style="border-bottom:solid 1px gray; ">
+                            <tr style="border-bottom:solid 1px gray; padding-top: 10px">
                                 <td class="text-left">
                                     @if (tI.ParentId == null)
                                     {
@@ -156,29 +157,30 @@
                                 </td>
                             </tr>
 
-                            <tr><td colspan="4" style="height:10px"></td></tr>
+                            <tr><td colspan="4" style="height:20px"></td></tr>
                         }
                         <tr>
-                            <td colspan="4" style="height:20px"></td>
+                            <td colspan="4" style="height:30px"></td>
                         </tr>
-                        <tr>
+                        <tr style="padding-top: 10px">
                             <td colspan="2" />
                             <td>Total</td>
                             <td align="right">
                                 @Model.TotalTaxedAmount.ToMoney()
                             </td>
                         </tr>
-                        <tr style="height:60px">
+                        <tr style="height:70px">
                             <td colspan="4" />
                         </tr>
-                        <tr style="height:30px">
+                        <tr style="height:30px; padding-top:10px">
                             <td colspan="4" align="center">
                                 NO VALIDO COMO COMPROBANTE FISCAL
                             </td>
                         </tr>
-                        <tr>
+                        <tr style="padding-top: 10px">
                             <td colspan="4">
                                 <label>
+                                    Estimado cliente,
                                     Solo se acepta mercancía en
                                     devolución   si  cumple con
                                     las  siguientes  políticas:
@@ -188,12 +190,12 @@
                                 o retrabajo<br />
                                 2. Mercancía   con
                                 empaque original<br />
-                                3. Máximo sesenta días a
+                                3. Máximo treinta días a
                                 la fecha de la nota<br />
                                 4.Autorización de su ejecutivo de venta
                             </td>
                         </tr>
-                        <tr style="height:30px">
+                        <tr style="height:30px; padding-top: 10px">
                             <td colspan="4" align="center">
                                 ====  GRACIAS POR SU COMPRA  ====
                             </td>

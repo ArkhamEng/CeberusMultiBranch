@@ -13,24 +13,11 @@ let marks = [];
 
 $(document).ready(function () {
 
-    
     GetSession();
 
     $("#btnBegingSearchProduct").off("click").on("click", BeginSearchProduct);
 
     $("#ProductFilter").off("keyup").on("keyup", function (e) { if (e.keyCode == 13) $("#btnBegingSearchProduct").click(); });
-
-    $('#ProductId').keyup(function () {
-        ValidateButtonAdd();
-    });
-
-    $('#Observations').keyup(function () {
-        ValidateButtonAdd();
-    });
-
-    $("#Name").keyup(function () {
-        ValidateButtonAdd();
-    });
 
     SetProductSearch();
 
@@ -53,9 +40,6 @@ $(document).ready(function () {
     TotalRows();
 
     beginDate = $("#BeginDate").text();
-
-    
-
 });
 
 function TotalRows() {
@@ -95,7 +79,6 @@ function GetSession() {
     if (dSystemsSelected !== null) {
         $("#Systems").prop('selectedIndex', dSystemsSelected);
         ChangeSystem();
-
     }
 
     let dproducts = sessionStorage.getItem('products');
@@ -142,8 +125,9 @@ function Accept() {
             "LinesCounted": linesCounted,
             "CorrectLines": correctLines,
             "LinesAccurancy": linesAccurancy.toFixed(2),
-            "BeginDate": beginDate
+            "BeginDate": $('#BeginDate').val()
         }
+
 
         $.ajax({
             url: "/StockCounts/CreateRegister",
@@ -166,12 +150,8 @@ function Accept() {
         });
     }
     else {
-        ShowNotify("Faltan datos", "warning", "Se deben llenar los campos Nombre con al menos 5 caracteres y Observación con al menos 20 caracteres", 3000);
+        ShowNotify("Faltan datos", "warning", "Se deben llenar los campos Nombre con al menos 5 caracteres y Observación con al menos 20 caracteres", 5000);
     }
-
-
-
-  
 }
 
 function ButtonAdd()
@@ -184,7 +164,6 @@ function ButtonAdd()
         "Products": products,
         "StockCountDetails": rows
     }
-
 
     $.ajax({
         url: "/StockCounts/AddStockCount",
@@ -533,6 +512,12 @@ function SearchProduct(input, productSelected, productsShown) {
 
 //comienza búsqueda de producto
 function BeginSearchProduct(e) {
+
+    if($("#Systems option:selected").val() == 0 || $("#Branches option:selected").val() == 0)
+    {
+        ShowNotify("Faltan datos", "warning", "Debes seleccionar Sucursal y Sistema", 3000);
+    }
+
     SearchProduct("#ProductFilter", SetProduct, function () {
         $("#tbSearchProductResults tbody tr").each(function (index, row) {
             var pId = $(row).find("#product_ProductId").val();
@@ -549,10 +534,11 @@ function BeginSearchProduct(e) {
 
 //se ejecuta al encontrar una coincidencia de producto o bien al seleccionar uno del listado
 function SetProduct(product) {
+    console.log(product);
     //este código se ejecuta al agregar un producto
     for (let i = 0; i < products.length; i++) {
         if (products[i].ProductId == parseInt(product.ProductId)) {
-            ShowNotify("Producto repetido", "info", "Este producto ya se encuentra en el detalle de venta", 3000);
+            ShowNotify("Producto repetido", "info", "Este producto ya se encuentra en el conteo", 3000);
             return;
         }
     }
