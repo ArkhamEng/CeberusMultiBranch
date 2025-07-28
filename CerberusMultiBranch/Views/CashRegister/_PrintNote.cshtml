@@ -11,23 +11,14 @@
             <tr>
                 <td width="300px">
                     <table style="width:100%">
-                        @if (User.Identity.GetBranchId() != 2)
-                        {
-                            <tr>
-                                <td>
-                                    <img src="@Url.Content(Model.Branch.LogoPath)" style="width:150px">
-                                </td>
+                        @{ string logoStyle = User.Identity.GetBranchId() != 2 ? "width:150px;" : "width:180px; height:90px";}
 
-                            </tr>
-                        }
-                        else
-                        {
-                            <tr>
-                                <td>
-                                    <img src="@Url.Content(Model.Branch.LogoPath)" style="width:180px; height:90px">
-                                </td>
-                            </tr>
-                        }
+                        <tr>
+                            <td>
+                                <img src="@Url.Content(Model.Branch.LogoPath)" style="@logoStyle">
+                            </td>
+                        </tr>
+
                         <tr>
                             <td>
                                 @Html.Raw(Model.Branch.NoteMemberHtml)
@@ -222,7 +213,7 @@
                             <td />
                         </tr>
                         <tr>
-                            <td colspan="5" style="height: 23px; border-top: 1px solid gray; "/>
+                            <td colspan="5" style="height: 23px; border-top: 1px solid gray; " />
                             <td style="border: 1px solid gray;" class="text-right">
                                 <label class="control-label">
                                     @Html.DisplayName("Total de piezas")
@@ -290,7 +281,7 @@
                         durante el mes en curso.
                     </label><br />
                 </td>
-            </tr>           
+            </tr>
         </table>
     </div>
 </div>
