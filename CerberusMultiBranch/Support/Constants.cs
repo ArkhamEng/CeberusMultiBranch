@@ -57,8 +57,6 @@
                 public const int Success = 200;
                 public const int ServerError = 500;
                 public const int UnAuthorized = 401;
-                
-
             }
         }
 
@@ -124,7 +122,7 @@
 
         public const int DaysToCancel = 60;
 
-        public const int DaysToModify = 30;
+        public const int DaysToModify = 31;
 
         public const int DescriptionLength = 300;
 

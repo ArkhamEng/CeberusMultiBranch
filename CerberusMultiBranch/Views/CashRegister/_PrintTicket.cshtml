@@ -11,7 +11,7 @@
             <tr>
                 <td align="center" colspan="2" style="padding-top: 10px">
                     <div style="width:200px">
-                        <img src="~/Content/Images/logo2.png" class="img-responsive" />
+                        <img src="@Url.Content(Model.Branch.LogoPath)" class="img-responsive" />
                     </div>
                 </td>
             </tr>
@@ -21,19 +21,19 @@
                     Sucursal @Model.Branch.Name
                 </td>
             </tr>
-            <tr style="padding-top: 10px">
+            <tr>
                 <td align="center" colspan="2">
                     @Model.Branch.Address
                 </td>
             </tr>
             <tr>
-                <td style="height:30px" colspan="2"></td>
+                <td style="height:20px" colspan="2"></td>
             </tr>
             <tr style="padding-top: 10px">
-                <td class="text-left" >
+                <td class="text-left">
                     <label>Folio</label><br />
                 </td>
-                <td  class="text-right">
+                <td class="text-right">
                     @Model.Folio.ToUpper()
                 </td>
             </tr>
@@ -43,7 +43,7 @@
                         Agente
                     </label>
                 </td>
-                <td  class="text-right">
+                <td class="text-right">
                     @Model.User.UserName.ToUpper()
                 </td>
             </tr>
@@ -51,26 +51,26 @@
                 <td class="text-left">
                     <label>Fecha</label><br />
                 </td>
-                <td  class="text-right">
+                <td class="text-right">
                     @Model.TransactionDate.ToString("dd/MM/yyyy HH:mm")
                 </td>
             </tr>
             <tr style="padding-top: 10px">
                 <td class="text-left">
-                    <label>Tipo de venta</label><br />
+                    <label>Venta</label><br />
                 </td>
                 <td class="text-right">
                     @Model.TransactionType.GetName()
                 </td>
             </tr>
-           
+
             @if (Model.Status == TranStatus.Revision)
             {
                 <tr style="padding-top: 10px">
                     <td class="text-left">
                         <label>Expira</label><br />
                     </td>
-                    <td  class="text-right">
+                    <td class="text-right">
                         @Model.Expiration.ToString("dd/MM/yyyy")
                     </td>
                 </tr>
@@ -96,10 +96,10 @@
             else if (Model.SalePayments.Count > Cons.One)
             {
                 <tr style="padding-top: 10px">
-                    <td  class="text-left">
-                        <label>Tipo de pago</label>
+                    <td class="text-left">
+                        <label>Pago</label>
                     </td>
-                    <td  class="text-right">
+                    <td class="text-right">
                         <a>@PaymentMethod.Mixto.ToString()</a>
                     </td>
                 </tr>
@@ -107,10 +107,10 @@
             else
             {
                 <tr style="padding-top: 10px">
-                    <td  class="text-left">
-                        <label>Tipo de pago</label>
+                    <td class="text-left">
+                        <label>Pago</label>
                     </td>
-                    <td  class="text-right">
+                    <td class="text-right">
                         @Model.SalePayments.First().PaymentMethod.ToString()
                     </td>
                 </tr>
@@ -118,15 +118,33 @@
             <tr>
                 <td style="height:30px" colspan="2"></td>
             </tr>
-            <tr style="padding-top: 10px"> 
+            <tr style="padding-top: 10px">
                 <td align="center" colspan="2">
-                    <table style="width:100%; border-top:dotted 1px gray">
+                    <table style="width: 100%; min-height:550px;">
+                        <tr style="height:20px;">
+                            <td class="text-left">
+                                Part.
+                            </td>
+                            <td class="text-center">
+                                Desc.
+                            </td>
+                            <td class="text-center">
+                                Cant.
+                            </td>
+                            <td class="text-center">
+                                Tot.
+                            </td>
+                        </tr>
+
+
+                        @{ int part = 1;}
                         @foreach (var tI in Model.SaleDetails)
                         {
                             var i = tI.Product.Code.Length - 4;
                             var sCode = tI.Product.Code; //.Length <= 4 ? tI.Product.Code : tI.Product.Code.Substring(i, 4);
                             var sName = tI.Product.Name.Length <= 12 ? tI.Product.Name : tI.Product.Name.Substring(0, 12);
-                            <tr style="border-bottom:solid 1px gray; padding-top: 10px">
+                            <tr style="height:40px;">
+                                <td>@part</td>
                                 <td class="text-left">
                                     @if (tI.ParentId == null)
                                     {
@@ -138,13 +156,7 @@
                                     }
                                     @sName
                                 </td>
-                                <td class="text-left">
-                                    @*@if (tI.ParentId != null)
-                                    {
-                                        sName = (sCode + " " + sName).ToString();
-                                    }
-                                    @sName*@
-                                </td>
+
                                 <td class="text-center">
                                     @tI.DueQuantity
                                 </td>
@@ -153,31 +165,44 @@
                                     {
                                         @tI.TaxedAmount.ToMoney()
                                     }
-
                                 </td>
                             </tr>
-
-                            <tr><td colspan="4" style="height:20px"></td></tr>
+                            part++;
                         }
+
                         <tr>
-                            <td colspan="4" style="height:30px"></td>
+                            <td />
+                            <td />
+                            <td />
+                            <td />
                         </tr>
-                        <tr style="padding-top: 10px">
+
+
+                        <tr style="height:40px;">
+                            <td class="text-right" colspan="3">
+                                <label>Total de productos</label>
+                            </td>
+                            <td class="text-center">@Model.SaleDetails.Sum(x => x.Quantity)</td>
+                        </tr>
+
+                        <tr style="height: 40px;">
                             <td colspan="2" />
-                            <td>Total</td>
+                            <td>
+                                <label>
+                                    Total
+                                </label>
+                            </td>
                             <td align="right">
                                 @Model.TotalTaxedAmount.ToMoney()
                             </td>
                         </tr>
-                        <tr style="height:70px">
-                            <td colspan="4" />
-                        </tr>
-                        <tr style="height:30px; padding-top:10px">
+
+                        <tr style="height:60px;">
                             <td colspan="4" align="center">
                                 NO VALIDO COMO COMPROBANTE FISCAL
                             </td>
                         </tr>
-                        <tr style="padding-top: 10px">
+                        <tr style="height:150px;">
                             <td colspan="4">
                                 <label>
                                     Estimado cliente,
@@ -192,11 +217,15 @@
                                 empaque original<br />
                                 3. Máximo treinta días a
                                 la fecha de la nota<br />
-                                4.Autorización de su ejecutivo de venta
+
                             </td>
                         </tr>
-                        <tr style="height:30px; padding-top: 10px">
+                        <tr style="height:100px">
                             <td colspan="4" align="center">
+                                <label>
+                                    Solicita tu factura por WhatsApp
+                                    durante el mes en curso.
+                                </label><br />
                                 ====  GRACIAS POR SU COMPRA  ====
                             </td>
                         </tr>
@@ -208,8 +237,7 @@
 </div>
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#divTicket").printThis();
     });
 

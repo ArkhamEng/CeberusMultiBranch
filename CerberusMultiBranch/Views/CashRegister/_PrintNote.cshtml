@@ -15,47 +15,27 @@
                         {
                             <tr>
                                 <td>
-                                    <img src="~/Content/Images/logo2.png" style="width:150px">
+                                    <img src="@Url.Content(Model.Branch.LogoPath)" style="width:150px">
                                 </td>
-                            </tr>
-                            <tr><td colspan="2" style="height:10px"></td></tr>
-                            <tr>
-                                <td>
-                                    <label class="control-label">
-                                        Autopartes Bicentenario S.A. de C.V.
-                                    </label><br />
-                                    APB 1000811 4Q4 <br />AV DE LA MANCHA 568 INT. 11-B<br />
-                                    LOMAS DE ZAPOPAN 45130 <br />ZAPOPAN JAL MX
-                                </td>
+
                             </tr>
                         }
                         else
                         {
                             <tr>
                                 <td>
-                                    <img src="~/Content/Images/rebilogo2.png" style="width:180px; height:90px">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <label class="control-label">
-                                        AUTOPARTES BICENTENARIO
-                                    </label><br />
-                                    HEME950906491 <br />AV MANUEL CARPIO ESQ. AQUILES SERDAN<br />
-                                    COLONIA CENTRO C.P. 95499 <br />COSAMALOAPAN, VER.
+                                    <img src="@Url.Content(Model.Branch.LogoPath)" style="width:180px; height:90px">
                                 </td>
                             </tr>
                         }
+                        <tr>
+                            <td>
+                                @Html.Raw(Model.Branch.NoteMemberHtml)
+                            </td>
                     </table>
                 </td>
                 <td width="292px" align="center">
-                    @if (User.Identity.GetBranchId() != 2)
-                    {
-                        <div style="width:250px">
-                            <label>Expedida en sucursal</label><br />
-                            @Model.Branch.Address
-                        </div>
-                    }
+                    @Html.Raw(Model.Branch.NoteLocalHtml)
                 </td>
                 <td width="244px">
                     <table style="width:100%" class="table-bordered">
@@ -96,8 +76,8 @@
                                 {
                                     var debt = (Model.TotalTaxedAmount - Model.SalePayments.Sum(s => s.Amount));
 
-                                    <label>Monto pagado </label>   <a>@Model.SalePayments.Sum(s => s.Amount).ToMoney()</a><br />
-                                    
+                                    <label>Monto pagado </label> <a>@Model.SalePayments.Sum(s => s.Amount).ToMoney()</a><br />
+
                                     <label>Monto restante </label> <a>@debt.ToMoney()</a><br />
                                 }
 
@@ -106,7 +86,7 @@
                                     <label>Tipo de pago:</label>
                                     <a>@PaymentMethod.Mixto.ToString()</a><br />
                                 }
-                                else if(Model.SalePayments.Count == Cons.One)
+                                else if (Model.SalePayments.Count == Cons.One)
                                 {
                                     <label>Tipo de pago:</label>
                                     <a>@Model.SalePayments.First().PaymentMethod.ToString()</a><br />
@@ -119,7 +99,7 @@
                         @if (Model.Status == TranStatus.Revision)
                         {
                             <tr>
-                                <td colspan="2" class="text-center"> 
+                                <td colspan="2" class="text-center">
                                     <label>Expira </label> @Model.Expiration.ToString("dd/MM/yyyy")
                                 </td>
                             </tr>
@@ -173,12 +153,15 @@
             </tr>
             <tr>
                 <td colspan="3">
-                    <table style="width:100%; min-height:600px; border:1px solid gray;">
+                    <table style="width:100%; min-height:550px; border:1px solid gray;">
                         <tr style="border-bottom:1px solid gray; height:15px">
-                            <td style="border-right:1px solid gray; width:10%" align="center">
+                            <td style="border-right:1px solid gray; width:6%" align="center">
+                                <label>Part.</label>
+                            </td>
+                            <td style="border-right:1px solid gray; width:8%" align="center">
                                 <label>Código</label>
                             </td>
-                            <td style="border-right:1px solid gray; width:10%" align="center">
+                            <td style="border-right:1px solid gray; width:8%" align="center">
                                 <label>Cve. Sat</label>
                             </td>
                             <td style="border-right:1px solid gray; width:40%" align="center">
@@ -194,6 +177,7 @@
                                 <label>Total</label>
                             </td>
                         </tr>
+                        @{ int part = 1;}
                         @foreach (var item in Model.SaleDetails)
                         {
                             string st = "height:20px";
@@ -203,10 +187,13 @@
                             }
 
                             <tr style="@st">
-                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                <td class="text-center" style="border-right:1px solid gray; width:6%" valign="top">
+                                    @Html.DisplayUpperFor(mItem => part)
+                                </td>
+                                <td class="text-center" style="border-right:1px solid gray; width:8%" valign="top">
                                     @Html.DisplayUpperFor(mItem => item.Product.Code)
                                 </td>
-                                <td class="text-center" style="border-right:1px solid gray; width:10%" valign="top">
+                                <td class="text-center" style="border-right:1px solid gray; width:8%" valign="top">
                                     @Html.DisplayUpperFor(mItem => item.Product.Category.SatCode)
                                 </td>
                                 <td style="border-right:1px solid gray; width:40%" valign="top">
@@ -222,8 +209,11 @@
                                     @Html.DisplayFor(mItem => item.Amount)
                                 </td>
                             </tr>
+                            part++;
                         }
+
                         <tr>
+                            <td style="border-right:1px solid gray;" />
                             <td style="border-right:1px solid gray;" />
                             <td style="border-right:1px solid gray;" />
                             <td style="border-right:1px solid gray;" />
@@ -231,12 +221,22 @@
                             <td style="border-right:1px solid gray;" />
                             <td />
                         </tr>
+                        <tr>
+                            <td colspan="5" style="height: 23px; border-top: 1px solid gray; "/>
+                            <td style="border: 1px solid gray;" class="text-right">
+                                <label class="control-label">
+                                    @Html.DisplayName("Total de piezas")
+                                </label>
+                            </td>
+                            <td class="text-right" style="border: 1px solid gray;">
+                                @Model.SaleDetails.Sum(x => x.Quantity)
+                            </td>
+                        </tr>
 
                         <tr style="height:23px; border-top:1px solid gray;">
-                            <td colspan="4" rowspan="3">
+                            <td colspan="5" rowspan="3">
                                 IMPORTE CON LETRA <br />
                                 @Model.TotalTaxedAmount.ToText()
-                                
                             </td>
 
                             <td class="text-right" style="border:1px solid gray; width:10%">
@@ -276,7 +276,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="3">
+                <td colspan="4">
                     <label>
                         Estimado cliente, solo se acepta mercancía en devolución si cumple con las siguientes políticas:
                     </label>
@@ -284,9 +284,13 @@
                     1. Mercancía sin daño o retrabajo<br />
                     2. Mercancía con empaque original<br />
                     3. Cuenta con un máximo de 30 días fecha factura<br />
-                    4. Contar con la autorización de su ejecutivo de venta
+                    4. Contar con la autorización de su ejecutivo de venta<br /><br />
+                    <label>
+                        Solicita tu factura por WhatsApp
+                        durante el mes en curso.
+                    </label><br />
                 </td>
-            </tr>
+            </tr>           
         </table>
     </div>
 </div>
@@ -294,13 +298,11 @@
 
 
 <script>
-    $(document).ready(function ()
-    {
+    $(document).ready(function () {
         $("#divNote").printThis();
     });
 
-    function PrintNote()
-    {
+    function PrintNote() {
         $("#divNote").printThis();
     }
 </script>
