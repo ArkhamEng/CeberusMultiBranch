@@ -1,6 +1,27 @@
 ﻿@model ICollection<CerberusMultiBranch.Models.Entities.Operative.ShoppingCart>
 @using CerberusMultiBranch.Support
 
+<style>
+    .cartDivScroll {
+        overflow-y: scroll;
+        /*scrollbar-width: none;*/ /* Firefox */
+        /*-ms-overflow-style: none;*/
+        height: 400px;
+        width: 100%;
+        margin-top: -20px;
+        scrollbar-gutter: stable;
+    }
+
+  
+    .divCartFooter {
+        width: 100%;
+        margin-top: 20px;
+        display: flex;
+        border-top: solid;
+        border-width: 1px;
+    }
+</style>
+
 @if (Model.Count > 0)
 {
     @Html.HiddenFor(m => m.First().ClientId)
@@ -44,31 +65,49 @@
     </div>
 
     <div class="panel panel-default">
-        <div class="panel-body" style="overflow-y:auto; max-height:300px">
-            <table id="tbCartDetails" class="table table-bordered panel panel-primary small">
+        <div class="panel-body" style="padding-right: 0px;">
+            <table id="tbCartDetails" class="table table-bordered panel panel-primary small" style="width:calc(100% - 17px)">
                 <thead class="panel-heading">
                     <tr>
-                        <th></th>
-                        <th class="text-center">@Html.DisplayName("Descripción")</th>
-                        <th class="text-center">@Html.DisplayName("Precio")</th>
-                        <th class="text-center">@Html.DisplayName("Cantidad")</th>
-                        <th class="text-center">@Html.DisplayName("Total")</th>
-                        <th align="center" style="align-items:center !important">
+                        <th style="width: 10%" class="text-center">
+                            @Html.DisplayName("Part")
+                        </th>
+                        <th style="width: 10%" class="text-center">
+                            @Html.DisplayName("Img")
+                        </th>
+                        <th style="width: 40%;" class="text-center">
+                            @Html.DisplayName("Descripción")
+                        </th>
+                        <th style="width: 10%;" class="text-center">
+                            @Html.DisplayName("Precio")
+                        </th>
+                        <th style="width: 10%;" class="text-center">
+                            @Html.DisplayName("Cantidad")
+                        </th>
+                        <th style="width: 10%;" class="text-center">
+                            @Html.DisplayName("Total")
+                        </th>
+                        <th style="width:10%;" class="text-center">
                             <button class="btn btn-primary btn-sm center" type="button" onclick="EmptyCart()" title="vaciar carrito">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </th>
                     </tr>
                 </thead>
-                <tbody>
-
+            </table>
+            <div class="cartDivScroll">
+                <table class="table table-bordered panel panel-primary small" style=" width:100%">
+                    @{ int part = 1; }
                     @foreach (var item in Model)
                     {
                         <tr class="@item.RowClass">
-                            <td class="col-md-1" align="center">
+                            <td style="width: 10%" class="text-center">
+                                @Html.DisplayFor(x => part)
+                            </td>
+                            <td style="width: 10%" align="center">
                                 <img src="@item.Image" class="img-responsive" style="max-height:50px" />
                             </td>
-                            <td>
+                            <td style="width: 40%">
                                 <label>
                                     @Html.DisplayFor(modelItem => item.Product.Code)
                                 </label>
@@ -78,7 +117,7 @@
 
                             @if (item.Product.ProductType == CerberusMultiBranch.Models.Entities.Catalog.ProductType.Single)
                             {
-                                <td class="col-md-2 text-center">
+                                <td style="width: 10%" class="text-center">
                                     <h5 id="txtPrice" class="text-info" onmouseover="SetPointer(this)" onclick="ChangePrice(@item.ProductId)">
                                         <u>
                                             @Html.DisplayFor(modelItem => item.TaxedPrice)
@@ -88,46 +127,61 @@
                             }
                             else
                             {
-                                <td class="col-md-2 text-center">
+                                <td style="width: 10%" class="text-center">
                                     <h5 id="txtPrice" class="text-info">
                                         @Html.DisplayFor(modelItem => item.TaxedPrice)
                                     </h5>
                                 </td>
                             }
-                            <td class="col-md-1 text-info text-center">
+                            <td style="width: 10%" class="text-info text-center">
                                 <h5 id="txtQuantity" class="text-info" onmouseover="SetPointer(this)" onclick="ChangeQuantity(@item.ProductId)">
                                     <u>
                                         @Html.DisplayFor(modelItem => item.Quantity)
                                     </u>
                                 </h5>
                             </td>
-                            <td class="text-right">
-                                <h5 id="txtAmount" class="text-right">
+                            <td style="width: 10%" class="text-center">
+                                <h5 id="txtAmount" class="text-center">
                                     @Html.DisplayFor(modelItem => item.TaxedAmount)
                                 </h5>
                             </td>
-                            <td align="center">
+                            <td style="width: 10%" align="center">
                                 <button class="btn btn-danger btn-sm center" type="button" onclick="RemoveFromCart('@item.ProductId')" title="Quitar del carrito">
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
                         </tr>
+                        part++;
                     }
-                </tbody>
-            </table>
+                </table>
+            </div>
+            <div class="divCartFooter" style="font-size: large">
+                <div class="text-right" style="width: 70%; font-weight: bold;">
+                    Totales
+                </div>
+                <div class="text-center" style="width:10%;">
+                    @Model.Sum(x => x.Quantity)
+                </div>
+                <div class="text-center" style="width:10%;">
+                    @Model.Sum(x => x.TaxedAmount).ToMoney()
+                </div>
+                <div style="width: 10%;" />
+            </div>
         </div>
     </div>
 
-  }
- else
+}
+else
 {
     <div class="panel-body">
-       <div class="col-md-offset-2 col-md-8">
-           <p><h3>
-              Aun no has agregado ningun producto al carrito, Agregaga productos
-              desde el Catálogo selecciona la opcion PRODUCTOS en el menú lateral
-           </h3></p>
-         </div>
+        <div class="col-md-offset-2 col-md-8">
+            <p>
+                <h3>
+                    Aun no has agregado ningun producto al carrito, Agregaga productos
+                    desde el Catálogo selecciona la opcion PRODUCTOS en el menú lateral
+                </h3>
+            </p>
+        </div>
     </div>
 }
 
