@@ -11,7 +11,7 @@
             <tr>
                 <td width="300px">
                     <table style="width:100%">
-                        @{ string logoStyle = User.Identity.GetBranchId() != 2 ? "width:150px;" : "width:180px; height:90px";}
+                        @{ string logoStyle = User.Identity.GetBranchId() != 2 ? "width:150px;" : "width:150px; height:75px";}
 
                         <tr>
                             <td>
@@ -275,10 +275,13 @@
                     1. Mercancía sin daño o retrabajo<br />
                     2. Mercancía con empaque original<br />
                     3. Cuenta con un máximo de 30 días fecha factura<br />
-                    4. Contar con la autorización de su ejecutivo de venta<br /><br />
+                    4. Contar con la autorización de su ejecutivo de venta<br />
                     <label>
                         Solicita tu factura por WhatsApp
                         durante el mes en curso.
+                    </label><br />
+                    <label>
+                        * No hay cancelación en preventas.
                     </label><br />
                 </td>
             </tr>
