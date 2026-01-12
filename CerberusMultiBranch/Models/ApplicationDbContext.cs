@@ -4,6 +4,7 @@ using CerberusMultiBranch.Models.Entities.Finances;
 using CerberusMultiBranch.Models.Entities.Inventory;
 using CerberusMultiBranch.Models.Entities.Operative;
 using CerberusMultiBranch.Models.Entities.Purchasing;
+using CerberusMultiBranch.Support;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Data.Entity;
 
@@ -137,7 +138,7 @@ namespace CerberusMultiBranch.Models
 
         #endregion
 
-        public ApplicationDbContext() : base("LocalConnection", throwIfV1Schema: false)
+        public ApplicationDbContext() : base(Cons.Connection, throwIfV1Schema: false)
         { }
 
         public static ApplicationDbContext Create()

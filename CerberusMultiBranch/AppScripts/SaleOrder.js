@@ -398,6 +398,7 @@ function SumAmount(isFirstLoad) {
 
         let exist = false;
 
+               
         $(Details).each(function (index, product)
         {
             if (product.ProductId == detail.ProductId)

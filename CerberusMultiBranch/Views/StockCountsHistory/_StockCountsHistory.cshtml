@@ -1,0 +1,324 @@
+﻿@model List<CerberusMultiBranch.Models.ViewModels.Inventory.StockCountsHistory>
+@using CerberusMultiBranch.Support
+
+@Scripts.Render("~/bundles/dayjs")
+<script src="~/Scripts/printThis.js"></script>
+<table class="table dt-responsive nowrap table-bordered small hidden" style="width:100%" id="DivGridHistory">
+    <thead>
+        <tr>
+            <th>Fecha</th>
+            <th>Sucursal</th>
+            <th>Categoría</th>
+            <th>Descripción</th>
+            <th>Líneas contadas</th>
+            <th>Líneas correctas</th>
+            <th>% de líneas</th>
+            <th>Costo Total</th>
+            <th>Costo Total Varianza</th>
+            <th>Usuario</th>
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Compleation)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BranchName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PartSystemName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                @*<td style"width:200px">
+                        @Html.TextAreaFor(modelItem => item.Comment, new { style = "width:400px !important;" })
+                    </td>*@
+                <td>
+                    @Html.DisplayFor(modelItem => item.LinesCounted)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CorrectLines)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LinesAccurancy) %
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalCost)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TotalCostVariance)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User)
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-sm"
+                            onclick="GetDetails('@item.StockCountId')">
+                        <span class="fa fa-eye"></span>
+                        Detalle
+                    </button>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+
+</table>
+
+<!-- Modal Popup -->
+<div id="Popup" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width:65%">
+        <div class="modal-content">
+            <div class="modal-header btn-primary">
+            
+                <button type="button" class="close" data-dismiss="modal">
+                    &times;
+                </button>
+                <h4 class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+
+                <!-- StockCount Template -->
+                <div class="container" style="padding-top:10px">
+                    <div class="panel panel-danger" id="scContainer" style="padding-bottom:0px">
+                        <div class="panel-body">
+                            <span style="font-size:x-large">Detalle Recuentos</span>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td style="width:200px;text-align:center">
+                                                    <span class="input-group-addon"><a>Sucursal</a></span>
+                                                    <div class="input-group">
+                                                        <label style="font-size:small" id="BranchName" />
+                                                    </div>
+                                                </td>
+                                                <td style="width:200px;text-align:center">
+                                                    <span class="input-group-addon"><a>Categoría</a></span>
+                                                    <div class="input-group">
+                                                        <label style="font-size:small" id="PartSystemName" />
+                                                    </div>
+                                                </td>
+
+                                                <td style="width:200px;text-align:center">
+                                                    <span class="input-group-addon"><a>Nombre</a></span>
+                                                    <div class="input-group">
+                                                        <label style="font-size:small" id="Description" />
+                                                    </div>
+                                                </td>
+                                                <td style="width:200px;text-align:center">
+                                                    <span class="input-group-addon"><a>Fecha de Inicio</a></span>
+                                                    <div class="input-group">
+                                                        <label style="font-size:small" id="Compleation" />
+                                                    </div>
+                                                </td>
+                                                <td style="width:200px;text-align:center">
+                                                    <span class="input-group-addon"><a>Usuario</a></span>
+                                                    <div class="input-group">
+                                                        <label style="font-size:small" id="User" />
+                                                    </div>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <span class="input-group-addon"><a>Observación</a></span>
+                                    <div class="input-group" style="width:100%">
+                                        <textarea rows="3" class="form-control text-uppercase input-sm textwrapper" id="Comment"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <br>
+                                    <table class="Footer" id="footer">
+                                        <tr>
+                                            <th style="width:200px;text-align:center"><label style="font-size:small" class="control-label" id="lineCounted"></label></th>
+                                            <th style="width:500px;text-align:center"><label style="font-size:small" class="control-label" id="correctLines"></label></th>
+                                            <th style="width:200px;text-align:center"><label style="font-size:small" class="control-label" id="linesAccurancy"></label></th>
+                                            <th style="width:200px;text-align:center"></th>
+                                            <th style="width:200px;text-align:center"><label style="font-size:small" class="control-label" id="currentTotal"></label></th>
+                                            <th style="width:200px;text-align:center"></th>
+                                            <th style="width:200px;text-align:center"> <label style="font-size:small" class="control-label" id="TVar"></label></th>
+                                            <th style="width:200px;text-align:center"> <label style="font-size:small" class="control-label" id="TCosVar"></label></th>
+                                            <th style="width:50px;text-align:center"></th>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <br />
+
+                        <div class="panel-footer clearfix" id="panel-footer">
+
+                            <div class="col-lg-2" style="align-content:center">
+                                <button type="button" class="btn btn-default" id="btnImp" style="width:100px">
+                                    <span class="fa fa-print"></span>
+                                    Imprimir
+                                </button>
+                            </div>
+                            <div class="col-lg-10"></div>
+                        </div>
+                    </div>
+                    <div class="row" id="scContainerBody">
+                        <div class="container">
+                            <table class="table dt-responsive table-bordered small dataTable" id="DivGrid">
+                                <thead>
+                                    <tr>
+                                        <th style="width:200px;text-align:center">Código</th>
+                                        <th style="width:400px;text-align:center">Descripción</th>
+                                        <th style="width:200px;text-align:center">Costo Unitario</th>
+                                        <th style="width:200px;text-align:center">Existencias</th>
+                                        <th style="width:200px;text-align:center">Existencia real</th>
+                                        <th style="width:200px;text-align:center">Varianza</th>
+                                        <th style="width:200px;text-align:center">Costo Varianza</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contenido"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" id="btnClosePopup" value="Close" data-dismiss="modal" class="btn btn-danger" />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    var obj = [];
+    obj = @Html.Raw(Json.Encode(Model));
+    var dataStock = [];
+
+    $(document).ready(function () {
+
+        $("#DivGridHistory").removeClass('hidden');
+
+        $("#btnImp").click(function () {
+        
+            $("#scContainer, #scContainerBody").printThis();
+        });
+
+        var printOp = { Title: 'Histórico de Recuentos', Columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9] };
+        Paginate("#DivGridHistory", 10, true, "#txtFilter", false, "#GridButtons", printOp);
+    });
+
+    function GetDetails(stockCountId) {
+        for (var i = 0; i < obj.length; i++) {
+            let sc = obj[i].StockCountId;
+            if (sc == stockCountId) {
+                dataStock = obj[i];
+            }
+        }
+
+         GetModal();
+       }
+
+
+    function parseJsonDate(jsonDateString) {
+        var date = new Date(parseInt(jsonDateString.replace('/Date(', '')));
+
+        var dateStr =
+            date.getFullYear() + "-" +
+            ("00" + (date.getMonth() + 1)).slice(-2) + "-" +
+            ("00" + date.getDate()).slice(-2) + " " +
+            ("00" + date.getHours()).slice(-2) + ":" +
+            ("00" + date.getMinutes()).slice(-2) + ":" +
+            ("00" + date.getSeconds()).slice(-2);
+        return dateStr;
+    }
+
+    function GetModal() {
+
+        ////////////// Encabezado //////////////
+        document.getElementById("BranchName").innerHTML = dataStock.BranchName;
+        document.getElementById("PartSystemName").innerHTML = dataStock.PartSystemName;
+        document.getElementById("Description").innerHTML = dataStock.Description;
+        document.getElementById("Compleation").innerHTML = parseJsonDate(dataStock.Compleation);
+        document.getElementById("Comment").innerHTML = dataStock.Comment;
+        document.getElementById("User").innerHTML = dataStock.User;
+
+        document.getElementById("lineCounted").innerHTML = "Líneas contadas: " + dataStock.LinesCounted;
+        document.getElementById("correctLines").innerHTML = "Líneas correctas: " + dataStock.CorrectLines;
+        document.getElementById("linesAccurancy").innerHTML = "% de líneas: " + dataStock.LinesAccurancy;
+    
+        document.getElementById("TVar").innerHTML = "Total: " + dataStock.TotalCost;
+        document.getElementById("TCosVar").innerHTML = "Total: $"+ dataStock.TotalCostVariance;
+
+       
+        ////////////// Encabezado //////////////
+
+        ////////////// Tabla Detalle //////////////
+        $("#contenido").html('');
+        let ctotal = 0;
+        dataStock.StockCountsHistoryDetail.forEach(function (r) {
+
+            let colorQuantity = Colors(r.VarianceQty);
+            let colorVarCost = Colors(r.VarianceCost);
+
+            $("#contenido").append("<tr class='QtyValid'><td class='QtyValidValue'  style='width:200px;text-align:center;font-weight:bold;'>" + r.ProductCode + "</td><td  style='width:400px;text-align:left'>" + r.ProductName + "</td> <td style='width:200px;text-align:center'>" + r.UnitCost + "</td><td style='width:200px;text-align:center'>" + r.CurrentQty
+                + "</td> <td  style='width:200px;text-align:center'>"  + r.CountQty + "</td><td  style='width:200px;text-align:center;font-weight:bold;' bgcolor='" + colorQuantity.backGroundColor + "'><font color='" + colorQuantity.fontColor + "' >"
+                + r.VarianceQty + "</font></td><td style='width:200px;text-align:center;font-weight:bold;' bgcolor='" + colorVarCost.backGroundColor + "'><font color='" + colorVarCost.fontColor + "' > $" + r.VarianceCost + "</font></td></tr>");
+            ctotal = ctotal + r.CurrentQty;
+        });
+
+        document.getElementById("currentTotal").innerHTML = "Total Existencias: " + ctotal;
+
+        ////////////// Tabla Detalle //////////////
+
+        $("#Popup").modal("show");
+    }
+
+
+    function Colors(value) {
+        let fontColor;
+        let backGroundColor;
+
+        if (value > 0) {
+            backGroundColor = "#d60000"; //Rojo
+            fontColor = "#ffffff";
+        }
+        else if (value === 0) {
+            backGroundColor = "1BBD1B";//Verde
+            fontColor = "#ffffff";
+        }
+        else if (value < 0) {
+            backGroundColor = "#d60000";  //Rojo
+            fontColor = "#ffffff";
+        }
+        else {
+            backGroundColor = "1BBD1B";//Verde
+            fontColor = "#ffffff";
+        }
+
+        return {
+            backGroundColor,
+            fontColor
+        }
+    }
+
+
+
+
+</script>
+
+

@@ -1659,7 +1659,7 @@ namespace CerberusMultiBranch.Controllers.Catalog
         [CustomAuthorize(Roles = "Supervisor")]
         [HttpPost]
         public ActionResult SearchMovements(int branchId, string description, DateTime? beginDate, DateTime? endDate)
-        {
+         {
 
             string code = null;
             string[] arr = new List<string>().ToArray();

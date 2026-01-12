@@ -1,94 +1,148 @@
-﻿@model IEnumerable<CerberusMultiBranch.Models.Entities.Inventory.StockCount>
+﻿@model CerberusMultiBranch.Models.ViewModels.Inventory.StockCountsViewModel
 
 @{
-    ViewBag.Title = "Index";
-    Layout = "~/Views/Shared/PageLayout.cshtml";
+    ViewBag.Title = "Recuentos de existencias ";
+    ViewBag.Class = "fa fa-dropbox";
+
 }
 
-<h2>Index</h2>
+@Scripts.Render("~/bundles/StockCounts")
+@Scripts.Render("~/bundles/jqueryval")
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Branch.Name)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.SystemId)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Description)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Comment)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Compleation)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LinesCounted)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CorrectLines)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.LinesAccurancy)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalCost)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TotalCostVariance)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.User)
-        </th>
-        <th></th>
-    </tr>
+<script src="~/Scripts/printThis.js"></script>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Branch.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.SystemId)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Comment)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Compleation)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LinesCounted)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CorrectLines)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.LinesAccurancy)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalCost)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TotalCostVariance)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.User)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.StockCountId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.StockCountId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.StockCountId })
-        </td>
-    </tr>
-}
 
-</table>
+<br />
+
+<div class="panel panel-default">
+    <div class="panel-body small">
+        @Html.HiddenFor(m => m.StockCountId)
+        <div class="form-group col-md-7">
+            @Html.LabelFor(m => m.Name, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-tag"></i></span>
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-4 col-md-offset-1">
+            @Html.LabelFor(m => m.BeginDate, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                @Html.EditorFor(model => model.BeginDate, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off", @readonly = true } })
+            </div>
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(m => m.BranchId, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-industry"></i></span>
+                @Html.DropDownListFor(model => model.Branches, new SelectList(Model.Branches, "Id", "Name"), htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(m => m.PartSysmtemId, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-list"></i></span>
+                @Html.DropDownListFor(model => model.Systems, new SelectList(Model.Systems, "Id", "Name"), htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-4">
+            @Html.LabelFor(m => m.MarkId, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-list"></i></span>
+                @Html.DropDownListFor(model => model.Marks, new SelectList(Model.Marks, "Id", "Name"), htmlAttributes:
+               new { @class = "form-control text-uppercase input-sm" })
+            </div>
+        </div>
+
+        <div class="form-group col-md-12">
+            @Html.LabelFor(m => m.Observations, htmlAttributes: new { @class = "control-label" })
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-comments"></i></span>
+                @Html.EditorFor(model => model.Observations, new { htmlAttributes = new { @class = "form-control text-uppercase input-sm", autocomplete = "off" } })
+                @Html.ValidationMessageFor(model => model.Observations, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-footer clearfix">
+        <div class="pull-right">
+            <button type="button" class="btn btn-default" id="btnImp" title="Registro Producto" style="width:100px">
+                <span class="fa fa-print"></span>
+                Imprimir
+            </button>
+            <button type="button" class="btn btn-danger" id="btnCancel" value="Submit" style="width:100px">
+                <span class="fa fa-close"></span>
+                Cancelar
+            </button>
+            <button type="button" class="btn btn-success" id="btnAccept" title="Registro Producto" style="width:100px">
+                <span class="fa fa-check"></span>
+                Aceptar
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body small">
+        <div class="row">
+            <div class="col-lg-12">
+                <label class="control-label" for="Name">Producto</label>
+                <div class="input-group">
+                    <input class="form-control input-sm text-uppercase"
+                           placeholder="Clave o nombre de producto"
+                           style="width:100% !important"
+                           id="ProductFilter"
+                           name="ProductFilter"
+                           type="text">
+                    <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary btn-sm" id="btnBegingSearchProduct" tooltip-title="Agregar Productos">
+                            <i id="iSearchProduct" class="fa fa-plus"></i>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+        <table class="tfood" id="footer">
+            <tr>
+                <th style="width:200px;text-align:center"><label class="control-label" id="lineCounted"></label></th>
+                <th style="width:500px;text-align:center"><label class="control-label" id="correctLines"></label></th>
+                <th style="width:200px;text-align:center"><label class="control-label" id="linesAccurancy"></label></th>
+                <th style="width:200px;text-align:center"></th>
+                <th style="width:200px;text-align:center"><label class="control-label" id="currentTotal"></label></th>
+                <th style="width:200px;text-align:center"></th>
+                <th style="width:200px;text-align:center"> <label class="control-label" id="TVar"></label></th>
+                <th style="width:200px;text-align:center"> <label class="control-label" id="TCosVar"></label></th>
+                <th style="width:50px;text-align:center"></th>
+            </tr>
+        </table>
+    </div>
+
+    <div class="panel-group">
+        <table class="table dt-responsive nowrap table-bordered small" id="DivGrid">
+            <thead>
+                <tr>
+                    <th style="width:200px;text-align:center">Código</th>
+                    <th style="width:500px;text-align:center">Descripción</th>
+                    <th style="width:200px;text-align:center">Costo Unitario</th>
+                    <th style="width:200px;text-align:center">Existencias</th>
+                    <th style="width:200px;text-align:center">Existencia real</th>
+                    <th style="width:200px;text-align:center">Varianza</th>
+                    <th style="width:200px;text-align:center">Costo Varianza</th>
+                    <th style="width:50px;text-align:center"></th>
+                </tr>
+            </thead>
+            <tbody id="contenido"></tbody>
+        </table>
+    </div>
+</div>
+
+

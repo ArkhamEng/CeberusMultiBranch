@@ -4,18 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Reflection;
-using System.Web;
 
 namespace CerberusMultiBranch.Support
 {
     public class DBHelper
     {
-        const string connectionName = "LocalConnection";
         public static bool ProcessExternalProducts(int providerId)
         {
-            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName].ToString();
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[Cons.Connection].ToString();
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();
@@ -32,7 +29,7 @@ namespace CerberusMultiBranch.Support
 
         public static bool SetProductState(int productId, int branchId, string user, bool isLocked)
         {
-            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName].ToString();
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[Cons.Connection].ToString();
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();
@@ -59,7 +56,7 @@ namespace CerberusMultiBranch.Support
         {
             var dt = ToDataTable(list);
 
-            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName].ToString();
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[Cons.Connection].ToString();
 
             using (var connection = new SqlConnection(cs))
             {
@@ -109,7 +106,7 @@ namespace CerberusMultiBranch.Support
 
         public static bool SearchProduct(int branchId, string[] words)
         {
-            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[connectionName].ToString();
+            var cs = System.Configuration.ConfigurationManager.ConnectionStrings[Cons.Connection].ToString();
             using (SqlConnection conn = new SqlConnection(cs))
             {
                 conn.Open();

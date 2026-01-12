@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace CerberusMultiBranch.Support
+﻿namespace CerberusMultiBranch.Support
 {
     public struct ConfigVariable
     {
@@ -62,8 +57,6 @@ namespace CerberusMultiBranch.Support
                 public const int Success = 200;
                 public const int ServerError = 500;
                 public const int UnAuthorized = 401;
-                
-
             }
         }
 
@@ -127,9 +120,9 @@ namespace CerberusMultiBranch.Support
 
         public const string DefaultPassword = "ADn9JXAPolz3R1QmEjw7chz42neVTLn426+eRtgaG2TvE2mR03Ri7TtoKH8iWJyuVw==";
 
-        public const int DaysToCancel = 30;
+        public const int DaysToCancel = 60;
 
-        public const int DaysToModify = 30;
+        public const int DaysToModify = 31;
 
         public const int DescriptionLength = 300;
 
@@ -140,6 +133,8 @@ namespace CerberusMultiBranch.Support
         public const char SplitChar = ',';
 
         public const string NullString = "null";
+
+        public const string Connection = "CloudConnection";
     }
 
     public struct FileStruct

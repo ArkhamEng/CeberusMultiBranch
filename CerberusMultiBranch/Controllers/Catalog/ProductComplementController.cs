@@ -126,20 +126,43 @@ namespace CerberusMultiBranch.Controllers.Catalog
             {
                 int branchId = User.Identity.GetBranchId();
 
-                var model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m => m.MovementDate).ToList();
+                List<StockMovement> model = null;
 
-                if (model.Count == Cons.Zero)
+                var date = (from m in db.StockMovements
+                            join s in db.StockCounts on m.StockCountId equals s.StockCountId
+                            join sd in db.StockCountDetails on s.StockCountId equals sd.StockCountId
+                            where (m.BranchId == branchId && m.ProductId == id)
+                            orderby m.MovementDate descending
+                            select m).FirstOrDefault();
+
+                if (date != null)
                 {
-                    return Json(new JResponse
-                    {
-                        Result = Cons.Responses.Info,
-                        Code = Cons.Responses.Codes.RecordNotFound,
-                        Header = "Producto sin movimientos",
-                        Body = "El producto, aun no tiene movimientos registrados en esta sucursal"
-                    });
+                    model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId && sm.MovementDate > date.MovementDate).OrderByDescending(m => m.MovementDate).ToList();
+                    
+                    ViewBag.Date = string.Format($"Fecha último corte: { date.MovementDate }        Cantidad: { date.Quantity }        Almacenista: { date.User }");
+                }
+                else
+                {
+                   model = db.StockMovements.Where(sm => sm.ProductId == id && sm.BranchId == branchId).OrderByDescending(m => m.MovementDate).ToList();
+
+                    ViewBag.Date = string.Format("No hay corte para este producto");
                 }
 
+                //if (model.Count == Cons.Zero)
+                //{
+                //    return Json(new JResponse
+                //    {
+                //        Result = Cons.Responses.Info,
+                //        Code = Cons.Responses.Codes.RecordNotFound,
+                //        Header = "Producto sin movimientos",
+                //        Body = "El producto, aun no tiene movimientos registrados en esta sucursal"
+          
 
+                //    });
+
+                //}
+
+       
                 return PartialView("_ProductMovement", model);
             }
             catch (Exception)
